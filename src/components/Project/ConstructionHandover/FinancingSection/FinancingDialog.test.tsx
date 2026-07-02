@@ -1,5 +1,6 @@
 import mockI18next from '@/mocks/mockI18next';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import FinancingDialog from './FinancingDialog';
 
 const mockDispatch = jest.fn();
@@ -58,6 +59,7 @@ describe('FinancingDialog', () => {
   });
 
   it('uses dialog values for add flow and only reads id from save response', async () => {
+    const user = userEvent.setup();
     const onRowSaved = jest.fn();
     const handleClose = jest.fn();
 
@@ -94,7 +96,7 @@ describe('FinancingDialog', () => {
       target: { value: 'Local description' },
     });
 
-    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+    await user.click(screen.getByTestId('submit-financing-row-button'));
 
     await waitFor(() => {
       expect(mockPostFinancingRow).toHaveBeenCalledWith({
@@ -124,6 +126,7 @@ describe('FinancingDialog', () => {
   });
 
   it('uses local edited values in edit flow instead of remapping response payload', async () => {
+    const user = userEvent.setup();
     const onRowSaved = jest.fn();
 
     mockPatchFinancingRow.mockResolvedValue({
@@ -158,7 +161,7 @@ describe('FinancingDialog', () => {
       target: { value: 'Edited locally' },
     });
 
-    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+    await user.click(screen.getByTestId('submit-financing-row-button'));
 
     await waitFor(() => {
       expect(mockPatchFinancingRow).toHaveBeenCalledWith(
@@ -190,6 +193,7 @@ describe('FinancingDialog', () => {
   });
 
   it('normalizes formatted budget value to decimal string in request payload', async () => {
+    const user = userEvent.setup();
     mockPostFinancingRow.mockResolvedValue({ id: 'created-43' });
 
     render(
@@ -217,7 +221,7 @@ describe('FinancingDialog', () => {
       target: { value: 'Formatted budget row' },
     });
 
-    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+    await user.click(screen.getByTestId('submit-financing-row-button'));
 
     await waitFor(() => {
       expect(mockPostFinancingRow).toHaveBeenCalledWith({
@@ -232,6 +236,7 @@ describe('FinancingDialog', () => {
   });
 
   it('updates budget value from input edits before submit', async () => {
+    const user = userEvent.setup();
     mockPatchFinancingRow.mockResolvedValue({ id: 'row-2' });
 
     render(
@@ -259,7 +264,7 @@ describe('FinancingDialog', () => {
       target: { value: '250,75€' },
     });
 
-    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+    await user.click(screen.getByTestId('submit-financing-row-button'));
 
     await waitFor(() => {
       expect(mockPatchFinancingRow).toHaveBeenCalledWith(

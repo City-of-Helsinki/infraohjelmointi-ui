@@ -34,6 +34,41 @@ if (!globalThis.crypto) {
 // Needed for React 18 so async updates are treated as act-aware in tests.
 (globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
+// Some console warnings are possible in tests, but they can clutter the output.
+// This code overrides console.error to ignore specific warnings that are known and not relevant to the tests.
+const ignoredConsoleErrors = [
+  'Warning: The current testing environment is not configured to support act(...)',
+];
+
+const originalConsoleError = console.error;
+console.error = (...args: unknown[]) => {
+  const allArgs = args
+    .map((arg) => {
+      if (typeof arg === 'string') return arg;
+      return String(arg ?? '');
+    })
+    .join(' ');
+
+  const isAuthProviderActWarning =
+    allArgs.includes('inside a test was not wrapped in act(...)') &&
+    allArgs.includes('AuthProvider');
+
+  if (isAuthProviderActWarning || ignoredConsoleErrors.some((msg) => allArgs.includes(msg))) {
+    return;
+  }
+  originalConsoleError(...args);
+};
+
+const originalEmitWarning = process.emitWarning.bind(process);
+process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
+  const message = typeof warning === 'string' ? warning : warning?.message;
+  if (typeof message === 'string' && message.includes('punycode')) {
+    return;
+  }
+
+  originalEmitWarning(warning as never, ...(args as never[]));
+}) as typeof process.emitWarning;
+
 const originalStyleAppendChild = HTMLStyleElement.prototype.appendChild;
 HTMLStyleElement.prototype.appendChild = function <T extends Node>(newChild: T): T {
   if (
