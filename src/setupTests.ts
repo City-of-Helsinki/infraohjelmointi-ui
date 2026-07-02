@@ -40,14 +40,25 @@ const ignoredConsoleErrors = [
   'Warning: The current testing environment is not configured to support act(...)',
 ];
 
+const normalizeConsoleArg = (arg: unknown): string => {
+  if (typeof arg === 'string') return arg;
+  if (arg == null) return '';
+  if (arg instanceof Error) return arg.message;
+  if (typeof arg === 'number' || typeof arg === 'boolean' || typeof arg === 'bigint') {
+    return `${arg}`;
+  }
+  if (typeof arg === 'symbol') return arg.description ?? '';
+
+  try {
+    return JSON.stringify(arg);
+  } catch {
+    return '';
+  }
+};
+
 const originalConsoleError = console.error;
 console.error = (...args: unknown[]) => {
-  const allArgs = args
-    .map((arg) => {
-      if (typeof arg === 'string') return arg;
-      return String(arg ?? '');
-    })
-    .join(' ');
+  const allArgs = args.map(normalizeConsoleArg).join(' ');
 
   const isAuthProviderActWarning =
     allArgs.includes('inside a test was not wrapped in act(...)') &&

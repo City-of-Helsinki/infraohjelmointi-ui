@@ -9,10 +9,10 @@ interface IRejectedAction {
 export const toSerializableError = (error: unknown): IError => {
   if (error && typeof error === 'object') {
     const errorObject = error as {
+      errors: IError['errors'];
       status?: number;
       data?: unknown;
       message?: string;
-      errors?: IError['errors'];
       type?: string;
     };
 
