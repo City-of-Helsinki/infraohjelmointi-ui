@@ -58,6 +58,7 @@ import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForce
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
+import MyWorkloadBaseView from './views/MyWorkloadView/shared/MyWorkloadBaseView';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -172,10 +173,7 @@ const App: FC = () => {
                 <Route path="new" element={<ProjectBasics />} />
                 <Route path="notes" element={<ProjectNotes />} />
                 <Route path="talpa" element={<ProjectTalpa />} />
-                <Route
-                  path="construction-handover"
-                  element={<ConstructionHandoverContainer />}
-                />
+                <Route path="construction-handover" element={<ConstructionHandoverContainer />} />
               </Route>
               <Route path="/planning" element={<PlanningView />} />
               <Route path="/coordination" element={<PlanningView />} />
@@ -190,6 +188,7 @@ const App: FC = () => {
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>
               <Route path="/maintenance" element={<MaintenanceView />} />
+              <Route path="/my-workload" element={<MyWorkloadBaseView />} />
               <Route path="/" element={<></>}></Route>
               <Route path="*" element={<ErrorView />} />
             </Routes>

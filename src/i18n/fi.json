@@ -1012,5 +1012,22 @@
       "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
       "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
     }
+  },
+  "myWorkloadView": {
+    "mainTitle": "Omat hankkeet",
+    "myWorkload": "Omat hankkeet",
+    "tasks": "Tehtävät",
+    "table": {
+      "projectName": "Hanke",
+      "description": "Hankkeen kuvaus",
+      "planningStart": "Suunnittelu alkaa",
+      "planningEnd": "Suunnittelu päättyy",
+      "phase": "Vaihe",
+      "functions": "Toimenpiteet",
+      "modifyInformation": "Muokkaa tietoja",
+      "editDialogTitle": "Muokkaa hankkeen tietoja",
+      "invalidDate": "Syötä päivämäärä muodossa DD.MM.YYYY",
+      "emptyText": "Hankkeita ei löytynyt"
+    }
   }
 }
