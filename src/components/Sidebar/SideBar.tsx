@@ -48,7 +48,7 @@ const SideBar = () => {
     },
     {
       route: 'my-workload',
-      label: t('myWorkload'),
+      label: t('myWorkloadView.mainTitle'),
       component: <IconBox style={iconStyles} />,
       disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
