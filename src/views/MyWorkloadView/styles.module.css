@@ -17,6 +17,12 @@
   width: 100%;
 }
 
+.loadingIndicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-m);
+}
+
 .tableContainer :global(th) {
   text-align: left;
   white-space: normal;
@@ -140,10 +146,55 @@
   gap: var(--spacing-m);
 }
 
+.editDialogProjectSubtitle {
+  margin: 0;
+  font-size: var(--fontsize-body-s);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-black-70);
+}
+
+.editDialogSectionTitle {
+  margin: 0;
+  font-size: var(--fontsize-heading-s);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.editDialogDivider {
+  margin: 0;
+  border: 0;
+  height: 1.5px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-black-30) 0,
+    var(--color-black-30) 8px,
+    transparent 8px,
+    transparent 12px
+  );
+}
+
 .editDialogDateRow {
   display: grid;
   gap: var(--spacing-m);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.editDialogThreeColumnRow {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.editDialogPlanningEstimateRow {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.25fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.editDialogPlanningPhaseSelect :global(label) {
+  visibility: hidden;
 }
 
 .editDialogDateField {
@@ -162,4 +213,32 @@
   color: var(--color-error);
   font-size: var(--fontsize-body-s);
   margin: calc(var(--spacing-xs) * -1) 0 0;
+}
+
+.editDialogFooterActionContainer {
+  padding: 0 var(--spacing-l) var(--spacing-l);
+}
+
+.editDialogActionButtonRow {
+  display: grid;
+  gap: var(--spacing-s);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.editDialogActionButton {
+  width: 100%;
+}
+
+.editDialogFooterActionButton {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .editDialogDateRow,
+  .editDialogThreeColumnRow,
+  .editDialogPlanningEstimateRow,
+  .editDialogActionButtonRow {
+    grid-template-columns: 1fr;
+  }
 }

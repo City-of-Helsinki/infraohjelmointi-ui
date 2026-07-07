@@ -11,6 +11,13 @@
   "topBar": {
     "programming": "Programmering"
   },
+  "myWorkloadView": {
+    "myWorkload": "Mina projekt",
+    "table": {
+      "loading": "Projekt laddas...",
+      "requiredField": "Obligatoriskt fält"
+    }
+  },
   "lang": {
     "fi": "FI",
     "se": "SE",
@@ -20,5 +27,7 @@
   "appTitle": "Infrastruktur programmering UI",
   "search": "Sök",
   "searchPage": "Sök på sidan",
-  "login": "Logga in"
+  "login": "Logga in",
+  "keur": "keur",
+  "m2": "m²"
 }

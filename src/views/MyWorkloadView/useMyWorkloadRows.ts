@@ -1,26 +1,17 @@
 import { useEffect, useState } from 'react';
-import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { selectUser } from '@/reducers/authSlice';
+import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { isRequestCanceled } from '@/utils/http';
+import { normalizeMyWorkloadDate } from './myWorkloadDateUtils';
 
 export type MyWorkloadViewType = 'design' | 'construction';
-
-const formatMyWorkloadDate = (date?: string | null): string => {
-  if (!date) {
-    return '';
-  }
-
-  const normalizedDate = date.trim().replace(/\s+/g, '');
-  const parsed = moment(normalizedDate, ['DD.MM.YYYY', 'D.M.YYYY'], true);
-  return parsed.isValid() ? parsed.format('D.M.YYYY') : '';
-};
 
 const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewType) => {
   if (viewType === 'construction') {
@@ -37,24 +28,34 @@ const mapProjectToMyWorkloadTableRow = (
   id: project.id,
   projectName: project.name,
   description: project.description,
-  planningStart: formatMyWorkloadDate(project.estPlanningStart),
-  planningEnd: formatMyWorkloadDate(project.estPlanningEnd),
+  planningStart: normalizeMyWorkloadDate(project.estPlanningStart),
+  planningEnd: normalizeMyWorkloadDate(project.estPlanningEnd),
+  presenceStart: normalizeMyWorkloadDate(project.presenceStart),
+  presenceEnd: normalizeMyWorkloadDate(project.presenceEnd),
+  visibilityStart: normalizeMyWorkloadDate(project.visibilityStart),
+  visibilityEnd: normalizeMyWorkloadDate(project.visibilityEnd),
+  constructionStart: normalizeMyWorkloadDate(project.estConstructionStart),
+  constructionEnd: normalizeMyWorkloadDate(project.estConstructionEnd),
+  projectCostForecast: project.projectCostForecast ?? '',
+  planningCostForecast: project.planningCostForecast ?? '',
+  planningPhaseId: project.planningPhase?.id ?? '',
+  planningWorkQuantity: project.planningWorkQuantity ?? '',
+  constructionCostForecast: project.constructionCostForecast ?? '',
+  costForecast: project.costForecast ?? '',
   phase: project.phase?.value ? translate(`option.${project.phase.value}`) : '',
   phaseValue: project.phase?.value ?? '',
   phaseId: project.phase?.id ?? '',
-  planningStartRaw: project.estPlanningStart ?? '',
-  planningEndRaw: project.estPlanningEnd ?? '',
   functions: translate('myWorkloadView.table.modifyInformation'),
 });
 
-const fetchAllProjects = async (year: number, signal: AbortSignal) => {
+const fetchAllProjects = async (year: number, signal: AbortSignal, params = '') => {
   const allProjects: IProject[] = [];
   let fullPath: string | undefined;
 
   do {
     const response = await getProjectsWithParams(
       {
-        params: '',
+        params,
         year,
         forcedToFrame: false,
         direct: false,
@@ -71,11 +72,21 @@ const fetchAllProjects = async (year: number, signal: AbortSignal) => {
   return allProjects;
 };
 
+const getUniqueResponsiblePersonId = (
+  responsiblePersons: ReturnType<typeof selectResponsiblePersonsRaw>,
+  userEmail: string,
+) => {
+  const matches = responsiblePersons.filter((person) => person.email?.toLowerCase() === userEmail);
+
+  return matches.length === 1 ? matches[0].id : undefined;
+};
+
 const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const startYear = useAppSelector(selectStartYear);
+  const responsiblePersons = useAppSelector(selectResponsiblePersonsRaw);
 
   const [rows, setRows] = useState<MyWorkloadTableRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +94,9 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
 
   useEffect(() => {
     const userEmail = user?.email?.toLowerCase();
+    const responsiblePersonId = userEmail
+      ? getUniqueResponsiblePersonId(responsiblePersons, userEmail)
+      : undefined;
 
     if (!userEmail) {
       setRows([]);
@@ -98,7 +112,17 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
 
     const fetchProjects = async () => {
       try {
-        const allProjects = await fetchAllProjects(startYear, abortController.signal);
+        const responsiblePersonParam = responsiblePersonId
+          ? `${
+              viewType === 'construction' ? 'personConstruction' : 'personPlanning'
+            }=${responsiblePersonId}`
+          : '';
+
+        const allProjects = await fetchAllProjects(
+          startYear,
+          abortController.signal,
+          responsiblePersonParam,
+        );
         const filteredProjects = allProjects
           .filter((project) => {
             const responsiblePersonEmail = getResponsiblePersonEmail(project, viewType);
@@ -116,11 +140,13 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
         if (isActive) {
           setRows([]);
           setHasError(true);
-          dispatch(notifyError({
-            message: 'appDataError',
-            title: '500',
-            type: 'notification',
-          }));
+          dispatch(
+            notifyError({
+              message: 'appDataError',
+              title: '500',
+              type: 'notification',
+            }),
+          );
         }
       } finally {
         if (isActive) {
@@ -135,7 +161,7 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
       isActive = false;
       abortController.abort();
     };
-  }, [dispatch, startYear, user?.email, viewType, t]);
+  }, [dispatch, responsiblePersons, startYear, user?.email, viewType, t]);
 
   return { rows, isLoading, hasError };
 };

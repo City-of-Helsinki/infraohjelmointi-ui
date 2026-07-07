@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import classes from '../styles.module.css';
+import classes from './styles.module.css';
 
 const MyWorkloadTasks: FC = () => {
   const { t } = useTranslation();

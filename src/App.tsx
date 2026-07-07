@@ -58,7 +58,7 @@ import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForce
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
-import MyWorkloadBaseView from './views/MyWorkloadView/shared/MyWorkloadBaseView';
+import MyWorkloadBaseView from './views/MyWorkloadView/MyWorkloadBaseView';
 
 const LOADING_APP_ID = 'loading-app-data';
 
