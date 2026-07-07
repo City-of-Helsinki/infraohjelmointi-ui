@@ -112,11 +112,12 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
 
     const fetchProjects = async () => {
       try {
-        const responsiblePersonParam = responsiblePersonId
-          ? `${
-              viewType === 'construction' ? 'personConstruction' : 'personPlanning'
-            }=${responsiblePersonId}`
-          : '';
+        let responsiblePersonParam = '';
+        if (responsiblePersonId) {
+          const responsiblePersonField =
+            viewType === 'construction' ? 'personConstruction' : 'personPlanning';
+          responsiblePersonParam = `${responsiblePersonField}=${responsiblePersonId}`;
+        }
 
         const allProjects = await fetchAllProjects(
           startYear,

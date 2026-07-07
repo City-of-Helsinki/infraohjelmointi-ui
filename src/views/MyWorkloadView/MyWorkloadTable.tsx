@@ -45,6 +45,89 @@ const phaseClassByValue = (phaseValue: string): string => {
   return phaseClassMap[normalizedValue] ?? classes.phasePillDefault;
 };
 
+interface PhaseCellProps {
+  phase: string;
+  phaseValue: string;
+}
+
+const PhaseCell: FC<PhaseCellProps> = ({ phase, phaseValue }) => (
+  <div className={classes.phaseCellAlignRight}>
+    <span className={`${classes.phasePill} ${phaseClassByValue(phaseValue)}`}>{phase}</span>
+  </div>
+);
+
+interface FunctionsCellProps {
+  row: MyWorkloadTableRow;
+  label: string;
+  onEdit: (row: MyWorkloadTableRow) => void;
+}
+
+const FunctionsCell: FC<FunctionsCellProps> = ({ row, label, onEdit }) => (
+  <button type="button" className={classes.modifyInformationButton} onClick={() => onEdit(row)}>
+    <span>{label}</span>
+    <IconAngleRight aria-hidden="true" />
+  </button>
+);
+
+type TranslateFunction = ReturnType<typeof useTranslation>['t'];
+
+const transformPlanningStart = ({ planningStart }: MyWorkloadTableRow) =>
+  formatMyWorkloadDateForDisplay(planningStart);
+
+const transformPlanningEnd = ({ planningEnd }: MyWorkloadTableRow) =>
+  formatMyWorkloadDateForDisplay(planningEnd);
+
+const transformPhase = ({ phase, phaseValue }: MyWorkloadTableRow) => (
+  <PhaseCell phase={phase} phaseValue={phaseValue} />
+);
+
+const renderFunctionsCell = (
+  row: MyWorkloadTableRow,
+  label: string,
+  onEdit: (row: MyWorkloadTableRow) => void,
+) => <FunctionsCell row={row} label={label} onEdit={onEdit} />;
+
+const createTableColumns = (
+  t: TranslateFunction,
+  onEdit: (row: MyWorkloadTableRow) => void,
+): TableProps['cols'] => [
+  {
+    key: 'projectName',
+    headerName: t('myWorkloadView.table.projectName'),
+    isSortable: true,
+  },
+  {
+    key: 'description',
+    headerName: t('myWorkloadView.table.description'),
+    isSortable: true,
+  },
+  {
+    key: 'planningStart',
+    headerName: t('myWorkloadView.table.planningStart'),
+    isSortable: true,
+    transform: transformPlanningStart,
+  },
+  {
+    key: 'planningEnd',
+    headerName: t('myWorkloadView.table.planningEnd'),
+    isSortable: true,
+    transform: transformPlanningEnd,
+  },
+  {
+    key: 'phase',
+    headerName: t('myWorkloadView.table.phase'),
+    isSortable: true,
+    transform: transformPhase,
+  },
+  {
+    key: 'functions',
+    headerName: t('myWorkloadView.table.functions'),
+    isSortable: true,
+    transform: (row: MyWorkloadTableRow) =>
+      renderFunctionsCell(row, t('myWorkloadView.table.modifyInformation'), onEdit),
+  },
+];
+
 const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   listOfProjects,
   isLoading,
@@ -124,106 +207,52 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
     [],
   );
 
-  const cols: TableProps['cols'] = [
-    {
-      key: 'projectName',
-      headerName: t('myWorkloadView.table.projectName'),
-      isSortable: true,
-    },
-    {
-      key: 'description',
-      headerName: t('myWorkloadView.table.description'),
-      isSortable: true,
-    },
-    {
-      key: 'planningStart',
-      headerName: t('myWorkloadView.table.planningStart'),
-      isSortable: true,
-      transform: ({ planningStart }: MyWorkloadTableRow) =>
-        formatMyWorkloadDateForDisplay(planningStart),
-    },
-    {
-      key: 'planningEnd',
-      headerName: t('myWorkloadView.table.planningEnd'),
-      isSortable: true,
-      transform: ({ planningEnd }: MyWorkloadTableRow) =>
-        formatMyWorkloadDateForDisplay(planningEnd),
-    },
-    {
-      key: 'phase',
-      headerName: t('myWorkloadView.table.phase'),
-      isSortable: true,
-      transform: ({ phase, phaseValue }: MyWorkloadTableRow) => (
-        <div className={classes.phaseCellAlignRight}>
-          <span className={`${classes.phasePill} ${phaseClassByValue(phaseValue)}`}>{phase}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'functions',
-      headerName: t('myWorkloadView.table.functions'),
-      isSortable: true,
-      transform: (row: MyWorkloadTableRow) => (
-        <button
-          type="button"
-          className={classes.modifyInformationButton}
-          onClick={() => setEditedProject(row)}
-        >
-          <span>{t('myWorkloadView.table.modifyInformation')}</span>
-          <IconAngleRight aria-hidden="true" />
-        </button>
-      ),
-    },
-  ];
+  const cols = useMemo(() => createTableColumns(t, setEditedProject), [t]);
 
   return (
-    <>
-      <div className={classes.tableContainer} id="my-workload-table-container">
-        <h2 className={`${classes.sectionTitle} text-heading-m`}>
-          {t('myWorkloadView.myWorkload')}
-        </h2>
-        {isLoading && (
-          <div className={classes.loadingIndicator} data-testid="my-workload-loading-indicator">
-            <LoadingSpinner small loadingText={t('myWorkloadView.table.loading')} />
-          </div>
-        )}
-        {shouldRenderTable && (
-          <Table
-            cols={cols}
-            rows={availableRowsList}
-            indexKey="id"
-            renderIndexCol={false}
-            onSort={handleSort}
-            initialSortingColumnKey={sortState?.colKey}
-            initialSortingOrder={sortState?.order}
-          />
-        )}
-        {isEmpty && <p className={classes.emptyStateText}>{t('myWorkloadView.table.emptyText')}</p>}
-        {hasError && <p className={classes.emptyStateText}>{t('appDataError')}</p>}
-        {hasRows && pageCount > 1 && (
-          <div className="custom-pagination" data-testid="my-workload-pagination-container">
-            <Pagination
-              data-testid="my-workload-pagination"
-              language="fi"
-              onChange={handlePageChange}
-              pageCount={pageCount}
-              pageHref={pageHref}
-              pageIndex={page}
-              paginationAriaLabel="My workload pagination"
-              siblingCount={2}
-            />
-          </div>
-        )}
-
-        <MyWorkloadEditDialog
-          isOpen={editedProject !== null}
-          project={editedProject}
-          viewType={viewType}
-          onClose={() => setEditedProject(null)}
-          onSave={handleProjectSaved}
+    <div className={classes.tableContainer} id="my-workload-table-container">
+      <h2 className={`${classes.sectionTitle} text-heading-m`}>{t('myWorkloadView.myWorkload')}</h2>
+      {isLoading && (
+        <div className={classes.loadingIndicator} data-testid="my-workload-loading-indicator">
+          <LoadingSpinner small loadingText={t('myWorkloadView.table.loading')} />
+        </div>
+      )}
+      {shouldRenderTable && (
+        <Table
+          cols={cols}
+          rows={availableRowsList}
+          indexKey="id"
+          renderIndexCol={false}
+          onSort={handleSort}
+          initialSortingColumnKey={sortState?.colKey}
+          initialSortingOrder={sortState?.order}
         />
-      </div>
-    </>
+      )}
+      {isEmpty && <p className={classes.emptyStateText}>{t('myWorkloadView.table.emptyText')}</p>}
+      {hasError && <p className={classes.emptyStateText}>{t('appDataError')}</p>}
+      {hasRows && pageCount > 1 && (
+        <div className="custom-pagination" data-testid="my-workload-pagination-container">
+          <Pagination
+            data-testid="my-workload-pagination"
+            language="fi"
+            onChange={handlePageChange}
+            pageCount={pageCount}
+            pageHref={pageHref}
+            pageIndex={page}
+            paginationAriaLabel="My workload pagination"
+            siblingCount={2}
+          />
+        </div>
+      )}
+
+      <MyWorkloadEditDialog
+        isOpen={editedProject !== null}
+        project={editedProject}
+        viewType={viewType}
+        onClose={() => setEditedProject(null)}
+        onSave={handleProjectSaved}
+      />
+    </div>
   );
 };
 

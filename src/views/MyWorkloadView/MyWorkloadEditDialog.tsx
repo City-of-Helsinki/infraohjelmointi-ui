@@ -275,7 +275,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
 
   const onSubmit = useCallback(() => {
     setSubmitAttempted(true);
-    void handleSubmit(onSubmitValid)();
+    handleSubmit(onSubmitValid)();
   }, [handleSubmit, onSubmitValid]);
 
   const dateFieldError = useCallback(

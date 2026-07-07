@@ -15,7 +15,7 @@ const getMyWorkloadViewType = (user: ReturnType<typeof selectUser>): MyWorkloadV
   // For now, we check if the user has any of the keywords in their groups or department name.
   // In reality metadata does not seem to reliably contain said words,
   // so this is a temporary solution until we have a better way to determine the view type.
-  const userGroupNames = user?.ad_groups
+  const userGroupNames = (user?.ad_groups ?? [])
     .flatMap((group) => [group.name, group.display_name])
     .join(' ')
     .toLowerCase();
