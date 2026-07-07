@@ -7,8 +7,12 @@ import { mockUser } from '@/mocks/mockUsers';
 import { setupStore } from '@/store';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
+<<<<<<< HEAD
 import useMyWorkloadRows from './useMyWorkloadRows';
 import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+=======
+import useMyWorkloadRows, { MyWorkloadViewType } from './useMyWorkloadRows';
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
 const stableTranslate = (key: string) => key;
 
@@ -106,7 +110,11 @@ describe('useMyWorkloadRows', () => {
   });
 
   it('returns empty state without fetch when user email is missing', async () => {
+<<<<<<< HEAD
     const { result } = renderMyWorkloadHook('planning', '');
+=======
+    const { result } = renderMyWorkloadHook('design', '');
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.rows).toEqual([]);
@@ -127,7 +135,11 @@ describe('useMyWorkloadRows', () => {
       next: null,
     });
 
+<<<<<<< HEAD
     const { result } = renderMyWorkloadHook('planning');
+=======
+    const { result } = renderMyWorkloadHook('design');
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -163,7 +175,11 @@ describe('useMyWorkloadRows', () => {
       next: null,
     });
 
+<<<<<<< HEAD
     const { result } = renderMyWorkloadHook('planning', 'planner@hel.fi', []);
+=======
+    const { result } = renderMyWorkloadHook('design', 'planner@hel.fi', []);
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -194,7 +210,11 @@ describe('useMyWorkloadRows', () => {
       makeResponsiblePerson('planning-person-id-2', 'planner@hel.fi'),
     ];
 
+<<<<<<< HEAD
     const { result } = renderMyWorkloadHook('planning', 'planner@hel.fi', duplicatePersons);
+=======
+    const { result } = renderMyWorkloadHook('design', 'planner@hel.fi', duplicatePersons);
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -247,7 +267,11 @@ describe('useMyWorkloadRows', () => {
   it('sets error state and dispatches notification on non-cancel errors', async () => {
     mockedGetProjectsWithParams.mockRejectedValueOnce(new Error('boom'));
 
+<<<<<<< HEAD
     const { result, store } = renderMyWorkloadHook('planning');
+=======
+    const { result, store } = renderMyWorkloadHook('design');
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -266,7 +290,11 @@ describe('useMyWorkloadRows', () => {
       new AxiosError('canceled', AxiosError.ERR_CANCELED),
     );
 
+<<<<<<< HEAD
     const { result, store } = renderMyWorkloadHook('planning');
+=======
+    const { result, store } = renderMyWorkloadHook('design');
+>>>>>>> 3feaf119 (feat(ui): refactor myworkload flow, editing, sorting, and add focused tests)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);

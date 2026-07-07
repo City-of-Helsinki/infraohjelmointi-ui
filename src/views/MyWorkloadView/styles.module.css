@@ -41,158 +41,238 @@
 
 .viewTypeButtonIcon {
   flex-shrink: 0;
-.sectionTitle {
-  padding-top: var(--spacing-m);
-  padding-bottom: var(--spacing-s);
-}
+  .sectionTitle {
+    padding-top: var(--spacing-m);
+    padding-bottom: var(--spacing-s);
+  }
 
-.tableContainer {
-  width: 100%;
-}
+  .tableContainer {
+    width: 100%;
+  }
 
-.tableContainer :global(th) {
-  text-align: left;
-  white-space: normal;
-}
+  .loadingIndicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-m);
+  }
 
-.emptyStateText {
-  margin-top: var(--spacing-m);
-  margin-bottom: 0;
-  text-align: center;
-}
+  .tableContainer :global(th) {
+    text-align: left;
+    white-space: normal;
+  }
 
-.phasePill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 2px var(--spacing-s);
-  font-size: var(--fontsize-body-s);
-  font-weight: 600;
-  line-height: 1.3;
-  white-space: nowrap;
-}
+  .emptyStateText {
+    margin-top: var(--spacing-m);
+    margin-bottom: 0;
+    text-align: center;
+  }
 
-.phaseCellAlignRight {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-}
+  .phasePill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 2px var(--spacing-s);
+    font-size: var(--fontsize-body-s);
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
 
-.phasePillProposal {
-  background-color: #f9e6ee;
-  color: #7a254a;
-}
+  .phaseCellAlignRight {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
 
-.phasePillDesign {
-  background-color: #e5f3fa;
-  color: #1e5d78;
-}
+  .phasePillProposal {
+    background-color: #f9e6ee;
+    color: #7a254a;
+  }
 
-.phasePillProgramming {
-  background-color: #e7f4ec;
-  color: #2f6a46;
-}
+  .phasePillDesign {
+    background-color: #e5f3fa;
+    color: #1e5d78;
+  }
 
-.phasePillDraftInitiation {
-  background-color: #f4edf9;
-  color: #5b3a85;
-}
+  .phasePillProgramming {
+    background-color: #e7f4ec;
+    color: #2f6a46;
+  }
 
-.phasePillDraftApproval {
-  background-color: #fcefdc;
-  color: #8a5417;
-}
+  .phasePillDraftInitiation {
+    background-color: #f4edf9;
+    color: #5b3a85;
+  }
 
-.phasePillConstructionPlan {
-  background-color: #e6f1ff;
-  color: #2b4f89;
-}
+  .phasePillDraftApproval {
+    background-color: #fcefdc;
+    color: #8a5417;
+  }
 
-.phasePillConstructionWait {
-  background-color: #fff1e6;
-  color: #8a4a19;
-}
+  .phasePillConstructionPlan {
+    background-color: #e6f1ff;
+    color: #2b4f89;
+  }
 
-.phasePillConstruction {
-  background-color: #ffe8d6;
-  color: #8d4518;
-}
+  .phasePillConstructionWait {
+    background-color: #fff1e6;
+    color: #8a4a19;
+  }
 
-.phasePillConstructionPreparation {
-  background-color: #f7f2e7;
-  color: #6e5a2e;
-}
+  .phasePillConstruction {
+    background-color: #ffe8d6;
+    color: #8d4518;
+  }
 
-.phasePillWarranty {
-  background-color: #e8f8f3;
-  color: #24614d;
-}
+  .phasePillConstructionPreparation {
+    background-color: #f7f2e7;
+    color: #6e5a2e;
+  }
 
-.phasePillCompleted {
-  background-color: #e7f7e7;
-  color: #2f6a3c;
-}
+  .phasePillWarranty {
+    background-color: #e8f8f3;
+    color: #24614d;
+  }
 
-.phasePillSuspended {
-  background-color: #f6eaea;
-  color: #7a2f2f;
-}
+  .phasePillCompleted {
+    background-color: #e7f7e7;
+    color: #2f6a3c;
+  }
 
-.phasePillDefault {
-  background-color: #eef1f5;
-  color: #3c4a5b;
-}
+  .phasePillSuspended {
+    background-color: #f6eaea;
+    color: #7a2f2f;
+  }
 
-.modifyInformationButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  appearance: none;
-  border: none;
-  background: none;
-  color: var(--color-coat-of-arms);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: var(--fontsize-body-m);
-  font-weight: 600;
-  padding: 0;
-  text-decoration: none;
-}
+  .phasePillDefault {
+    background-color: #eef1f5;
+    color: #3c4a5b;
+  }
 
-.modifyInformationButton:hover {
-  color: var(--color-coat-of-arms-dark);
-}
+  .modifyInformationButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2-xs);
+    appearance: none;
+    border: none;
+    background: none;
+    color: var(--color-coat-of-arms);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--fontsize-body-m);
+    font-weight: 600;
+    padding: 0;
+    text-decoration: none;
+  }
 
-.modifyInformationButton:focus-visible {
-  outline: 2px solid var(--color-coat-of-arms);
-  outline-offset: 2px;
-}
+  .modifyInformationButton:hover {
+    color: var(--color-coat-of-arms-dark);
+  }
 
-.editDialogFields {
-  display: grid;
-  gap: var(--spacing-m);
-}
+  .modifyInformationButton:focus-visible {
+    outline: 2px solid var(--color-coat-of-arms);
+    outline-offset: 2px;
+  }
 
-.editDialogDateRow {
-  display: grid;
-  gap: var(--spacing-m);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
+  .editDialogFields {
+    display: grid;
+    gap: var(--spacing-m);
+  }
 
-.editDialogDateField {
-  margin-bottom: 0;
-}
+  .editDialogProjectSubtitle {
+    margin: 0;
+    font-size: var(--fontsize-body-s);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-black-70);
+  }
 
-.editDialogDateField :global(.input-xl) {
-  max-width: 100%;
-}
+  .editDialogSectionTitle {
+    margin: 0;
+    font-size: var(--fontsize-heading-s);
+    font-weight: 600;
+    line-height: 1.3;
+  }
 
-.editDialogDateField :global(.date-input) {
-  max-width: 100%;
-}
+  .editDialogDivider {
+    margin: 0;
+    border: 0;
+    height: 1.5px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--color-black-30) 0,
+      var(--color-black-30) 8px,
+      transparent 8px,
+      transparent 12px
+    );
+  }
 
-.editDialogFieldError {
-  color: var(--color-error);
-  font-size: var(--fontsize-body-s);
-  margin: calc(var(--spacing-xs) * -1) 0 0;
+  .editDialogDateRow {
+    display: grid;
+    gap: var(--spacing-m);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .editDialogThreeColumnRow {
+    display: grid;
+    gap: var(--spacing-m);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .editDialogPlanningEstimateRow {
+    display: grid;
+    gap: var(--spacing-m);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .editDialogPlanningPhaseSelect :global(label) {
+    visibility: hidden;
+  }
+
+  .editDialogDateField {
+    margin-bottom: 0;
+  }
+
+  .editDialogDateField :global(.input-xl) {
+    max-width: 100%;
+  }
+
+  .editDialogDateField :global(.date-input) {
+    max-width: 100%;
+  }
+
+  .editDialogFieldError {
+    color: var(--color-error);
+    font-size: var(--fontsize-body-s);
+    margin: calc(var(--spacing-xs) * -1) 0 0;
+  }
+
+  .editDialogFooterActionContainer {
+    padding: 0 var(--spacing-l) var(--spacing-l);
+  }
+
+  .editDialogActionButtonRow {
+    display: grid;
+    gap: var(--spacing-s);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .editDialogActionButton {
+    width: 100%;
+  }
+
+  .editDialogFooterActionButton {
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .editDialogDateRow,
+    .editDialogThreeColumnRow,
+    .editDialogPlanningEstimateRow,
+    .editDialogActionButtonRow {
+      grid-template-columns: 1fr;
+    }
+  }
 }

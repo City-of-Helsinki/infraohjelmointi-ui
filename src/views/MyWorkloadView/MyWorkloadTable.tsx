@@ -1,19 +1,28 @@
 import { FC, memo, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Pagination, Table } from 'hds-react';
+import { LoadingSpinner, Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import classes from '../styles.module.css';
+import { MyWorkloadViewType } from './useMyWorkloadRows';
+import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from './myWorkloadDateUtils';
+import classes from './styles.module.css';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
 interface MyWorkloadTableProps {
   listOfProjects: MyWorkloadTableRow[];
   isLoading: boolean;
   hasError: boolean;
+  viewType: MyWorkloadViewType;
 }
 
 const ITEMS_PER_PAGE = 10;
+const DATE_COLUMNS = new Set<keyof MyWorkloadTableRow>(['planningStart', 'planningEnd']);
+
+type SortState = {
+  colKey: keyof MyWorkloadTableRow;
+  order: 'asc' | 'desc';
+} | null;
 
 const phaseClassByValue = (phaseValue: string): string => {
   const normalizedValue = phaseValue.toLowerCase();
@@ -36,26 +45,58 @@ const phaseClassByValue = (phaseValue: string): string => {
   return phaseClassMap[normalizedValue] ?? classes.phasePillDefault;
 };
 
-const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, isLoading, hasError }) => {
+const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
+  listOfProjects,
+  isLoading,
+  hasError,
+  viewType,
+}) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [tableRows, setTableRows] = useState<Array<MyWorkloadTableRow>>([]);
+  const [sortState, setSortState] = useState<SortState>(null);
   const [editedProject, setEditedProject] = useState<MyWorkloadTableRow | null>(null);
 
   const isEmpty = !isLoading && !hasError && tableRows.length === 0;
-  const hasRows = !isLoading && !hasError && tableRows.length > 0;
+  const hasRows = !hasError && tableRows.length > 0;
+  const shouldRenderTable = !hasError && (hasRows || isLoading);
 
   useEffect(() => {
     setTableRows(listOfProjects);
   }, [listOfProjects]);
 
-  const pageCount = useMemo(() => Math.ceil(tableRows.length / ITEMS_PER_PAGE), [tableRows]);
+  const sortedRows = useMemo(() => {
+    if (!sortState) {
+      return tableRows;
+    }
+
+    const sorted = [...tableRows].sort((rowA, rowB) => {
+      const { colKey } = sortState;
+      const valueA = rowA[colKey];
+      const valueB = rowB[colKey];
+
+      if (DATE_COLUMNS.has(colKey)) {
+        const dateValueA = getMyWorkloadDateTimeValue(String(valueA ?? ''));
+        const dateValueB = getMyWorkloadDateTimeValue(String(valueB ?? ''));
+        return dateValueA - dateValueB;
+      }
+
+      return String(valueA ?? '').localeCompare(String(valueB ?? ''), 'fi', {
+        sensitivity: 'base',
+        numeric: true,
+      });
+    });
+
+    return sortState.order === 'desc' ? sorted.reverse() : sorted;
+  }, [sortState, tableRows]);
+
+  const pageCount = useMemo(() => Math.ceil(sortedRows.length / ITEMS_PER_PAGE), [sortedRows]);
   const pageHref = useCallback(() => '#', []);
 
   const availableRowsList = useMemo(() => {
     const startIndex = page * ITEMS_PER_PAGE;
-    return tableRows.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [tableRows, page]);
+    return sortedRows.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [sortedRows, page]);
 
   useEffect(() => {
     setPage(0);
@@ -75,6 +116,14 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, isLoading, 
     );
   }, []);
 
+  const handleSort = useCallback<NonNullable<TableProps['onSort']>>(
+    (order, colKey, applyHdsSortState) => {
+      applyHdsSortState();
+      setSortState({ colKey: colKey as keyof MyWorkloadTableRow, order });
+    },
+    [],
+  );
+
   const cols: TableProps['cols'] = [
     {
       key: 'projectName',
@@ -90,11 +139,15 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, isLoading, 
       key: 'planningStart',
       headerName: t('myWorkloadView.table.planningStart'),
       isSortable: true,
+      transform: ({ planningStart }: MyWorkloadTableRow) =>
+        formatMyWorkloadDateForDisplay(planningStart),
     },
     {
       key: 'planningEnd',
       headerName: t('myWorkloadView.table.planningEnd'),
       isSortable: true,
+      transform: ({ planningEnd }: MyWorkloadTableRow) =>
+        formatMyWorkloadDateForDisplay(planningEnd),
     },
     {
       key: 'phase',
@@ -129,7 +182,22 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, isLoading, 
         <h2 className={`${classes.sectionTitle} text-heading-m`}>
           {t('myWorkloadView.myWorkload')}
         </h2>
-        {hasRows && <Table cols={cols} rows={availableRowsList} indexKey="id" renderIndexCol={false} />}
+        {isLoading && (
+          <div className={classes.loadingIndicator} data-testid="my-workload-loading-indicator">
+            <LoadingSpinner small loadingText={t('myWorkloadView.table.loading')} />
+          </div>
+        )}
+        {shouldRenderTable && (
+          <Table
+            cols={cols}
+            rows={availableRowsList}
+            indexKey="id"
+            renderIndexCol={false}
+            onSort={handleSort}
+            initialSortingColumnKey={sortState?.colKey}
+            initialSortingOrder={sortState?.order}
+          />
+        )}
         {isEmpty && <p className={classes.emptyStateText}>{t('myWorkloadView.table.emptyText')}</p>}
         {hasError && <p className={classes.emptyStateText}>{t('appDataError')}</p>}
         {hasRows && pageCount > 1 && (
@@ -150,6 +218,7 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, isLoading, 
         <MyWorkloadEditDialog
           isOpen={editedProject !== null}
           project={editedProject}
+          viewType={viewType}
           onClose={() => setEditedProject(null)}
           onSave={handleProjectSaved}
         />
