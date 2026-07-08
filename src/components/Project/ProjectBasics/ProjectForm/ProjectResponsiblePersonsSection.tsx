@@ -1,7 +1,7 @@
 import { FormSectionTitle, SelectField } from '@/components/shared';
-import { FC, memo, useCallback, useEffect, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues, UseFormTrigger, useWatch } from 'react-hook-form';
+import { Control, UseFormGetValues, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
@@ -10,13 +10,11 @@ import { defaultFilter } from 'hds-react';
 interface IProjectResponsiblePersonsSectionProps {
   control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
-  trigger: UseFormTrigger<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
     control: Control<IProjectForm>;
   };
-  hasSubmitAttempted: boolean;
   isInputDisabled: boolean;
   isUserOnlyViewer: boolean;
 }
@@ -24,8 +22,6 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   control,
   getFieldProps,
   getValues,
-  trigger,
-  hasSubmitAttempted,
   isInputDisabled,
   isUserOnlyViewer,
 }) => {
@@ -35,7 +31,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const phases = useOptions('phases');
   const programmers = useOptions('programmers');
 
-  const findPhase = (val: string) => phases.find((p) => p.value === val)?.value ?? '';
+  const findPhase = (val: string) => phases.find((p) => p.label === val)?.value ?? '';
   const draftInitiationPhase = findPhase('draftInitiation');
   const draftApprovalPhase = findPhase('draftApproval');
   const constructionPlanPhase = findPhase('constructionPlan');
@@ -45,15 +41,16 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const completedPhase = findPhase('completed');
 
   const phasesThatNeedResponsiblePerson = useMemo(
-    () => [
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
+    () =>
+      [
+        draftInitiationPhase,
+        draftApprovalPhase,
+        constructionPlanPhase,
+        constructionWaitPhase,
+        constructionPhase,
+        warrantyPeriodPhase,
+        completedPhase,
+      ].filter((phase): phase is string => phase !== ''),
     [
       completedPhase,
       constructionPhase,
@@ -66,7 +63,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () => [constructionPhase, warrantyPeriodPhase, completedPhase],
+    () => [constructionPhase, warrantyPeriodPhase, completedPhase].filter((phase): phase is string => phase !== ''),
     [completedPhase, constructionPhase, warrantyPeriodPhase],
   );
 
@@ -74,15 +71,6 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     control,
     name: 'phase',
   })?.value;
-
-  useEffect(() => {
-    if (!hasSubmitAttempted) {
-      return;
-    }
-
-    trigger('personPlanning');
-    trigger('personConstruction');
-  }, [currentPhase, hasSubmitAttempted, trigger]);
 
   const validatePersonPlanning = useCallback(() => {
     return {

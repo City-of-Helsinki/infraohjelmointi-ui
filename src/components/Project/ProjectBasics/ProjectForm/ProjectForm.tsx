@@ -14,7 +14,6 @@ import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
 import { useNavigate } from 'react-router';
-import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
@@ -34,7 +33,12 @@ import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
 import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
-import { FieldErrors, FieldPath, SubmitErrorHandler } from 'react-hook-form';
+import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
+import {
+  collectErrorElements,
+  collectErrorFieldNames,
+  scrollToFirstField,
+} from './projectFormErrorHelpers';
 
 interface IProjectFormProps {
   project: IProject | null;
@@ -54,8 +58,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
-  const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -67,161 +70,15 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     setValue,
     setError,
     reset,
-    trigger,
   } = formMethods;
 
-  const collectErrorElements = useCallback((errors: FieldErrors<IProjectForm>) => {
-    const visitedObjects = new WeakSet<object>();
-    const elements: HTMLElement[] = [];
-
-    const addElement = (value: unknown) => {
-      if (value instanceof HTMLElement && value.isConnected) {
-        elements.push(value);
-      }
-    };
-
-    const visit = (value: unknown) => {
-      if (!value || typeof value !== 'object') {
-        return;
-      }
-
-      if (visitedObjects.has(value)) {
-        return;
-      }
-
-      visitedObjects.add(value);
-
-      if ('type' in value || 'message' in value || 'ref' in value) {
-        if ('ref' in value) {
-          addElement((value as { ref?: unknown }).ref);
-        }
-        return;
-      }
-
-      for (const nestedValue of Object.values(value)) {
-        visit(nestedValue);
-      }
-    };
-
-    visit(errors);
-
-    return elements;
+  const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>((errors) => {
+    scrollToFirstField(
+      formRef.current,
+      collectErrorElements(errors),
+      collectErrorFieldNames(errors),
+    );
   }, []);
-
-  const collectErrorFieldNames = useCallback((errors: FieldErrors<IProjectForm>) => {
-    const visitedObjects = new WeakSet<object>();
-    const fieldNames = new Set<string>();
-
-    const visit = (value: unknown, path: string[] = []) => {
-      if (!value || typeof value !== 'object') {
-        return;
-      }
-
-      if (visitedObjects.has(value)) {
-        return;
-      }
-
-      visitedObjects.add(value);
-
-      if ('type' in value || 'message' in value || 'ref' in value) {
-        if (path.length > 0) {
-          fieldNames.add(path[0]);
-        }
-        return;
-      }
-
-      for (const [key, nestedValue] of Object.entries(value)) {
-        const nextPath = /^\d+$/.test(key) ? path : [...path, key];
-        visit(nestedValue, nextPath);
-      }
-    };
-
-    visit(errors);
-
-    return [...fieldNames];
-  }, []);
-
-  const scrollToFirstField = useCallback(
-    (preferredElements: HTMLElement[] = [], fieldNames: string[] = []) => {
-      if (!formRef.current) {
-        return;
-      }
-
-      const form = formRef.current;
-
-      const invalidFieldSelectors = [
-        'input[aria-invalid="true"]',
-        'textarea[aria-invalid="true"]',
-        'select[aria-invalid="true"]',
-        '[role="combobox"][aria-invalid="true"]',
-        '[aria-invalid="true"] input:not([type="hidden"])',
-        '[aria-invalid="true"] textarea',
-        '[aria-invalid="true"] [role="combobox"]',
-      ].join(', ');
-
-      const queriedInvalidElements = Array.from(
-        form.querySelectorAll<HTMLElement>(invalidFieldSelectors),
-      );
-
-      const fieldNameElements = fieldNames.flatMap((fieldName) => {
-        const selectors = [
-          `[id="${fieldName}"]`,
-          `[id="projectForm.${fieldName}"]`,
-          `[name="${fieldName}"]`,
-          `[data-testid="${fieldName}"]`,
-        ];
-
-        return selectors
-          .map((selector) => form.querySelector<HTMLElement>(selector))
-          .filter((element): element is HTMLElement => element instanceof HTMLElement);
-      });
-
-      const uniqueCandidates = Array.from(
-        new Set([...preferredElements, ...fieldNameElements, ...queriedInvalidElements]),
-      ).filter((element) => element instanceof HTMLElement && form.contains(element));
-
-      const visibleCandidates = uniqueCandidates.filter(
-        (element) => element.getClientRects().length > 0,
-      );
-      const candidatesToSort = visibleCandidates.length > 0 ? visibleCandidates : uniqueCandidates;
-
-      const scrollTarget = [...candidatesToSort].sort((first, second) => {
-        const firstTop = first.getBoundingClientRect().top + window.scrollY;
-        const secondTop = second.getBoundingClientRect().top + window.scrollY;
-
-        if (firstTop !== secondTop) {
-          return firstTop - secondTop;
-        }
-
-        const firstLeft = first.getBoundingClientRect().left + window.scrollX;
-        const secondLeft = second.getBoundingClientRect().left + window.scrollX;
-        return firstLeft - secondLeft;
-      })[0];
-
-      if (!scrollTarget) {
-        return;
-      }
-
-      const focusTarget =
-        (scrollTarget.matches(
-          'input:not([type="hidden"]), textarea, select, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
-        )
-          ? scrollTarget
-          : scrollTarget.querySelector<HTMLElement>(
-              'input:not([type="hidden"]), textarea, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
-            )) ?? scrollTarget;
-
-      const absoluteTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
-      const targetTop = Math.max(absoluteTop - 120, 0);
-
-      window.scrollTo({ top: targetTop, behavior: 'smooth' });
-
-      if (typeof focusTarget.focus === 'function') {
-        focusTarget.focus({ preventScroll: true });
-      }
-    },
-    [],
-  );
 
   const setBackendFieldErrors = useCallback(
     (error: unknown) => {
@@ -241,7 +98,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       };
 
       let hasFieldErrors = false;
-      const fieldNamesWithErrors = new Set<string>();
+      const fieldNamesWithErrors: string[] = [];
       for (const [backendField, fieldError] of Object.entries(data)) {
         const mappedField =
           backendToFormFieldMap[backendField] ?? (backendField as FieldPath<IProjectForm>);
@@ -269,19 +126,19 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           type: 'server',
           message,
         });
-        fieldNamesWithErrors.add(mappedField);
+        fieldNamesWithErrors.push(mappedField);
         hasFieldErrors = true;
       }
 
       if (hasFieldErrors) {
         globalThis.requestAnimationFrame(() => {
-          scrollToFirstField([], [...fieldNamesWithErrors]);
+          scrollToFirstField(formRef.current, [], fieldNamesWithErrors);
         });
       }
 
       return hasFieldErrors;
     },
-    [getValues, setError, scrollToFirstField],
+    [getValues, setError],
   );
 
   usePromptConfirmOnNavigate({
@@ -451,7 +308,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
-      setHasSubmitAttempted(true);
       dispatch(setLoading({ text: 'Creating a new project', id: CREATE_NEW_PROJECT }));
 
       if (isDirty) {
@@ -486,7 +342,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           try {
             await patchProject({ id: project?.id, data }).unwrap();
             reset(form);
-            setHasSubmitAttempted(false);
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
@@ -525,7 +380,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             const response = await postProject({ data }).unwrap();
             dispatch(setIsSaving(false));
             reset(form);
-            setHasSubmitAttempted(false);
             setNewProjectId(response.id);
           } catch (error) {
             console.log('project post error: ', error);
@@ -592,20 +446,8 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       watch,
       setValue,
       useWatchField,
-      trigger,
-      hasSubmitAttempted,
     }),
-    [
-      control,
-      getFieldProps,
-      getFieldState,
-      getValues,
-      watch,
-      setValue,
-      useWatchField,
-      trigger,
-      hasSubmitAttempted,
-    ],
+    [control, getFieldProps, getFieldState, getValues, watch, setValue, useWatchField],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -638,14 +480,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     };
   }, []);
 
-  const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>(
-    (errors) => {
-      setHasSubmitAttempted(true);
-      scrollToFirstField(collectErrorElements(errors), collectErrorFieldNames(errors));
-    },
-    [collectErrorElements, collectErrorFieldNames, scrollToFirstField],
-  );
-
   const submitCallback = useCallback(() => {
     // We disable onBlur events when the datepicker is opened because it messes up with the HDS DateInput's DatePicker
     if (datePickerVisible) {
@@ -663,7 +497,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isUserProjectManagerCheck = useMemo(() => isUserOnlyProjectManager(user), [user]);
 
   return (
-    <form data-testid="project-form" className="project-form" ref={formRef}>
+    <form ref={formRef} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
         {...formProps}

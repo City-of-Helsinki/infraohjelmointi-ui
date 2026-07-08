@@ -1,13 +1,7 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import {
-  Control,
-  UseFormGetValues,
-  UseFormSetValue,
-  UseFormTrigger,
-  useWatch,
-} from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormSetValue, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { Trans, useTranslation } from 'react-i18next';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -15,7 +9,6 @@ import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
-import _ from 'lodash';
 import { listItemToOption, mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
@@ -38,8 +31,6 @@ interface IProjectStatusSectionProps {
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
-  hasSubmitAttempted: boolean;
-  trigger: UseFormTrigger<IProjectForm>;
   useWatchField: (
     name: keyof IProjectForm,
     control: Control<IProjectForm>,
@@ -61,8 +52,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer,
-  hasSubmitAttempted,
-  trigger,
   useWatchField,
 }) => {
   const phases = useOptions('phases');
@@ -123,17 +112,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       }
     }
   }, [currentPhase, allPhaseDetails, getValues, setValue]);
-
-  useEffect(() => {
-    if (!hasSubmitAttempted) {
-      return;
-    }
-
-    trigger('phaseDetail');
-    trigger('programmed');
-    trigger('planningStartYear');
-    trigger('constructionEndYear');
-  }, [currentPhase, hasSubmitAttempted, trigger]);
 
   useEffect(() => {
     if (!showStaraProcurementReason) {

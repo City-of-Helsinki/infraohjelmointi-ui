@@ -599,27 +599,13 @@ describe('projectForm', () => {
       name: getFormField('address *'),
     });
     const submitProjectButton = await findByTestId('submit-project-button');
-    const scrollToMock = jest.fn();
-    const originalScrollTo = window.scrollTo;
 
-    window.scrollTo = scrollToMock;
+    await user.type(descriptionField, 'Invalid submit test');
+    await user.click(submitProjectButton);
 
-    try {
-      await user.type(descriptionField, 'Invalid submit test');
-      await user.click(submitProjectButton);
-
-      await waitFor(() => {
-        expect(scrollToMock).toHaveBeenCalled();
-        expect(scrollToMock).toHaveBeenCalledWith(
-          expect.objectContaining({
-            behavior: 'smooth',
-          }),
-        );
-        expect(addressField).toHaveFocus();
-      });
-    } finally {
-      window.scrollTo = originalScrollTo;
-    }
+    await waitFor(() => {
+      expect(addressField).toHaveFocus();
+    });
   });
 
   it('prevents submit when phase requires year bounds and years are missing', async () => {

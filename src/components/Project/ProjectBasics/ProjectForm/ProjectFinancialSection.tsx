@@ -5,7 +5,6 @@ import {
   Control,
   UseFormGetValues,
   UseFormSetValue,
-  UseFormTrigger,
   UseFormWatch,
 } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -25,9 +24,7 @@ interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   watch: UseFormWatch<IProjectForm>;
-  trigger: UseFormTrigger<IProjectForm>;
   setValue: UseFormSetValue<IProjectForm>;
-  hasSubmitAttempted: boolean;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -46,9 +43,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getValues,
   getFieldProps,
   watch,
-  trigger,
   setValue,
-  hasSubmitAttempted,
   classOptions,
   isInputDisabled,
   isUserOnlyViewer,
@@ -178,15 +173,6 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   );
 
   const currentPhase = watch('phase')?.value;
-
-  useEffect(() => {
-    if (!hasSubmitAttempted) {
-      return;
-    }
-
-    trigger('masterClass');
-    trigger('class');
-  }, [currentPhase, hasSubmitAttempted, trigger]);
 
   const validateMasterClass = useMemo(
     () => ({

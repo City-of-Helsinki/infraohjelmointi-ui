@@ -1,20 +1,13 @@
 import { FormSectionTitle } from '@/components/shared';
-import { FC, memo, useCallback, useEffect, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import {
-  Control,
-  UseFormGetFieldState,
-  UseFormGetValues,
-  UseFormTrigger,
-  useWatch,
-} from 'react-hook-form';
+import { Control, UseFormGetFieldState, UseFormGetValues, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
 import { validateAfter, validateBefore, validateSameOrAfter } from '@/utils/validation';
-import { isBefore } from '@/utils/dates';
-import _ from 'lodash';
+import { createDateToStartOfYear, isBefore } from '@/utils/dates';
 
 interface IProjectScheduleSectionProps {
   control: Control<IProjectForm>;
@@ -25,8 +18,6 @@ interface IProjectScheduleSectionProps {
     control: Control<IProjectForm>;
   };
   getFieldState: UseFormGetFieldState<IProjectForm>;
-  trigger: UseFormTrigger<IProjectForm>;
-  hasSubmitAttempted: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
 }
@@ -36,8 +27,6 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   getFieldProps,
   getValues,
   getFieldState,
-  trigger,
-  hasSubmitAttempted,
   isUserOnlyProjectManager,
   isUserOnlyViewer,
 }) => {
@@ -60,18 +49,10 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     name: 'phase',
   })?.value;
 
-  useEffect(() => {
-    if (!hasSubmitAttempted) {
-      return;
-    }
-
-    trigger('estPlanningStart');
-    trigger('estPlanningEnd');
-    trigger('estConstructionStart');
-    trigger('estConstructionEnd');
-    trigger('estWarrantyPhaseStart');
-    trigger('estWarrantyPhaseEnd');
-  }, [currentPhase, hasSubmitAttempted, trigger]);
+  const warrantyPeriodPhase = useMemo(
+    () => phases.find(({ label }) => label === 'warrantyPeriod')?.value ?? '',
+    [phases],
+  );
 
   const validateEstPlanningStart = useCallback(() => {
     return {
@@ -298,8 +279,9 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
       validate: {
         isWarrantyPeriodStartValid: (date: string | null) => {
           const constructionEndYear = getValues('constructionEndYear');
+          const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
 
-          if (date && constructionEndYear && date.split('.')[2] < constructionEndYear) {
+          if (date && constructionEndYear && isBefore(date, constructionEndYearStartDate)) {
             return t('validation.isSameOrAfter', {
               value: t('validation.constructionEndYear'),
             });
@@ -334,12 +316,13 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         isWarrantyPhaseValid: (date: string | null) => {
           const phase = getValues('phase').value;
           const constructionEndYear = getValues('constructionEndYear');
+          const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
 
-          if (phase === 'warrantyPeriod' && !date) {
+          if (phase === warrantyPeriodPhase && !date) {
             return t('validation.required', { field: t('validation.estWarrantyPhaseEnd') });
           }
 
-          if (date && constructionEndYear && date.split('.')[2] < constructionEndYear) {
+          if (date && constructionEndYear && isBefore(date, constructionEndYearStartDate)) {
             return t('validation.isSameOrAfter', {
               value: t('validation.constructionEndYear'),
             });
@@ -360,7 +343,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, t]);
+  }, [getValues, t, warrantyPeriodPhase]);
 
   return (
     <div className="w-full" id="basics-schedule-section">
@@ -451,7 +434,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estWarrantyPhaseEnd')}
               readOnly={isUserOnlyViewer}
               rules={validateWarrantyPhaseEnd()}
-              required={currentPhase === 'warrantyPeriod'}
+              required={currentPhase === warrantyPeriodPhase}
             />
           </div>
         </div>
