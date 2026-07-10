@@ -28,8 +28,19 @@ import {
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadEditDialog.tsx
 import classes from './styles.module.css';
-import { normalizeMyWorkloadDate } from '@/utils/myWorkloadUtils';
+<<<<<<<< HEAD:src/components/MyWorkLoad/MyWorkloadEditDialog.tsx
+import { normalizeMyWorkloadDate } from '../../utils/myWorkloadUtils';
+========
+import { MyWorkloadViewType } from './useMyWorkloadRows';
+import { normalizeMyWorkloadDate } from './myWorkloadUtils';
+=======
+import classes from '../styles.module.css';
+import { MyWorkloadViewType } from '../useMyWorkloadRows';
+import { normalizeMyWorkloadDate } from '../myWorkloadDateUtils';
+>>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadEditDialog.tsx
+>>>>>>>> 5ee20174 (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadEditDialog.tsx
 import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 

@@ -84,6 +84,7 @@ describe('MyWorkloadTable', () => {
     consoleErrorSpy.mockRestore();
   });
 
+<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.test.tsx
   it('renders empty state text when there are no rows', () => {
     const { getByText } = render(
       <MyWorkloadTable
@@ -137,6 +138,12 @@ describe('MyWorkloadTable', () => {
         hasError={false}
         viewType="planning"
       />,
+=======
+  it('opens edit dialog for selected row when modify button is clicked', async () => {
+    const user = userEvent.setup();
+    const { getAllByRole, getByTestId } = render(
+      <MyWorkloadTable listOfProjects={[makeRow(1), makeRow(2)]} viewType="design" />,
+>>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.test.tsx
     );
 
     await waitFor(() => {
@@ -155,12 +162,16 @@ describe('MyWorkloadTable', () => {
   it('updates table row when dialog calls onSave with edited project', async () => {
     const user = userEvent.setup();
     const { getAllByRole, getByRole, queryByText } = render(
+<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.test.tsx
       <MyWorkloadTable
         listOfProjects={[makeRow(1)]}
         isLoading={false}
         hasError={false}
         viewType="planning"
       />,
+=======
+      <MyWorkloadTable listOfProjects={[makeRow(1)]} viewType="design" />,
+>>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.test.tsx
     );
 
     await waitFor(() => {
@@ -181,12 +192,16 @@ describe('MyWorkloadTable', () => {
     const user = userEvent.setup();
     const rows = Array.from({ length: 11 }, (_, i) => makeRow(i + 1));
     const { getByTestId, queryByText } = render(
+<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.test.tsx
       <MyWorkloadTable
         listOfProjects={rows}
         isLoading={false}
         hasError={false}
         viewType="planning"
       />,
+=======
+      <MyWorkloadTable listOfProjects={rows} viewType="design" />,
+>>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.test.tsx
     );
 
     const paginationContainer = getByTestId('my-workload-pagination-container');
@@ -220,12 +235,16 @@ describe('MyWorkloadTable', () => {
     ];
 
     const { getByTestId, queryByText } = render(
+<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.test.tsx
       <MyWorkloadTable
         listOfProjects={rows}
         isLoading={false}
         hasError={false}
         viewType="planning"
       />,
+=======
+      <MyWorkloadTable listOfProjects={rows} viewType="design" />,
+>>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.test.tsx
     );
 
     const planningStartSortButton = getByTestId('hds-table-sorting-header-planningStart');

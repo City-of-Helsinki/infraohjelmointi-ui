@@ -19,7 +19,7 @@ import {
 } from '@/interfaces/constructionHandoverInterfaces';
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
-import { parseCurrency } from '@/utils/constructionHandoverUtils';
+import { parseCurrency } from '@/utils/currencyUtils';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {

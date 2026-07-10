@@ -26,11 +26,7 @@ import { TFunction } from 'i18next';
 import { ChangeEvent, FC, FocusEvent, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../styles.module.css';
-import {
-  formatBudgetEuro,
-  parseCurrency,
-  currencyToRequestValue,
-} from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro, parseCurrency, currencyToRequestValue } from '@/utils/currencyUtils';
 
 const getFieldError = (
   t: TFunction<'translation'>,

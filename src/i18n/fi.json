@@ -1042,6 +1042,14 @@
       "requiredField": "Pakollinen kenttä",
       "invalidDate": "Päivämäärä on virheellinen",
       "emptyText": "Hankkeita ei löytynyt"
+    },
+    "tasks": {
+      "title": "Tehtävät",
+      "planningPeriod": "Suunnittelun aikataulu",
+      "constructionPeriod": "Rakentamisen aikataulu",
+      "budget": "Kokonaisrahoitusvaraus",
+      "constructionProcurementMethod": "Rakentamisen hankintatapa",
+      "infoNotAvailable": "Ei tiedossa"
     }
   }
 }

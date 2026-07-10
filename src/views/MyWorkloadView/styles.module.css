@@ -1,6 +1,7 @@
 .contentContainer {
   padding-left: var(--spacing-xl);
   padding-right: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 }
 
 .mainTitle {

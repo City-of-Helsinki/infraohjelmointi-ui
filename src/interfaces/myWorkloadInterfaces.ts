@@ -1,5 +1,6 @@
 export interface MyWorkloadTableRow {
   id: string;
+  budget: string;
   projectName: string;
   description: string;
   planningStart: string;
@@ -20,6 +21,17 @@ export interface MyWorkloadTableRow {
   phaseValue: string;
   phaseId: string;
   functions: string;
+  constructionProcurementMethod: string | undefined;
+}
+
+export interface MyWorkloadTaskItem {
+  id: string;
+  budget: string;
+  projectName: string;
+  planningPeriod: string;
+  constructionPeriod: string;
+  constructionProcurementMethod: string;
+  taskDescription: string;
 }
 
 export type MyWorkloadViewType = 'planning' | 'construction';
