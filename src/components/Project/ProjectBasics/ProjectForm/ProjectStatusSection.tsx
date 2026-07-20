@@ -133,7 +133,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const constructionPhase = phaseByValue('construction');
   const warrantyPeriodPhase = phaseByValue('warrantyPeriod');
   const completedPhase = phaseByValue('completed');
-  const suspendedPhase = phaseByValue('suspended');
 
   const validatePhase = useMemo(
     () => ({
@@ -217,13 +216,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               }
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
-            case suspendedPhase:
-              break;
           }
 
           const isProposalOrDesignPhase =
             phase.value === proposalPhase || phase.value === designPhase;
-          const isSuspendedPhase = phase.value === suspendedPhase;
+          // IO-863: suspension is now the `suspended` phaseDetail under designPlanning,
+          // not a phase; waive the programmed requirement when that detail is selected
+          // (mirrors the API's ProgrammedValidator).
+          const isSuspendedPhase = getValues('phaseDetail')?.value === 'suspended';
 
           if (!isSuspendedPhase) {
             if (
@@ -254,7 +254,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       constructionPhase,
       warrantyPeriodPhase,
       completedPhase,
-      suspendedPhase,
       allPhaseDetails,
       checkTodayIsBeforeWarrantyPhaseEnd,
       projectMode,

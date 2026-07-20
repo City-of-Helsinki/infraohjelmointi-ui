@@ -231,7 +231,6 @@ export enum ProjectPhase {
   WarrantyPeriod = 'warrantyPeriod',
   Completed = 'completed',
   ConstructionPreparation = 'constructionPreparation',
-  Suspended = 'suspended',
 }
 
 export enum ProjectArea {

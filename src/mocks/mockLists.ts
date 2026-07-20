@@ -76,10 +76,6 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
       id: 'a1b2c3d4-mock-construction-prep',
       value: 'constructionPreparation',
     },
-    {
-      id: 'a1b2c3d4-mock-suspended',
-      value: 'suspended',
-    },
   ],
 };
 
@@ -133,6 +129,11 @@ export const mockProjectPhaseDetails: { data: Array<IListItem> } = {
     {
       id: 'a1b2c3d4-mock-planning-3',
       value: 'constructionDesign',
+      projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
+    },
+    {
+      id: 'a1b2c3d4-mock-planning-suspended',
+      value: 'suspended',
       projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
     },
   ],
