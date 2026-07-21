@@ -1,7 +1,7 @@
 import { BaseQueryFn, createApi } from '@reduxjs/toolkit/query/react';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-const axiosBaseQuery =
+export const axiosBaseQuery =
   ({
     baseUrl,
   }: {
@@ -28,11 +28,27 @@ const axiosBaseQuery =
       });
       return { data: result.data };
     } catch (axiosError) {
-      const err = axiosError as AxiosError;
+      const parsedError = axiosError as AxiosError & {
+        data?: unknown;
+        status?: number;
+        hkrId?: unknown;
+      };
+
+      const status = parsedError.response?.status ?? parsedError.status;
+
+      let data: unknown = parsedError.response?.data ?? parsedError.data;
+      if (data === undefined && parsedError.hkrId !== undefined) {
+        data = parsedError;
+      }
+
+      if (data === undefined) {
+        data = parsedError.message;
+      }
+
       return {
         error: {
-          status: err.response?.status,
-          data: err.response?.data || err.message,
+          status,
+          data,
         },
       };
     }
