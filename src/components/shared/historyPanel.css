@@ -8,7 +8,8 @@
 }
 
 .project-history-panel {
-  @apply relative flex h-full w-full max-w-[28rem] flex-col bg-white;
+  /* border-0/m-0/p-0 reset the native <dialog> user-agent styles. */
+  @apply relative m-0 flex h-full w-full max-w-[28rem] flex-col border-0 bg-white p-0;
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
   animation: project-history-slide-in 0.2s ease-out;
 }

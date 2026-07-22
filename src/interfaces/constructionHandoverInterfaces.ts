@@ -58,6 +58,36 @@ export interface IConstructionHandoverTransitionResponse {
   currentStatus: ConstructionHandoverStatus;
   possibleTransitions: ConstructionHandoverStatus[];
 }
+
+// IO-883: a single change event from GET /construction-handovers/{id}/history/
+// (IO-882). Relations are already resolved server-side to display strings
+// (person names, related-row `value`, ISO dates), so no id→name lookup is needed
+// here. Mirrors the project-history feed shape (IProjectHistoryEntry).
+export interface IConstructionHandoverHistoryEntry {
+  id: string;
+  actor: string | null;
+  actor_username: string | null;
+  actor_first_name: string | null;
+  actor_last_name: string | null;
+  operation: 'CREATE' | 'UPDATE';
+  old_values: Record<string, unknown>;
+  new_values: Record<string, unknown>;
+  changed_fields: Array<string>;
+  createdDate: string | null;
+}
+
+export interface IConstructionHandoverHistoryResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Array<IConstructionHandoverHistoryEntry>;
+}
+
+export interface IConstructionHandoverHistoryRequest {
+  handoverId: string;
+  pageSize?: number;
+}
+
 export interface FinancingDialogState {
   open: boolean;
   mode: DialogMode;

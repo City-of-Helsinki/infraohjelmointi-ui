@@ -515,6 +515,39 @@
         "budget": "Budjetti"
       },
       "projectNumberWarning": "Projektinumeroa ei voitu hakea tietokannasta. Kirjaa se käsin tai yritä myöhemmin uudelleen."
+    },
+    "changeHistory": {
+      "title": "Rakennuttamiseen siirron muutoshistoria",
+      "loading": "Ladataan muutoshistoriaa…",
+      "empty": "Tälle rakennuttamiseen siirrolle ei ole tallennettua muutoshistoriaa.",
+      "error": "Muutoshistorian lataaminen epäonnistui.",
+      "close": "Sulje",
+      "today": "tänään",
+      "yesterday": "eilen",
+      "unknownActor": "Tuntematon käyttäjä",
+      "action": {
+        "created": "loi rakennuttamiseen siirron",
+        "changedStatus": "muutti tilaa",
+        "editedField": "muokkasi {{field}}-kenttää",
+        "editedForm": "muokkasi lomaketta"
+      },
+      "fields": {
+        "status": "Tila",
+        "name": "Hankkeen nimi",
+        "description": "Hankkeen kuvaus",
+        "constructionProcurementMethod": "Hankintatapa",
+        "constructionStart": "Aloitus viimeistään",
+        "constructionEnd": "Valmis viimeistään",
+        "otherTimelineNotes": "Muut aikataulun sidonnaisuudet ja välitavoitteet",
+        "totalCost": "Kokonaiskustannus",
+        "personPlanning": "Suunnittelu ja tekniset asiat",
+        "personFinancing": "Rahoitus ja aikataulu",
+        "constructionProjectManager": "Projektipäällikkö",
+        "linkDesignDrawings": "Suunnitelmapiirustukset",
+        "linkCostAllocation": "Kustannusjako",
+        "linkContractBoundaries": "Urakkarajat",
+        "previousProjectPhase": "Edellinen hankevaihe"
+      }
     }
   },
   "notification": {
