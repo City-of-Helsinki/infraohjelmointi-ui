@@ -34,5 +34,29 @@
   "searchPage": "Sök på sidan",
   "login": "Logga in",
   "keur": "keur",
-  "m2": "m²"
+  "m2": "m²",
+  "closeNotification": "Stang notis",
+  "projectProgramme": "Projektprogram",
+  "notification": {
+    "message": {
+      "projectProgrammeSwitchTypeSuccess": "Byte av projektprogrammets typ lyckades.",
+      "projectProgrammeSwitchTypeError": "Byte av projektprogrammets typ misslyckades.",
+      "projectProgrammeCreateError": "Det gick inte att skapa projektprogrammet.",
+      "projectProgrammeBasicInfoSuccess": "Grunduppgifter oppnades.",
+      "projectProgrammeBasicInfoError": "Det gick inte att oppna grunduppgifterna.",
+      "projectProgrammeNotFound": "Inget projektprogram hittades for projektet."
+    }
+  },
+  "projectProgrammeForm": {
+    "briefNotificationTitle": "Du fyller for narvarande i ett kortfattat projektprogram",
+    "briefNotificationText": "Text laggs till senare.",
+    "switchToExtendedProgramme": "Ga over till att utarbeta ett omfattande projektprogram",
+    "basicInfoCardTitle": "Grunduppgifter",
+    "basicInfoCardText": "Text laggs till senare.",
+    "fillBasicInfo": "Fyll i grunduppgifter",
+    "basicInfoSectionTitle": "Grunduppgifter",
+    "basicInfoSectionText": "Text laggs till senare.",
+    "name": "Projektets namn",
+    "district": "Stordistrikt"
+  }
 }

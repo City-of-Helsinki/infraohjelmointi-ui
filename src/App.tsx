@@ -59,6 +59,7 @@ import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
 import MyWorkloadBaseView from './views/MyWorkloadView/MyWorkloadBaseView';
+import ProjectProgramme from './components/Project/ProjectProgramme/ProjectProgramme';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -174,6 +175,7 @@ const App: FC = () => {
                 <Route path="notes" element={<ProjectNotes />} />
                 <Route path="talpa" element={<ProjectTalpa />} />
                 <Route path="construction-handover" element={<ConstructionHandoverContainer />} />
+                <Route path="project-programme" element={<ProjectProgramme />} />
               </Route>
               <Route path="/planning" element={<PlanningView />} />
               <Route path="/coordination" element={<PlanningView />} />

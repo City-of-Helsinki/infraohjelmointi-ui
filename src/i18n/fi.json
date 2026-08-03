@@ -27,6 +27,7 @@
     "responsiblePersons": "Hankkeen vastuuhenkilöt",
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma",
+    "projectProgramme": "Hankeohjelma",
     "documents": "Dokumentit",
     "pwFolderLink": "Avaa dokumentit ProjectWisessa",
     "planning": "Ohjelmointi",
@@ -554,6 +555,18 @@
       }
     }
   },
+  "projectProgrammeForm": {
+    "briefNotificationTitle": "Täytät tällä hetkellä suppeaa hankeohjelmaa",
+    "briefNotificationText": "Teksti lisätään myöhemmin.",
+    "switchToExtendedProgramme": "Siirry laatimaan laaja hankeohjelma",
+    "basicInfoCardTitle": "Perustiedot",
+    "basicInfoCardText": "Teksti lisätään myöhemmin.",
+    "fillBasicInfo": "Täytä perustiedot",
+    "basicInfoSectionTitle": "Perustiedot",
+    "basicInfoSectionText": "Teksti lisätään myöhemmin.",
+    "name": "Hankkeen nimi",
+    "district": "Suurpiiri"
+  },
   "notification": {
     "title": {
       "400": "Virheellinen pyyntö",
@@ -603,6 +616,12 @@
       "talpaProjectPatchSuccess": "Projektin avauspyyntö-excel muokattu onnistuneesti.",
       "constructionHandoverPatchSuccess": "Rakennuttamiseen siirto muokattu onnistuneesti",
       "constructionHandoverStatusTransitionSuccess": "Siirretty {{parameter}} onnistuneesti",
+      "projectProgrammeSwitchTypeSuccess": "Hankeohjelman tyyppi vaihdettu onnistuneesti.",
+      "projectProgrammeSwitchTypeError": "Hankeohjelman tyypin vaihtaminen ei onnistunut.",
+      "projectProgrammeCreateError": "Hankeohjelman luominen ei onnistunut.",
+      "projectProgrammeBasicInfoSuccess": "Perustiedot avattu onnistuneesti.",
+      "projectProgrammeBasicInfoError": "Perustietojen avaaminen ei onnistunut.",
+      "projectProgrammeNotFound": "Hankeohjelmaa ei löytynyt tälle hankkeelle.",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 401": "Pyyntö epäonnistui virhekoodilla 401",
       "Request failed with status code 403": "Pyyntö epäonnistui virhekoodilla 403",
@@ -677,6 +696,7 @@
   "myWorkload": "Omat hankkeet",
   "notes": "Muistiinpanot",
   "talpa": "Projektitiedot Talpaan",
+  "projectProgramme": "Hankeohjelma",
   "constructionHandover": "Rakennuttamiseen siirto",
   "tasks": "Tehtävät",
   "new": "Uusi",
