@@ -208,7 +208,8 @@ const useProjectForm = (project: IProject | null) => {
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: formValues,
-    mode: 'onBlur',
+    mode: 'onSubmit',
+    shouldFocusError: false,
   });
   const isProjectCardLoading = useAppSelector(selectIsProjectCardLoading);
   const isLoading = useAppSelector(selectIsLoading);
