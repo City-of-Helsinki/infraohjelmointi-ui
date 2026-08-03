@@ -9,6 +9,7 @@ interface IDateFieldProps {
   label: string;
   control?: HookFormControlType;
   rules?: HookFormRulesType;
+  required?: boolean;
   readOnly?: boolean;
   helperText?: string;
   className?: string;
@@ -21,13 +22,14 @@ const DateField: FC<IDateFieldProps> = ({
   label,
   control,
   rules,
+  required,
   readOnly,
   className = '',
   helperText,
   size = 'l',
   disabled,
 }) => {
-  const required = rules?.required ? true : false;
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
   const currentDate = new Date();
   const datePlus10Years = new Date(currentDate.getFullYear() + 10, 11, 31);
@@ -57,7 +59,7 @@ const DateField: FC<IDateFieldProps> = ({
               language="fi"
               id={label}
               readOnly={readOnly}
-              required={required}
+              required={isRequired}
               initialMonth={new Date()}
               invalid={error ? true : false}
               errorText={error?.message}
