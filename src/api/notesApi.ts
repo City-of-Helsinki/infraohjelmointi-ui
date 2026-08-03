@@ -33,8 +33,8 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
               type: 'toast',
             }),
           );
-        } catch (error) {
-          console.error('Error deleting note: ', error);
+        } catch {
+          // Mutation failure is handled by rejected state in consumers.
         }
       },
       invalidatesTags: ['Notes'],
@@ -55,8 +55,8 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
               type: 'toast',
             }),
           );
-        } catch (error) {
-          console.error('Error patching note: ', error);
+        } catch {
+          // Mutation failure is handled by rejected state in consumers.
         }
       },
       invalidatesTags: ['Notes'],

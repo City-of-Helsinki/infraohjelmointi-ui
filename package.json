@@ -42,7 +42,7 @@
   "scripts": {
     "start": "PORT=4000 craco start",
     "build": "craco build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "node ./scripts/run-tests.js --env=jsdom",
     "test:coverage": "yarn test --coverage",
     "test:ci": "CI=true yarn test:coverage --ci",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}'",

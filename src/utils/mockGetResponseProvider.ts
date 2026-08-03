@@ -121,6 +121,14 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockGroups);
     case url === `/project-groups/coordinator/?year=${year}`:
       return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/?year=${year}&forcedToFrame=false`:
+      return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/?year=${year}&forcedToFrame=true`:
+      return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/?forcedToFrame=false&year=${year}`:
+      return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/?forcedToFrame=true&year=${year}`:
+      return Promise.resolve(mockGroups);
     case lowerCaseUrl.includes(`/projects/search-results/`):
       return Promise.resolve(mockSearchResults);
     case lowerCaseUrl.includes(`/projects/`):
@@ -131,12 +139,22 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockCoordinatorNotes);
     case lowerCaseUrl.includes(`/sap-current-year-costs/${year}/`):
       return Promise.resolve(mockSapCosts);
+    case lowerCaseUrl.includes(`/sap-current-year-costs/${year}`):
+      return Promise.resolve(mockSapCosts);
     case lowerCaseUrl.includes('/budget-overrun-reasons/'):
       return Promise.resolve(mockBudgetOverrunReasons);
     case url === '/financing-parties/':
       return Promise.resolve(mockFinancingParties);
     case url === '/project-programmers/':
       return Promise.resolve(mockProgrammers);
+    case url === '/talpa-project-ranges/':
+      return Promise.resolve({ data: [] });
+    case url === '/talpa-project-types/':
+      return Promise.resolve({ data: [] });
+    case url === '/talpa-service-classes/':
+      return Promise.resolve({ data: [] });
+    case url === '/talpa-asset-classes/':
+      return Promise.resolve({ data: [] });
     case url === '/app-state-value/':
       return Promise.resolve(mockAppStateValue);
     case url.includes('/project-groups/coordinator/?year=2025&forcedToFrame=true'):
@@ -157,11 +175,20 @@ const mockProgrammers = {
 };
 
 const mockAppStateValue = {
-  data: {
-    id: 'app-state-1',
-    key: 'test-key',
-    value: 'test-value',
-  },
+  data: [
+    {
+      id: 'forced-to-frame-state-id',
+      name: 'forcedToFrameStatus',
+      value: false,
+      updatedDate: '2026-01-01T00:00:00Z',
+    },
+    {
+      id: 'forced-to-frame-data-updated-id',
+      name: 'forcedToFrameDataUpdated',
+      value: false,
+      updatedDate: '2026-01-01T00:00:00Z',
+    },
+  ],
 };
 
 /**
