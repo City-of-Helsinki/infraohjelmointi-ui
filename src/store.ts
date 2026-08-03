@@ -43,7 +43,14 @@ export const setupStore = (preloadedState?: Partial<RootState>) => {
     reducer: rootReducer,
     preloadedState,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(infraohjelmointiApi.middleware),
+      getDefaultMiddleware({
+        serializableCheck: {
+          warnAfter: 128,
+        },
+        immutableCheck: {
+          warnAfter: 128,
+        },
+      }).concat(infraohjelmointiApi.middleware),
   });
 };
 

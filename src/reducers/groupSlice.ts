@@ -6,6 +6,7 @@ import {
   getPlanningGroups,
   postGroup,
 } from '@/services/groupServices';
+import { toSerializableError } from '@/utils/reduxErrorUtils';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -32,7 +33,7 @@ export const getCoordinationGroupsThunk = createAsyncThunk(
     try {
       return await getCoordinatorGroups(year, false);
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -42,7 +43,7 @@ export const getForcedToFrameGroupsThunk = createAsyncThunk(
     try {
       return await getCoordinatorGroups(year, true);
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -53,7 +54,7 @@ export const postGroupThunk = createAsyncThunk(
       const group = await postGroup(request);
       return group;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -63,7 +64,7 @@ export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: stri
     const res = await deleteGroup(id);
     return res;
   } catch (e) {
-    return thunkAPI.rejectWithValue(e);
+    return thunkAPI.rejectWithValue(toSerializableError(e));
   }
 });
 
@@ -74,7 +75,7 @@ export const getPlanningGroupsThunk = createAsyncThunk(
       const groups = await getPlanningGroups(year);
       return groups;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );

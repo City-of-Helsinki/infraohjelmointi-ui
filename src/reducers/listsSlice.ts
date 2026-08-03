@@ -30,6 +30,7 @@ import {
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
+import { toSerializableError } from '@/utils/reduxErrorUtils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   ITalpaAssetClass,
@@ -207,7 +208,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectClasses: [],
     };
   } catch (err) {
-    return thunkAPI.rejectWithValue(err);
+    return thunkAPI.rejectWithValue(toSerializableError(err));
   }
 });
 
@@ -220,7 +221,7 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
       talpaAssetClasses: await getTalpaAssetClasses(),
     };
   } catch (err) {
-    return thunkAPI.rejectWithValue(err);
+    return thunkAPI.rejectWithValue(toSerializableError(err));
   }
 });
 
@@ -238,7 +239,7 @@ export const patchMenuItemsThunk = createAsyncThunk(
       );
       return listItem;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -250,7 +251,7 @@ export const postMenuItemsThunk = createAsyncThunk(
       const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -265,7 +266,7 @@ export const deleteMenuItemsThunk = createAsyncThunk(
         rowId: thunkContent.id,
       };
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -289,7 +290,7 @@ export const saveTableOrderThunk = createAsyncThunk(
       const savedTable = await putMenuListOrder(listData, path);
       return savedTable;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );

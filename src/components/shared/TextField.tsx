@@ -18,6 +18,7 @@ interface ITextFieldProps extends Omit<TextInputProps, 'size' | 'id' | 'tooltip'
   defaultValue?: string;
   wrapperClassName?: string;
   size?: 'full' | 'l';
+  shouldTranslate?: boolean;
 }
 
 const TextField: FC<ITextFieldProps> = ({
@@ -34,6 +35,7 @@ const TextField: FC<ITextFieldProps> = ({
   defaultValue = '',
   wrapperClassName = '',
   size = 'l',
+  shouldTranslate,
   ...rest
 }) => {
   const required = rules?.required ? true : false;

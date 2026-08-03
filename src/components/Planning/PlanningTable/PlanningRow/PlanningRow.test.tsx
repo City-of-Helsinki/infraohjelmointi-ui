@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
@@ -159,7 +159,9 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
     });
 
     // Simulate a change to global groupsExpanded (like what happens during navigation)
-    store.dispatch(setGroupsExpanded(false));
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(false));
+    });
 
     // With our fix: The group should stay expanded because of search
     await waitFor(() => {
@@ -176,8 +178,10 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
     });
 
     // Changing global groupsExpanded should not affect search-driven expansion
-    store.dispatch(setGroupsExpanded(true));
-    store.dispatch(setGroupsExpanded(false));
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(true));
+      store.dispatch(setGroupsExpanded(false));
+    });
 
     // Should still be expanded due to search
     await waitFor(() => {
