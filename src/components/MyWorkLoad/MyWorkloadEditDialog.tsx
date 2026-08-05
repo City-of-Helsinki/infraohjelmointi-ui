@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
+import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
@@ -29,7 +29,6 @@ import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from './styles.module.css';
-import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { normalizeMyWorkloadDate } from '../../utils/myWorkloadUtils';
 import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
 import { HookFormControlType } from '@/interfaces/formInterfaces';

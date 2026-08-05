@@ -71,6 +71,7 @@ const SideBar = () => {
           aria-label={n.label}
           key={n.route}
           disabled={!user || n.disabled}
+          type="button"
         >
           {n.component}
         </button>
