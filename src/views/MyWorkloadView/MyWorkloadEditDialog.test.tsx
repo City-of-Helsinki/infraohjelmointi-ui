@@ -54,7 +54,7 @@ const baseProject: MyWorkloadTableRow = {
 };
 
 const renderDialog = (
-  viewType: 'design' | 'construction',
+  viewType: 'planning' | 'construction',
   project: MyWorkloadTableRow | null = baseProject,
 ) => {
   const store = setupStore();
@@ -108,13 +108,16 @@ describe('MyWorkloadEditDialog', () => {
     jest.clearAllMocks();
   });
 
-  it('blocks submit when required design dates are missing', async () => {
+  it('blocks submit when required planning dates are missing', async () => {
     const projectWithMissingRequiredDate = {
       ...baseProject,
       planningStart: '',
     };
 
-    const { user, getByRole, queryByText } = renderDialog('design', projectWithMissingRequiredDate);
+    const { user, getByRole, queryByText } = renderDialog(
+      'planning',
+      projectWithMissingRequiredDate,
+    );
 
     await user.click(getByRole('button', { name: 'save' }));
 
@@ -129,7 +132,7 @@ describe('MyWorkloadEditDialog', () => {
     };
 
     const { user, getByRole, queryByText, onClose } = renderDialog(
-      'design',
+      'planning',
       projectWithMissingRequiredDate,
     );
 
@@ -148,7 +151,7 @@ describe('MyWorkloadEditDialog', () => {
       planningStart: '31-12-2026',
     };
 
-    const { user, getByRole, queryByText } = renderDialog('design', projectWithInvalidDate);
+    const { user, getByRole, queryByText } = renderDialog('planning', projectWithInvalidDate);
 
     await user.click(getByRole('button', { name: 'save' }));
 
@@ -187,7 +190,7 @@ describe('MyWorkloadEditDialog', () => {
       planningStart: '1.7.2026',
     };
 
-    const { user, getByRole } = renderDialog('design', projectWithSingleDigitDate);
+    const { user, getByRole } = renderDialog('planning', projectWithSingleDigitDate);
 
     await user.click(getByRole('button', { name: 'save' }));
 
@@ -201,7 +204,7 @@ describe('MyWorkloadEditDialog', () => {
     });
   });
 
-  it('submits design payload and maps response values back to onSave', async () => {
+  it('submits planning payload and maps response values back to onSave', async () => {
     mockPatchProject.mockReturnValueOnce({
       unwrap: () =>
         Promise.resolve({
@@ -227,7 +230,7 @@ describe('MyWorkloadEditDialog', () => {
         }),
     });
 
-    const { user, getByRole, onClose, onSave, store } = renderDialog('design');
+    const { user, getByRole, onClose, onSave, store } = renderDialog('planning');
 
     await user.click(getByRole('button', { name: 'save' }));
 
@@ -322,7 +325,7 @@ describe('MyWorkloadEditDialog', () => {
   });
 
   it('navigates to project card edit from footer action', async () => {
-    const { user, getByRole, onClose } = renderDialog('design');
+    const { user, getByRole, onClose } = renderDialog('planning');
 
     await user.click(getByRole('button', { name: 'myWorkloadView.table.goToProjectCardEdit' }));
 

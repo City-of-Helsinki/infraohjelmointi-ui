@@ -1039,7 +1039,6 @@
       "modifyInformation": "Muokkaa tietoja",
       "editDialogTitle": "Muokkaa hankkeen tietoja",
       "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
-      "loading": "Ladataan hankkeita...",
       "requiredField": "Pakollinen kenttä",
       "invalidDate": "Päivämäärä on virheellinen",
       "emptyText": "Hankkeita ei löytynyt"
