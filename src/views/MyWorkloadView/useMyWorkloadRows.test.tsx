@@ -7,7 +7,8 @@ import { mockUser } from '@/mocks/mockUsers';
 import { setupStore } from '@/store';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
-import useMyWorkloadRows, { MyWorkloadViewType } from './useMyWorkloadRows';
+import useMyWorkloadRows from './useMyWorkloadRows';
+import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 
 const stableTranslate = (key: string) => key;
 

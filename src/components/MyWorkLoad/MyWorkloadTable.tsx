@@ -3,9 +3,11 @@ import { Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import { MyWorkloadViewType } from './useMyWorkloadRows';
-import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from './myWorkloadUtils';
+import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import {
+  formatMyWorkloadDateForDisplay,
+  getMyWorkloadDateTimeValue,
+} from '@/utils/myWorkloadUtils';
 import classes from './styles.module.css';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 

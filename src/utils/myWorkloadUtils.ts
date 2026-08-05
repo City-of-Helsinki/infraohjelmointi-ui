@@ -2,7 +2,7 @@ import moment from 'moment';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { MyWorkloadViewType } from './useMyWorkloadRows';
+import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 
 const MY_WORKLOAD_DATE_FORMATS = ['DD.MM.YYYY', 'D.M.YYYY', 'YYYY-MM-DD'];
 

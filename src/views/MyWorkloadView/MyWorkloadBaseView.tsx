@@ -3,14 +3,15 @@ import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
-import useMyWorkloadRows, { MyWorkloadViewType } from './useMyWorkloadRows';
-import { getMyWorkloadViewType } from './myWorkloadUtils';
+import useMyWorkloadRows from './useMyWorkloadRows';
 import { useTranslation } from 'react-i18next';
 import { isRequestCanceled } from '@/utils/http';
 import classes from './styles.module.css';
-import MyWorkloadTasks from './MyWorkloadTasks';
-import MyWorkloadTable from './MyWorkloadTable';
+import MyWorkloadTasks from '../../components/MyWorkLoad/MyWorkloadTasks';
+import MyWorkloadTable from '../../components/MyWorkLoad/MyWorkloadTable';
 import MyWorkloadViewTypeButtons from './MyWorkloadViewTypeButtons';
+import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { getMyWorkloadViewType } from '@/utils/myWorkloadUtils';
 
 const MyWorkloadBaseView: FC = () => {
   const [viewType, setViewType] = useState<MyWorkloadViewType>('planning');

@@ -16,10 +16,7 @@ const mockedGetProjectsWithParams = getProjectsWithParams as jest.MockedFunction
   typeof getProjectsWithParams
 >;
 
-const makeProject = (
-  personPlanningEmail: string | null,
-  personConstructionEmail: string | null,
-) =>
+const makeProject = (personPlanningEmail: string | null, personConstructionEmail: string | null) =>
   ({
     ...mockProject.data,
     id: `${personPlanningEmail ?? 'none'}-${personConstructionEmail ?? 'none'}`,
@@ -35,13 +32,13 @@ const makeProject = (
           email: personConstructionEmail,
         }
       : undefined,
-  }) as IProject;
+  } as IProject);
 
 const makeResponse = (
   results: IProject[],
   next: string | null = null,
   count = results.length,
-) : IProjectsResponse => ({
+): IProjectsResponse => ({
   count,
   next,
   results,

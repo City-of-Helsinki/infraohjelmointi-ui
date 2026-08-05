@@ -3,15 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import type { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { isRequestCanceled } from '@/utils/http';
-import { getUniqueResponsiblePersonId, normalizeMyWorkloadDate } from './myWorkloadUtils';
-
-export type MyWorkloadViewType = 'planning' | 'construction';
+import { getUniqueResponsiblePersonId, normalizeMyWorkloadDate } from '@/utils/myWorkloadUtils';
 
 const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewType) => {
   if (viewType === 'construction') {

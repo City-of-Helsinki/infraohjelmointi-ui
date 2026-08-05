@@ -29,8 +29,8 @@ import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from './styles.module.css';
-import { MyWorkloadViewType } from './useMyWorkloadRows';
-import { normalizeMyWorkloadDate } from './myWorkloadUtils';
+import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { normalizeMyWorkloadDate } from '../../utils/myWorkloadUtils';
 import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 

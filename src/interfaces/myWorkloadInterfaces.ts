@@ -21,3 +21,5 @@ export interface MyWorkloadTableRow {
   phaseId: string;
   functions: string;
 }
+
+export type MyWorkloadViewType = 'planning' | 'construction';
