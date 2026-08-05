@@ -105,7 +105,7 @@ describe('useMyWorkloadRows', () => {
   });
 
   it('returns empty state without fetch when user email is missing', async () => {
-    const { result } = renderMyWorkloadHook('design', '');
+    const { result } = renderMyWorkloadHook('planning', '');
 
     await waitFor(() => {
       expect(result.current.rows).toEqual([]);
@@ -126,7 +126,7 @@ describe('useMyWorkloadRows', () => {
       next: null,
     });
 
-    const { result } = renderMyWorkloadHook('design');
+    const { result } = renderMyWorkloadHook('planning');
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -162,7 +162,7 @@ describe('useMyWorkloadRows', () => {
       next: null,
     });
 
-    const { result } = renderMyWorkloadHook('design', 'planner@hel.fi', []);
+    const { result } = renderMyWorkloadHook('planning', 'planner@hel.fi', []);
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -193,7 +193,7 @@ describe('useMyWorkloadRows', () => {
       makeResponsiblePerson('planning-person-id-2', 'planner@hel.fi'),
     ];
 
-    const { result } = renderMyWorkloadHook('design', 'planner@hel.fi', duplicatePersons);
+    const { result } = renderMyWorkloadHook('planning', 'planner@hel.fi', duplicatePersons);
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -246,7 +246,7 @@ describe('useMyWorkloadRows', () => {
   it('sets error state and dispatches notification on non-cancel errors', async () => {
     mockedGetProjectsWithParams.mockRejectedValueOnce(new Error('boom'));
 
-    const { result, store } = renderMyWorkloadHook('design');
+    const { result, store } = renderMyWorkloadHook('planning');
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -265,7 +265,7 @@ describe('useMyWorkloadRows', () => {
       new AxiosError('canceled', AxiosError.ERR_CANCELED),
     );
 
-    const { result, store } = renderMyWorkloadHook('design');
+    const { result, store } = renderMyWorkloadHook('planning');
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);

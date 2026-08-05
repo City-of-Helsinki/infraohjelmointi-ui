@@ -1,11 +1,11 @@
 import { FC, memo, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { LoadingSpinner, Pagination, Table } from 'hds-react';
+import { Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 import { MyWorkloadViewType } from './useMyWorkloadRows';
-import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from './myWorkloadDateUtils';
+import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from './myWorkloadUtils';
 import classes from './styles.module.css';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
@@ -142,7 +142,7 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
 
   const isEmpty = !isLoading && !hasError && tableRows.length === 0;
   const hasRows = !hasError && tableRows.length > 0;
-  const shouldRenderTable = !hasError && (hasRows || isLoading);
+  const shouldRenderTable = !isLoading && !hasError && hasRows;
 
   useEffect(() => {
     setTableRows(listOfProjects);
@@ -212,11 +212,6 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   return (
     <div className={classes.tableContainer} id="my-workload-table-container">
       <h2 className={`${classes.sectionTitle} text-heading-m`}>{t('myWorkloadView.myWorkload')}</h2>
-      {isLoading && (
-        <div className={classes.loadingIndicator} data-testid="my-workload-loading-indicator">
-          <LoadingSpinner small loadingText={t('myWorkloadView.table.loading')} />
-        </div>
-      )}
       {shouldRenderTable && (
         <Table
           cols={cols}

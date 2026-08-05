@@ -13,6 +13,8 @@
   },
   "myWorkloadView": {
     "myWorkload": "Mina projekt",
+    "viewTypeConstruction": "Byggherreprojekt",
+    "viewTypePlanning": "Planeringsprojekt",
     "table": {
       "loading": "Projekt laddas...",
       "requiredField": "Obligatoriskt fält"

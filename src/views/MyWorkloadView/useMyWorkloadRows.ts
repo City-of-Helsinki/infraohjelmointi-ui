@@ -9,9 +9,9 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { isRequestCanceled } from '@/utils/http';
-import { normalizeMyWorkloadDate } from './myWorkloadDateUtils';
+import { getUniqueResponsiblePersonId, normalizeMyWorkloadDate } from './myWorkloadUtils';
 
-export type MyWorkloadViewType = 'design' | 'construction';
+export type MyWorkloadViewType = 'planning' | 'construction';
 
 const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewType) => {
   if (viewType === 'construction') {
@@ -49,10 +49,21 @@ const mapProjectToMyWorkloadTableRow = (
 });
 
 const fetchAllProjects = async (year: number, signal: AbortSignal, params = '') => {
-  const allProjects: IProject[] = [];
-  let fullPath: string | undefined;
+  const firstResponse = await getProjectsWithParams(
+    {
+      params,
+      year,
+      forcedToFrame: false,
+      direct: false,
+    },
+    false,
+    { signal },
+  );
 
-  do {
+  const allProjects: IProject[] = [...firstResponse.results];
+  let fullPath = firstResponse.next ?? undefined;
+
+  while (fullPath != null) {
     const response = await getProjectsWithParams(
       {
         params,
@@ -67,21 +78,12 @@ const fetchAllProjects = async (year: number, signal: AbortSignal, params = '') 
 
     allProjects.push(...response.results);
     fullPath = response.next ?? undefined;
-  } while (fullPath);
+  }
 
   return allProjects;
 };
 
-const getUniqueResponsiblePersonId = (
-  responsiblePersons: ReturnType<typeof selectResponsiblePersonsRaw>,
-  userEmail: string,
-) => {
-  const matches = responsiblePersons.filter((person) => person.email?.toLowerCase() === userEmail);
-
-  return matches.length === 1 ? matches[0].id : undefined;
-};
-
-const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
+const useMyWorkloadRows = (viewType: MyWorkloadViewType, isEnabled = true) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
@@ -91,8 +93,18 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
   const [rows, setRows] = useState<MyWorkloadTableRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [hasLoadedForCurrentRequest, setHasLoadedForCurrentRequest] = useState(false);
 
   useEffect(() => {
+    if (!isEnabled) {
+      setHasLoadedForCurrentRequest(false);
+      setIsLoading(false);
+      setHasError(false);
+      return;
+    }
+
+    setHasLoadedForCurrentRequest(false);
+
     const userEmail = user?.email?.toLowerCase();
     const responsiblePersonId = userEmail
       ? getUniqueResponsiblePersonId(responsiblePersons, userEmail)
@@ -102,6 +114,7 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
       setRows([]);
       setIsLoading(false);
       setHasError(false);
+      setHasLoadedForCurrentRequest(true);
       return;
     }
 
@@ -152,6 +165,7 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
       } finally {
         if (isActive) {
           setIsLoading(false);
+          setHasLoadedForCurrentRequest(true);
         }
       }
     };
@@ -162,9 +176,11 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType) => {
       isActive = false;
       abortController.abort();
     };
-  }, [dispatch, responsiblePersons, startYear, user?.email, viewType, t]);
+  }, [dispatch, isEnabled, responsiblePersons, startYear, user?.email, viewType, t]);
 
-  return { rows, isLoading, hasError };
+  const effectiveIsLoading = isEnabled && (!hasLoadedForCurrentRequest || isLoading);
+
+  return { rows, isLoading: effectiveIsLoading, hasError };
 };
 
 export default useMyWorkloadRows;

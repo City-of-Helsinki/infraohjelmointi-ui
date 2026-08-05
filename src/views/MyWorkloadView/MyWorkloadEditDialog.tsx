@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from './styles.module.css';
 import { MyWorkloadViewType } from './useMyWorkloadRows';
-import { normalizeMyWorkloadDate } from './myWorkloadDateUtils';
+import { normalizeMyWorkloadDate } from './myWorkloadUtils';
 import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 
@@ -77,7 +77,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     useMyWorkloadEditForm(project);
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  const isDesignerView = viewType === 'design';
+  const isPlanningView = viewType === 'planning';
 
   const dateFieldRefs = useMemo(
     () => ({
@@ -181,7 +181,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         ? normalizeMyWorkloadDate(constructionEnd)
         : null;
 
-      const hasDesignerValidationErrors =
+      const hasPlanningValidationErrors =
         !formattedPlanningStart ||
         !formattedPlanningEnd ||
         !formattedPresenceStart ||
@@ -194,13 +194,13 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
 
       const hasValidationErrors =
         !values.phaseId.trim() ||
-        (isDesignerView ? hasDesignerValidationErrors : hasConstructionValidationErrors);
+        (isPlanningView ? hasPlanningValidationErrors : hasConstructionValidationErrors);
 
       if (hasValidationErrors) {
         return;
       }
 
-      const payload = isDesignerView
+      const payload = isPlanningView
         ? {
             phase: values.phaseId,
             estPlanningStart: formattedPlanningStart,
@@ -270,7 +270,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         );
       }
     },
-    [dispatch, isDesignerView, onClose, onSave, patchProject, project, t],
+    [dispatch, isPlanningView, onClose, onSave, patchProject, project, t],
   );
 
   const onSubmit = useCallback(() => {
@@ -368,7 +368,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         <div className={classes.editDialogFields} id="my-workload-edit-dialog-content">
           <p className={classes.editDialogProjectSubtitle}>{project?.projectName ?? ''}</p>
 
-          {isDesignerView && (
+          {isPlanningView && (
             <>
               <h3 className={classes.editDialogSectionTitle}>
                 {t('myWorkloadView.table.planningScheduleTitle')}
@@ -462,7 +462,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
             </>
           )}
 
-          {!isDesignerView && (
+          {!isPlanningView && (
             <>
               <div className={classes.editDialogDateRow}>
                 {renderDateField({
@@ -508,7 +508,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
             </p>
           )}
 
-          {!isDesignerView && (
+          {!isPlanningView && (
             <>
               <hr className={classes.editDialogDivider} />
               <Controller

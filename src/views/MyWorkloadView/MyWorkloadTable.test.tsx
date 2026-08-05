@@ -84,7 +84,12 @@ describe('MyWorkloadTable', () => {
 
   it('renders empty state text when there are no rows', () => {
     const { getByText } = render(
-      <MyWorkloadTable listOfProjects={[]} isLoading={false} hasError={false} viewType="design" />,
+      <MyWorkloadTable
+        listOfProjects={[]}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
     );
 
     expect(getByText('myWorkloadView.table.emptyText')).toBeInTheDocument();
@@ -92,19 +97,33 @@ describe('MyWorkloadTable', () => {
 
   it('renders app data error state when request fails', () => {
     const { getByText } = render(
-      <MyWorkloadTable listOfProjects={[]} isLoading={false} hasError={true} viewType="design" />,
+      <MyWorkloadTable listOfProjects={[]} isLoading={false} hasError={true} viewType="planning" />,
     );
 
     expect(getByText('appDataError')).toBeInTheDocument();
   });
 
-  it('shows a loading spinner and hides empty text while rows are loading', () => {
-    const { getByTestId, queryByText } = render(
-      <MyWorkloadTable listOfProjects={[]} isLoading={true} hasError={false} viewType="design" />,
+  it('hides custom loading content and empty text while rows are loading', () => {
+    const { getByText, queryByText } = render(
+      <MyWorkloadTable listOfProjects={[]} isLoading={true} hasError={false} viewType="planning" />,
     );
 
-    expect(getByTestId('my-workload-loading-indicator')).toBeInTheDocument();
+    expect(getByText('myWorkloadView.myWorkload')).toBeInTheDocument();
+    expect(queryByText('myWorkloadView.table.loading')).toBeNull();
     expect(queryByText('myWorkloadView.table.emptyText')).toBeNull();
+  });
+
+  it('hides table rows while loading even when previous rows exist', () => {
+    const { queryByText } = render(
+      <MyWorkloadTable
+        listOfProjects={[makeRow(1)]}
+        isLoading={true}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    expect(queryByText('Project 1')).toBeNull();
   });
 
   it('opens edit dialog for selected row when modify button is clicked', async () => {
@@ -114,7 +133,7 @@ describe('MyWorkloadTable', () => {
         listOfProjects={[makeRow(1), makeRow(2)]}
         isLoading={false}
         hasError={false}
-        viewType="design"
+        viewType="planning"
       />,
     );
 
@@ -138,7 +157,7 @@ describe('MyWorkloadTable', () => {
         listOfProjects={[makeRow(1)]}
         isLoading={false}
         hasError={false}
-        viewType="design"
+        viewType="planning"
       />,
     );
 
@@ -164,7 +183,7 @@ describe('MyWorkloadTable', () => {
         listOfProjects={rows}
         isLoading={false}
         hasError={false}
-        viewType="design"
+        viewType="planning"
       />,
     );
 
@@ -203,7 +222,7 @@ describe('MyWorkloadTable', () => {
         listOfProjects={rows}
         isLoading={false}
         hasError={false}
-        viewType="design"
+        viewType="planning"
       />,
     );
 

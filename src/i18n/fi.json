@@ -1018,6 +1018,8 @@
   "myWorkloadView": {
     "mainTitle": "Omat hankkeet",
     "myWorkload": "Omat hankkeet",
+    "viewTypeConstruction": "Rakennuttamisen projektit",
+    "viewTypePlanning": "Suunnitteluttamisen projektit",
     "tasks": "Tehtävät",
     "table": {
       "projectName": "Hanke",
@@ -1037,7 +1039,6 @@
       "modifyInformation": "Muokkaa tietoja",
       "editDialogTitle": "Muokkaa hankkeen tietoja",
       "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
-      "loading": "Ladataan hankkeita...",
       "requiredField": "Pakollinen kenttä",
       "invalidDate": "Päivämäärä on virheellinen",
       "emptyText": "Hankkeita ei löytynyt"
