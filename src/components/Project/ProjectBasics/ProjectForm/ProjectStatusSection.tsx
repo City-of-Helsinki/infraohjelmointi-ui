@@ -9,7 +9,6 @@ import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
-import _ from 'lodash';
 import { listItemToOption, mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';

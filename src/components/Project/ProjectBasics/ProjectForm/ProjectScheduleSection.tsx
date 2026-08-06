@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
 import { validateAfter, validateBefore, validateSameOrAfter } from '@/utils/validation';
-import _ from 'lodash';
 
 interface IProjectScheduleSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
