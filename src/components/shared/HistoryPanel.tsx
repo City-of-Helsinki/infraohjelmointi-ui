@@ -24,7 +24,7 @@ export interface IHistoryPanelProps<E extends IHistoryPanelEntry> {
   onClose: () => void;
   t: TFunction;
   // Distinguishes the two panels' data-testids (e.g. 'project-history').
-  testIdPrefix: string;
+  testIdPrefix: 'project-history' | 'handover-history';
   // i18n namespace for the panel chrome and action phrasing
   // (e.g. 'projectForm.changeHistory').
   i18nPrefix: string;
