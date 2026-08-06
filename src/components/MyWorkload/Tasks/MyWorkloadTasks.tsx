@@ -5,10 +5,10 @@ import classes from '../styles.module.css';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 
 interface MyWorkloadTasksProps {
-  listOfProjects: MyWorkloadTableRow[];
+  listOfTasks: MyWorkloadTableRow[];
 }
 
-const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfProjects }) => {
+const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
   const { t } = useTranslation();
 
   const dateTextFormatter = (startDate: string, endDate: string): string => {
@@ -30,7 +30,7 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfProjects }) => {
   };
 
   // Todo: Find out where the task description = the action button text comes from
-  const tasks = listOfProjects.map((project) => ({
+  const tasks = listOfTasks.map((project) => ({
     id: project.id,
     budget: project.budget ?? '',
     projectName: project.projectName,

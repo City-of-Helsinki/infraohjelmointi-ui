@@ -3,28 +3,18 @@ import { Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
-<<<<<<<< HEAD:src/components/MyWorkLoad/MyWorkloadTable.tsx
 import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import {
   formatMyWorkloadDateForDisplay,
   getMyWorkloadDateTimeValue,
 } from '@/utils/myWorkloadUtils';
-========
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.tsx
-import { MyWorkloadViewType } from './useMyWorkloadRows';
-import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from './myWorkloadUtils';
->>>>>>>> 5ee20174 (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.tsx
-import classes from './styles.module.css';
-=======
-import { formatMyWorkloadDateForDisplay, getMyWorkloadDateTimeValue } from '../myWorkloadDateUtils';
 import classes from '../styles.module.css';
->>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.tsx
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
-import { MyWorkloadViewType } from '../useMyWorkloadRows';
 
 interface MyWorkloadTableProps {
   listOfProjects: MyWorkloadTableRow[];
+  isLoading: boolean;
+  hasError: boolean;
   viewType: MyWorkloadViewType;
 }
 
@@ -140,20 +130,22 @@ const createTableColumns = (
   },
 ];
 
-const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, viewType }) => {
+const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
+  listOfProjects,
+  isLoading,
+  hasError,
+  viewType,
+}) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [tableRows, setTableRows] = useState<Array<MyWorkloadTableRow>>([]);
   const [sortState, setSortState] = useState<SortState>(null);
   const [editedProject, setEditedProject] = useState<MyWorkloadTableRow | null>(null);
 
-<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.tsx
   const isEmpty = !isLoading && !hasError && tableRows.length === 0;
   const hasRows = !hasError && tableRows.length > 0;
   const shouldRenderTable = !isLoading && !hasError && hasRows;
 
-=======
->>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.tsx
   useEffect(() => {
     setTableRows(listOfProjects);
   }, [listOfProjects]);
@@ -222,7 +214,6 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, viewType })
   return (
     <div className={classes.tableContainer} id="my-workload-table-container">
       <h2 className={`${classes.sectionTitle} text-heading-m`}>{t('myWorkloadView.myWorkload')}</h2>
-<<<<<<< HEAD:src/views/MyWorkloadView/MyWorkloadTable.tsx
       {shouldRenderTable && (
         <Table
           cols={cols}
@@ -237,18 +228,6 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, viewType })
       {isEmpty && <p className={classes.emptyStateText}>{t('myWorkloadView.table.emptyText')}</p>}
       {hasError && <p className={classes.emptyStateText}>{t('appDataError')}</p>}
       {hasRows && pageCount > 1 && (
-=======
-      <Table
-        cols={cols}
-        rows={availableRowsList}
-        indexKey="id"
-        renderIndexCol={false}
-        onSort={handleSort}
-        initialSortingColumnKey={sortState?.colKey}
-        initialSortingOrder={sortState?.order}
-      />
-      {pageCount > 1 && (
->>>>>>> 7804e8bc (feat(ui): added tasks-section to myworkload-view):src/components/MyWorkload/Table/MyWorkloadTable.tsx
         <div className="custom-pagination" data-testid="my-workload-pagination-container">
           <Pagination
             data-testid="my-workload-pagination"
@@ -262,6 +241,7 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({ listOfProjects, viewType })
           />
         </div>
       )}
+
       <MyWorkloadEditDialog
         isOpen={editedProject !== null}
         project={editedProject}
