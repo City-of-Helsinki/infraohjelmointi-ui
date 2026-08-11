@@ -140,9 +140,7 @@ const toProgrammersListItems = (programmers: Array<IPerson>): Array<IListItem> =
   programmers
     .filter(
       ({ firstName, lastName }) =>
-        firstName?.trim() &&
-        lastName?.trim() &&
-        !(firstName === 'Ei' && lastName === 'Valintaa'),
+        firstName?.trim() && lastName?.trim() && !(firstName === 'Ei' && lastName === 'Valintaa'),
     )
     .map(({ id, firstName, lastName }) => ({
       id,

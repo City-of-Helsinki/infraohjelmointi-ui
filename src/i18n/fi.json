@@ -637,6 +637,7 @@
   "planning": "Ohjelmointinäkymä",
   "coordination": "Koordinointinäkymä",
   "basicInfo": "Perustiedot",
+  "myWorkload": "Omat hankkeet",
   "notes": "Muistiinpanot",
   "talpa": "Projektitiedot Talpaan",
   "constructionHandover": "Rakennuttamiseen siirto",
@@ -669,6 +670,7 @@
   "budgetProposalPreparation": "Talousarvioehdotusten valmistelu",
   "allocationPreparation": "Määrärahojen valmistelu",
   "keur": "keur",
+  "m2": "m²",
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
   "send:": "Lähetä",
   "savedTime": "Viimeksi tallennettu {{time}}",
@@ -1011,6 +1013,35 @@
       "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
       "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
       "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
+    }
+  },
+  "myWorkloadView": {
+    "mainTitle": "Omat hankkeet",
+    "myWorkload": "Omat hankkeet",
+    "viewTypeConstruction": "Rakennuttamisen projektit",
+    "viewTypePlanning": "Suunnitteluttamisen projektit",
+    "tasks": "Tehtävät",
+    "table": {
+      "projectName": "Hanke",
+      "description": "Hankkeen kuvaus",
+      "planningStart": "Suunnittelu alkaa",
+      "planningEnd": "Suunnittelu päättyy",
+      "planningScheduleTitle": "Suunnittelun aikataulu",
+      "designCostEstimateSectionTitle": "Suunnittelun kustannusarvio",
+      "costEstimate": "Kustannusarvio",
+      "workQuantity": "Suoritemäärä",
+      "projectCostForecast": "Hankkeen kustannusarvio",
+      "planningCostForecast": "Suunnittelun kustannusarvio",
+      "constructionCostForecast": "Rakentamisen kustannusarvio",
+      "totalBudget": "Hankkeen kokonaisbudjetti",
+      "phase": "Vaihe",
+      "functions": "Toimenpiteet",
+      "modifyInformation": "Muokkaa tietoja",
+      "editDialogTitle": "Muokkaa hankkeen tietoja",
+      "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
+      "requiredField": "Pakollinen kenttä",
+      "invalidDate": "Päivämäärä on virheellinen",
+      "emptyText": "Hankkeita ei löytynyt"
     }
   }
 }
