@@ -40,10 +40,14 @@ function getTextValue(value?: string | null): string {
   return value ?? '';
 }
 
+function hasItems<T>(items?: T[] | null): items is T[] {
+  return (items?.length ?? 0) > 0;
+}
+
 function getLinksValue(
   links?: IProjectProgrammeBasicInfo['links'],
 ): IProjectProgrammeLinkFormItem[] {
-  if (!links || !links.length) {
+  if (!hasItems(links)) {
     return [{ value: '' }];
   }
 
@@ -57,7 +61,11 @@ function getLinksValue(
     })
     .filter((link) => link.value !== '');
 
-  return normalizedLinks.length ? normalizedLinks : [{ value: '' }];
+  if (hasItems(normalizedLinks)) {
+    return normalizedLinks;
+  }
+
+  return [{ value: '' }];
 }
 
 export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasicInfo | null) {

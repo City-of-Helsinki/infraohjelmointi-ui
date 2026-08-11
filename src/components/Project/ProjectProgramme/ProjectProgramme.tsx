@@ -97,6 +97,16 @@ export default function ProjectProgramme() {
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
 
   const activeSection = activeSectionState?.id ?? null;
+  const hasActiveSection = Boolean(activeSection && projectProgrammeId);
+  const showLoadError = hasProjectProgrammeLoadError;
+  const showStartProjectProgramme = !showLoadError && !hasProjectProgramme;
+  const showActiveSectionForm = !showLoadError && hasProjectProgramme && hasActiveSection;
+  const showOverview = !showLoadError && hasProjectProgramme && !hasActiveSection;
+
+  let activeSectionBasicInfo = initialBasicInfo;
+  if (activeSection === 'basicInfo' && activeSectionState?.data) {
+    activeSectionBasicInfo = activeSectionState.data as IProjectProgrammeBasicInfo;
+  }
 
   function notifyMissingProject() {
     dispatch(
@@ -303,10 +313,14 @@ export default function ProjectProgramme() {
     return null;
   }
 
+  const extendedSectionTextSuffix = t(
+    'projectProgrammeForm.basicInfoCardTextExtensionForExtended',
+  );
+
   return (
     <div className="project-programme-container">
       <div className="project-programme-view" data-testid="project-programme-view">
-        {hasProjectProgrammeLoadError ? (
+        {showLoadError && (
           <div className="project-form mx-auto max-w-xl" data-testid="project-programme-load-error">
             <Notification type="error" label={t('saveError')}>
               <div className="project-programme-notification-content">
@@ -322,21 +336,22 @@ export default function ProjectProgramme() {
               </div>
             </Notification>
           </div>
-        ) : !hasProjectProgramme ? (
+        )}
+
+        {showStartProjectProgramme && (
           <StartProjectProgramme onStartProjectProgramme={handleStartProjectProgramme} />
-        ) : activeSection && projectProgrammeId ? (
+        )}
+
+        {showActiveSectionForm && activeSection && projectProgrammeId && (
           <ProjectProgrammeForm
             projectProgrammeId={projectProgrammeId}
             activeSection={activeSection}
-            basicInfo={
-              activeSection === 'basicInfo'
-                ? (activeSectionState?.data as IProjectProgrammeBasicInfo | null) ??
-                  initialBasicInfo
-                : initialBasicInfo
-            }
+            basicInfo={activeSectionBasicInfo}
             onClose={handleCloseSection}
           />
-        ) : (
+        )}
+
+        {showOverview && (
           <div className="project-form mx-auto max-w-xl">
             {briefProgramme && (
               <Notification type="alert" label={t('projectProgrammeForm.briefNotificationTitle')}>
@@ -357,26 +372,27 @@ export default function ProjectProgramme() {
 
             {PROJECT_PROGRAMME_SECTIONS.filter(
               (section) => !briefProgramme || section.showInBrief,
-            ).map((section) => (
-              <div className="project-programme-section" key={section.id}>
-                <Notification type="info" label={t(section.labelKey)}>
-                  <div className="project-programme-notification-content">
-                    <p>
-                      {briefProgramme
-                        ? t(section.textKey)
-                        : `${t(section.textKey)} ${t(
-                            'projectProgrammeForm.basicInfoCardTextExtensionForExtended',
-                          )}`}
-                    </p>
-                    <div>
-                      <Button type="button" onClick={() => handleOpenSection(section.id)}>
-                        {t(section.actionKey)}
-                      </Button>
+            ).map((section) => {
+              let sectionDescription = t(section.textKey);
+              if (!briefProgramme) {
+                sectionDescription = `${sectionDescription} ${extendedSectionTextSuffix}`;
+              }
+
+              return (
+                <div className="project-programme-section" key={section.id}>
+                  <Notification type="info" label={t(section.labelKey)}>
+                    <div className="project-programme-notification-content">
+                      <p>{sectionDescription}</p>
+                      <div>
+                        <Button type="button" onClick={() => handleOpenSection(section.id)}>
+                          {t(section.actionKey)}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </Notification>
-              </div>
-            ))}
+                  </Notification>
+                </div>
+              );
+            })}
 
             <div className="project-form-banner">
               <div className="project-form-banner-container">
