@@ -83,3 +83,23 @@
 .project-form-toolbar {
   @apply mb-6 flex w-full justify-end;
 }
+
+.project-programme-container {
+  @apply flex w-full justify-center;
+}
+
+.project-programme-view {
+  @apply mb-20 w-full pr-4;
+}
+
+.project-programme-notification-content {
+  @apply flex flex-col gap-4;
+}
+
+.project-programme-section {
+  @apply mt-6;
+}
+
+.project-programme-actions {
+  @apply flex items-center gap-6;
+}

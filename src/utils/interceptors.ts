@@ -108,7 +108,7 @@ const getErrorNotification = (error: AxiosError): INotification => {
     return parsedError;
   }
 
-  if (url.includes('projects') && error.request?.status === 404) {
+  if (url.includes('/projects/') && error.request?.status === 404) {
     parsedError.title = 'projectNotFound';
     parsedError.message = 'projectNotFound';
   }
@@ -136,6 +136,14 @@ const handleError = (error: AxiosError): Promise<IError> => {
 
   if (responseUrl.includes('/talpa-project-opening/by-project') && error.status === 404) {
     excludedUrls = excludedUrls.concat(['/talpa-project-opening/by-project']);
+  }
+
+  if (responseUrl.includes('/project-programmes/by-project') && error.status === 404) {
+    excludedUrls = excludedUrls.concat(['/project-programmes/by-project']);
+  }
+
+  if (responseUrl.endsWith('/project-programmes/') && [403, 409].includes(error.status ?? 0)) {
+    excludedUrls = excludedUrls.concat(['/project-programmes/']);
   }
 
   // The handling of backend errors is still in the works, so we're excluding endpoints that we want to handle differently

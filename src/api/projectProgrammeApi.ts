@@ -1,7 +1,8 @@
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
-  IProjectProgrammeBasicInfo,
+  IProjectProgrammeTransitionResponse,
+  ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
@@ -10,7 +11,10 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       query: (projectId: string) => ({
         url: `/project-programmes/by-project/${projectId}/`,
       }),
-      providesTags: ['ProjectProgrammes'],
+      providesTags: (result) =>
+        result
+          ? [{ type: 'ProjectProgrammes', id: result.id }, { type: 'ProjectProgrammes' }]
+          : [{ type: 'ProjectProgrammes' }],
     }),
     getProjectProgrammeById: build.query<IProjectProgramme, string>({
       query: (id: string) => ({
@@ -24,21 +28,75 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         method: 'POST',
         data: request,
       }),
-      invalidatesTags: ['ProjectProgrammes'],
+      invalidatesTags: [{ type: 'ProjectProgrammes' }],
     }),
     postSwitchProjectProgrammeType: build.mutation<IProjectProgramme, string>({
       query: (id: string) => ({
         url: `/project-programmes/${id}/switch-type/`,
         method: 'POST',
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'ProjectProgrammes', id }],
+      invalidatesTags: (result, error, id) => [
+        { type: 'ProjectProgrammes', id },
+        { type: 'ProjectProgrammes' },
+      ],
     }),
-    postProjectProgrammeBasicInfoSection: build.mutation<IProjectProgrammeBasicInfo, string>({
-      query: (id: string) => ({
-        url: `/project-programmes/${id}/sections/basic-info/`,
+    transitionProjectProgrammeStatus: build.mutation<
+      IProjectProgrammeTransitionResponse,
+      { id: string; to: ProjectProgrammeStatus }
+    >({
+      query: ({ id, to }: { id: string; to: ProjectProgrammeStatus }) => ({
+        url: `/project-programmes/${id}/transitions/`,
         method: 'POST',
+        data: { to },
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'ProjectProgrammes', id }],
+      invalidatesTags: (result, error, arg) => [
+        { type: 'ProjectProgrammes', id: arg.id },
+        { type: 'ProjectProgrammes' },
+      ],
+    }),
+    postProjectProgrammeSection: build.mutation<
+      Record<string, unknown>,
+      {
+        id: string;
+        section: string;
+        data?: Record<string, unknown>;
+      }
+    >({
+      query: ({ id, section, data }: {
+        id: string;
+        section: string;
+        data?: Record<string, unknown>;
+      }) => ({
+        url: `/project-programmes/${id}/sections/${section}/`,
+        method: 'POST',
+        data,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'ProjectProgrammes', id: arg.id },
+        { type: 'ProjectProgrammes' },
+      ],
+    }),
+    patchProjectProgrammeSection: build.mutation<
+      Record<string, unknown>,
+      {
+        id: string;
+        section: string;
+        data: Record<string, unknown>;
+      }
+    >({
+      query: ({ id, section, data }: {
+        id: string;
+        section: string;
+        data: Record<string, unknown>;
+      }) => ({
+        url: `/project-programmes/${id}/sections/${section}/`,
+        method: 'PATCH',
+        data,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'ProjectProgrammes', id: arg.id },
+        { type: 'ProjectProgrammes' },
+      ],
     }),
   }),
   overrideExisting: false,
@@ -49,5 +107,7 @@ export const {
   useGetProjectProgrammeByIdQuery,
   usePostProjectProgrammeMutation,
   usePostSwitchProjectProgrammeTypeMutation,
-  usePostProjectProgrammeBasicInfoSectionMutation,
+  useTransitionProjectProgrammeStatusMutation,
+  usePostProjectProgrammeSectionMutation,
+  usePatchProjectProgrammeSectionMutation,
 } = projectProgrammeApi;
