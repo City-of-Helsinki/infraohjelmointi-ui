@@ -1021,6 +1021,7 @@
     "viewTypeConstruction": "Rakennuttamisen projektit",
     "viewTypePlanning": "Suunnitteluttamisen projektit",
     "table": {
+      "loading": "Hankkeita ladataan...",
       "projectName": "Hanke",
       "description": "Hankkeen kuvaus",
       "planningStart": "Suunnittelu alkaa",
@@ -1044,6 +1045,7 @@
     },
     "tasks": {
       "title": "Tehtävät",
+      "taskDescription": "Muokkaa hanketta {{projectName}}",
       "planningPeriod": "Suunnittelun aikataulu",
       "constructionPeriod": "Rakentamisen aikataulu",
       "budget": "Kokonaisrahoitusvaraus",
