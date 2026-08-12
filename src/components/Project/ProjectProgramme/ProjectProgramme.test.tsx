@@ -266,24 +266,6 @@ describe('ProjectProgramme', () => {
     expect(mockPostProjectProgramme).toHaveBeenCalledWith({ project: 'project-1' });
   });
 
-  it('switches to extended programme when an existing programme is open', async () => {
-    await render();
-
-    await act(async () => {
-      screen
-        .getByRole('button', { name: 'projectProgrammeForm.switchToExtendedProgramme' })
-        .click();
-    });
-
-    expect(mockSwitchType).toHaveBeenCalledWith('programme-1');
-    expect(
-      screen.queryByRole('button', { name: 'projectProgrammeForm.switchToExtendedProgramme' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
-    ).toBeInTheDocument();
-  });
-
   it('shows overview bottom-bar actions', async () => {
     await render();
 

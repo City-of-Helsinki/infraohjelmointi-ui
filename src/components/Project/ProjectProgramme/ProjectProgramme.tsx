@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, IconLink, Notification } from 'hds-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
@@ -53,14 +53,9 @@ export default function ProjectProgramme() {
   const [transitionStatus] = useTransitionProjectProgrammeStatusMutation();
   const [activeSectionState, setActiveSectionState] =
     useState<IActiveProjectProgrammeSection | null>(null);
-  const [briefProgrammeOverride, setBriefProgrammeOverride] = useState<boolean | null>(null);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
   const projectProgrammeId = effectiveProjectProgramme?.id ?? null;
-
-  useEffect(() => {
-    setBriefProgrammeOverride(null);
-  }, [effectiveProjectProgramme?.id]);
 
   const initialBasicInfoFromProject = useMemo<IProjectProgrammeBasicInfo>(
     () => ({
@@ -83,9 +78,7 @@ export default function ProjectProgramme() {
     return initialBasicInfoFromProject;
   }, [effectiveProjectProgramme?.basicInfo, initialBasicInfoFromProject, project?.name]);
 
-  const briefProgramme =
-    briefProgrammeOverride ??
-    (effectiveProjectProgramme ? isBriefProgramme(effectiveProjectProgramme) : true);
+  const briefProgramme = effectiveProjectProgramme ? isBriefProgramme(effectiveProjectProgramme) : true;
   const hasProjectProgramme = Boolean(projectProgrammeId);
   const projectProgrammeQueryStatus = (
     projectProgrammeByProjectError as { status?: number } | undefined
@@ -170,7 +163,7 @@ export default function ProjectProgramme() {
 
     try {
       await switchType(effectiveProjectProgramme.id).unwrap();
-      setBriefProgrammeOverride(!briefProgramme);
+      await refetchProjectProgramme();
       dispatch(
         notifySuccess({
           title: 'patchSuccess',

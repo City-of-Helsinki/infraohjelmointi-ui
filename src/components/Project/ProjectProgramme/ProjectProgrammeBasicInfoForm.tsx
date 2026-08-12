@@ -75,7 +75,6 @@ function ProjectProgrammeBasicInfoForm() {
           ...validateMaxLength(200, t),
           ...requiredRule('projectProgrammeForm.personsInvolved'),
         }}
-        tooltip={tooltip('personsInvolved')}
       />
       <TextField
         {...getFieldProps('inspector')}
@@ -104,7 +103,6 @@ function ProjectProgrammeBasicInfoForm() {
           ...validateMaxLength(200, t),
           ...requiredRule('projectProgrammeForm.projectSize'),
         }}
-        tooltip={tooltip('projectSize')}
       />
       <TextAreaField
         {...getFieldProps('risks')}
@@ -130,15 +128,17 @@ function ProjectProgrammeBasicInfoForm() {
       <div className="input-wrapper" id="projectProgrammeLinksTitle">
         <h4 className="text-heading-s">{t('projectProgrammeForm.links')}</h4>
       </div>
-      {linkFields.map((field, index) => (
-        <TextField
-          key={field.formId}
-          name={`links.${index}.value`}
-          label={`${t('projectProgrammeForm.linkLabel')} ${index + 1}`}
-          shouldTranslate={false}
-          size="full"
-        />
-      ))}
+      {linkFields.map((field, index) => {
+        const translatedLabel = `${t('projectProgrammeForm.linkLabel')} ${index + 1}`;
+        return (
+          <TextField
+            key={field.formId}
+            name={`links.${index}.value`}
+            label={translatedLabel}
+            size="full"
+          />
+        );
+      })}
       <div className="input-wrapper" id="projectProgrammeAddLinkButton">
         <Button
           type="button"
