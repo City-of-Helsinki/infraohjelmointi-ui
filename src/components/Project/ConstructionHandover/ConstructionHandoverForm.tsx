@@ -63,6 +63,11 @@ function ConstructionHandoverForm({
   } = formMethods;
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
+  const canBeReturnedToDraft = [
+    ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+    ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+    ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+  ].includes(constructionHandover.status);
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -123,6 +128,13 @@ function ConstructionHandoverForm({
     });
   }
 
+  function returnToDraft() {
+    doStatusTransition({
+      id: constructionHandover.id,
+      to: ConstructionHandoverStatus.DRAFT,
+    });
+  }
+
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(submitForm)}>
@@ -134,7 +146,7 @@ function ConstructionHandoverForm({
           ].includes(constructionHandover.status)}
         />
         <ScheduleSection />
-        <FinancingSection />
+        <FinancingSection handoverStatus={constructionHandover.status} />
         <ContactsSection />
 
         <div className="project-form-banner">
@@ -154,6 +166,11 @@ function ConstructionHandoverForm({
               {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
                 <Button variant={ButtonVariant.Secondary} type="submit">
                   {t('constructionHandoverForm.saveDraft')}
+                </Button>
+              )}
+              {canBeReturnedToDraft && (
+                <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
+                  {t('constructionHandoverForm.returnToDraft')}
                 </Button>
               )}
               <Button

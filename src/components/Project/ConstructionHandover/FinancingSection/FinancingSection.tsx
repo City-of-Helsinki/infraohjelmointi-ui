@@ -5,6 +5,7 @@ import { FocusEvent, memo, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
+  ConstructionHandoverStatus,
   FinancingDialogState,
   FinancingRowValues,
 } from '@/interfaces/constructionHandoverInterfaces';
@@ -17,7 +18,11 @@ import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
 import { formatBudgetEuro, parseCurrency } from '@/utils/currencyUtils';
 
-const FinancingSection = () => {
+interface IFinancingSectionProps {
+  handoverStatus: ConstructionHandoverStatus;
+}
+
+const FinancingSection = ({ handoverStatus }: IFinancingSectionProps) => {
   const { t } = useTranslation();
   const { control, setValue, watch } = useFormContext<IConstructionHandoverForm>();
   const financingPartyOptions = useOptions('financingParties');
@@ -213,11 +218,20 @@ const FinancingSection = () => {
     budget: <span style={{ whiteSpace: 'nowrap' }}>{row.budget}</span>,
     editCell:
       row.showActions && row.item ? (
-        <EditCell onEditRow={handleEdit} id={row.item.id} values={row.item} />
+        <EditCell
+          onEditRow={handleEdit}
+          id={row.item.id}
+          values={row.item}
+          disabled={handoverStatus !== ConstructionHandoverStatus.DRAFT}
+        />
       ) : null,
     deleteCell:
       row.showActions && row.item ? (
-        <DeleteCell onDeleteRow={handleDelete} id={row.item.id} />
+        <DeleteCell
+          onDeleteRow={handleDelete}
+          id={row.item.id}
+          disabled={handoverStatus !== ConstructionHandoverStatus.DRAFT}
+        />
       ) : null,
   }));
 
@@ -264,16 +278,18 @@ const FinancingSection = () => {
           <p>{t('constructionHandoverForm.financingSection.tableEmptyText')}</p>
         )}
       </div>
-      <div className="input-wrapper">
-        <Button
-          variant={ButtonVariant.Secondary}
-          onClick={addFinancingRow}
-          data-testid={'addFinancing-button'}
-          iconStart={<IconPlus />}
-        >
-          {t('constructionHandoverForm.financingSection.addRow')}
-        </Button>
-      </div>
+      {handoverStatus === ConstructionHandoverStatus.DRAFT && (
+        <div className="input-wrapper">
+          <Button
+            variant={ButtonVariant.Secondary}
+            onClick={addFinancingRow}
+            data-testid={'addFinancing-button'}
+            iconStart={<IconPlus />}
+          >
+            {t('constructionHandoverForm.financingSection.addRow')}
+          </Button>
+        </div>
+      )}
       <TextField
         {...getFieldProps('totalCost')}
         value={totalCostRawValue}
