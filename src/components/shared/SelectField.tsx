@@ -38,6 +38,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   disabled,
   clearable,
   size,
+  required,
   shouldTranslate = true,
   readOnly,
   placeholder,
@@ -47,7 +48,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   multiSelect,
   ...rest
 }) => {
-  const required = rules?.required ? true : false;
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
 
   const translateOption = useCallback(
@@ -67,7 +68,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   );
 
   const translatedOptions = useMemo(
-    () => options?.map(translateOption),
+    () => options?.map((option) => translateOption(option)),
     [options, translateOption],
   );
 
@@ -78,7 +79,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       }
 
       const values = Array.isArray(value) ? value : [value];
-      return values.map(translateOption);
+      return values.map((option) => translateOption(option));
     },
     [translateOption],
   );
@@ -127,7 +128,7 @@ const SelectField: FC<ISelectFieldProps> = ({
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
-        const isDisabled = disabled || fieldDisabled;
+        const isDisabled = disabled ?? fieldDisabled;
         return (
           <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**
@@ -157,7 +158,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   onBlur={onBlur}
                   invalid={error ? true : false}
                   options={translatedOptions ?? []}
-                  required={required}
+                  required={isRequired}
                   disabled={isDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
                   icon={icon}

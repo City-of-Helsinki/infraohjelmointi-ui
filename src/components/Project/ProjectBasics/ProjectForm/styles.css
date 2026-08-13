@@ -79,3 +79,7 @@
   width: 200%;
   @apply absolute h-full w-[200%] -translate-x-[13rem] shadow-2xl;
 }
+
+.project-form-toolbar {
+  @apply mb-6 flex w-full justify-end;
+}

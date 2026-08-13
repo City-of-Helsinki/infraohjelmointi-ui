@@ -1,14 +1,16 @@
 import { FormSectionTitle } from '@/components/shared';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetFieldState, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetFieldState, UseFormGetValues, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
 import { validateAfter, validateBefore, validateSameOrAfter } from '@/utils/validation';
+import { createDateToStartOfYear, isBefore } from '@/utils/dates';
 
 interface IProjectScheduleSectionProps {
+  control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
@@ -21,6 +23,7 @@ interface IProjectScheduleSectionProps {
 }
 
 const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
+  control,
   getFieldProps,
   getValues,
   getFieldState,
@@ -62,6 +65,16 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           ),
         )
         .map((p) => p.value),
+    [phases],
+  );
+
+  const currentPhase = useWatch({
+    control,
+    name: 'phase',
+  })?.value;
+
+  const warrantyPeriodPhase = useMemo(
+    () => phases.find(({ label }) => label === 'warrantyPeriod')?.value ?? '',
     [phases],
   );
 
@@ -272,6 +285,13 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return validateAfter(date, 'estConstructionStart', getValues, t);
           }
 
+          const warrantyPhaseStart = getValues('estWarrantyPhaseStart');
+          if (date && warrantyPhaseStart && isBefore(warrantyPhaseStart, date)) {
+            return t('validation.isBefore', {
+              value: t('validation.estWarrantyPhaseStart'),
+            });
+          }
+
           return true;
         },
       },
@@ -282,6 +302,15 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     return {
       validate: {
         isWarrantyPeriodStartValid: (date: string | null) => {
+          const constructionEndYear = getValues('constructionEndYear');
+          const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
+
+          if (date && constructionEndYear && isBefore(date, constructionEndYearStartDate)) {
+            return t('validation.isSameOrAfter', {
+              value: t('validation.constructionEndYear'),
+            });
+          }
+
           const sameOrAfterConstructionEnd = validateSameOrAfter(
             date,
             'estConstructionEnd',
@@ -310,9 +339,17 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
       validate: {
         isWarrantyPhaseValid: (date: string | null) => {
           const phase = getValues('phase').value;
+          const constructionEndYear = getValues('constructionEndYear');
+          const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
 
-          if (phase === 'warrantyPeriod' && !date) {
+          if (phase === warrantyPeriodPhase && !date) {
             return t('validation.required', { field: t('validation.estWarrantyPhaseEnd') });
+          }
+
+          if (date && constructionEndYear && isBefore(date, constructionEndYearStartDate)) {
+            return t('validation.isSameOrAfter', {
+              value: t('validation.constructionEndYear'),
+            });
           }
 
           const afterWarrantyPhaseStart = validateAfter(
@@ -330,7 +367,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, t]);
+  }, [getValues, t, warrantyPeriodPhase]);
 
   return (
     <div className="w-full" id="basics-schedule-section">
@@ -341,6 +378,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             <DateField
               {...getFieldProps('estPlanningStart')}
               rules={validateEstPlanningStart()}
+              required={phasesThatNeedPlanning.includes(currentPhase)}
               readOnly={isUserOnlyViewer}
             />
           </div>
@@ -348,6 +386,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             <DateField
               {...getFieldProps('estPlanningEnd')}
               rules={validateEstPlanningEnd()}
+              required={phasesThatNeedPlanning.includes(currentPhase)}
               readOnly={isUserOnlyViewer}
             />
           </div>
@@ -392,6 +431,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estConstructionStart')}
               readOnly={isUserOnlyViewer}
               rules={validateEstConstructionStart()}
+              required={phasesThatNeedConstruction.includes(currentPhase)}
             />
           </div>
           <div className="form-col-md">
@@ -399,6 +439,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estConstructionEnd')}
               readOnly={isUserOnlyViewer}
               rules={validateEstConstructionEnd()}
+              required={phasesThatNeedConstruction.includes(currentPhase)}
             />
           </div>
         </div>
@@ -417,6 +458,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estWarrantyPhaseEnd')}
               readOnly={isUserOnlyViewer}
               rules={validateWarrantyPhaseEnd()}
+              required={currentPhase === warrantyPeriodPhase}
             />
           </div>
         </div>

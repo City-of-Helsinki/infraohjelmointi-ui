@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 const mockI18next = () => ({
   useTranslation: () => {
     return {
@@ -8,6 +10,8 @@ const mockI18next = () => ({
       },
     };
   },
+  Trans: ({ i18nKey, children }: { i18nKey?: string; children?: ReactNode }) =>
+    children ?? i18nKey ?? null,
 });
 
 export default mockI18next;

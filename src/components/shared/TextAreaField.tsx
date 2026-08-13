@@ -59,13 +59,18 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => (
+      defaultValue=""
+      render={({
+        field: { onChange, onBlur, value, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             data-testid={testId}
             ref={textAreaRef}
             onChange={onChange}
-            value={value}
+            onBlur={onBlur}
+            value={value ?? ''}
             className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
             hideLabel={hideLabel}

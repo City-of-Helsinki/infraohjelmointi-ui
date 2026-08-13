@@ -11,27 +11,36 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
+jest.mock('@/components/shared/TextAreaField', () => ({
+  __esModule: true,
+  default: () => <textarea data-testid="mock-textarea-field" />,
+}));
 const store = setupStore();
 
-const render = async () =>
-  await act(async () =>
-    renderWithProviders(
-      <Route path="/project/:projectId/basics" element={<ProjectBasics />} />,
-      {
-        preloadedState: {
-          auth: { user: mockUser.data, error: {} },
-          project: {
-            ...store.getState().project,
-          },
-          lists: {
-            ...store.getState().lists,
-            phases: mockProjectPhases.data,
-          },
+const render = async () => {
+  const rendered = renderWithProviders(
+    <Route path="/project/:projectId/basics" element={<ProjectBasics />} />,
+    {
+      preloadedState: {
+        auth: { user: mockUser.data, error: {} },
+        project: {
+          ...store.getState().project,
+        },
+        lists: {
+          ...store.getState().lists,
+          phases: mockProjectPhases.data,
         },
       },
-      { route: `/project/${mockProject.data.id}/basics` },
-    ),
+    },
+    { route: `/project/${mockProject.data.id}/basics` },
   );
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  return rendered;
+};
 describe('ProjectBasics', () => {
   const spyScrollTo = jest.fn();
 

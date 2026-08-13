@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
@@ -6,7 +7,13 @@ import { getFieldProps } from './ConstructionHandoverForm';
 import { useTranslation } from 'react-i18next';
 import { validateRequired } from '@/utils/validation';
 
-export default function NameAndDescriptionSection() {
+interface INameAndDescriptionSectionProps {
+  shouldShowProcurementMethod?: boolean;
+}
+
+function NameAndDescriptionSection({
+  shouldShowProcurementMethod,
+}: Readonly<INameAndDescriptionSectionProps>) {
   const { t } = useTranslation();
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
 
@@ -26,11 +33,15 @@ export default function NameAndDescriptionSection() {
         rules={{ ...validateRequired('description', t) }}
         tooltip={<Tooltip>{t('constructionHandoverForm.descriptionTooltip')}</Tooltip>}
       />
-      <SelectField
-        {...getFieldProps('constructionProcurementMethod')}
-        options={constructionProcurementMethods}
-        size="full"
-      />
+      {shouldShowProcurementMethod && (
+        <SelectField
+          {...getFieldProps('constructionProcurementMethod')}
+          options={constructionProcurementMethods}
+          size="full"
+        />
+      )}
     </div>
   );
 }
+
+export default memo(NameAndDescriptionSection);

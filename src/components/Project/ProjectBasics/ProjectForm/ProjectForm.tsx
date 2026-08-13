@@ -1,7 +1,7 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectProjectMode, setIsSaving, setProjectMode } from '@/reducers/projectSlice';
 import { IProject, IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
@@ -14,7 +14,6 @@ import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
 import { useNavigate } from 'react-router';
-import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
@@ -34,6 +33,12 @@ import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
 import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
+import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
+import {
+  collectErrorElements,
+  collectErrorFieldNames,
+  scrollToFirstField,
+} from './projectFormErrorHelpers';
 
 interface IProjectFormProps {
   project: IProject | null;
@@ -53,6 +58,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -62,8 +68,78 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     getFieldState,
     watch,
     setValue,
+    setError,
     reset,
   } = formMethods;
+
+  const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>((errors) => {
+    scrollToFirstField(
+      formRef.current,
+      collectErrorElements(errors),
+      collectErrorFieldNames(errors),
+    );
+  }, []);
+
+  const setBackendFieldErrors = useCallback(
+    (error: unknown) => {
+      if (!error || typeof error !== 'object') {
+        return false;
+      }
+
+      const data = (error as { data?: unknown }).data;
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        return false;
+      }
+
+      const backendToFormFieldMap: Partial<Record<string, FieldPath<IProjectForm>>> = {
+        projectClass: 'subClass',
+        projectLocation: 'district',
+        projectDistrict: 'district',
+      };
+
+      let hasFieldErrors = false;
+      const fieldNamesWithErrors: string[] = [];
+      for (const [backendField, fieldError] of Object.entries(data)) {
+        const mappedField =
+          backendToFormFieldMap[backendField] ?? (backendField as FieldPath<IProjectForm>);
+
+        const isFieldInForm = backendField in getValues() || backendField in backendToFormFieldMap;
+
+        if (!isFieldInForm) {
+          continue;
+        }
+
+        let message: string;
+        if (Array.isArray(fieldError)) {
+          message = fieldError.find((item) => typeof item === 'string') ?? '';
+        } else if (typeof fieldError === 'string') {
+          message = fieldError;
+        } else {
+          message = '';
+        }
+
+        if (!message) {
+          continue;
+        }
+
+        setError(mappedField, {
+          type: 'server',
+          message,
+        });
+        fieldNamesWithErrors.push(mappedField);
+        hasFieldErrors = true;
+      }
+
+      if (hasFieldErrors) {
+        globalThis.requestAnimationFrame(() => {
+          scrollToFirstField(formRef.current, [], fieldNamesWithErrors);
+        });
+      }
+
+      return hasFieldErrors;
+    },
+    [getValues, setError],
+  );
 
   usePromptConfirmOnNavigate({
     title: t('confirmLeaveTitle'),
@@ -191,16 +267,20 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const updateDateBasedOnYear = (data: IProjectRequest, project: IProject) => {
     if (data.planningStartYear) {
       const estPlanningStart = data.estPlanningStart ?? project.estPlanningStart;
-      const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
-      if (!isSamePlanningStartYear) {
-        data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart);
+      if (estPlanningStart) {
+        const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
+        if (!isSamePlanningStartYear) {
+          data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart);
+        }
       }
     }
     if (data.constructionEndYear) {
       const estConstructionEnd = data.estConstructionEnd ?? project.estConstructionEnd;
-      const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
-      if (!isSameConstructionEndYear) {
-        data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd);
+      if (estConstructionEnd) {
+        const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
+        if (!isSameConstructionEndYear) {
+          data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd);
+        }
       }
     }
     return data;
@@ -261,6 +341,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
           try {
             await patchProject({ id: project?.id, data }).unwrap();
+            reset(form);
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
@@ -276,9 +357,13 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               dispatch(setIsSaving(false));
               return;
             }
+
+            const hasBackendFieldErrors = setBackendFieldErrors(error);
             dispatch(
               notifyError({
-                message: getProjectPatchErrorMessage(error),
+                message: hasBackendFieldErrors
+                  ? 'formSaveError'
+                  : getProjectPatchErrorMessage(error),
                 title: 'saveError',
                 type: 'notification',
               }),
@@ -310,10 +395,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               dispatch(setIsSaving(false));
               return;
             }
+
+            const hasBackendFieldErrors = setBackendFieldErrors(error);
             dispatch(setIsSaving(false));
             dispatch(
               notifyError({
-                message: 'projectCreatingError',
+                message: hasBackendFieldErrors ? 'formSaveError' : 'projectCreatingError',
                 title: 'createError',
                 type: 'notification',
               }),
@@ -399,8 +486,8 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       return undefined;
     }
 
-    return handleSubmit(onSubmit);
-  }, [handleSubmit, onSubmit, datePickerVisible]);
+    return handleSubmit(onSubmit, onFormInvalid);
+  }, [handleSubmit, onSubmit, onFormInvalid, datePickerVisible]);
 
   const isInputDisabled = useMemo(
     () => canUserEditProjectFormField(selectedMasterClassName, user),
@@ -410,7 +497,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isUserProjectManagerCheck = useMemo(() => isUserOnlyProjectManager(user), [user]);
 
   return (
-    <form data-testid="project-form" className="project-form">
+    <form ref={formRef} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
         {...formProps}

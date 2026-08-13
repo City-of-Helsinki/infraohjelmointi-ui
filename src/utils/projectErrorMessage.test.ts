@@ -44,11 +44,26 @@ describe('getProjectPatchErrorMessage', () => {
     expect(getProjectPatchErrorMessage(error)).toBe('formSaveError');
   });
 
+  it('matches when the flattened error keeps the backend payload under data', () => {
+    const error = {
+      status: 400,
+      data: {
+        status: 400,
+        hkrId: ['SOME_OTHER_CODE', PW_PROJECT_NOT_FOUND_CODE],
+        message: 'Request failed with status code 400',
+      },
+    };
+
+    expect(getProjectPatchErrorMessage(error)).toBe('pwProjectNotFound');
+  });
+
   it('matches when the PW code is present but not first in the array', () => {
     const error = {
       status: 400,
       data: { hkrId: ['SOME_OTHER_CODE', PW_PROJECT_NOT_FOUND_CODE] },
+      message: 'Request failed with status code 400',
     };
+
     expect(getProjectPatchErrorMessage(error)).toBe('pwProjectNotFound');
   });
 });

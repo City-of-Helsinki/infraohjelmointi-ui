@@ -2,7 +2,13 @@ import { INavigationItem } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
-import { IconBinoculars, IconCogwheel, IconGraphColumns, IconScrollCogwheel } from 'hds-react';
+import {
+  IconBox,
+  IconBinoculars,
+  IconCogwheel,
+  IconGraphColumns,
+  IconScrollCogwheel,
+} from 'hds-react';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserAdmin, isUserOnlyViewer } from '@/utils/userRoleHelpers';
@@ -41,6 +47,12 @@ const SideBar = () => {
       disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
+      route: 'my-workload',
+      label: t('myWorkload'),
+      component: <IconBox style={iconStyles} />,
+      disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
+    },
+    {
       route: 'admin/functions',
       label: t('admin'),
       component: <IconCogwheel style={iconStyles} />,
@@ -59,6 +71,7 @@ const SideBar = () => {
           aria-label={n.label}
           key={n.route}
           disabled={!user || n.disabled}
+          type="button"
         >
           {n.component}
         </button>

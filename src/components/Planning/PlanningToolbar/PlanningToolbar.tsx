@@ -16,12 +16,14 @@ import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
+  selectChangeHistoryEnabled,
   selectForcedToFrame,
   selectGroupsExpanded,
   selectHoverTooltipsEnabled,
   selectPlanningMode,
   selectSelectedYears,
   selectSelections,
+  setChangeHistoryEnabled,
   setForcedToFrame,
   setGroupsExpanded,
   setHoverTooltipsEnabled,
@@ -60,6 +62,7 @@ const PlanningToolbar = () => {
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
+  const changeHistoryEnabled = useAppSelector(selectChangeHistoryEnabled);
   const user = useAppSelector(selectUser);
 
   const groupsExpandIcon = useMemo(
@@ -109,6 +112,16 @@ const PlanningToolbar = () => {
     }
     dispatch(setHoverTooltipsEnabled(nextValue));
   }, [dispatch, hoverTooltipsEnabled]);
+
+  // IO-881: toggling change-history mode shows per-cell audit popovers and
+  // suppresses the regular info tooltips (handled in useHoverTooltip).
+  const toggleChangeHistory = useCallback(() => {
+    const nextValue = !changeHistoryEnabled;
+    if (nextValue) {
+      hideTooltipImmediately();
+    }
+    dispatch(setChangeHistoryEnabled(nextValue));
+  }, [dispatch, changeHistoryEnabled]);
 
   const onOpenNewProjectForm = useCallback(() => {
     dispatch(setProjectMode('new'));
@@ -212,6 +225,18 @@ const PlanningToolbar = () => {
               iconStart={hoverTooltipsEnabled ? <IconEyeCrossed /> : <IconEye />}
             >
               {hoverTooltipsEnabled ? t('tooltips.hideTooltips') : t('tooltips.showTooltips')}
+            </Button>
+            {/* Change history (IO-881) */}
+            <Button
+              variant={ButtonVariant.Supplementary}
+              className="toolbar-button"
+              onClick={toggleChangeHistory}
+              data-testid="toggle-change-history-button"
+              iconStart={changeHistoryEnabled ? <IconEyeCrossed /> : <IconEye />}
+            >
+              {changeHistoryEnabled
+                ? t('tooltips.hideChangeHistory')
+                : t('tooltips.showChangeHistory')}
             </Button>
             <GroupDialog
               isOpen={groupDialogVisible}

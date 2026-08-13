@@ -1,0 +1,266 @@
+.sectionTitle {
+  padding-top: var(--spacing-m);
+  padding-bottom: var(--spacing-s);
+}
+
+.tableContainer {
+  width: 100%;
+}
+
+.tableContainer :global(th) {
+  text-align: left;
+  white-space: normal;
+}
+
+.emptyStateText {
+  margin-top: var(--spacing-m);
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.phasePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px var(--spacing-s);
+  font-size: var(--fontsize-body-s);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.phaseCellAlignRight {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.phasePillProposal {
+  background-color: #f9e6ee;
+  color: #7a254a;
+}
+
+.phasePillDesign {
+  background-color: #e5f3fa;
+  color: #1e5d78;
+}
+
+.phasePillProgramming {
+  background-color: #e7f4ec;
+  color: #2f6a46;
+}
+
+.phasePillDraftInitiation {
+  background-color: #f4edf9;
+  color: #5b3a85;
+}
+
+.phasePillDraftApproval {
+  background-color: #fcefdc;
+  color: #8a5417;
+}
+
+.phasePillConstructionPlan {
+  background-color: #e6f1ff;
+  color: #2b4f89;
+}
+
+.phasePillConstructionWait {
+  background-color: #fff1e6;
+  color: #8a4a19;
+}
+
+.phasePillConstruction {
+  background-color: #ffe8d6;
+  color: #8d4518;
+}
+
+.phasePillConstructionPreparation {
+  background-color: #f7f2e7;
+  color: #6e5a2e;
+}
+
+.phasePillWarranty {
+  background-color: #e8f8f3;
+  color: #24614d;
+}
+
+.phasePillCompleted {
+  background-color: #e7f7e7;
+  color: #2f6a3c;
+}
+
+.phasePillSuspended {
+  background-color: #f6eaea;
+  color: #7a2f2f;
+}
+
+.phasePillDefault {
+  background-color: #eef1f5;
+  color: #3c4a5b;
+}
+
+.modifyInformationButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2-xs);
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--color-coat-of-arms);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--fontsize-body-m);
+  font-weight: 600;
+  padding: 0;
+  text-decoration: none;
+}
+
+.modifyInformationButton:hover {
+  color: var(--color-coat-of-arms-dark);
+}
+
+.modifyInformationButton:focus-visible {
+  outline: 2px solid var(--color-coat-of-arms);
+  outline-offset: 2px;
+}
+
+.editDialogFields {
+  display: grid;
+  gap: var(--spacing-m);
+}
+
+.editDialogProjectSubtitle {
+  margin: 0;
+  font-size: var(--fontsize-body-s);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-black-70);
+}
+
+.editDialogSectionTitle {
+  margin: 0;
+  font-size: var(--fontsize-heading-s);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.editDialogDivider {
+  margin: 0;
+  border: 0;
+  height: 1.5px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-black-30) 0,
+    var(--color-black-30) 8px,
+    transparent 8px,
+    transparent 12px
+  );
+}
+
+.editDialogDateRow {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.editDialogPlanningEstimateRow {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.25fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.editDialogPlanningPhaseSelect :global(label) {
+  visibility: hidden;
+}
+
+.editDialogDateField {
+  margin-bottom: 0;
+}
+
+.editDialogDateField :global(.input-xl) {
+  max-width: 100%;
+}
+
+.editDialogDateField :global(.date-input) {
+  max-width: 100%;
+}
+
+.editDialogFieldError {
+  color: var(--color-error);
+  font-size: var(--fontsize-body-s);
+  margin: calc(var(--spacing-xs) * -1) 0 0;
+}
+
+.editDialogFooterActionContainer {
+  padding: 0 var(--spacing-l) var(--spacing-l);
+}
+
+.editDialogActionButtonRow {
+  display: grid;
+  gap: var(--spacing-s);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.editDialogActionButton {
+  width: 100%;
+}
+
+.editDialogFooterActionButton {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .editDialogDateRow,
+  .editDialogPlanningEstimateRow,
+  .editDialogActionButtonRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.taskCard {
+  width: 100%;
+  border: 1px solid var(--color-black-20);
+}
+
+.taskDetails {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-m);
+}
+
+.taskColumns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.taskColumns p {
+  margin: 0;
+}
+
+.taskColumns svg {
+  margin-right: var(--spacing-xs);
+}
+
+.taskList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.taskListItem {
+  margin-bottom: var(--spacing-m);
+}
+
+.taskListItem:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .taskDetails {
+    grid-template-columns: 1fr;
+  }
+}

@@ -4,6 +4,18 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { fireEvent } from '@testing-library/react';
 
+const PHASES = {
+  draftInitiation: 'phase-id-draft-initiation',
+  draftApproval: 'phase-id-draft-approval',
+  constructionPlan: 'phase-id-construction-plan',
+  constructionWait: 'phase-id-construction-wait',
+  construction: 'phase-id-construction',
+  warrantyPeriod: 'phase-id-warranty-period',
+  completed: 'phase-id-completed',
+};
+
+const latestSelectProps: Record<string, any> = {};
+
 // Mock the hooks
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -11,17 +23,20 @@ jest.mock('react-i18next', () => ({
 
 // Mock the SelectField component
 jest.mock('@/components/shared/SelectField', () => {
-  return function MockSelectField({ name, value, options, control }: any) {
+  return function MockSelectField({ name, options, control, rules, required, ...props }: any) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { Controller } = require('react-hook-form');
+    latestSelectProps[name] = { name, options, control, rules, required, ...props };
     return (
       <Controller
         name={name}
         control={control}
+        rules={rules}
         render={({ field }: { field: { value: any; onChange: (value: any) => void } }) => (
           <div>
             <select
               data-testid={name}
+              required={Boolean(required)}
               value={field.value?.value || ''}
               onChange={(e) => {
                 const option = options.find((o: any) => o.value === e.target.value);
@@ -53,8 +68,13 @@ jest.mock('@/hooks/useOptions', () => ({
     }
     if (key === 'phases') {
       return [
-        { value: 'phase1', label: 'Phase 1' },
-        { value: 'phase2', label: 'Phase 2' },
+        { value: PHASES.draftInitiation, label: 'draftInitiation' },
+        { value: PHASES.draftApproval, label: 'draftApproval' },
+        { value: PHASES.constructionPlan, label: 'constructionPlan' },
+        { value: PHASES.constructionWait, label: 'constructionWait' },
+        { value: PHASES.construction, label: 'construction' },
+        { value: PHASES.warrantyPeriod, label: 'warrantyPeriod' },
+        { value: PHASES.completed, label: 'completed' },
       ];
     }
     if (key === 'programmers') {
@@ -167,14 +187,18 @@ const defaultFormValues = {
   otherPersons: [],
 } as IProjectForm;
 
-const TestComponent = () => {
+const TestComponent = ({ phase = '' }: { phase?: string }) => {
   const methods = useForm<IProjectForm>({
-    defaultValues: defaultFormValues,
+    defaultValues: {
+      ...defaultFormValues,
+      phase: { value: phase, label: '' },
+    },
   });
 
   return (
     <FormProvider {...methods}>
       <ProjectResponsiblePersonsSection
+        control={methods.control}
         getValues={methods.getValues}
         getFieldProps={(name) => ({
           name,
@@ -196,6 +220,7 @@ describe('ProjectResponsiblePersonsSection', () => {
       classes: [],
       subClasses: [],
     });
+    Object.keys(latestSelectProps).forEach((key) => delete latestSelectProps[key]);
   });
   it('shows programmer dropdown and it is enabled', () => {
     render(<TestComponent />);
@@ -214,7 +239,6 @@ describe('ProjectResponsiblePersonsSection', () => {
 
   it('starts with no programmer selected when no default is set', () => {
     render(<TestComponent />);
-    const dropdown = screen.getByTestId('personProgramming');
     const valueInput = screen.getByTestId('personProgramming-value');
     expect(valueInput).toHaveValue('');
   });
@@ -232,5 +256,26 @@ describe('ProjectResponsiblePersonsSection', () => {
     // Check if the hidden input was updated
     const valueInput = screen.getByTestId('personProgramming-value');
     expect(valueInput).toHaveValue('jane.doe');
+  });
+
+  it('requires planning person in draft initiation phase using phase id', () => {
+    render(<TestComponent phase={PHASES.draftInitiation} />);
+
+    const planningSelect = screen.getByTestId('personPlanning');
+    expect(planningSelect).toBeRequired();
+
+    const validator = latestSelectProps.personPlanning?.rules?.validate?.isResponsiblePersonValid;
+    expect(validator?.({ value: '', label: '' })).toBe('validation.required');
+  });
+
+  it('requires construction person in construction phase using phase id', () => {
+    render(<TestComponent phase={PHASES.construction} />);
+
+    const constructionSelect = screen.getByTestId('personConstruction');
+    expect(constructionSelect).toBeRequired();
+
+    const validator =
+      latestSelectProps.personConstruction?.rules?.validate?.isResponsiblePersonValid;
+    expect(validator?.({ value: '', label: '' })).toBe('validation.required');
   });
 });

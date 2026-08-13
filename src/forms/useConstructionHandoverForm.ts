@@ -1,11 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
-import { listItemToOption, personToOption } from '@/utils/common';
 import {
   ConstructionHandoverStatus,
   IConstructionHandover,
 } from '@/interfaces/constructionHandoverInterfaces';
+import { listItemToOption, personToOption } from '@/utils/common';
 import { formatDateToHds } from '@/utils/dates';
+import { formatBudgetEuro } from '@/utils/currencyUtils';
 
 function useConstructionHandoverFormValues(
   constructionHandover: IConstructionHandover,
@@ -22,6 +23,20 @@ function useConstructionHandoverFormValues(
     otherTimelineNotes: constructionHandover.otherTimelineNotes || '',
     personPlanning: personToOption(constructionHandover.personPlanning),
     personFinancing: personToOption(constructionHandover.personFinancing),
+    constructionHandoverFinancing: (constructionHandover.constructionHandoverFinancing ?? []).map(
+      (item) => ({
+        description: item.description ?? '',
+        budget: item.budget == null ? '' : formatBudgetEuro(String(item.budget)),
+        projectNumber: item.projectNumber ?? '',
+        budgetItem: item.budgetItem?.id ?? '',
+        id: item.id,
+        financer: item.financingParty ?? '',
+      }),
+    ),
+    totalCost:
+      constructionHandover.totalCost == null
+        ? ''
+        : formatBudgetEuro(String(constructionHandover.totalCost)),
   };
 }
 
@@ -30,6 +45,7 @@ export default function useConstructionHandoverForm(constructionHandover: IConst
 
   const formMethods = useForm<IConstructionHandoverForm>({
     values: formValues,
+    mode: 'onBlur',
     disabled: constructionHandover.status !== ConstructionHandoverStatus.DRAFT,
   });
 

@@ -12,9 +12,9 @@ const SearchTerms = () => {
     <div className="search-terms-container">
       {/* existing search terms */}
       <div className="search-terms">
-        {searchTerms.map((t) => (
+        {searchTerms.map((t, index) => (
           <Tag
-            key={t.id}
+            key={t.id ?? `${t.value}-${index}`}
             id={`search-term-${t.id}`}
             onDelete={() => deleteTerm(t)}
             data-testid="search-term"

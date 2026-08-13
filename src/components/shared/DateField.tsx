@@ -9,6 +9,7 @@ interface IDateFieldProps {
   label: string;
   control?: HookFormControlType;
   rules?: HookFormRulesType;
+  required?: boolean;
   readOnly?: boolean;
   helperText?: string;
   className?: string;
@@ -21,13 +22,14 @@ const DateField: FC<IDateFieldProps> = ({
   label,
   control,
   rules,
+  required,
   readOnly,
   className = '',
   helperText,
   size = 'l',
   disabled,
 }) => {
-  const required = rules?.required ? true : false;
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
   const currentDate = new Date();
   const datePlus10Years = new Date(currentDate.getFullYear() + 10, 11, 31);
@@ -37,7 +39,10 @@ const DateField: FC<IDateFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => {
+      render={({
+        field: { onChange, onBlur, value, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => {
         return (
           <div
             className={`input-wrapper date-field-wrapper ${className}`}
@@ -47,13 +52,14 @@ const DateField: FC<IDateFieldProps> = ({
             <HDSDateInput
               className={`input-${size} date-input`}
               onChange={onChange}
+              onBlur={onBlur}
               value={value}
               placeholder={''}
               label={t(label)}
               language="fi"
               id={label}
               readOnly={readOnly}
-              required={required}
+              required={isRequired}
               initialMonth={new Date()}
               invalid={error ? true : false}
               errorText={error?.message}

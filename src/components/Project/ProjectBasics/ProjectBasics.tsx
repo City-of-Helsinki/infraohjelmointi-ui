@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import ProjectSidePanel from './ProjectFormSidePanel/ProjectFormSidePanel';
 import ProjectForm from './ProjectForm/ProjectForm';
+import ProjectHistoryPanel from './ProjectForm/ProjectHistoryPanel';
 import './styles.css';
 import useGetProject from '@/hooks/useGetProject';
 
@@ -10,6 +12,7 @@ const ProjectBasics = () => {
   const { data: project } = useGetProject();
   const projectMode = useAppSelector(selectProjectMode);
   const { t } = useTranslation();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const navItems = [
     { route: '#basics', label: t('nav.basics') },
@@ -26,11 +29,22 @@ const ProjectBasics = () => {
       {(project || projectMode === 'new') && (
         <>
           <div className="flex w-[35%] justify-center">
-            <ProjectSidePanel navItems={navItems} project={project ?? null} />
+            <ProjectSidePanel
+              navItems={navItems}
+              project={project ?? null}
+              onOpenChangeHistory={project?.id ? () => setIsHistoryOpen(true) : undefined}
+            />
           </div>
           <div className="flex w-[65%]" data-testid="form-panel">
             <ProjectForm project={project ?? null} />
           </div>
+          {project?.id && (
+            <ProjectHistoryPanel
+              isOpen={isHistoryOpen}
+              onClose={() => setIsHistoryOpen(false)}
+              projectId={project.id}
+            />
+          )}
         </>
       )}
     </div>

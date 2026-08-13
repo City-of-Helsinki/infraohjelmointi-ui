@@ -13,8 +13,6 @@ const createMenuCardItem = (
 const menuCardItems = [
   createMenuCardItem('categories', 'project-categories'),
   createMenuCardItem('types', 'project-types'),
-  createMenuCardItem('phases', 'project-phases'),
-  createMenuCardItem('projectPhaseDetails', 'project-phase-details'),
   createMenuCardItem('constructionProcurementMethods', 'construction-procurement-methods'),
   createMenuCardItem('staraProcurementReasons', 'stara-procurement-reasons'),
   createMenuCardItem('projectQualityLevels', 'project-quality-levels'),

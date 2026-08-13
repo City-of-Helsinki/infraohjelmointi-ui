@@ -18,6 +18,7 @@ interface ITextFieldProps extends Omit<TextInputProps, 'size' | 'id' | 'tooltip'
   defaultValue?: string;
   wrapperClassName?: string;
   size?: 'full' | 'l';
+  shouldTranslate?: boolean;
 }
 
 const TextField: FC<ITextFieldProps> = ({
@@ -34,6 +35,7 @@ const TextField: FC<ITextFieldProps> = ({
   defaultValue = '',
   wrapperClassName = '',
   size = 'l',
+  shouldTranslate,
   ...rest
 }) => {
   const required = rules?.required ? true : false;
@@ -45,12 +47,16 @@ const TextField: FC<ITextFieldProps> = ({
       rules={rules}
       control={control as Control<FieldValues>}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => (
+      render={({
+        field: { onChange, onBlur, value, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => (
         <div className={`input-wrapper ${wrapperClassName}`} id={name} data-testid={name}>
           <HDSTextInput
             className={`input-${size}`}
             value={readOnlyValue ?? value}
             onChange={onChange}
+            onBlur={onBlur}
             label={t(label)}
             hideLabel={hideLabel}
             id={id ?? label}

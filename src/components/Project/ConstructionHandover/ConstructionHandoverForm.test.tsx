@@ -5,7 +5,7 @@ import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
-import { createConstructionHandover, createProject } from '@/mocks/createMocks';
+import { createConstructionHandover } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 
 const mockPatchConstructionHandover = jest.fn();
@@ -14,6 +14,9 @@ const mockTransitionConstructionHandoverStatus = jest.fn();
 jest.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
   useTransitionConstructionHandoverStatusMutation: () => [mockTransitionConstructionHandoverStatus],
+  usePostConstructionHandoverFinancingMutation: () => [jest.fn()],
+  usePatchConstructionHandoverFinancingMutation: () => [jest.fn()],
+  useDeleteConstructionHandoverFinancingMutation: () => [jest.fn()],
 }));
 
 jest.mock('react-i18next', () => mockI18next());
@@ -48,9 +51,7 @@ describe('ConstructionHandoverForm copy link', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -88,9 +89,7 @@ describe('ConstructionHandoverForm copy link', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -133,18 +132,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionStart: '2026-01-01',
       constructionEnd: '2026-02-01',
     });
-    const project = createProject({ id: 'project-123' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -167,29 +160,29 @@ describe('ConstructionHandoverForm submit', () => {
           constructionStart: '01.01.2026',
           constructionEnd: '01.02.2026',
           otherTimelineNotes: '',
-          personPlanning: '',
-          personFinancing: '',
-          project: 'project-123',
+          personPlanning: 'person-1',
+          personFinancing: 'person-2',
           totalCost: null,
           linkDesignDrawings: null,
           linkCostAllocation: null,
           linkContractBoundaries: null,
-          constructionProjectManager: null,
         },
       });
     });
   });
 
-  it('does not submit when project is missing', async () => {
-    const constructionHandover = createConstructionHandover();
+  it('maps totalCost as number when untouched form has initial value', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: 75000,
+    });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -203,7 +196,156 @@ describe('ConstructionHandoverForm submit', () => {
     });
 
     await waitFor(() => {
-      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: 75000,
+          }),
+        }),
+      );
+    });
+  });
+
+  it('maps totalCost as null when form field is empty', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: null,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: null,
+          }),
+        }),
+      );
+    });
+  });
+
+  it('maps totalCost as null when value is not a valid number', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: Number.NaN,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: null,
+          }),
+        }),
+      );
+    });
+  });
+
+  it('maps localized formatted totalCost value as number on submit', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: null,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('constructionHandoverForm.totalCost'), {
+        target: { value: '1000,5' },
+      });
+    });
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: 1000.5,
+          }),
+        }),
+      );
+    });
+  });
+});
+
+describe('ConstructionHandoverForm financing rows', () => {
+  it('displays financing rows returned from API in table', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionHandoverFinancing: [
+        {
+          id: 'financing-1',
+          financingParty: 'KYMP',
+          description: '',
+          budgetItem: { id: 'budget-1', value: 'K1' },
+          projectNumber: 'HEL-2024-001',
+          budget: '150000',
+        },
+      ],
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /^KYMP/ }));
+
+    await waitFor(() => {
+      expect(screen.getByText('HEL-2024-001')).toBeInTheDocument();
     });
   });
 });
@@ -211,6 +353,7 @@ describe('ConstructionHandoverForm submit', () => {
 describe('ConstructionHandoverForm status transitions', () => {
   beforeEach(() => {
     mockTransitionConstructionHandoverStatus.mockClear();
+    mockPatchConstructionHandover.mockClear();
   });
 
   it('disables form fields when handover status is not draft', async () => {
@@ -222,9 +365,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -248,9 +389,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -271,6 +410,43 @@ describe('ConstructionHandoverForm status transitions', () => {
     });
   });
 
+  it('does not submit handover to programmer when patching draft changes fails', async () => {
+    const unwrap = jest.fn().mockRejectedValue(new Error('Patch failed'));
+    mockPatchConstructionHandover.mockReturnValue({ unwrap });
+
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.DRAFT,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    await act(async () => {
+      fireEvent.change(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i }), {
+        target: { value: 'Updated handover name' },
+      });
+    });
+
+    const submitToProgrammerButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.submitToProgrammer',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitToProgrammerButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalled();
+      expect(mockTransitionConstructionHandoverStatus).not.toHaveBeenCalled();
+    });
+  });
+
   it('submits handover to construction when submit to construction button is clicked', async () => {
     const constructionHandover = createConstructionHandover({
       status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
@@ -280,9 +456,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );

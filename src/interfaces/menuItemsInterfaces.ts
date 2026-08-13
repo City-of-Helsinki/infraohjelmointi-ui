@@ -1,11 +1,10 @@
 import { IListState } from '@/reducers/listsSlice';
+import { DialogMode } from './common';
 
 const ADMIN_MENUS_MENU_TYPE = [
   'categories',
   'types',
   'programs',
-  'phases',
-  'projectPhaseDetails',
   'constructionProcurementMethods',
   'staraProcurementReasons',
   'projectQualityLevels',
@@ -22,8 +21,6 @@ type AdminMenusMenuType = (typeof ADMIN_MENUS_MENU_TYPE)[number];
 type ReorderableListType = keyof Pick<
   IListState,
   | 'types'
-  | 'phases'
-  | 'projectPhaseDetails'
   | 'constructionProcurementMethods'
   | 'staraProcurementReasons'
   | 'categories'
@@ -47,8 +44,6 @@ interface MenuItemDialogMessages {
   dialogHeader: string;
   dialogInputId: string;
 }
-
-type DialogMode = 'add' | 'edit' | 'delete';
 
 interface DialogState {
   open: boolean;

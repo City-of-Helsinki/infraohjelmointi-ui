@@ -14,6 +14,7 @@ import {
   getPersons,
   getDistricts,
   getBudgetOverrunReasons,
+  getFinancingParties,
   getProgrammers,
   getTalpaProjectRanges,
   getTalpaAssetClasses,
@@ -30,6 +31,7 @@ import {
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
+import { toSerializableError } from '@/utils/reduxErrorUtils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   ITalpaAssetClass,
@@ -68,6 +70,7 @@ export interface IListState {
   projectDivisions: Array<IProjectDistrictOption>;
   projectSubDivisions: Array<IProjectDistrictOption>;
   budgetOverrunReasons: Array<IListItem>;
+  financingParties: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
   programmersRaw: Array<IPerson>;
@@ -97,6 +100,7 @@ const initialState: IListState = {
   projectDivisions: [],
   projectSubDivisions: [],
   budgetOverrunReasons: [],
+  financingParties: [],
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
@@ -136,9 +140,7 @@ const toProgrammersListItems = (programmers: Array<IPerson>): Array<IListItem> =
   programmers
     .filter(
       ({ firstName, lastName }) =>
-        firstName?.trim() &&
-        lastName?.trim() &&
-        !(firstName === 'Ei' && lastName === 'Valintaa'),
+        firstName?.trim() && lastName?.trim() && !(firstName === 'Ei' && lastName === 'Valintaa'),
     )
     .map(({ id, firstName, lastName }) => ({
       id,
@@ -197,6 +199,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectDivisions: getProjectDistricts(districts, 'division'),
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
+      financingParties: await getFinancingParties(),
       programmers: await getProgrammers(),
       programmersRaw: await getRawProgrammers(),
       priorities: await getPriorities(),
@@ -207,7 +210,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectClasses: [],
     };
   } catch (err) {
-    return thunkAPI.rejectWithValue(err);
+    return thunkAPI.rejectWithValue(toSerializableError(err));
   }
 });
 
@@ -220,7 +223,7 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
       talpaAssetClasses: await getTalpaAssetClasses(),
     };
   } catch (err) {
-    return thunkAPI.rejectWithValue(err);
+    return thunkAPI.rejectWithValue(toSerializableError(err));
   }
 });
 
@@ -238,7 +241,7 @@ export const patchMenuItemsThunk = createAsyncThunk(
       );
       return listItem;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -250,7 +253,7 @@ export const postMenuItemsThunk = createAsyncThunk(
       const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -265,7 +268,7 @@ export const deleteMenuItemsThunk = createAsyncThunk(
         rowId: thunkContent.id,
       };
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -289,7 +292,7 @@ export const saveTableOrderThunk = createAsyncThunk(
       const savedTable = await putMenuListOrder(listData, path);
       return savedTable;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );

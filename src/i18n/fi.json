@@ -205,6 +205,7 @@
     "requiredFalse": "{{field}} on oltava 'Ei'",
     "programmed": "Ohjelmoitu",
     "description": "Hankkeen kuvaus",
+    "totalCostRequired": "Kokonaiskustannukset ovat pakolliset",
     "phaseTooEarly": "Hankkeen vaihe ei voi olla {{value}} jos nykyinen päivä on ennen rakentamisen päättymispäivää",
     "completedPhaseTooEarly": "Hankkeen vaihe ei voi olla Valmis / kunnossapidossa jos nykyinen päivä on ennen takuuajan päättymispäivää",
     "category": "Kategoria",
@@ -236,7 +237,10 @@
     "templateProject": "$t(projectTalpaForm.templateProject)",
     "address": "$t(projectForm.address)",
     "type": "$t(projectForm.type)",
-    "typeQualifier": "$t(projectForm.typeQualifier)"
+    "typeQualifier": "$t(projectForm.typeQualifier)",
+    "startLatest": "Aloitus viimeistään",
+    "endLatest": "Valmis viimeistään",
+    "person": "henkilö"
   },
   "projectTalpaForm": {
     "budgetItemNumber": "Hankkeen projektityyppi",
@@ -374,7 +378,53 @@
     "priority": "Prioriteetti",
     "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>",
     "noPostalCodeFound": "Katuosoitteelle ei löytynyt postinumeroa",
-    "noCityFound": "Katuosoitteelle ei löytynyt kaupunkia"
+    "noCityFound": "Katuosoitteelle ei löytynyt kaupunkia",
+    "changeHistory": {
+      "button": "Näytä muutoshistoria",
+      "title": "Hankkeen muutoshistoria",
+      "loading": "Ladataan muutoshistoriaa…",
+      "empty": "Tälle hankkeelle ei ole tallennettua muutoshistoriaa.",
+      "error": "Muutoshistorian lataaminen epäonnistui.",
+      "today": "tänään",
+      "yesterday": "eilen",
+      "unknownActor": "Tuntematon käyttäjä",
+      "field": "Kenttä",
+      "change": "Muutos",
+      "close": "Sulje",
+      "operation": {
+        "CREATE": "Hanke luotu",
+        "UPDATE": "Muokkaus",
+        "DELETE": "Hanke poistettu"
+      },
+      "action": {
+        "created": "loi hankkeen",
+        "deleted": "poisti hankkeen",
+        "changedPhase": "muutti hankkeen vaihetta",
+        "editedField": "muokkasi {{field}}-kenttää",
+        "editedForm": "muokkasi lomaketta"
+      },
+      "fields": {
+        "name": "Hankkeen nimi",
+        "description": "Hankkeen kuvaus",
+        "category": "Kategoria",
+        "projectClass": "Alaluokka",
+        "phase": "Hankkeen vaihe",
+        "phaseDetail": "Vaiheen tarkenne",
+        "planningStartYear": "Suunnittelun aloitusvuosi",
+        "constructionEndYear": "Rakentamisen valmistumisvuosi",
+        "constructionProcurementMethod": "Rakentamisen hankintatapa",
+        "estPlanningStart": "Suunnittelu, alkaa",
+        "estPlanningEnd": "Suunnittelu, päättyy",
+        "estConstructionStart": "Rakentaminen, alkaa",
+        "estConstructionEnd": "Rakentaminen, päättyy",
+        "estWarrantyPhaseStart": "Takuuaika, alkaa",
+        "estWarrantyPhaseEnd": "Takuuaika, päättyy",
+        "presenceStart": "Esilläolo alkaa",
+        "presenceEnd": "Esilläolo päättyy",
+        "visibilityStart": "Nähtävilläolo alkaa",
+        "visibilityEnd": "Nähtävilläolo päättyy"
+      }
+    }
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -429,9 +479,18 @@
     "contacts": "Yhteyshenkilöt",
     "personPlanning": "Suunnittelu ja tekniset asiat",
     "personFinancing": "Rahoitus ja aikataulu",
+    "constructionProjectManager": "Nimeä projektipäällikkö",
     "saveDraft": "Tallenna luonnoksena",
     "submitToProgrammer": "Siirrä ohjelmoijalle",
     "submitToConstruction": "Siirrä rakentamiselle",
+    "nameProjectManager": "Nimeä rakennuttamisen projektipäällikkö ja valitse hankkeen hankintatapa.",
+    "saveProjectManagerButton": "Tallenna projektipäällikkö",
+    "nameProjectManagerTooltip": "Eikö haluamaasi projektipäällikköä löydy listalta? Ota yhteyttä vastuuhenkilölistan ylläpitäjään.",
+    "projectManagerSet": "Projektipäällikkö on jo nimetty hankkeen perustiedoissa. Haluatko käyttää tätä valintaa?",
+    "moveToConstructionPreparation": "Siirrä hanke rakentamisen valmisteluun ja tarkista hankkeen hankintatapa",
+    "checkInformation": "Sinut on nimetty projektipäälliköksi. Tarkista tiedot ja siirrä hanke valmisteluun.",
+    "moveToConstructionPreparationButton": "Siirrä rakentamisen valmisteluun",
+    "nameProjectManagerNotification": "Nimeä urakan projektipäällikkö ennen valmisteluun siirtoa",
     "status": {
       "draft": "Luonnos",
       "submittedToProgrammer": "Siirretty ohjelmoijalle",
@@ -442,6 +501,25 @@
     "toStatus": {
       "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
       "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
+    },
+    "totalCost": "Kokonaiskustannus",
+    "financingSection": {
+      "title": "Hankkeen rahoitus",
+      "requiredField": "Pakollinen kenttä",
+      "addRow": "Lisää rahoitusrivi",
+      "closeDialogButton": "Takaisin",
+      "deleteDialogContent": "Haluatko varmasti poistaa tämän rahoitusrivin?",
+      "deleteDialogTitle": "Poista rahoitusrivi",
+      "editDialogTitle": "Muokkaa rahoitusriviä",
+      "addDialogTitle": "Lisää rahoitusrivi",
+      "tableEmptyText": "Ei rahoitustietoja",
+      "label": {
+        "financer": "Rahoittava taho",
+        "budgetItem": "Talousarviokohta",
+        "projectNumber": "Projektinumero",
+        "budget": "Budjetti"
+      },
+      "projectNumberWarning": "Projektinumeroa ei voitu hakea tietokannasta. Kirjaa se käsin tai yritä myöhemmin uudelleen."
     }
   },
   "notification": {
@@ -491,7 +569,7 @@
       "notePatchSuccess": "Muistiinpano muokattu onnistuneesti",
       "talpaProjectPostSuccess": "Projektin avauspyyntö-excel luotu onnistuneesti.",
       "talpaProjectPatchSuccess": "Projektin avauspyyntö-excel muokattu onnistuneesti.",
-      "constructionHandoverPatchSuccess": "Rakennuttamiseen siirron luonnos muokattu onnistuneesti.",
+      "constructionHandoverPatchSuccess": "Rakennuttamiseen siirto muokattu onnistuneesti",
       "constructionHandoverStatusTransitionSuccess": "Siirretty {{parameter}} onnistuneesti",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 401": "Pyyntö epäonnistui virhekoodilla 401",
@@ -508,6 +586,8 @@
       "postSuccess": "Lisäys onnistui",
       "deleteSuccess": "Arvon poistaminen onnistui",
       "deleteError": "Arvon poistaminen epäonnistui",
+      "rowDeleteSuccess": "Rivin poistaminen onnistui",
+      "rowDeleteError": "Rivin poistaminen epäonnistui",
       "addMenuItemSuccess": "Uusi arvo lisätty valikkoon onnistuneesti",
       "editMenuItemSuccess": "Arvon muokkaus onnistui",
       "deleteMenuItemSuccess": "Arvon poistaminen onnistui",
@@ -562,6 +642,7 @@
   "planning": "Ohjelmointinäkymä",
   "coordination": "Koordinointinäkymä",
   "basicInfo": "Perustiedot",
+  "myWorkload": "Omat hankkeet",
   "notes": "Muistiinpanot",
   "talpa": "Projektitiedot Talpaan",
   "constructionHandover": "Rakennuttamiseen siirto",
@@ -594,6 +675,7 @@
   "budgetProposalPreparation": "Talousarvioehdotusten valmistelu",
   "allocationPreparation": "Määrärahojen valmistelu",
   "keur": "keur",
+  "m2": "m²",
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
   "send:": "Lähetä",
   "savedTime": "Viimeksi tallennettu {{time}}",
@@ -854,10 +936,11 @@
       "changeStatus": "Vaihda tilan status",
       "dataLastUpdated": "Tiedot viimeksi siirretty",
       "updateData": "Siirrä tiedot",
+      "updateDataInfo": "Muut paitsi kuluvan vuoden tiedot siirretään",
       "open": "Auki",
       "locked": "Lukittu",
       "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
-      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään. Tietojen siirtoa ei voi myöhemmin peruuttaa."
+      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään, lukuun ottamatta kuluvan vuoden budjettitietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
     }
   },
   "projectCount": "Projektien määrä",
@@ -916,6 +999,15 @@
   "tooltips": {
     "hideTooltips": "Piilota infoikkunat",
     "showTooltips": "Näytä infoikkunat",
+    "showChangeHistory": "Näytä muutoshistoria",
+    "hideChangeHistory": "Piilota muutoshistoria",
+    "history": {
+      "loading": "Ladataan…",
+      "empty": "Ei muutoshistoriaa",
+      "unknownActor": "Tuntematon käyttäjä",
+      "showMore": "Näytä {{count}} muuta päivitystä",
+      "showLess": "Näytä vähemmän"
+    },
     "priority": {
       "high": "Hanke on kiireellisesti edistettävä",
       "medium": "Hanke on tavanomaisesti edistettävä",
@@ -926,6 +1018,44 @@
       "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
       "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
       "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
+    }
+  },
+  "myWorkloadView": {
+    "mainTitle": "Omat hankkeet",
+    "myWorkload": "Omat hankkeet",
+    "viewTypeConstruction": "Rakennuttamisen projektit",
+    "viewTypePlanning": "Suunnitteluttamisen projektit",
+    "table": {
+      "loading": "Hankkeita ladataan...",
+      "projectName": "Hanke",
+      "description": "Hankkeen kuvaus",
+      "planningStart": "Suunnittelu alkaa",
+      "planningEnd": "Suunnittelu päättyy",
+      "planningScheduleTitle": "Suunnittelun aikataulu",
+      "designCostEstimateSectionTitle": "Suunnittelun kustannusarvio",
+      "costEstimate": "Kustannusarvio",
+      "workQuantity": "Suoritemäärä",
+      "projectCostForecast": "Hankkeen kustannusarvio",
+      "planningCostForecast": "Suunnittelun kustannusarvio",
+      "constructionCostForecast": "Rakentamisen kustannusarvio",
+      "totalBudget": "Hankkeen kokonaisbudjetti",
+      "phase": "Vaihe",
+      "functions": "Toimenpiteet",
+      "modifyInformation": "Muokkaa tietoja",
+      "editDialogTitle": "Muokkaa hankkeen tietoja",
+      "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
+      "requiredField": "Pakollinen kenttä",
+      "invalidDate": "Päivämäärä on virheellinen",
+      "emptyText": "Hankkeita ei löytynyt"
+    },
+    "tasks": {
+      "title": "Tehtävät",
+      "taskDescription": "Muokkaa hanketta {{projectName}}",
+      "planningPeriod": "Suunnittelun aikataulu",
+      "constructionPeriod": "Rakentamisen aikataulu",
+      "budget": "Kokonaisrahoitusvaraus",
+      "constructionProcurementMethod": "Rakentamisen hankintatapa",
+      "infoNotAvailable": "Ei tiedossa"
     }
   }
 }

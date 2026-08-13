@@ -5,7 +5,7 @@ import { setupStore } from '../store';
 import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
@@ -66,7 +66,10 @@ export const renderWithProviders = (
     <BrowserRouter>
       <AuthProvider {...oidcConfig}>
         <Provider store={store}>
-          <Routes>{ui}</Routes>
+          <Routes>
+            {ui}
+            <Route path="*" element={<></>} />
+          </Routes>
         </Provider>
       </AuthProvider>
     </BrowserRouter>,
