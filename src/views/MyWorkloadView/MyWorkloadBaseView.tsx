@@ -3,14 +3,14 @@ import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
-import useMyWorkloadRows from './useMyWorkloadRows';
+import useMyWorkloadRows from '@/views/MyWorkloadView/useMyWorkloadRows';
 import { useTranslation } from 'react-i18next';
 import { isRequestCanceled } from '@/utils/http';
 import classes from './styles.module.css';
-import MyWorkloadTasks from '../../components/MyWorkLoad/MyWorkloadTasks';
-import MyWorkloadTable from '../../components/MyWorkLoad/MyWorkloadTable';
+import MyWorkloadTasks from '@/components/MyWorkload/Tasks/MyWorkloadTasks';
+import MyWorkloadTable from '@/components/MyWorkload/Table/MyWorkloadTable';
 import MyWorkloadViewTypeButtons from './MyWorkloadViewTypeButtons';
-import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { getMyWorkloadViewType } from '@/utils/myWorkloadUtils';
 
 const MyWorkloadBaseView: FC = () => {
@@ -25,6 +25,10 @@ const MyWorkloadBaseView: FC = () => {
     isLoading,
     hasError,
   } = useMyWorkloadRows(viewType, !isResolvingViewType);
+
+  // TODO:Replace this with actual tasks once the backend provides them (also add correct type then).
+  // For now, we just show an empty list of tasks.
+  const tasks: MyWorkloadTableRow[] = [];
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -68,13 +72,13 @@ const MyWorkloadBaseView: FC = () => {
   }, [responsiblePersons, startYear, user]);
   const isTableLoading = isResolvingViewType || isLoading;
 
-  const showConstructionTasks = viewType === 'construction';
+  const showConstructionTasks = viewType === 'construction' && tasks && tasks.length > 0;
 
   return (
     <div id="construction-my-workload-base-view" className={classes.contentContainer}>
       <h1 className={`${classes.mainTitle} text-heading-xl`}>{t('myWorkloadView.mainTitle')}</h1>
       <MyWorkloadViewTypeButtons viewType={viewType} setViewType={setViewType} />
-      {showConstructionTasks && <MyWorkloadTasks />}
+      {showConstructionTasks && <MyWorkloadTasks listOfTasks={tasks} />}
       <MyWorkloadTable
         listOfProjects={listOfProjects}
         isLoading={isTableLoading}

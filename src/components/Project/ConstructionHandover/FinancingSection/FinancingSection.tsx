@@ -15,7 +15,7 @@ import { getFieldProps } from '../ConstructionHandoverForm';
 import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
-import { formatBudgetEuro, parseCurrency } from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro, parseCurrency } from '@/utils/currencyUtils';
 
 const FinancingSection = () => {
   const { t } = useTranslation();

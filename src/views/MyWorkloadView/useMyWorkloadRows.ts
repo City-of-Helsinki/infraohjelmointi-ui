@@ -25,6 +25,7 @@ const mapProjectToMyWorkloadTableRow = (
   translate: (key: string) => string,
 ): MyWorkloadTableRow => ({
   id: project.id,
+  budget: project.budget ?? '',
   projectName: project.name,
   description: project.description,
   planningStart: normalizeMyWorkloadDate(project.estPlanningStart),
@@ -44,6 +45,7 @@ const mapProjectToMyWorkloadTableRow = (
   phase: project.phase?.value ? translate(`option.${project.phase.value}`) : '',
   phaseValue: project.phase?.value ?? '',
   phaseId: project.phase?.id ?? '',
+  constructionProcurementMethod: project.constructionProcurementMethod?.value,
   functions: translate('myWorkloadView.table.modifyInformation'),
 });
 

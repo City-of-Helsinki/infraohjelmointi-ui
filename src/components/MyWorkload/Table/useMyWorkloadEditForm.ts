@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro } from '@/utils/currencyUtils';
 
 export interface IMyWorkloadEditFormValues {
   planningStart: string;

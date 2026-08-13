@@ -51,6 +51,8 @@ const baseProject: MyWorkloadTableRow = {
   phaseValue: 'design',
   phaseId: mockProjectPhases.data[1].id,
   functions: 'myWorkloadView.table.modifyInformation',
+  budget: '',
+  constructionProcurementMethod: undefined,
 };
 
 const renderDialog = (

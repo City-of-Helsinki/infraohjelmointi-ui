@@ -15,6 +15,9 @@
     "myWorkload": "Mina projekt",
     "viewTypeConstruction": "Byggherreprojekt",
     "viewTypePlanning": "Planeringsprojekt",
+    "tasks": {
+      "taskDescription": "Redigera projektet {{projectName}}"
+    },
     "table": {
       "loading": "Projekt laddas...",
       "requiredField": "Obligatoriskt fält"

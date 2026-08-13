@@ -1020,8 +1020,8 @@
     "myWorkload": "Omat hankkeet",
     "viewTypeConstruction": "Rakennuttamisen projektit",
     "viewTypePlanning": "Suunnitteluttamisen projektit",
-    "tasks": "Tehtävät",
     "table": {
+      "loading": "Hankkeita ladataan...",
       "projectName": "Hanke",
       "description": "Hankkeen kuvaus",
       "planningStart": "Suunnittelu alkaa",
@@ -1042,6 +1042,15 @@
       "requiredField": "Pakollinen kenttä",
       "invalidDate": "Päivämäärä on virheellinen",
       "emptyText": "Hankkeita ei löytynyt"
+    },
+    "tasks": {
+      "title": "Tehtävät",
+      "taskDescription": "Muokkaa hanketta {{projectName}}",
+      "planningPeriod": "Suunnittelun aikataulu",
+      "constructionPeriod": "Rakentamisen aikataulu",
+      "budget": "Kokonaisrahoitusvaraus",
+      "constructionProcurementMethod": "Rakentamisen hankintatapa",
+      "infoNotAvailable": "Ei tiedossa"
     }
   }
 }

@@ -8,7 +8,7 @@ import {
   formatMyWorkloadDateForDisplay,
   getMyWorkloadDateTimeValue,
 } from '@/utils/myWorkloadUtils';
-import classes from './styles.module.css';
+import classes from '../styles.module.css';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
 interface MyWorkloadTableProps {

@@ -6,7 +6,7 @@ import {
 } from '@/interfaces/constructionHandoverInterfaces';
 import { listItemToOption, personToOption } from '@/utils/common';
 import { formatDateToHds } from '@/utils/dates';
-import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro } from '@/utils/currencyUtils';
 
 function useConstructionHandoverFormValues(
   constructionHandover: IConstructionHandover,

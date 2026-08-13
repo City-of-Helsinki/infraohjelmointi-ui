@@ -58,6 +58,8 @@ const makeRow = (index: number): MyWorkloadTableRow => ({
   phaseValue: 'design',
   phaseId: 'phase-id',
   functions: 'myWorkloadView.table.modifyInformation',
+  budget: '',
+  constructionProcurementMethod: undefined,
 });
 
 const makeDateSortRow = (index: number, planningStart: string): MyWorkloadTableRow => ({

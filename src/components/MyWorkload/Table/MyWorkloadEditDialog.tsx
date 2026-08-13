@@ -5,7 +5,7 @@ import { selectProjectPhases } from '@/reducers/listsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import TextField from '@/components/shared/TextField';
-import { currencyToRequestValue, formatBudgetEuro } from '@/utils/constructionHandoverUtils';
+import { currencyToRequestValue, formatBudgetEuro } from '@/utils/currencyUtils';
 import {
   Button,
   ButtonVariant,
@@ -28,8 +28,8 @@ import {
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import classes from './styles.module.css';
-import { normalizeMyWorkloadDate } from '../../utils/myWorkloadUtils';
+import classes from '../styles.module.css';
+import { normalizeMyWorkloadDate } from '@/utils/myWorkloadUtils';
 import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 
