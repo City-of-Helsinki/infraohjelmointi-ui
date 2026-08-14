@@ -10,20 +10,22 @@ import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
 import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
 
-type BasicInfoApiField = Exclude<keyof IProjectProgrammeForm, 'links'>;
+type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
 
 interface IProjectProgrammeFormProps {
   projectProgrammeId: string;
   activeSection: ProjectProgrammeSectionId;
   basicInfo: IProjectProgrammeBasicInfo | null;
+  briefProgramme: boolean;
   onClose: () => void;
 }
 
-const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoApiField, string> = {
+const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoFormField, string> = {
   projectName: 'projectName',
   district: 'district',
   projectProgrammeCompiler: 'projectProgrammeCompiler',
   personsInvolved: 'personsInvolved',
+  estimatedCosts: 'estimatedCosts',
   inspector: 'inspector',
   summary: 'summary',
   strategyGoals: 'strategyGoals',
@@ -38,13 +40,13 @@ const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoApiField, string> = {
 
 export function pickChangedBasicInfoFields(
   formData: IProjectProgrammeForm,
-  dirtyFields: Partial<Record<BasicInfoApiField, boolean>>,
+  dirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
 
-  (Object.keys(BASIC_INFO_FORM_TO_API_FIELD) as BasicInfoApiField[]).forEach((field) => {
+  (Object.keys(BASIC_INFO_FORM_TO_API_FIELD) as BasicInfoFormField[]).forEach((field) => {
     if (dirtyFields[field]) {
-      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData[field];
+      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo[field];
     }
   });
 
@@ -53,13 +55,13 @@ export function pickChangedBasicInfoFields(
 
 export function pickChangedLinks(
   formData: IProjectProgrammeForm,
-  dirtyFields: Partial<Record<keyof IProjectProgrammeForm, unknown>>,
+  dirtyFields: Partial<Record<keyof IProjectProgrammeForm['basicInfo'], unknown>>,
 ): string[] | null {
   if (!dirtyFields.links) {
     return null;
   }
 
-  return formData.links
+  return formData.basicInfo.links
     .map((link) => link.value.trim())
     .filter((linkValue) => linkValue.length > 0);
 }
@@ -68,6 +70,7 @@ function ProjectProgrammeForm({
   projectProgrammeId,
   activeSection,
   basicInfo,
+  briefProgramme,
   onClose,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
@@ -84,11 +87,11 @@ function ProjectProgrammeForm({
 
     const requestData: Record<string, unknown> = pickChangedBasicInfoFields(
       data,
-      dirtyFields as Partial<Record<BasicInfoApiField, boolean>>,
+      dirtyFields.basicInfo as Partial<Record<BasicInfoFormField, boolean>>,
     );
     const linksPayload = pickChangedLinks(
       data,
-      dirtyFields as Partial<Record<keyof IProjectProgrammeForm, unknown>>,
+      dirtyFields.basicInfo as Partial<Record<keyof IProjectProgrammeForm['basicInfo'], unknown>>,
     );
 
     if (linksPayload !== null) {
@@ -148,7 +151,9 @@ function ProjectProgrammeForm({
           </StatusLabel>
         </div>
 
-        {activeSection === 'basicInfo' && <ProjectProgrammeBasicInfoForm />}
+        {activeSection === 'basicInfo' && (
+          <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
+        )}
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">

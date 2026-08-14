@@ -6,11 +6,12 @@ export interface IProjectProgrammeLinkFormItem {
   value: string;
 }
 
-export interface IProjectProgrammeForm {
+export interface IProjectProgrammeBasicInfoForm {
   projectName: string;
   district: string;
   projectProgrammeCompiler: string;
   personsInvolved: string;
+  estimatedCosts: string;
   inspector: string;
   summary: string;
   strategyGoals: string;
@@ -22,6 +23,10 @@ export interface IProjectProgrammeForm {
   specialConsiderations: string;
   otherConsiderations: string;
   links: IProjectProgrammeLinkFormItem[];
+}
+
+export interface IProjectProgrammeForm {
+  basicInfo: IProjectProgrammeBasicInfoForm;
 }
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
@@ -71,21 +76,24 @@ function getLinksValue(
 export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasicInfo | null) {
   const formMethods = useForm<IProjectProgrammeForm>({
     defaultValues: {
-      projectName: '',
-      district: '',
-      projectProgrammeCompiler: '',
-      personsInvolved: '',
-      inspector: '',
-      summary: '',
-      strategyGoals: '',
-      costClass: '',
-      projectSize: '',
-      risks: '',
-      studyAndPlanningNeeds: '',
-      planningAndImplementationFeasibility: '',
-      specialConsiderations: '',
-      otherConsiderations: '',
-      links: [{ value: '' }],
+      basicInfo: {
+        projectName: '',
+        district: '',
+        projectProgrammeCompiler: '',
+        personsInvolved: '',
+        estimatedCosts: '',
+        inspector: '',
+        summary: '',
+        strategyGoals: '',
+        costClass: '',
+        projectSize: '',
+        risks: '',
+        studyAndPlanningNeeds: '',
+        planningAndImplementationFeasibility: '',
+        specialConsiderations: '',
+        otherConsiderations: '',
+        links: [{ value: '' }],
+      },
     },
     mode: 'onBlur',
   });
@@ -94,23 +102,26 @@ export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasi
 
   useEffect(() => {
     reset({
-      projectName: getTextValue(basicInfo?.projectName),
-      district: getDistrictValue(basicInfo?.district),
-      projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
-      personsInvolved: getTextValue(basicInfo?.personsInvolved),
-      inspector: getTextValue(basicInfo?.inspector),
-      summary: getTextValue(basicInfo?.summary),
-      strategyGoals: getTextValue(basicInfo?.strategyGoals),
-      costClass: getTextValue(basicInfo?.costClass),
-      projectSize: getTextValue(basicInfo?.projectSize),
-      risks: getTextValue(basicInfo?.risks),
-      studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
-      planningAndImplementationFeasibility: getTextValue(
-        basicInfo?.planningAndImplementationFeasibility,
-      ),
-      specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
-      otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
-      links: getLinksValue(basicInfo?.links),
+      basicInfo: {
+        projectName: getTextValue(basicInfo?.projectName),
+        district: getDistrictValue(basicInfo?.district),
+        projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
+        personsInvolved: getTextValue(basicInfo?.personsInvolved),
+        estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
+        inspector: getTextValue(basicInfo?.inspector),
+        summary: getTextValue(basicInfo?.summary),
+        strategyGoals: getTextValue(basicInfo?.strategyGoals),
+        costClass: getTextValue(basicInfo?.costClass),
+        projectSize: getTextValue(basicInfo?.projectSize),
+        risks: getTextValue(basicInfo?.risks),
+        studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
+        planningAndImplementationFeasibility: getTextValue(
+          basicInfo?.planningAndImplementationFeasibility,
+        ),
+        specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
+        otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
+        links: getLinksValue(basicInfo?.links),
+      },
     });
   }, [basicInfo, reset]);
 

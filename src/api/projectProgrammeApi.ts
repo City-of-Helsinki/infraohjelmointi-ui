@@ -37,7 +37,6 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [
         { type: 'ProjectProgrammes', id },
-        { type: 'ProjectProgrammes' },
       ],
     }),
     transitionProjectProgrammeStatus: build.mutation<
@@ -51,7 +50,6 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: 'ProjectProgrammes', id: arg.id },
-        { type: 'ProjectProgrammes' },
       ],
     }),
     postProjectProgrammeSection: build.mutation<
@@ -73,7 +71,6 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: 'ProjectProgrammes', id: arg.id },
-        { type: 'ProjectProgrammes' },
       ],
     }),
     patchProjectProgrammeSection: build.mutation<
@@ -95,7 +92,6 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: 'ProjectProgrammes', id: arg.id },
-        { type: 'ProjectProgrammes' },
       ],
     }),
   }),

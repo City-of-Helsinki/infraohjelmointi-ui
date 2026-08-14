@@ -120,7 +120,7 @@ describe('ProjectProgramme', () => {
       screen.getByRole('button', { name: 'projectProgrammeForm.switchToExtendedProgramme' }),
     ).toBeEnabled();
     expect(
-      screen.getByRole('button', { name: 'projectProgrammeForm.fillBasicInfo' }),
+      screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }),
     ).toBeEnabled();
     expect(screen.getByRole('button', { name: 'projectProgrammeForm.markReady' })).toBeEnabled();
   });
@@ -130,7 +130,7 @@ describe('ProjectProgramme', () => {
     await render();
 
     const fillBasicInfoButton = screen.getByRole('button', {
-      name: 'projectProgrammeForm.fillBasicInfo',
+      name: 'projectProgrammeForm.modifyInformation',
     });
 
     await act(async () => {
@@ -141,6 +141,20 @@ describe('ProjectProgramme', () => {
     expect(screen.getByTestId('project-programme-basic-info-form')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Mock project')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Keskinen')).toBeInTheDocument();
+  });
+
+  it('uses the secondary modify action and keeps switching to brief available after saving basic info', async () => {
+    mockProjectProgramme(false);
+    await render();
+
+    const modifyInformationButton = screen.getByRole('button', {
+      name: 'projectProgrammeForm.modifyInformation',
+    });
+
+    expect(modifyInformationButton).toHaveClass('Button-module_secondary__1nABp');
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
+    ).toBeInTheDocument();
   });
 
   it('creates basic info section when it does not exist yet', async () => {
@@ -167,7 +181,7 @@ describe('ProjectProgramme', () => {
     await render();
 
     await act(async () => {
-      screen.getByRole('button', { name: 'projectProgrammeForm.fillBasicInfo' }).click();
+      screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }).click();
     });
 
     await act(async () => {
@@ -176,7 +190,7 @@ describe('ProjectProgramme', () => {
 
     expect(screen.queryByTestId('project-programme-basic-info-form')).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'projectProgrammeForm.fillBasicInfo' }),
+      screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }),
     ).toBeInTheDocument();
   });
 
@@ -278,7 +292,7 @@ describe('ProjectProgramme', () => {
     ).toBeInTheDocument();
   });
 
-  it('refetches project programme when creation returns conflict', async () => {
+  it('does not refetch project programme when creation returns conflict', async () => {
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: undefined,
       error: { status: 404 },
@@ -294,7 +308,7 @@ describe('ProjectProgramme', () => {
       screen.getByRole('button', { name: 'projectProgrammeForm.startProjectProgramme' }).click();
     });
 
-    expect(mockRefetchProjectProgramme).toHaveBeenCalled();
+    expect(mockRefetchProjectProgramme).not.toHaveBeenCalled();
   });
 
   it('does not refetch project programme when creation is forbidden', async () => {

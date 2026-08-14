@@ -24,21 +24,24 @@ jest.mock('@/api/projectProgrammeApi', () => ({
 }));
 
 const baseFormData: IProjectProgrammeForm = {
-  projectName: 'Initial project',
-  district: 'Keskinen',
-  projectProgrammeCompiler: 'Compiler Name',
-  personsInvolved: 'Person A, Person B',
-  inspector: 'Inspector Name',
-  summary: 'Summary text',
-  strategyGoals: 'Strategy goals',
-  costClass: 'Cost class',
-  projectSize: 'Large',
-  risks: 'Risk text',
-  studyAndPlanningNeeds: 'Study and planning needs',
-  planningAndImplementationFeasibility: 'Feasibility text',
-  specialConsiderations: 'Special considerations',
-  otherConsiderations: 'Other considerations',
-  links: [{ value: 'https://old-link.fi' }],
+  basicInfo: {
+    projectName: 'Initial project',
+    district: 'Keskinen',
+    projectProgrammeCompiler: 'Compiler Name',
+    personsInvolved: 'Person A, Person B',
+    estimatedCosts: '100 000 EUR',
+    inspector: 'Inspector Name',
+    summary: 'Summary text',
+    strategyGoals: 'Strategy goals',
+    costClass: 'Cost class',
+    projectSize: 'Large',
+    risks: 'Risk text',
+    studyAndPlanningNeeds: 'Study and planning needs',
+    planningAndImplementationFeasibility: 'Feasibility text',
+    specialConsiderations: 'Special considerations',
+    otherConsiderations: 'Other considerations',
+    links: [{ value: 'https://old-link.fi' }],
+  },
 };
 
 describe('ProjectProgrammeForm save logic', () => {
@@ -46,6 +49,78 @@ describe('ProjectProgrammeForm save logic', () => {
     mockDispatch.mockReset();
     mockPatchProjectProgrammeSection.mockReset();
     mockPatchProjectProgrammeSection.mockResolvedValue({});
+  });
+
+  it('shows brief-only fields and requires inspector in brief programme mode', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              basicInfo={baseFormData.basicInfo}
+              briefProgramme
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(
+      screen.getByRole('textbox', { name: /projectProgrammeForm\.estimatedCosts/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ })).toBeRequired();
+    expect(
+      screen.queryByRole('textbox', { name: /projectProgrammeForm\.strategyGoals/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('textbox', { name: /projectProgrammeForm\.projectSize/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows complete-only fields and does not require inspector in complete programme mode', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              basicInfo={baseFormData.basicInfo}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(
+      screen.queryByRole('textbox', { name: /projectProgrammeForm\.estimatedCosts/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.costClass/ })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ })).not.toBeRequired();
+    [
+      'strategyGoals',
+      'projectSize',
+      'risks',
+      'studyAndPlanningNeeds',
+      'planningAndImplementationFeasibility',
+      'specialConsiderations',
+      'otherConsiderations',
+    ].forEach((fieldName) => {
+      expect(
+        screen.getByRole('textbox', { name: new RegExp(`projectProgrammeForm\\.${fieldName}`) }),
+      ).toBeInTheDocument();
+    });
   });
 
   it('maps only dirty basic info fields for save payload', () => {
@@ -65,7 +140,10 @@ describe('ProjectProgrammeForm save logic', () => {
     const links = pickChangedLinks(
       {
         ...baseFormData,
-        links: [{ value: '  https://one.fi  ' }, { value: '   ' }, { value: 'https://two.fi' }],
+        basicInfo: {
+          ...baseFormData.basicInfo,
+          links: [{ value: '  https://one.fi  ' }, { value: '   ' }, { value: 'https://two.fi' }],
+        },
       },
       { links: [{ value: true }] },
     );
@@ -84,7 +162,8 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData}
+              basicInfo={baseFormData.basicInfo}
+              briefProgramme={false}
               onClose={onClose}
             />
           }
@@ -129,7 +208,8 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData}
+              basicInfo={baseFormData.basicInfo}
+              briefProgramme={false}
               onClose={onClose}
             />
           }

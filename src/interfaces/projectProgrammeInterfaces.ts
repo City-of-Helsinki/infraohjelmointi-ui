@@ -16,6 +16,7 @@ export interface IProjectProgrammeBasicInfo {
   district?: string | { name?: string | null } | null;
   projectProgrammeCompiler?: string | null;
   personsInvolved?: string | null;
+  estimatedCosts?: string | null;
   inspector?: string | null;
   summary?: string | null;
   strategyGoals?: string | null;

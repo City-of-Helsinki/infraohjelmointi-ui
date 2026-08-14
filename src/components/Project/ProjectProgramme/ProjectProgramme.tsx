@@ -1,9 +1,9 @@
 import { Button, ButtonVariant, IconLink, Notification } from 'hds-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   useGetProjectProgrammeByProjectQuery,
@@ -12,11 +12,6 @@ import {
   usePostSwitchProjectProgrammeTypeMutation,
   useTransitionProjectProgrammeStatusMutation,
 } from '@/api/projectProgrammeApi';
-import {
-  IProjectProgramme,
-  IProjectProgrammeBasicInfo,
-} from '@/interfaces/projectProgrammeInterfaces';
-import { selectProjectDistricts } from '@/reducers/listsSlice';
 import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
   mapSectionIdToApiRoute,
@@ -29,16 +24,10 @@ function isBriefProgramme(projectProgramme: { briefProjectProgramme?: boolean | 
   return projectProgramme.briefProjectProgramme ?? true;
 }
 
-interface IActiveProjectProgrammeSection {
-  id: ProjectProgrammeSectionId;
-  data: unknown;
-}
-
 export default function ProjectProgramme() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { data: project } = useGetProject();
-  const districts = useAppSelector(selectProjectDistricts);
 
   const {
     data: projectProgrammeFromProject,
@@ -51,34 +40,14 @@ export default function ProjectProgramme() {
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [transitionStatus] = useTransitionProjectProgrammeStatusMutation();
-  const [activeSectionState, setActiveSectionState] =
-    useState<IActiveProjectProgrammeSection | null>(null);
+  const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
   const projectProgrammeId = effectiveProjectProgramme?.id ?? null;
 
-  const initialBasicInfoFromProject = useMemo<IProjectProgrammeBasicInfo>(
-    () => ({
-      projectName: project?.name ?? '',
-      district: districts.find((district) => district.id === project?.projectDistrict)?.value ?? '',
-    }),
-    [districts, project?.name, project?.projectDistrict],
-  );
-
-  const initialBasicInfo = useMemo<IProjectProgrammeBasicInfo>(() => {
-    const existingBasicInfo = effectiveProjectProgramme?.basicInfo;
-
-    if (existingBasicInfo) {
-      return {
-        projectName: existingBasicInfo.projectName ?? project?.name ?? '',
-        district: existingBasicInfo.district ?? initialBasicInfoFromProject.district,
-      };
-    }
-
-    return initialBasicInfoFromProject;
-  }, [effectiveProjectProgramme?.basicInfo, initialBasicInfoFromProject, project?.name]);
-
-  const briefProgramme = effectiveProjectProgramme ? isBriefProgramme(effectiveProjectProgramme) : true;
+  const briefProgramme = effectiveProjectProgramme
+    ? isBriefProgramme(effectiveProjectProgramme)
+    : true;
   const hasProjectProgramme = Boolean(projectProgrammeId);
   const projectProgrammeQueryStatus = (
     projectProgrammeByProjectError as { status?: number } | undefined
@@ -88,18 +57,18 @@ export default function ProjectProgramme() {
     projectProgrammeQueryStatus !== undefined &&
     projectProgrammeQueryStatus !== 404;
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
+  const hasBasicInfo = Boolean(effectiveProjectProgramme?.basicInfo);
+  const hasSavedExtendedSection = PROJECT_PROGRAMME_SECTIONS.some(
+    (section) =>
+      !section.showInBrief &&
+      Boolean((effectiveProjectProgramme as Record<string, unknown> | undefined)?.[section.id]),
+  );
 
-  const activeSection = activeSectionState?.id ?? null;
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;
   const showStartProjectProgramme = !showLoadError && !hasProjectProgramme;
   const showActiveSectionForm = !showLoadError && hasProjectProgramme && hasActiveSection;
   const showOverview = !showLoadError && hasProjectProgramme && !hasActiveSection;
-
-  let activeSectionBasicInfo = initialBasicInfo;
-  if (activeSection === 'basicInfo' && activeSectionState?.data) {
-    activeSectionBasicInfo = activeSectionState.data as IProjectProgrammeBasicInfo;
-  }
 
   function notifyMissingProject() {
     dispatch(
@@ -121,18 +90,6 @@ export default function ProjectProgramme() {
       await postProjectProgramme({ project: project.id }).unwrap();
     } catch (error) {
       const status = (error as { status?: number })?.status;
-
-      if (status === 409) {
-        await refetchProjectProgramme();
-        dispatch(
-          notifySuccess({
-            title: 'postSuccess',
-            message: 'projectProgrammeAlreadyExists',
-            type: 'toast',
-          }),
-        );
-        return;
-      }
 
       if (status === 403) {
         dispatch(
@@ -163,7 +120,6 @@ export default function ProjectProgramme() {
 
     try {
       await switchType(effectiveProjectProgramme.id).unwrap();
-      await refetchProjectProgramme();
       dispatch(
         notifySuccess({
           title: 'patchSuccess',
@@ -251,40 +207,24 @@ export default function ProjectProgramme() {
     }
 
     if (sectionId === 'basicInfo' && effectiveProjectProgramme.basicInfo) {
-      setActiveSectionState({
-        id: sectionId,
-        data: effectiveProjectProgramme.basicInfo,
-      });
+      setActiveSection(sectionId);
       return;
     }
 
     try {
-      const response = await postProjectProgrammeSection({
+      await postProjectProgrammeSection({
         id: effectiveProjectProgramme.id,
         section: mapSectionIdToApiRoute(sectionId),
       }).unwrap();
 
-      setActiveSectionState({
-        id: sectionId,
-        data: sectionId === 'basicInfo' ? (response as IProjectProgrammeBasicInfo) : response,
-      });
+      setActiveSection(sectionId);
       return;
     } catch (error) {
       const status = (error as { status?: number })?.status;
 
       if (status === 409) {
-        const refreshedResult = (await refetchProjectProgramme()) as {
-          data?: IProjectProgramme;
-        };
-        setActiveSectionState({
-          id: sectionId,
-          data:
-            sectionId === 'basicInfo'
-              ? refreshedResult.data?.basicInfo ??
-                effectiveProjectProgramme.basicInfo ??
-                initialBasicInfo
-              : null,
-        });
+        await refetchProjectProgramme();
+        setActiveSection(sectionId);
         return;
       }
 
@@ -299,16 +239,14 @@ export default function ProjectProgramme() {
   }
 
   function handleCloseSection() {
-    setActiveSectionState(null);
+    setActiveSection(null);
   }
 
   if (isLoadingProjectProgrammeByProject) {
     return null;
   }
 
-  const extendedSectionTextSuffix = t(
-    'projectProgrammeForm.basicInfoCardTextExtensionForExtended',
-  );
+  const extendedSectionTextSuffix = t('projectProgrammeForm.basicInfoCardTextExtensionForExtended');
 
   return (
     <div className="project-programme-container">
@@ -339,7 +277,8 @@ export default function ProjectProgramme() {
           <ProjectProgrammeForm
             projectProgrammeId={projectProgrammeId}
             activeSection={activeSection}
-            basicInfo={activeSectionBasicInfo}
+            basicInfo={effectiveProjectProgramme?.basicInfo ?? null}
+            briefProgramme={briefProgramme}
             onClose={handleCloseSection}
           />
         )}
@@ -377,8 +316,14 @@ export default function ProjectProgramme() {
                     <div className="project-programme-notification-content">
                       <p>{sectionDescription}</p>
                       <div>
-                        <Button type="button" onClick={() => handleOpenSection(section.id)}>
-                          {t(section.actionKey)}
+                        <Button
+                          variant={hasBasicInfo ? ButtonVariant.Secondary : ButtonVariant.Primary}
+                          type="button"
+                          onClick={() => handleOpenSection(section.id)}
+                        >
+                          {hasBasicInfo
+                            ? t('projectProgrammeForm.modifyInformation')
+                            : t(section.actionKey)}
                         </Button>
                       </div>
                     </div>
@@ -412,7 +357,7 @@ export default function ProjectProgramme() {
                   >
                     {t('projectProgrammeForm.makePdf')}
                   </Button>
-                  {!briefProgramme && (
+                  {!briefProgramme && !hasSavedExtendedSection && (
                     <Button
                       variant={ButtonVariant.Secondary}
                       type="button"
