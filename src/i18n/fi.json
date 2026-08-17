@@ -543,10 +543,9 @@
         "personPlanning": "Suunnittelu ja tekniset asiat",
         "personFinancing": "Rahoitus ja aikataulu",
         "constructionProjectManager": "Projektipäällikkö",
-        "linkDesignDrawings": "Suunnitelmapiirustukset",
-        "linkCostAllocation": "Kustannusjako",
-        "linkContractBoundaries": "Urakkarajat",
-        "previousProjectPhase": "Edellinen hankevaihe"
+        "linkDesignDrawings": "Suunnittelupiirrustukset",
+        "linkCostAllocation": "Tilaajien välinen kustannusjako",
+        "linkContractBoundaries": "Urakkarajapiirrustukset ja kustannusarvio"
       }
     }
   },

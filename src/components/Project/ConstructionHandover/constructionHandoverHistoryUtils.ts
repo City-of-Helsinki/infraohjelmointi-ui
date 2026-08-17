@@ -15,7 +15,7 @@ const DATE_FIELDS = new Set<string>(['constructionStart', 'constructionEnd']);
 
 // Relations the backend resolves to a related row's enum `value`; run through
 // the shared `option.<value>` catalogue for a readable, localised label.
-const OPTION_FIELDS = new Set<string>(['constructionProcurementMethod', 'previousProjectPhase']);
+const OPTION_FIELDS = new Set<string>(['constructionProcurementMethod']);
 
 // The handover status enum is audited as its raw SCREAMING_SNAKE value; the
 // i18n catalogue keys it in camelCase (see constructionHandoverForm.status.*).

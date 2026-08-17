@@ -45,7 +45,6 @@ describe('resolveHistoryValue', () => {
     expect(resolveHistoryValue('constructionProcurementMethod', 'openTender', t)).toBe(
       'option.openTender',
     );
-    expect(resolveHistoryValue('previousProjectPhase', 'programming', t)).toBe('option.programming');
   });
 
   it('passes a plain text value through unchanged', () => {
