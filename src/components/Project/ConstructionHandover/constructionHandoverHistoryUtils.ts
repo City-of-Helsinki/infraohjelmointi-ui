@@ -1,6 +1,6 @@
 import { TFunction } from 'i18next';
 import { IConstructionHandoverHistoryEntry } from '@/interfaces/constructionHandoverInterfaces';
-import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro } from '@/utils/currencyUtils';
 import { formatDateToHds } from '@/utils/dates';
 import { normalizeHistoryValue } from '@/utils/historyPanelUtils';
 
