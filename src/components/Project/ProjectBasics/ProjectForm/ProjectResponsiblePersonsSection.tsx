@@ -32,9 +32,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const programmers = useOptions('programmers');
 
   const findPhase = (val: string) => phases.find((p) => p.label === val)?.value ?? '';
-  const draftInitiationPhase = findPhase('draftInitiation');
-  const draftApprovalPhase = findPhase('draftApproval');
-  const constructionPlanPhase = findPhase('constructionPlan');
+  const planningPhase = findPhase('designPlanning');
   const constructionWaitPhase = findPhase('constructionWait');
   const constructionPhase = findPhase('construction');
   const warrantyPeriodPhase = findPhase('warrantyPeriod');
@@ -43,9 +41,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const phasesThatNeedResponsiblePerson = useMemo(
     () =>
       [
-        draftInitiationPhase,
-        draftApprovalPhase,
-        constructionPlanPhase,
+        planningPhase,
         constructionWaitPhase,
         constructionPhase,
         warrantyPeriodPhase,
@@ -54,10 +50,8 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     [
       completedPhase,
       constructionPhase,
-      constructionPlanPhase,
       constructionWaitPhase,
-      draftApprovalPhase,
-      draftInitiationPhase,
+      planningPhase,
       warrantyPeriodPhase,
     ],
   );

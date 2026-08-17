@@ -35,15 +35,12 @@ export const useProjectPhaseValidation = ({
   const proposalPhase = findPhase('proposal');
   const designPhase = findPhase('design');
   const programmedPhase = findPhase('programming');
-  const draftInitiationPhase = findPhase('draftInitiation');
-  const draftApprovalPhase = findPhase('draftApproval');
-  const constructionPlanPhase = findPhase('constructionPlan');
+  const planningPhase = findPhase('designPlanning');
   const constructionWaitPhase = findPhase('constructionWait');
   const constructionPreparationPhase = findPhase('constructionPreparation');
   const constructionPhase = findPhase('construction');
   const warrantyPeriodPhase = findPhase('warrantyPeriod');
   const completedPhase = findPhase('completed');
-  const suspendedPhase = findPhase('suspended');
 
   return useMemo(
     () =>
@@ -83,9 +80,7 @@ export const useProjectPhaseValidation = ({
             fields = fieldsIfEmpty([...programmedRequirements], project);
             if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail'], project));
             break;
-          case draftInitiationPhase:
-          case draftApprovalPhase:
-          case constructionPlanPhase:
+          case planningPhase:
           case constructionWaitPhase:
             fields = fieldsIfEmpty([...programmedRequirements, ...planningRequirements], project);
             if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail'], project));
@@ -101,13 +96,14 @@ export const useProjectPhaseValidation = ({
             }
             fields = fieldsIfEmpty([...combinedRequirements], project);
             break;
-          case suspendedPhase:
-            break;
         }
 
         const isProposalOrDesign =
           phase.value === proposalPhase || phase.value === designPhase;
-        const isSuspended = phase.value === suspendedPhase;
+        // IO-863: suspension is now the `suspended` phaseDetail under designPlanning,
+        // not a phase; mirror the API's ProgrammedValidator and waive the programmed
+        // requirement when the project carries that detail.
+        const isSuspended = project.phaseDetail?.value === 'suspended';
 
         if (!isSuspended) {
           if ((isProposalOrDesign && programmed) || (!isProposalOrDesign && !programmed)) {
@@ -119,20 +115,16 @@ export const useProjectPhaseValidation = ({
       },
     [
       project,
-      phaseValues,
       allPhaseDetails,
       proposalPhase,
       designPhase,
       programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
+      planningPhase,
       constructionWaitPhase,
       constructionPreparationPhase,
       constructionPhase,
       warrantyPeriodPhase,
       completedPhase,
-      suspendedPhase,
     ],
   );
 };

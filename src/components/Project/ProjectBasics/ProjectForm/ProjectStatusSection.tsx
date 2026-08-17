@@ -143,9 +143,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const proposalPhase = phaseByValue('proposal');
   const designPhase = phaseByValue('design');
   const programmedPhase = phaseByValue('programming');
-  const draftInitiationPhase = phaseByValue('draftInitiation');
-  const draftApprovalPhase = phaseByValue('draftApproval');
-  const constructionPlanPhase = phaseByValue('constructionPlan');
+  const planningPhase = phaseByValue('designPlanning');
   const constructionWaitPhase = phaseByValue('constructionWait');
   const constructionPreparationPhase = phaseByValue('constructionPreparation');
   const constructionPhase = phaseByValue('construction');
@@ -155,9 +153,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     () =>
       [
         programmedPhase,
-        draftInitiationPhase,
-        draftApprovalPhase,
-        constructionPlanPhase,
+        planningPhase,
         constructionWaitPhase,
         constructionPreparationPhase,
         constructionPhase,
@@ -166,9 +162,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       ].filter((phase): phase is string => phase !== ''),
     [
       programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
+      planningPhase,
       constructionWaitPhase,
       constructionPreparationPhase,
       constructionPhase,
@@ -266,9 +260,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         fields.push(...fieldsIfEmpty([...programmedRequirements]));
         if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
         break;
-      case draftInitiationPhase:
-      case draftApprovalPhase:
-      case constructionPlanPhase:
+      case planningPhase:
       case constructionWaitPhase:
         fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
         if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
@@ -290,9 +282,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     getValues,
     projectMode,
     programmedPhase,
-    draftInitiationPhase,
-    draftApprovalPhase,
-    constructionPlanPhase,
+    planningPhase,
     constructionWaitPhase,
     constructionPreparationPhase,
     constructionPhase,
@@ -329,6 +319,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       validate: {
         isProgrammedValid: (programmed: boolean) => {
           const phase = getValues('phase');
+          const isSuspended = getValues('phaseDetail')?.value === 'suspended';
+          if (isSuspended) {
+            return true;
+          }
           if (phase.value === proposalPhase || phase.value === designPhase || phase.value === '') {
             return programmed
               ? t('validation.requiredFalse', { field: t('validation.programmed') })

@@ -1,5 +1,4 @@
 import {
-  IconArrowRightDashed,
   IconClock,
   IconCogwheel,
   IconCrossCircle,
@@ -11,7 +10,6 @@ import {
   IconQuestionCircle,
   IconScrollContent,
   IconShield,
-  IconThumbsUp,
   IconUser,
 } from 'hds-react/icons';
 
@@ -19,8 +17,12 @@ const optionIcon = {
   proposal: <IconQuestionCircle />,
   design: <IconLightbulb />,
   programming: <IconCogwheel />,
-  draftInitiation: <IconArrowRightDashed />,
-  draftApproval: <IconThumbsUp />,
+  // IO-863: shared icon for all three planning sub-phases. IconScrollContent
+  // matches the old constructionPlan icon, which fit "design document" the
+  // best out of the three.
+  designPlanning: <IconScrollContent />,
+  draftInitiation: <IconScrollContent />,
+  draftApproval: <IconScrollContent />,
   constructionPlan: <IconScrollContent />,
   constructionWait: <IconPlaybackPause />,
   construction: <IconHammers />,

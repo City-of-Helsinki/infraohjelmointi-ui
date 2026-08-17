@@ -54,15 +54,7 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
     },
     {
       id: 'c0011fd1-89a5-491c-a6d2-f968b0384069',
-      value: 'draftInitiation',
-    },
-    {
-      id: '1b72b334-0b6b-4b85-8767-a18b8102e6fd',
-      value: 'draftApproval',
-    },
-    {
-      id: 'fdd7ef12-6050-4dfb-89d8-6b3dd8664417',
-      value: 'constructionPlan',
+      value: 'designPlanning',
     },
     {
       id: '741cdfd3-ecd1-48dc-9d01-560deee400c5',
@@ -83,10 +75,6 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
     {
       id: 'a1b2c3d4-mock-construction-prep',
       value: 'constructionPreparation',
-    },
-    {
-      id: 'a1b2c3d4-mock-suspended',
-      value: 'suspended',
     },
   ],
 };
@@ -127,6 +115,26 @@ export const mockProjectPhaseDetails: { data: Array<IListItem> } = {
       id: 'a1b2c3d4-mock-constructionWait-1',
       value: 'waitingFunding',
       projectPhase: { id: '741cdfd3-ecd1-48dc-9d01-560deee400c5', value: 'constructionWait' },
+    },
+    {
+      id: 'a1b2c3d4-mock-planning-1',
+      value: 'streetParkPlanDraft',
+      projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
+    },
+    {
+      id: 'a1b2c3d4-mock-planning-2',
+      value: 'streetParkPlanApproval',
+      projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
+    },
+    {
+      id: 'a1b2c3d4-mock-planning-3',
+      value: 'constructionDesign',
+      projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
+    },
+    {
+      id: 'a1b2c3d4-mock-planning-suspended',
+      value: 'suspended',
+      projectPhase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'designPlanning' },
     },
   ],
 };

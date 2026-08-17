@@ -222,15 +222,15 @@ export enum ProjectPhase {
   Proposal = 'proposal',
   Design = 'design',
   Programming = 'programming',
-  DraftInitiation = 'draftInitiation',
-  DraftApproval = 'draftApproval',
-  ConstructionPlan = 'constructionPlan',
+  // IO-863: the three former planning phases were merged into one "Suunnittelu"
+  // phase; the planning sub-steps are now its tarkenne. Value is `designPlanning`
+  // (not `planning`) to avoid colliding with the existing option.planning i18n key.
+  Planning = 'designPlanning',
   ConstructionWait = 'constructionWait',
   Construction = 'construction',
   WarrantyPeriod = 'warrantyPeriod',
   Completed = 'completed',
   ConstructionPreparation = 'constructionPreparation',
-  Suspended = 'suspended',
 }
 
 export enum ProjectArea {
