@@ -134,8 +134,15 @@ const handleError = (error: AxiosError): Promise<IError> => {
 
   let excludedUrls = ['/project-hashtags', '/projects/'];
 
-  if (responseUrl.includes('/talpa-project-opening/by-project') && error.status === 404) {
-    excludedUrls = excludedUrls.concat(['/talpa-project-opening/by-project']);
+  if (
+    (responseUrl.includes('/talpa-project-opening/by-project') ||
+      responseUrl.includes('/project-programmes/by-project/')) &&
+    error.response?.status === 404
+  ) {
+    excludedUrls = excludedUrls.concat([
+      '/talpa-project-opening/by-project',
+      '/project-programmes/by-project/',
+    ]);
   }
 
   // The handling of backend errors is still in the works, so we're excluding endpoints that we want to handle differently

@@ -11,6 +11,7 @@ import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
 import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
 
 type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
+type BasicInfoDirtyFields = Partial<Record<BasicInfoFormField, boolean>> & { links?: unknown };
 
 interface IProjectProgrammeFormProps {
   projectProgrammeId: string;
@@ -38,13 +39,31 @@ const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoFormField, string> = {
   otherConsiderations: 'otherConsiderations',
 };
 
+const BASIC_INFO_FORM_FIELDS: BasicInfoFormField[] = [
+  'projectName',
+  'district',
+  'projectProgrammeCompiler',
+  'personsInvolved',
+  'estimatedCosts',
+  'inspector',
+  'summary',
+  'strategyGoals',
+  'costClass',
+  'projectSize',
+  'risks',
+  'studyAndPlanningNeeds',
+  'planningAndImplementationFeasibility',
+  'specialConsiderations',
+  'otherConsiderations',
+];
+
 export function pickChangedBasicInfoFields(
   formData: IProjectProgrammeForm,
   dirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
 
-  (Object.keys(BASIC_INFO_FORM_TO_API_FIELD) as BasicInfoFormField[]).forEach((field) => {
+  BASIC_INFO_FORM_FIELDS.forEach((field) => {
     if (dirtyFields[field]) {
       payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo[field];
     }
@@ -55,7 +74,7 @@ export function pickChangedBasicInfoFields(
 
 export function pickChangedLinks(
   formData: IProjectProgrammeForm,
-  dirtyFields: Partial<Record<keyof IProjectProgrammeForm['basicInfo'], unknown>>,
+  dirtyFields: BasicInfoDirtyFields,
 ): string[] | null {
   if (!dirtyFields.links) {
     return null;
@@ -87,11 +106,11 @@ function ProjectProgrammeForm({
 
     const requestData: Record<string, unknown> = pickChangedBasicInfoFields(
       data,
-      dirtyFields.basicInfo as Partial<Record<BasicInfoFormField, boolean>>,
+      dirtyFields.basicInfo ?? {},
     );
     const linksPayload = pickChangedLinks(
       data,
-      dirtyFields.basicInfo as Partial<Record<keyof IProjectProgrammeForm['basicInfo'], unknown>>,
+      dirtyFields.basicInfo ?? {},
     );
 
     if (linksPayload !== null) {

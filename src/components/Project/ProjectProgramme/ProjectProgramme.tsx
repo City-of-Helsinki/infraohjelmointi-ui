@@ -1,4 +1,4 @@
-import { Button, ButtonVariant, IconLink, Notification } from 'hds-react';
+import { Button, ButtonVariant, Notification } from 'hds-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
@@ -10,7 +10,6 @@ import {
   usePostProjectProgrammeSectionMutation,
   usePostProjectProgrammeMutation,
   usePostSwitchProjectProgrammeTypeMutation,
-  useTransitionProjectProgrammeStatusMutation,
 } from '@/api/projectProgrammeApi';
 import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
@@ -19,12 +18,22 @@ import {
   ProjectProgrammeSectionId,
 } from './projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
+import ProjectProgrammeBottomBar from './ProjectProgrammeBottomBar';
+import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
 
-function isBriefProgramme(projectProgramme: { briefProjectProgramme?: boolean | null }) {
+const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
   return projectProgramme.briefProjectProgramme ?? true;
+};
+
+function getErrorStatus(error: unknown): number | undefined {
+  if (typeof error !== 'object' || error === null || !('status' in error)) {
+    return undefined;
+  }
+
+  return typeof error.status === 'number' ? error.status : undefined;
 }
 
-export default function ProjectProgramme() {
+function ProjectProgramme() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { data: project } = useGetProject();
@@ -39,7 +48,6 @@ export default function ProjectProgramme() {
   const [postProjectProgramme] = usePostProjectProgrammeMutation();
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
-  const [transitionStatus] = useTransitionProjectProgrammeStatusMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
@@ -49,9 +57,7 @@ export default function ProjectProgramme() {
     ? isBriefProgramme(effectiveProjectProgramme)
     : true;
   const hasProjectProgramme = Boolean(projectProgrammeId);
-  const projectProgrammeQueryStatus = (
-    projectProgrammeByProjectError as { status?: number } | undefined
-  )?.status;
+  const projectProgrammeQueryStatus = getErrorStatus(projectProgrammeByProjectError);
   const hasProjectProgrammeLoadError =
     !hasProjectProgramme &&
     projectProgrammeQueryStatus !== undefined &&
@@ -61,7 +67,7 @@ export default function ProjectProgramme() {
   const hasSavedExtendedSection = PROJECT_PROGRAMME_SECTIONS.some(
     (section) =>
       !section.showInBrief &&
-      Boolean((effectiveProjectProgramme as Record<string, unknown> | undefined)?.[section.id]),
+      Boolean(effectiveProjectProgramme?.[section.id]),
   );
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
@@ -89,7 +95,7 @@ export default function ProjectProgramme() {
     try {
       await postProjectProgramme({ project: project.id }).unwrap();
     } catch (error) {
-      const status = (error as { status?: number })?.status;
+      const status = getErrorStatus(error);
 
       if (status === 403) {
         dispatch(
@@ -139,74 +145,13 @@ export default function ProjectProgramme() {
     }
   }
 
-  function handleCopyLinkClick() {
-    navigator.clipboard
-      .writeText(globalThis.location.href)
-      .then(() => {
-        dispatch(
-          notifySuccess({
-            title: 'linkCopied',
-            message: 'linkCopiedToClipboard',
-            type: 'toast',
-            duration: 3500,
-          }),
-        );
-      })
-      .catch(() => {
-        dispatch(
-          notifyError({
-            title: 'undefined',
-            message: 'linkCopyFailed',
-            type: 'toast',
-            duration: 3500,
-          }),
-        );
-      });
-  }
-
-  function handleGeneratePdfClick() {
-    dispatch(
-      notifySuccess({
-        title: 'update',
-        message: 'projectProgrammePdfGenerationNotImplemented',
-        type: 'toast',
-      }),
-    );
-  }
-
-  async function handleMarkProgrammeReady() {
-    if (!effectiveProjectProgramme?.id) {
-      notifyMissingProject();
-      return;
-    }
-
-    try {
-      await transitionStatus({ id: effectiveProjectProgramme.id, to: 'COMPLETE' }).unwrap();
-      dispatch(
-        notifySuccess({
-          title: 'saveSuccess',
-          message: 'projectProgrammeMarkReadySuccess',
-          type: 'toast',
-        }),
-      );
-    } catch {
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeMarkReadyError',
-          type: 'toast',
-        }),
-      );
-    }
-  }
-
   async function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
     if (!effectiveProjectProgramme?.id) {
       notifyMissingProject();
       return;
     }
 
-    if (sectionId === 'basicInfo' && effectiveProjectProgramme.basicInfo) {
+    if (sectionId && effectiveProjectProgramme[sectionId]) {
       setActiveSection(sectionId);
       return;
     }
@@ -220,7 +165,7 @@ export default function ProjectProgramme() {
       setActiveSection(sectionId);
       return;
     } catch (error) {
-      const status = (error as { status?: number })?.status;
+      const status = getErrorStatus(error);
 
       if (status === 409) {
         await refetchProjectProgramme();
@@ -301,77 +246,25 @@ export default function ProjectProgramme() {
                 </div>
               </Notification>
             )}
-
-            {PROJECT_PROGRAMME_SECTIONS.filter(
-              (section) => !briefProgramme || section.showInBrief,
-            ).map((section) => {
-              let sectionDescription = t(section.textKey);
-              if (!briefProgramme) {
-                sectionDescription = `${sectionDescription} ${extendedSectionTextSuffix}`;
-              }
-
-              return (
-                <div className="project-programme-section" key={section.id}>
-                  <Notification type="info" label={t(section.labelKey)}>
-                    <div className="project-programme-notification-content">
-                      <p>{sectionDescription}</p>
-                      <div>
-                        <Button
-                          variant={hasBasicInfo ? ButtonVariant.Secondary : ButtonVariant.Primary}
-                          type="button"
-                          onClick={() => handleOpenSection(section.id)}
-                        >
-                          {hasBasicInfo
-                            ? t('projectProgrammeForm.modifyInformation')
-                            : t(section.actionKey)}
-                        </Button>
-                      </div>
-                    </div>
-                  </Notification>
-                </div>
-              );
-            })}
-
-            <div className="project-form-banner">
-              <div className="project-form-banner-container">
-                <div className="project-programme-actions">
-                  <Button
-                    type="button"
-                    onClick={handleMarkProgrammeReady}
-                    disabled={isProjectProgrammeComplete}
-                  >
-                    {t('projectProgrammeForm.markReady')}
-                  </Button>
-                  <Button
-                    variant={ButtonVariant.Secondary}
-                    iconStart={<IconLink />}
-                    type="button"
-                    onClick={handleCopyLinkClick}
-                  >
-                    {t('copyLink')}
-                  </Button>
-                  <Button
-                    variant={ButtonVariant.Secondary}
-                    type="button"
-                    onClick={handleGeneratePdfClick}
-                  >
-                    {t('projectProgrammeForm.makePdf')}
-                  </Button>
-                  {!briefProgramme && !hasSavedExtendedSection && (
-                    <Button
-                      variant={ButtonVariant.Secondary}
-                      type="button"
-                      onClick={handleSwitchType}
-                    >
-                      {t('projectProgrammeForm.switchToBriefProgramme')}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <ProjectProgrammeSectionCard
+              extendedSectionTextSuffix={extendedSectionTextSuffix}
+              briefProgramme={briefProgramme}
+              sectionIsStarted={hasBasicInfo}
+              isProjectProgrammeComplete={isProjectProgrammeComplete}
+              handleOpenSection={handleOpenSection}
+            />
+            <ProjectProgrammeBottomBar
+              isBriefProgramme={briefProgramme}
+              hasSavedExtendedSection={hasSavedExtendedSection}
+              isProjectProgrammeComplete={isProjectProgrammeComplete}
+              effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+              handleSwitchType={handleSwitchType}
+            />
           </div>
         )}
       </div>
     </div>
   );
 }
+
+export default ProjectProgramme;
