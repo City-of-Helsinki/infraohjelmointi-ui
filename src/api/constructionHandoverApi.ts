@@ -4,6 +4,8 @@ import {
   FinancingRowRequest,
   IConstructionHandover,
   IConstructionHandoverFinancing,
+  IConstructionHandoverHistoryRequest,
+  IConstructionHandoverHistoryResponse,
   IConstructionHandoverPatchRequest,
   IConstructionHandoverTransitionResponse,
 } from '@/interfaces/constructionHandoverInterfaces';
@@ -16,6 +18,17 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       query: (projectId: string) => ({
         url: `/projects/${projectId}/construction-handovers/`,
       }),
+      providesTags: ['ConstructionHandovers'],
+    }),
+    getConstructionHandoverHistory: build.query<
+      IConstructionHandoverHistoryResponse,
+      IConstructionHandoverHistoryRequest
+    >({
+      query: ({ handoverId, pageSize }: IConstructionHandoverHistoryRequest) => ({
+        url: `/construction-handovers/${handoverId}/history/?pageSize=${pageSize ?? 100}`,
+      }),
+      // Tie the history cache to the handover tag so any edit/status transition
+      // (which invalidates 'ConstructionHandovers') refetches the log.
       providesTags: ['ConstructionHandovers'],
     }),
     postConstructionHandover: build.mutation<IConstructionHandover, { project: string | null }>({
@@ -118,6 +131,7 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
 
 export const {
   useGetConstructionHandoversByProjectQuery,
+  useGetConstructionHandoverHistoryQuery,
   usePostConstructionHandoverMutation,
   usePostConstructionHandoverFinancingMutation,
   usePatchConstructionHandoverMutation,

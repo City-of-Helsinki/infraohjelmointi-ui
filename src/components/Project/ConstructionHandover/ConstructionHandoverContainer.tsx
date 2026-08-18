@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StartConstructionHandover from './StartConstructionHandover';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
+import ConstructionHandoverHistoryPanel from './ConstructionHandoverHistoryPanel';
 import { ProjectFormSidePanel } from '../ProjectBasics/ProjectFormSidePanel';
 import useGetProject from '@/hooks/useGetProject';
 import {
@@ -23,6 +25,7 @@ export default function ConstructionHandoverContainer() {
   const constructionHandover =
     constructionHandovers && constructionHandovers.length > 0 ? constructionHandovers[0] : null;
   const [postConstructionHandover] = usePostConstructionHandoverMutation();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const isConstructionHandoverStarted = constructionHandover !== null;
 
   const showHandoverFinalizingForm =
@@ -58,6 +61,9 @@ export default function ConstructionHandoverContainer() {
           project={null}
           showSaveIndicator={false}
           showPwFolderLink={false}
+          onOpenChangeHistory={
+            constructionHandover ? () => setIsHistoryOpen(true) : undefined
+          }
           formStatusSection={
             constructionHandover ? (
               <ConstructionHandoverStatusLabel status={constructionHandover.status} />
@@ -78,6 +84,13 @@ export default function ConstructionHandoverContainer() {
           <StartConstructionHandover onStartHandover={handleStartHandover} />
         )}
       </div>
+      {constructionHandover && (
+        <ConstructionHandoverHistoryPanel
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          handoverId={constructionHandover.id}
+        />
+      )}
     </div>
   );
 }

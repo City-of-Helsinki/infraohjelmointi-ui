@@ -1,11 +1,9 @@
-import moment from 'moment';
 import { TFunction } from 'i18next';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
-
-export const NO_PREVIOUS_VALUE = '—';
+import { normalizeHistoryValue } from '@/utils/historyPanelUtils';
 
 // Financial figures are stored keyed by calendar year ("2026"); form-field
 // changes are keyed by field name. The form-level panel only shows the latter —
@@ -43,11 +41,6 @@ export const historyFieldLabel = (field: string, t: TFunction): string =>
 // class UUID; resolve against the class hierarchy to a readable name.
 const CLASS_FIELDS = new Set<string>(['projectClass']);
 
-// The backend stringifies an absent relation as "None" (and may send "null"),
-// so treat those as "no value" and let the panel render the em dash instead.
-const isEmptyHistoryValue = (raw: string): boolean =>
-  raw === '' || raw === 'None' || raw === 'null' || raw === 'undefined';
-
 export const resolveHistoryValue = (
   field: string,
   value: unknown,
@@ -55,14 +48,8 @@ export const resolveHistoryValue = (
   classes: Array<IClass>,
   t: TFunction,
 ): string => {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  const raw =
-    typeof value === 'object'
-      ? JSON.stringify(value)
-      : String(value as string | number | boolean);
-  if (isEmptyHistoryValue(raw)) {
+  const raw = normalizeHistoryValue(value);
+  if (raw === null) {
     return '';
   }
 
@@ -99,23 +86,6 @@ export const historyOptionKey = (field: string, value: unknown, lists: IListStat
   return match?.value ?? raw;
 };
 
-// Format an audit timestamp the way the design shows it: "tänään HH:mm" /
-// "eilen HH:mm" for the last two days, otherwise "D.M.YYYY HH:mm".
-export const relativeHistoryDateTime = (iso: string, t: TFunction): string => {
-  const m = moment(iso);
-  if (!m.isValid()) {
-    return iso;
-  }
-  const time = m.format('HH:mm');
-  if (m.isSame(moment(), 'day')) {
-    return `${t('projectForm.changeHistory.today')} ${time}`;
-  }
-  if (m.isSame(moment().subtract(1, 'day'), 'day')) {
-    return `${t('projectForm.changeHistory.yesterday')} ${time}`;
-  }
-  return m.format('D.M.YYYY HH:mm');
-};
-
 // The non-financial fields this entry changed, in a stable order.
 export const formFieldsOf = (entry: IProjectHistoryEntry): Array<string> =>
   (entry.changed_fields ?? []).filter((field) => !isYearKey(field));
@@ -146,38 +116,4 @@ export const historyActionOf = (
     return { key: 'editedField', field: fields[0] };
   }
   return { key: 'editedForm' };
-};
-
-const AVATAR_COLORS = [
-  'var(--color-coat-of-arms)',
-  'var(--color-bus)',
-  'var(--color-success)',
-  'var(--color-gold)',
-  'var(--color-suomenlinna)',
-  'var(--color-tram)',
-  'var(--color-copper)',
-  'var(--color-error)',
-];
-
-export const avatarColor = (seed: string): string => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash * 31 + (seed.codePointAt(i) ?? 0)) >>> 0;
-  }
-  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
-};
-
-export const initialsOf = (first?: string | null, last?: string | null): string => {
-  const f = (first ?? '').trim();
-  const l = (last ?? '').trim();
-  const initials = `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
-  return initials || '?';
-};
-
-export const actorNameOf = (
-  entry: IProjectHistoryEntry,
-  fallback: string,
-): string => {
-  const name = `${entry.actor_first_name ?? ''} ${entry.actor_last_name ?? ''}`.trim();
-  return name || fallback;
 };
