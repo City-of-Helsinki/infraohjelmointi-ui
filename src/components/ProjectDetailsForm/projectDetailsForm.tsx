@@ -20,6 +20,7 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   const onBasicsPage = location.includes('basics');
   const onNotesPage = location.includes('notes');
   const onTalpaPage = location.includes('talpa');
+  const onProjectProgrammePage = location.includes('project-programme');
   const onConstructionHandoverPage = location.includes('construction-handover');
 
   return (
@@ -36,6 +37,14 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
         {projectMode !== 'new' && !isOnlyViewer && (
           <Link className={`button ${onTalpaPage ? 'buttonHighlighted' : ''}`} href="talpa">
             {t('talpa')}
+          </Link>
+        )}
+        {projectMode !== 'new' && !isOnlyViewer && (
+          <Link
+            className={`button ${onProjectProgrammePage ? 'buttonHighlighted' : ''}`}
+            href="project-programme"
+          >
+            {t('projectProgramme')}
           </Link>
         )}
         {projectMode !== 'new' && !isOnlyViewer && (
