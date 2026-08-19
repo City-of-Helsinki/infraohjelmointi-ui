@@ -25,8 +25,10 @@ import { arrayHasValue } from '@/utils/common';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import './styles.css';
-import _ from 'lodash';
 import { usePatchProjectMutation } from '@/api/projectApi';
+import has from 'lodash/has';
+import isEqual from 'lodash/isEqual';
+import uniqWith from 'lodash/uniqWith';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -122,10 +124,10 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           // Remove hashTags from popularHashTags and hashTagsForSearch that are already
           // added to the project for submission
           hashTagsForSearch: selectableHashTags.filter(
-            (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
+            (ah) => !hashTagsForSubmit.some((hfs) => hfs.id === ah.id),
           ),
           popularHashTags: selectablePopularHashTags.filter(
-            (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
+            (ph) => !hashTagsForSubmit.some((hfs) => hfs.id === ph.id),
           ),
         }));
       }
@@ -154,10 +156,10 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             ...current,
             hashTagsForSubmit: hashTagsForSubmit,
             hashTagsForSearch: selectableHashTags.filter(
-              (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
+              (ah) => !hashTagsForSubmit.some((hfs) => hfs.id === ah.id),
             ),
             popularHashTags: selectablePopularHashTags.filter(
-              (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
+              (ph) => !hashTagsForSubmit.some((hfs) => hfs.id === ph.id),
             ),
           };
         });
@@ -170,21 +172,21 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onHashTagClick = useCallback(
       (value: string) => {
         if (
-          _.has(hashTagsObject, value) &&
-          selectableHashTags.findIndex((sht) => sht.value === value) !== -1 &&
-          hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
+          has(hashTagsObject, value) &&
+          selectableHashTags.some((sht) => sht.value === value) &&
+          !hashTagsForSubmit.some((hfs) => hfs.value === value)
         ) {
           setFormState((current) => {
             const hashTagsForSubmit = [...current.hashTagsForSubmit, hashTagsObject[value]];
 
             return {
               ...current,
-              hashTagsForSubmit: _.uniqWith(hashTagsForSubmit, _.isEqual),
+              hashTagsForSubmit: uniqWith(hashTagsForSubmit, isEqual),
               hashTagsForSearch: selectableHashTags.filter(
-                (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
+                (ah) => !hashTagsForSubmit.some((hfs) => hfs.id === ah.id),
               ),
               popularHashTags: selectablePopularHashTags.filter(
-                (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
+                (ph) => !hashTagsForSubmit.some((hfs) => hfs.id === ph.id),
               ),
             };
           });
@@ -200,7 +202,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           if (projectMode === 'new' && setHashTagsState) {
             setHashTagsState((current) => ({
               ...current,
-              projectHashTags: _.uniqWith(hashTagsForSubmit, _.isEqual),
+              projectHashTags: uniqWith(hashTagsForSubmit, isEqual),
             }));
           } else {
             await patchProject({
