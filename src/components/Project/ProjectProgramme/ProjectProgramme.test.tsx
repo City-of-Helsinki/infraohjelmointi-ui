@@ -50,7 +50,7 @@ describe('ProjectProgramme', () => {
 
   function mockProjectProgramme(
     briefProjectProgramme: boolean,
-    basicInfo: { projectName: string; district: string } | null = {
+    basicInfo: Record<string, unknown> | null = {
       projectName: 'Mock project',
       district: 'Keskinen',
     },
@@ -143,7 +143,7 @@ describe('ProjectProgramme', () => {
     expect(screen.getByDisplayValue('Keskinen')).toBeInTheDocument();
   });
 
-  it('uses the secondary modify action and keeps switching to brief available after saving basic info', async () => {
+  it('uses the secondary modify action and keeps switching to brief available when only basic info is saved', async () => {
     mockProjectProgramme(false);
     await render();
 
@@ -155,6 +155,28 @@ describe('ProjectProgramme', () => {
     expect(
       screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
     ).toBeInTheDocument();
+  });
+
+  it('shows switching to brief when no extended section has been saved yet', async () => {
+    mockProjectProgramme(false, null);
+    await render();
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
+    ).toBeInTheDocument();
+  });
+
+  it('hides switching to brief once extended-only basic info content is saved', async () => {
+    mockProjectProgramme(false, {
+      projectName: 'Mock project',
+      district: 'Keskinen',
+      strategyGoals: 'Some strategy goals',
+    });
+    await render();
+
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
+    ).not.toBeInTheDocument();
   });
 
   it('creates basic info section when it does not exist yet', async () => {

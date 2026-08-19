@@ -13,6 +13,7 @@ import {
 } from '@/api/projectProgrammeApi';
 import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
+  hasExtendedBasicInfoContent,
   mapSectionIdToApiRoute,
   PROJECT_PROGRAMME_SECTIONS,
   ProjectProgrammeSectionId,
@@ -64,11 +65,11 @@ function ProjectProgramme() {
     projectProgrammeQueryStatus !== 404;
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
   const hasBasicInfo = Boolean(effectiveProjectProgramme?.basicInfo);
-  const hasSavedExtendedSection = PROJECT_PROGRAMME_SECTIONS.some(
-    (section) =>
-      !section.showInBrief &&
-      Boolean(effectiveProjectProgramme?.[section.id]),
-  );
+  const hasSavedExtendedSection =
+    hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
+    PROJECT_PROGRAMME_SECTIONS.some(
+      (section) => !section.showInBrief && Boolean(effectiveProjectProgramme?.[section.id]),
+    );
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;

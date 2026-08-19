@@ -1,3 +1,5 @@
+import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
+
 export type ProjectProgrammeSectionId = 'basicInfo';
 
 export interface IProjectProgrammeSectionConfig {
@@ -6,6 +8,24 @@ export interface IProjectProgrammeSectionConfig {
   textKey: string;
   actionKey: string;
   showInBrief: boolean;
+}
+
+// Fields only editable/required in the extended (non-brief) basic info form
+const EXTENDED_ONLY_BASIC_INFO_FIELDS: (keyof IProjectProgrammeBasicInfo)[] = [
+  'strategyGoals',
+  'costClass',
+  'projectSize',
+  'risks',
+  'studyAndPlanningNeeds',
+  'planningAndImplementationFeasibility',
+  'specialConsiderations',
+  'otherConsiderations',
+];
+
+export function hasExtendedBasicInfoContent(
+  basicInfo?: IProjectProgrammeBasicInfo | null,
+): boolean {
+  return EXTENDED_ONLY_BASIC_INFO_FIELDS.some((field) => Boolean(basicInfo?.[field]));
 }
 
 export const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
