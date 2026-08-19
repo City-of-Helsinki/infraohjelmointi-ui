@@ -24,6 +24,7 @@ import {
   mockFinancingParties,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
+import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
 import { mockProjectClasses } from '@/mocks/mockClasses';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within, screen } from '@testing-library/react';
@@ -51,17 +52,25 @@ const getFormField = (name: string) => {
 };
 
 const render = async (
-  { project = mockProject.data, mode = 'edit' }: { project?: IProject; mode?: 'edit' | 'new' } = {
+  {
+    project = mockProject.data,
+    mode = 'edit',
+    hashTags = mockHashTags.data,
+  }: {
+    project?: IProject;
+    mode?: 'edit' | 'new';
+    hashTags?: IHashTagsResponse;
+  } = {
     project: mockProject.data,
     mode: 'edit',
+    hashTags: mockHashTags.data,
   },
 ) => {
   const projectForRender = project
     ? { ...project, projectClass: project.projectClass ?? 'test-sub-class-1' }
     : project;
 
-  return (
-  await act(async () =>
+  return await act(async () =>
     renderWithProviders(
       <Route>
         <Route
@@ -116,8 +125,8 @@ const render = async (
             error: {},
           },
           hashTags: {
-            hashTags: mockHashTags.data.hashTags,
-            popularHashTags: mockHashTags.data.popularHashTags,
+            hashTags: hashTags.hashTags,
+            popularHashTags: hashTags.popularHashTags,
             error: {},
           },
           sapCosts: {
@@ -132,7 +141,7 @@ const render = async (
         },
       },
     ),
-  ));
+  );
 };
 
 const sendProjectUpdateEventForProject = async (project: IProject) => {
@@ -432,6 +441,37 @@ describe('projectForm', () => {
     expect(await findByText('raidejokeri')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(dispatch);
+  });
+
+  it('doesnt render archived hashtags as selectable, but keeps them on the project', async () => {
+    const archivedHashTags: IHashTagsResponse = {
+      // 'hulevesi' is selectable and 'leikkipuisto' is already added to the mockProject
+      hashTags: mockHashTags.data.hashTags.map((h) =>
+        h.value === 'hulevesi' || h.value === 'leikkipuisto' ? { ...h, archived: true } : h,
+      ),
+      popularHashTags: mockHashTags.data.popularHashTags.map((h) =>
+        h.value === 'raidejokeri' ? { ...h, archived: true } : h,
+      ),
+    };
+
+    const { findByRole, findByTestId, user } = await render({ hashTags: archivedHashTags });
+
+    // Open modal
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
+    const dialog = within(await findByRole('dialog'));
+
+    // The archived hashtag that's already added to the project is still displayed
+    const projectHashTags = await dialog.findAllByTestId('project-hashtags');
+    expect(projectHashTags.map((tag) => tag.id)).toContain('leikkipuisto');
+
+    // The archived popular hashtag isn't displayed
+    expect(dialog.queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
+
+    // The archived hashtag isn't found from the search options
+    await user.click(await dialog.findByText('addHashTag'));
+    await user.type(await dialog.findByPlaceholderText('projectForm.searchForHashTags'), 'hul');
+
+    await waitFor(() => expect(dialog.queryByRole('option', { name: 'hulevesi' })).toBeNull());
   });
 
   it('can patch a NumberField', async () => {
