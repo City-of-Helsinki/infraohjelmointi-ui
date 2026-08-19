@@ -11,6 +11,7 @@ import {
   useEffect,
   memo,
   useCallback,
+  useMemo,
   Dispatch,
   SetStateAction,
 } from 'react';
@@ -70,6 +71,17 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { t } = useTranslation();
     const [patchProject] = usePatchProjectMutation();
 
+    // Archived hashtags can stay on a project, but they cannot be added to new places
+    const selectableHashTags = useMemo(
+      () => allHashTags.hashTags.filter(({ archived }) => !archived),
+      [allHashTags.hashTags],
+    );
+
+    const selectablePopularHashTags = useMemo(
+      () => allHashTags.popularHashTags.filter(({ archived }) => !archived),
+      [allHashTags.popularHashTags],
+    );
+
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
       hashTagsForSearch: [],
@@ -94,9 +106,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             },
           ]),
         ),
-        popularHashTags: allHashTags.popularHashTags,
+        popularHashTags: selectablePopularHashTags,
       }));
-    }, [allHashTags]);
+    }, [allHashTags, selectablePopularHashTags]);
 
     // Add the existing projectHashTags to hashTagsForSubmit
     useEffect(() => {
@@ -109,15 +121,22 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           hashTagsForSubmit: hashTagsForSubmit,
           // Remove hashTags from popularHashTags and hashTagsForSearch that are already
           // added to the project for submission
-          hashTagsForSearch: allHashTags.hashTags.filter(
+          hashTagsForSearch: selectableHashTags.filter(
             (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
           ),
-          popularHashTags: allHashTags.popularHashTags.filter(
+          popularHashTags: selectablePopularHashTags.filter(
             (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
           ),
         }));
       }
-    }, [projectHashTags, allHashTags, projectMode, setHashTagsState]);
+    }, [
+      projectHashTags,
+      allHashTags,
+      selectableHashTags,
+      selectablePopularHashTags,
+      projectMode,
+      setHashTagsState,
+    ]);
 
     const onHashTagDelete = useCallback(
       (value: string) => {
@@ -134,16 +153,16 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           return {
             ...current,
             hashTagsForSubmit: hashTagsForSubmit,
-            hashTagsForSearch: allHashTags.hashTags.filter(
+            hashTagsForSearch: selectableHashTags.filter(
               (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
             ),
-            popularHashTags: allHashTags.popularHashTags.filter(
+            popularHashTags: selectablePopularHashTags.filter(
               (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
             ),
           };
         });
       },
-      [allHashTags, projectMode, setHashTagsState],
+      [selectableHashTags, selectablePopularHashTags, projectMode, setHashTagsState],
     );
 
     // Set a hashtag to be submitted, make sure that the hashtag exists
@@ -152,6 +171,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       (value: string) => {
         if (
           _.has(hashTagsObject, value) &&
+          selectableHashTags.findIndex((sht) => sht.value === value) !== -1 &&
           hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
           setFormState((current) => {
@@ -160,17 +180,17 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             return {
               ...current,
               hashTagsForSubmit: _.uniqWith(hashTagsForSubmit, _.isEqual),
-              hashTagsForSearch: allHashTags.hashTags.filter(
+              hashTagsForSearch: selectableHashTags.filter(
                 (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
               ),
-              popularHashTags: allHashTags.popularHashTags.filter(
+              popularHashTags: selectablePopularHashTags.filter(
                 (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
               ),
             };
           });
         }
       },
-      [hashTagsObject, hashTagsForSubmit, allHashTags],
+      [hashTagsObject, hashTagsForSubmit, selectableHashTags, selectablePopularHashTags],
     );
 
     // Submit hashTagsForSubmit and close the dialog
