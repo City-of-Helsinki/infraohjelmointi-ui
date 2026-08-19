@@ -23,6 +23,7 @@ import {
   mockStaraProcurementReasons,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
+import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within, screen } from '@testing-library/react';
 import { Route } from 'react-router';
@@ -46,19 +47,32 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async (
-  { project = mockProject.data, mode = 'edit' }: { project?: IProject; mode?: 'edit' | 'new' } = {
+  {
+    project = mockProject.data,
+    mode = 'edit',
+    hashTags = mockHashTags.data,
+  }: {
+    project?: IProject;
+    mode?: 'edit' | 'new';
+    hashTags?: IHashTagsResponse;
+  } = {
     project: mockProject.data,
     mode: 'edit',
+    hashTags: mockHashTags.data,
   },
-) =>
-  await act(async () =>
+) => {
+  const projectForRender = project
+    ? { ...project, projectClass: project.projectClass ?? 'test-sub-class-1' }
+    : project;
+
+  return await act(async () =>
     renderWithProviders(
       <Route>
         <Route
           path="/"
           element={
             <ConfirmDialogContextProvider>
-              <ProjectForm project={project} />
+              <ProjectForm project={projectForRender} />
               <ConfirmDialog />
             </ConfirmDialogContextProvider>
           }
@@ -105,8 +119,8 @@ const render = async (
             error: {},
           },
           hashTags: {
-            hashTags: mockHashTags.data.hashTags,
-            popularHashTags: mockHashTags.data.popularHashTags,
+            hashTags: hashTags.hashTags,
+            popularHashTags: hashTags.popularHashTags,
             error: {},
           },
           sapCosts: {
@@ -122,6 +136,7 @@ const render = async (
       },
     ),
   );
+};
 
 const sendProjectUpdateEventForProject = async (project: IProject) => {
   try {
@@ -396,6 +411,37 @@ describe('projectForm', () => {
     removeProjectUpdateEventListener(dispatch);
   });
 
+  it('doesnt render archived hashtags as selectable, but keeps them on the project', async () => {
+    const archivedHashTags: IHashTagsResponse = {
+      // 'hulevesi' is selectable and 'leikkipuisto' is already added to the mockProject
+      hashTags: mockHashTags.data.hashTags.map((h) =>
+        h.value === 'hulevesi' || h.value === 'leikkipuisto' ? { ...h, archived: true } : h,
+      ),
+      popularHashTags: mockHashTags.data.popularHashTags.map((h) =>
+        h.value === 'raidejokeri' ? { ...h, archived: true } : h,
+      ),
+    };
+
+    const { findByRole, findByTestId, user } = await render({ hashTags: archivedHashTags });
+
+    // Open modal
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
+    const dialog = within(await findByRole('dialog'));
+
+    // The archived hashtag that's already added to the project is still displayed
+    const projectHashTags = await dialog.findAllByTestId('project-hashtags');
+    expect(projectHashTags.map((tag) => tag.id)).toContain('leikkipuisto');
+
+    // The archived popular hashtag isn't displayed
+    expect(dialog.queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
+
+    // The archived hashtag isn't found from the search options
+    await user.click(await dialog.findByText('addHashTag'));
+    await user.type(await dialog.findByPlaceholderText('projectForm.searchForHashTags'), 'hul');
+
+    await waitFor(() => expect(dialog.queryByRole('option', { name: 'hulevesi' })).toBeNull());
+  });
+
   it('can patch a NumberField', async () => {
     const project = mockProject.data;
     const expectedValue = '1234';
@@ -483,17 +529,11 @@ describe('projectForm', () => {
     const estPlanningStart = await findByRole('textbox', {
       name: getFormField('estPlanningStart'),
     });
-    const planningStartYear = await findByRole('spinbutton', {
-      name: getFormField('planningStartYear'),
-    });
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
     await user.click(formSubmitButton);
 
-    const yearToBeSet = expectedValue.split('.')[2];
-
-    expect(planningStartYear).not.toEqual(yearToBeSet);
     expect(mockedAxios.patch.mock.lastCall).toBeUndefined();
   });
 
@@ -658,11 +698,11 @@ describe('projectForm', () => {
 
       mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-      const { user, findByRole, findByTestId } = await render({ project });
+      const { user, findByTestId } = await render({ project });
 
-      const planningStartYearField = await findByRole('spinbutton', {
-        name: getFormField('planningStartYear'),
-      });
+      const planningStartYearField = (await findByTestId('planningStartYear')).querySelector(
+        'input',
+      ) as HTMLInputElement;
       const formSubmitButton = await findByTestId('submit-project-button');
 
       await user.clear(planningStartYearField);
@@ -837,11 +877,11 @@ describe('projectForm', () => {
 
       mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-      const { user, findByRole, findByTestId } = await render({ project });
+      const { user, findByTestId } = await render({ project });
 
-      const constructionEndYearField = await findByRole('spinbutton', {
-        name: getFormField('constructionEndYear'),
-      });
+      const constructionEndYearField = (await findByTestId('constructionEndYear')).querySelector(
+        'input',
+      ) as HTMLInputElement;
       const formSubmitButton = await findByTestId('submit-project-button');
 
       await user.clear(constructionEndYearField);
