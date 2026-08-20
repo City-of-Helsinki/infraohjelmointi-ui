@@ -11,6 +11,7 @@ import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { usePatchNoteMutation } from '@/api/notesApi';
 import NotesFileInput from './NoteFileInput';
+import usePostNoteImages from './usePostNoteImages';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
@@ -24,15 +25,18 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   const { t } = useTranslation();
   const [patchNote] = usePatchNoteMutation();
   const [files, setFiles] = useState<File[] | null>(null);
+  const { postImages } = usePostNoteImages();
 
   const { handleSubmit, control } = formMethods;
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
       await patchNote({ content: form.content, id: form.id });
+      await postImages(form.id, files);
+      setFiles(null);
       close();
     },
-    [close, patchNote],
+    [close, patchNote, postImages, files],
   );
 
   return (

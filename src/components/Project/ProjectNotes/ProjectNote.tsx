@@ -9,7 +9,7 @@ import EditNoteForm from './EditNoteForm';
 import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
 import { sortArrayByDates, stringToDateTime } from '@/utils/dates';
 import NoteAttachmentList from './NoteAttachmentList';
-import { INoteAttachment } from '@/interfaces/noteInterfaces';
+import { useGetNoteImagesQuery, useDeleteNoteImageMutation } from '@/api/notesApi';
 
 interface IProjectNoteProps {
   note: INote;
@@ -43,24 +43,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
     [note.history],
   );
 
-  const fallbackAttachments: INoteAttachment[] = [
-    {
-      id: `${note.id}-attachment-1`,
-      name: 'Liite 1',
-      src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg',
-      size: '5.6 MB',
-      createdDate: new Date().toISOString(),
-    },
-    {
-      id: `${note.id}-attachment-2`,
-      name: 'Liite 2',
-      src: 'https://images.pexels.com/photos/1461974/pexels-photo-1461974.jpeg',
-      size: '4.3 MB',
-      createdDate: new Date().toISOString(),
-    },
-  ];
-
-  const noteAttachments = note.attachments?.length ? note.attachments : fallbackAttachments;
+  const { data: noteImages } = useGetNoteImagesQuery(note.id);
+  const [deleteNoteImage] = useDeleteNoteImageMutation();
 
   return (
     <div className="note-container" data-testid="note-container">
@@ -97,9 +81,14 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
           </Button>
         </div>
       </div>
-      <div className="pb-8 pl-6 pr-2">
-        <NoteAttachmentList attachments={noteAttachments} />
-      </div>
+      {noteImages && noteImages.length > 0 && (
+        <div className="pb-8 pl-6 pr-2 pt-8">
+          <NoteAttachmentList
+            attachments={noteImages ?? []}
+            onDeleteAttachment={(imageId) => deleteNoteImage({ noteId: note.id, imageId })}
+          />
+        </div>
+      )}
       {hasHistory && (
         <div className="px-3 pb-4">
           <Button

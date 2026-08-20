@@ -15,13 +15,15 @@ export default function NoteFileInput({ handleChange }: INoteFileInputProps) {
   return (
     <div className="mb-6 w-full">
       <FileInput
-        id="file-input-notes"
+        id="note-file-input"
+        data-testid="note-file-input"
         label={t('noteAttachments.dragAndDrop')}
         language={language as Language}
         maxSize={512288}
         accept=".jpg,.png"
         dragAndDrop
         onChange={handleChange}
+        multiple
       />
     </div>
   );
