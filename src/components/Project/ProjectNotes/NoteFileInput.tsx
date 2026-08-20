@@ -6,7 +6,7 @@ interface INoteFileInputProps {
   handleChange: (files: File[] | null) => void;
 }
 
-export default function NoteFileInput({ handleChange }: INoteFileInputProps) {
+export default function NoteFileInput({ handleChange }: Readonly<INoteFileInputProps>) {
   const {
     t,
     i18n: { language },

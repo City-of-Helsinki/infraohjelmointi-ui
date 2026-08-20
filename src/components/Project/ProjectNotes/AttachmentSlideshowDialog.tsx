@@ -73,6 +73,7 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
           />
           <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
             <button
+              type="button"
               onClick={onPrevious}
               disabled={attachments.length < 2}
               className="focus:outline-[var(--color-coat-of-arms)]"
@@ -84,6 +85,7 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
               {selectedIndex + 1} / {attachments.length}
             </p>
             <button
+              type="button"
               onClick={onNext}
               disabled={attachments.length < 2}
               className="focus:outline-[var(--color-coat-of-arms)]"

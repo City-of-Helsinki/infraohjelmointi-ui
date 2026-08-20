@@ -22,7 +22,7 @@ const formatSizeToKilobytes = (size?: number) => {
 export default function NoteAttachmentList({
   attachments,
   onDeleteAttachment,
-}: INoteAttachmentListProps) {
+}: Readonly<INoteAttachmentListProps>) {
   const { t } = useTranslation();
   const { isConfirmed } = useConfirmDialog();
   const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
@@ -81,12 +81,17 @@ export default function NoteAttachmentList({
           className="flex flex-wrap justify-between gap-2 border-b border-[--color-black-30] py-6 last:border-b-0"
         >
           <div className="flex gap-4">
-            <img
-              src={attachment.url}
-              alt={attachment.fileName}
-              className="h-[70px] w-[70px] cursor-pointer border border-[--color-black-30] object-cover"
+            <button
+              type="button"
               onClick={() => handleOpenImage(index)}
-            />
+              aria-label={t('noteAttachments.viewAttachment', { fileName: attachment.fileName })}
+            >
+              <img
+                src={attachment.url}
+                alt=""
+                className="h-[70px] w-[70px] cursor-pointer border border-[--color-black-30] object-cover"
+              />
+            </button>
             <div className="flex flex-col justify-center text-sm">
               <p className="my-0 font-medium">{t('noteAttachments.attachmentAdded')}</p>
               <p className="my-0">
