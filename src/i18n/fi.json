@@ -868,7 +868,12 @@
     "dragAndDrop": "Raahaa liitetiedosto",
     "imageAttachments": "Kuvaliitteet",
     "attachmentAdded": "Liitetiedosto lisätty",
-    "view": "Näytä"
+    "view": "Näytä",
+    "deleteDialog": {
+      "title": "Poistetaanko liite?",
+      "description": "Haluatko varmasti poistaa tämän liitteen?",
+      "delete": "Poista liite"
+    }
   },
   "attachmentSlideshowDialog": {
     "nextImage": "Seuraava kuva",

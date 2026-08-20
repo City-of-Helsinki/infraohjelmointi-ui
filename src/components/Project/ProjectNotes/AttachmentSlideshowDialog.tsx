@@ -1,12 +1,12 @@
+import { INoteImage } from '@/interfaces/noteInterfaces';
 import { Button, ButtonVariant, Dialog } from 'hds-react';
 import { IconAngleLeft, IconAngleRight, IconCross } from 'hds-react/icons';
 import { FC, memo, useEffect } from 'react';
-import { INoteAttachment } from '@/interfaces/noteInterfaces';
 import { useTranslation } from 'react-i18next';
 
 interface IAttachmentSlideshowDialogProps {
   isOpen: boolean;
-  attachments: INoteAttachment[];
+  attachments: INoteImage[];
   selectedIndex: number;
   onClose: () => void;
   onPrevious: () => void;
@@ -67,8 +67,8 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
       <Dialog.Content style={{ padding: '14px 24px 24px', position: 'relative' }}>
         <div className="flex flex-col items-center">
           <img
-            src={currentAttachment.src}
-            alt={currentAttachment.name}
+            src={currentAttachment.url}
+            alt={currentAttachment.fileName}
             className="max-h-[70vh] w-full rounded-sm object-contain"
           />
           <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
