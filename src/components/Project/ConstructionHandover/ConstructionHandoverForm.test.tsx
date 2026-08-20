@@ -476,4 +476,77 @@ describe('ConstructionHandoverForm status transitions', () => {
       });
     });
   });
+
+  it.each([
+    ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+    ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+    ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+  ])('shows return to draft button for %s status', async (status) => {
+    const constructionHandover = createConstructionHandover({ status });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
+    'hides return to draft button for %s status',
+    async (status) => {
+      const constructionHandover = createConstructionHandover({
+        status,
+      });
+
+      await act(async () =>
+        renderWithProviders(
+          <Route
+            path="/"
+            element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+          />,
+        ),
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
+      ).toBeNull();
+    },
+  );
+
+  it('returns handover to draft when return to draft button is clicked', async () => {
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    const returnToDraftButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.returnToDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(returnToDraftButton);
+    });
+
+    await waitFor(() => {
+      expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+        id: 'handover-1',
+        to: ConstructionHandoverStatus.DRAFT,
+      });
+    });
+  });
 });

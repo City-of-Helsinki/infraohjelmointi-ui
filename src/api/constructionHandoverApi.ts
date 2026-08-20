@@ -105,10 +105,16 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       async onQueryStarted({ to }, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+          const title =
+            to === ConstructionHandoverStatus.DRAFT ? 'returnSuccess' : 'statusTransitionSuccess';
+          const message =
+            to === ConstructionHandoverStatus.DRAFT
+              ? 'constructionHandoverReturnedToDraft'
+              : 'constructionHandoverStatusTransitionSuccess';
           dispatch(
             notifySuccess({
-              title: 'statusTransitionSuccess',
-              message: 'constructionHandoverStatusTransitionSuccess',
+              title: title,
+              message: message,
               parameter: t(`constructionHandoverForm.toStatus.${to}`),
               type: 'toast',
             }),

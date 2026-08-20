@@ -7,6 +7,7 @@ import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import FinancingSection from './FinancingSection';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
+import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -151,7 +152,7 @@ const renderSection = async (
 
     return (
       <FormProvider {...formMethods}>
-        <FinancingSection />
+        <FinancingSection handoverStatus={ConstructionHandoverStatus.DRAFT} />
       </FormProvider>
     );
   };
