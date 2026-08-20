@@ -9,6 +9,7 @@ interface INumberFieldProps {
   label: string;
   control?: HookFormControlType;
   rules?: HookFormRulesType;
+  required?: boolean;
   readOnly?: boolean;
   tooltip?: string;
   hideLabel?: boolean;
@@ -21,13 +22,14 @@ const NumberField: FC<INumberFieldProps> = ({
   label,
   control,
   rules,
+  required: requiredProp,
   readOnly,
   tooltip,
   hideLabel,
   disabled,
   size = 'l',
 }) => {
-  const required = rules?.required ? true : false;
+  const required = requiredProp ?? (rules?.required ? true : false);
   const { t } = useTranslation();
   return (
     <Controller
