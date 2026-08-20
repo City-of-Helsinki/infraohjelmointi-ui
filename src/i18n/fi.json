@@ -854,6 +854,7 @@
     "imageAttachments": "Kuvaliitteet",
     "attachmentAdded": "Liitetiedosto lisätty",
     "view": "Näytä",
+    "viewAttachment": "Näytä liite {{fileName}}",
     "deleteDialog": {
       "title": "Poistetaanko liite?",
       "description": "Haluatko varmasti poistaa tämän liitteen?",
