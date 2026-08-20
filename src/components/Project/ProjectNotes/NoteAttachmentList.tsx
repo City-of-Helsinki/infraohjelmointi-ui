@@ -1,16 +1,30 @@
-import { INoteAttachment } from '@/interfaces/noteInterfaces';
 import { stringToDateTime } from '@/utils/dates';
-import { Button, ButtonVariant, IconEye } from 'hds-react';
+import { Button, ButtonVariant, IconEye, IconTrash } from 'hds-react';
 import { useCallback, useMemo, useState } from 'react';
 import AttachmentSlideshowDialog from './AttachmentSlideshowDialog';
 import { useTranslation } from 'react-i18next';
+import { INoteImage } from '@/interfaces/noteInterfaces';
+import useConfirmDialog from '@/hooks/useConfirmDialog';
 
 interface INoteAttachmentListProps {
-  attachments: INoteAttachment[];
+  attachments: INoteImage[];
+  onDeleteAttachment?: (imageId: string) => void;
 }
 
-export default function NoteAttachmentList({ attachments }: INoteAttachmentListProps) {
+const formatSizeToKilobytes = (size?: number) => {
+  if (size === undefined || size === null || Number.isNaN(size)) {
+    return '-';
+  }
+
+  return `${Math.round(size / 1024)} kB`;
+};
+
+export default function NoteAttachmentList({
+  attachments,
+  onDeleteAttachment,
+}: INoteAttachmentListProps) {
   const { t } = useTranslation();
+  const { isConfirmed } = useConfirmDialog();
   const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState(0);
 
@@ -38,6 +52,22 @@ export default function NoteAttachmentList({ attachments }: INoteAttachmentListP
     [attachments, selectedAttachmentIndex],
   );
 
+  const handleDeleteAttachment = useCallback(
+    async (imageId: string): Promise<void> => {
+      const confirm = await isConfirmed({
+        dialogType: 'delete',
+        confirmButtonText: t('noteAttachments.deleteDialog.delete'),
+        title: t('noteAttachments.deleteDialog.title'),
+        description: t('noteAttachments.deleteDialog.description'),
+      });
+
+      if (confirm !== false && onDeleteAttachment) {
+        onDeleteAttachment(imageId);
+      }
+    },
+    [isConfirmed, onDeleteAttachment, t],
+  );
+
   if (!hasAttachments) {
     return null;
   }
@@ -47,14 +77,15 @@ export default function NoteAttachmentList({ attachments }: INoteAttachmentListP
       <p className="font-medium">{t('noteAttachments.imageAttachments')}</p>
       {attachments.map((attachment, index) => (
         <div
-          key={attachment.id || `${attachment.name}-${index}`}
+          key={attachment.id || `${attachment.fileName}-${index}`}
           className="flex flex-wrap justify-between gap-2 border-b border-[--color-black-30] py-6 last:border-b-0"
         >
           <div className="flex gap-4">
             <img
-              src={attachment.src}
-              alt={attachment.name}
-              className="h-[70px] w-[70px] border border-[--color-black-30] object-cover"
+              src={attachment.url}
+              alt={attachment.fileName}
+              className="h-[70px] w-[70px] cursor-pointer border border-[--color-black-30] object-cover"
+              onClick={() => handleOpenImage(index)}
             />
             <div className="flex flex-col justify-center text-sm">
               <p className="my-0 font-medium">{t('noteAttachments.attachmentAdded')}</p>
@@ -62,19 +93,29 @@ export default function NoteAttachmentList({ attachments }: INoteAttachmentListP
                 {attachment.createdDate ? stringToDateTime(attachment.createdDate) : '-'}
               </p>
               <div className="flex gap-2">
-                <span>{attachment.name}</span>
+                <span>{attachment.fileName}</span>
                 <span>&ndash;</span>
-                <span>{attachment.size || '-'}</span>
+                <span>{formatSizeToKilobytes(attachment.size)}</span>
               </div>
             </div>
           </div>
-          <Button
-            variant={ButtonVariant.Supplementary}
-            iconStart={<IconEye />}
-            onClick={() => handleOpenImage(index)}
-          >
-            {t('noteAttachments.view')}
-          </Button>
+          <div>
+            <Button
+              variant={ButtonVariant.Supplementary}
+              iconStart={<IconTrash />}
+              onClick={() => handleDeleteAttachment(attachment.id)}
+              data-testid={`delete-attachment-${attachment.id}-button`}
+            >
+              {t('delete')}
+            </Button>
+            <Button
+              variant={ButtonVariant.Supplementary}
+              iconStart={<IconEye />}
+              onClick={() => handleOpenImage(index)}
+            >
+              {t('noteAttachments.view')}
+            </Button>
+          </div>
         </div>
       ))}
 
