@@ -70,6 +70,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     setValue,
     setError,
     reset,
+    trigger,
   } = formMethods;
 
   const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>((errors) => {
@@ -446,8 +447,9 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       watch,
       setValue,
       useWatchField,
+      trigger,
     }),
-    [control, getFieldProps, getFieldState, getValues, watch, setValue, useWatchField],
+    [control, getFieldProps, getFieldState, getValues, watch, setValue, useWatchField, trigger],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
