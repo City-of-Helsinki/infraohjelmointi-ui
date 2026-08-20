@@ -1,6 +1,6 @@
 {
   "name": "infraohjelmointi-ui",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "private": true,
   "dependencies": {
     "@react-pdf/renderer": "^3.1.16",

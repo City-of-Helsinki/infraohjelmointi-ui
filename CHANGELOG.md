@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.11.0...infraohjelmointi-ui-v1.11.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* Add required prop to NumberField for release build (IO-863) ([e27b148](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/e27b148e7deb92593f023db4d04dd4f6a2db8757))
+
 ## [1.11.0](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.10.5...infraohjelmointi-ui-v1.11.0) (2026-08-20)
 
 
