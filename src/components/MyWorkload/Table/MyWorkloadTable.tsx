@@ -3,11 +3,13 @@ import { Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
-import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import {
-  formatMyWorkloadDateForDisplay,
-  getMyWorkloadDateTimeValue,
-} from '@/utils/myWorkloadUtils';
+  MyWorkloadTableRow,
+  MyWorkloadViewType,
+  PhaseInfo,
+} from '@/interfaces/myWorkloadInterfaces';
+import { formatMyWorkloadDateForDisplay } from '@/utils/myWorkloadUtils';
+import { isBefore } from '@/utils/dates';
 import classes from '../styles.module.css';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
@@ -19,7 +21,23 @@ interface MyWorkloadTableProps {
 }
 
 const ITEMS_PER_PAGE = 10;
-const DATE_COLUMNS = new Set<keyof MyWorkloadTableRow>(['planningStart', 'planningEnd']);
+const DATE_COLUMNS = new Set<keyof MyWorkloadTableRow>([
+  'planningStart',
+  'planningEnd',
+  'constructionStart',
+  'constructionEnd',
+]);
+const LABEL_SORT_COLUMNS = new Set<keyof MyWorkloadTableRow>(['phase', 'phaseDetail']);
+const SORTABLE_COLUMN_KEYS = new Set<string>([
+  'projectName',
+  'description',
+  'planningStart',
+  'planningEnd',
+  'constructionStart',
+  'constructionEnd',
+  'phase',
+  'phaseDetail',
+]);
 
 type SortState = {
   colKey: keyof MyWorkloadTableRow;
@@ -48,13 +66,14 @@ const phaseClassByValue = (phaseValue: string): string => {
 };
 
 interface PhaseCellProps {
-  phase: string;
-  phaseValue: string;
+  phaseInfo: PhaseInfo;
 }
 
-const PhaseCell: FC<PhaseCellProps> = ({ phase, phaseValue }) => (
+const PhaseCell: FC<PhaseCellProps> = ({ phaseInfo }) => (
   <div className={classes.phaseCellAlignRight}>
-    <span className={`${classes.phasePill} ${phaseClassByValue(phaseValue)}`}>{phase}</span>
+    <span className={`${classes.phasePill} ${phaseClassByValue(phaseInfo.value)}`}>
+      {phaseInfo.label}
+    </span>
   </div>
 );
 
@@ -73,15 +92,38 @@ const FunctionsCell: FC<FunctionsCellProps> = ({ row, label, onEdit }) => (
 
 type TranslateFunction = ReturnType<typeof useTranslation>['t'];
 
-const transformPlanningStart = ({ planningStart }: MyWorkloadTableRow) =>
-  formatMyWorkloadDateForDisplay(planningStart);
+const getSortableValue = (
+  row: MyWorkloadTableRow,
+  colKey: keyof MyWorkloadTableRow,
+): string | null => {
+  if (colKey === 'phase') {
+    const label = row.phase.label.trim();
+    return label || null;
+  }
 
-const transformPlanningEnd = ({ planningEnd }: MyWorkloadTableRow) =>
-  formatMyWorkloadDateForDisplay(planningEnd);
+  if (colKey === 'phaseDetail') {
+    const label = row.phaseDetail.label.trim();
+    return label || null;
+  }
 
-const transformPhase = ({ phase, phaseValue }: MyWorkloadTableRow) => (
-  <PhaseCell phase={phase} phaseValue={phaseValue} />
-);
+  const value = row[colKey];
+
+  if (DATE_COLUMNS.has(colKey)) {
+    const date = String(value ?? '');
+    return formatMyWorkloadDateForDisplay(date) ? date : null;
+  }
+
+  const stringValue = String(value ?? '').trim();
+  return stringValue || null;
+};
+
+const hasSortableValues = (rows: MyWorkloadTableRow[], colKey: keyof MyWorkloadTableRow) =>
+  rows.some((row) => getSortableValue(row, colKey) !== null);
+
+const isSortableColumnKey = (key: string): key is keyof MyWorkloadTableRow =>
+  SORTABLE_COLUMN_KEYS.has(key);
+
+const transformPhase = ({ phase }: MyWorkloadTableRow) => <PhaseCell phaseInfo={phase} />;
 
 const renderFunctionsCell = (
   row: MyWorkloadTableRow,
@@ -90,45 +132,83 @@ const renderFunctionsCell = (
 ) => <FunctionsCell row={row} label={label} onEdit={onEdit} />;
 
 const createTableColumns = (
+  viewType: MyWorkloadViewType,
   t: TranslateFunction,
   onEdit: (row: MyWorkloadTableRow) => void,
-): TableProps['cols'] => [
-  {
-    key: 'projectName',
-    headerName: t('myWorkloadView.table.projectName'),
-    isSortable: true,
-  },
-  {
-    key: 'description',
-    headerName: t('myWorkloadView.table.description'),
-    isSortable: true,
-  },
-  {
-    key: 'planningStart',
-    headerName: t('myWorkloadView.table.planningStart'),
-    isSortable: true,
-    transform: transformPlanningStart,
-  },
-  {
-    key: 'planningEnd',
-    headerName: t('myWorkloadView.table.planningEnd'),
-    isSortable: true,
-    transform: transformPlanningEnd,
-  },
-  {
-    key: 'phase',
-    headerName: t('myWorkloadView.table.phase'),
-    isSortable: true,
-    transform: transformPhase,
-  },
-  {
-    key: 'functions',
-    headerName: t('myWorkloadView.table.functions'),
-    isSortable: true,
-    transform: (row: MyWorkloadTableRow) =>
-      renderFunctionsCell(row, t('myWorkloadView.table.modifyInformation'), onEdit),
-  },
-];
+): TableProps['cols'] => {
+  const dateColumns: TableProps['cols'] =
+    viewType === 'planning'
+      ? [
+          {
+            key: 'planningStart',
+            headerName: t('myWorkloadView.table.planningStart'),
+            isSortable: true,
+            sortIconType: 'other',
+            transform: (row: MyWorkloadTableRow) =>
+              formatMyWorkloadDateForDisplay(row.planningStart),
+          },
+          {
+            key: 'planningEnd',
+            headerName: t('myWorkloadView.table.planningEnd'),
+            isSortable: true,
+            sortIconType: 'other',
+            transform: (row: MyWorkloadTableRow) => formatMyWorkloadDateForDisplay(row.planningEnd),
+          },
+        ]
+      : [
+          {
+            key: 'constructionStart',
+            headerName: t('myWorkloadView.table.constructionStart'),
+            isSortable: true,
+            sortIconType: 'other',
+            transform: (row: MyWorkloadTableRow) =>
+              formatMyWorkloadDateForDisplay(row.constructionStart),
+          },
+          {
+            key: 'constructionEnd',
+            headerName: t('myWorkloadView.table.constructionEnd'),
+            isSortable: true,
+            sortIconType: 'other',
+            transform: (row: MyWorkloadTableRow) =>
+              formatMyWorkloadDateForDisplay(row.constructionEnd),
+          },
+        ];
+  return [
+    {
+      key: 'projectName',
+      headerName: t('myWorkloadView.table.projectName'),
+      isSortable: true,
+      sortIconType: 'other',
+    },
+    {
+      key: 'description',
+      headerName: t('myWorkloadView.table.description'),
+      isSortable: true,
+      sortIconType: 'other',
+    },
+    ...dateColumns,
+    {
+      key: 'phase',
+      headerName: t('myWorkloadView.table.phase'),
+      isSortable: true,
+      sortIconType: 'other',
+      transform: transformPhase,
+    },
+    {
+      key: 'phaseDetail',
+      headerName: t('projectForm.phaseDetail'),
+      isSortable: true,
+      sortIconType: 'other',
+      transform: (row: MyWorkloadTableRow) => row.phaseDetail.label,
+    },
+    {
+      key: 'functions',
+      headerName: t('myWorkloadView.table.functions'),
+      transform: (row: MyWorkloadTableRow) =>
+        renderFunctionsCell(row, t('myWorkloadView.table.modifyInformation'), onEdit),
+    },
+  ];
+};
 
 const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   listOfProjects,
@@ -151,19 +231,35 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   }, [listOfProjects]);
 
   const sortedRows = useMemo(() => {
-    if (!sortState) {
+    if (!sortState || !hasSortableValues(tableRows, sortState.colKey)) {
       return tableRows;
     }
 
     const sorted = [...tableRows].sort((rowA, rowB) => {
       const { colKey } = sortState;
-      const valueA = rowA[colKey];
-      const valueB = rowB[colKey];
+      const valueA = getSortableValue(rowA, colKey);
+      const valueB = getSortableValue(rowB, colKey);
+
+      if (LABEL_SORT_COLUMNS.has(colKey)) {
+        return String(valueA ?? '').localeCompare(String(valueB ?? ''), 'fi', {
+          sensitivity: 'base',
+        });
+      }
 
       if (DATE_COLUMNS.has(colKey)) {
-        const dateValueA = getMyWorkloadDateTimeValue(String(valueA ?? ''));
-        const dateValueB = getMyWorkloadDateTimeValue(String(valueB ?? ''));
-        return dateValueA - dateValueB;
+        if (!valueA && !valueB) {
+          return 0;
+        }
+
+        if (!valueA || isBefore(valueA, valueB)) {
+          return -1;
+        }
+
+        if (!valueB || isBefore(valueB, valueA)) {
+          return 1;
+        }
+
+        return 0;
       }
 
       return String(valueA ?? '').localeCompare(String(valueB ?? ''), 'fi', {
@@ -203,13 +299,20 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
 
   const handleSort = useCallback<NonNullable<TableProps['onSort']>>(
     (order, colKey, applyHdsSortState) => {
+      if (!isSortableColumnKey(colKey) || !hasSortableValues(tableRows, colKey)) {
+        return;
+      }
+
       applyHdsSortState();
-      setSortState({ colKey: colKey as keyof MyWorkloadTableRow, order });
+      setSortState({ colKey, order });
     },
-    [],
+    [tableRows],
   );
 
-  const cols = useMemo(() => createTableColumns(t, setEditedProject), [t]);
+  const cols = useMemo(
+    () => createTableColumns(viewType, t, setEditedProject),
+    [viewType, t, setEditedProject],
+  );
 
   return (
     <div className={classes.tableContainer} id="my-workload-table-container">

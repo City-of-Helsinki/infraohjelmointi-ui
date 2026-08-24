@@ -1,3 +1,9 @@
+export interface PhaseInfo {
+  id: string;
+  label: string;
+  value: string;
+}
+
 export interface MyWorkloadTableRow {
   id: string;
   budget: string;
@@ -11,15 +17,14 @@ export interface MyWorkloadTableRow {
   visibilityEnd: string;
   constructionStart: string;
   constructionEnd: string;
-  projectCostForecast: string;
   planningCostForecast: string;
   planningPhaseId: string;
   planningWorkQuantity: string;
   constructionCostForecast: string;
-  costForecast: string;
-  phase: string;
-  phaseValue: string;
-  phaseId: string;
+  constructionPhaseId: string;
+  constructionWorkQuantity: string;
+  phase: PhaseInfo;
+  phaseDetail: PhaseInfo;
   functions: string;
   constructionProcurementMethod: string | undefined;
 }

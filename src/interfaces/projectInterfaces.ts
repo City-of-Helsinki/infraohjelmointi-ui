@@ -134,10 +134,10 @@ export interface IProjectRequest {
   estConstructionEnd?: string | null;
   estWarrantyPhaseStart?: string | null;
   estWarrantyPhaseEnd?: string | null;
-  presenceStart?: string;
-  presenceEnd?: string;
-  visibilityStart?: string;
-  visibilityEnd?: string;
+  presenceStart?: string | null;
+  presenceEnd?: string | null;
+  visibilityStart?: string | null;
+  visibilityEnd?: string | null;
   phaseDetail?: string | null;
   constructionProcurementMethod?: string | null;
   louhi?: boolean;

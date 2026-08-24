@@ -152,7 +152,7 @@ describe('useMyWorkloadRows', () => {
       'Alpha project',
       'Beta project',
     ]);
-    expect(result.current.rows[0].phase).toBe('option.design');
+    expect(result.current.rows[0].phase.label).toBe('option.design');
     expect(result.current.rows[0].planningStart).toBe('01.02.2026');
   });
 

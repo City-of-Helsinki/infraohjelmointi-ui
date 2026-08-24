@@ -2,6 +2,7 @@ import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-for
 import { FreeSearchFormObject, IOption } from './common';
 import { FinancingRowValues } from './constructionHandoverInterfaces';
 import { IProjectSapCost } from './sapCostsInterfaces';
+import type { IMyWorkloadEditFormValues } from '@/components/MyWorkload/Table/useMyWorkloadEditForm';
 
 export enum FormField {
   Select,
@@ -194,6 +195,7 @@ export type HookFormControlType =
   | Control<IHashTagsForm>
   | Control<ISearchForm>
   | Control<IGroupForm>
+  | Control<IMyWorkloadEditFormValues>
   | undefined;
 
 export type HookFormRulesType = Omit<

@@ -4,7 +4,7 @@ import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { setIsSaving } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
-import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
+import { HookFormControlType, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import { selectUser } from '@/reducers/authSlice';
@@ -51,7 +51,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
         dispatch(setIsSaving(true));
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form);
 
         if ('favourite' in data) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite

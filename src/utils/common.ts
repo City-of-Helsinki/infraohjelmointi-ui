@@ -148,20 +148,20 @@ const getLowestLocationId = (
   hierarchyDistricts: ILocation[] | undefined,
   hierarchyDivisions: ILocation[] | undefined,
   hierarchySubDivisions: ILocation[] | undefined,
-  form: IAppForms,
+  form: Partial<IAppForms>,
 ) => {
   let lowestLocationId: string | null = null;
   if (hierarchyDistricts) {
-    const districts = getLocationList(hierarchyDistricts, undefined, form.subClass.value);
-    const district = getLocation(districts, form.district.label);
+    const districts = getLocationList(hierarchyDistricts, undefined, form.subClass?.value);
+    const district = getLocation(districts, form.district?.label ?? '');
     lowestLocationId = district?.id ?? null;
-    if (canGetNextLevel(form.division.value, district, hierarchyDivisions)) {
+    if (canGetNextLevel(form.division?.value, district, hierarchyDivisions)) {
       const divisions = getLocationList(hierarchyDivisions, district?.id);
-      const division = getLocation(divisions, form.division.label);
+      const division = getLocation(divisions, form.division?.label ?? '');
       lowestLocationId = division?.id ?? district?.id ?? null;
-      if (canGetNextLevel(form.subDivision.value, division, hierarchySubDivisions)) {
+      if (canGetNextLevel(form.subDivision?.value, division, hierarchySubDivisions)) {
         const subDivisions = getLocationList(hierarchySubDivisions, division?.id);
-        const subDivision = getLocation(subDivisions, form.subDivision.label);
+        const subDivision = getLocation(subDivisions, form.subDivision?.label ?? '');
         lowestLocationId = subDivision?.id ?? division?.id ?? null;
       }
     }
@@ -198,7 +198,7 @@ const getKey = (key: string) => {
  */
 export const dirtyFieldsToRequestObject = (
   dirtyFields: object,
-  form: IAppForms,
+  form: Partial<IAppForms>,
   hierarchyDistricts?: ILocation[],
   hierarchyDivisions?: ILocation[],
   hierarchySubDivisions?: ILocation[],

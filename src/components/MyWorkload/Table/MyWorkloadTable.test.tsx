@@ -48,15 +48,22 @@ const makeRow = (index: number): MyWorkloadTableRow => ({
   visibilityEnd: '31.12.2026',
   constructionStart: '01.01.2027',
   constructionEnd: '31.12.2027',
-  projectCostForecast: '100',
   planningCostForecast: '100',
   planningPhaseId: 'planning-phase-id',
   planningWorkQuantity: '10',
   constructionCostForecast: '200',
-  costForecast: '300',
-  phase: 'option.design',
-  phaseValue: 'design',
-  phaseId: 'phase-id',
+  constructionPhaseId: 'construction-phase-id',
+  constructionWorkQuantity: '20',
+  phase: {
+    id: 'phase-id',
+    label: 'option.design',
+    value: 'design',
+  },
+  phaseDetail: {
+    id: '',
+    label: '',
+    value: '',
+  },
   functions: 'myWorkloadView.table.modifyInformation',
   budget: '',
   constructionProcurementMethod: undefined,
@@ -66,6 +73,25 @@ const makeDateSortRow = (index: number, planningStart: string): MyWorkloadTableR
   ...makeRow(index),
   planningStart,
   planningEnd: planningStart,
+});
+
+const makePhaseSortRow = (
+  index: number,
+  phaseLabel: string,
+  phaseDetailLabel: string,
+): MyWorkloadTableRow => ({
+  ...makeRow(index),
+  projectName: `Sort project ${index}`,
+  phase: {
+    id: `phase-${index}`,
+    label: phaseLabel,
+    value: `phase-${index}`,
+  },
+  phaseDetail: {
+    id: `phase-detail-${index}`,
+    label: phaseDetailLabel,
+    value: `phase-detail-${index}`,
+  },
 });
 
 describe('MyWorkloadTable', () => {
@@ -202,6 +228,25 @@ describe('MyWorkloadTable', () => {
     });
   });
 
+  it('does not render sorting control for the functions column', async () => {
+    const { getAllByRole, queryByTestId } = render(
+      <MyWorkloadTable
+        listOfProjects={[makeRow(1)]}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        getAllByRole('button', { name: /myWorkloadView.table.modifyInformation/i })[0],
+      ).toBeInTheDocument();
+    });
+
+    expect(queryByTestId('hds-table-sorting-header-functions')).not.toBeInTheDocument();
+  });
+
   it('sorts full dataset by date and keeps sorting when changing pages', async () => {
     const user = userEvent.setup();
     const rows = [
@@ -230,6 +275,10 @@ describe('MyWorkloadTable', () => {
 
     const planningStartSortButton = getByTestId('hds-table-sorting-header-planningStart');
     await user.click(planningStartSortButton);
+
+    expect(queryByText('AÖ')).not.toBeInTheDocument();
+    expect(queryByText('ÖA')).not.toBeInTheDocument();
+
     await user.click(planningStartSortButton);
 
     await waitFor(() => {
@@ -245,5 +294,82 @@ describe('MyWorkloadTable', () => {
       expect(queryByText('Project 2')).toBeInTheDocument();
       expect(queryByText('Project 12')).not.toBeInTheDocument();
     });
+  });
+
+  it('sorts phase column alphabetically by phase label', async () => {
+    const user = userEvent.setup();
+    const rows = [
+      makePhaseSortRow(1, 'option.zeta', 'option.detailC'),
+      makePhaseSortRow(2, 'option.beta', 'option.detailB'),
+      makePhaseSortRow(3, 'option.alpha', 'option.detailA'),
+    ];
+
+    const { getByTestId, getAllByRole } = render(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    await user.click(getByTestId('hds-table-sorting-header-phase'));
+
+    const tableRows = getAllByRole('row');
+    expect(within(tableRows[1]).getByText('Sort project 3')).toBeInTheDocument();
+    expect(within(tableRows[2]).getByText('Sort project 2')).toBeInTheDocument();
+    expect(within(tableRows[3]).getByText('Sort project 1')).toBeInTheDocument();
+  });
+
+  it('sorts phase detail column alphabetically by phase detail label', async () => {
+    const user = userEvent.setup();
+    const rows = [
+      makePhaseSortRow(1, 'option.alpha', 'option.detailC'),
+      makePhaseSortRow(2, 'option.alpha', 'option.detailB'),
+      makePhaseSortRow(3, 'option.alpha', 'option.detailA'),
+    ];
+
+    const { getByTestId, getAllByRole } = render(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    await user.click(getByTestId('hds-table-sorting-header-phaseDetail'));
+
+    const tableRows = getAllByRole('row');
+    expect(within(tableRows[1]).getByText('Sort project 3')).toBeInTheDocument();
+    expect(within(tableRows[2]).getByText('Sort project 2')).toBeInTheDocument();
+    expect(within(tableRows[3]).getByText('Sort project 1')).toBeInTheDocument();
+  });
+
+  it('keeps original row order when sorting a column with no values', async () => {
+    const user = userEvent.setup();
+    const rows = [
+      makePhaseSortRow(1, 'option.alpha', ''),
+      makePhaseSortRow(2, 'option.alpha', ''),
+      makePhaseSortRow(3, 'option.alpha', ''),
+    ];
+
+    const { getByTestId, getAllByRole } = render(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    const phaseDetailSortButton = getByTestId('hds-table-sorting-header-phaseDetail');
+    await user.click(phaseDetailSortButton);
+    await user.click(phaseDetailSortButton);
+
+    const tableRows = getAllByRole('row');
+    expect(within(tableRows[1]).getByText('Sort project 1')).toBeInTheDocument();
+    expect(within(tableRows[2]).getByText('Sort project 2')).toBeInTheDocument();
+    expect(within(tableRows[3]).getByText('Sort project 3')).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectProjectMode, setIsSaving, setProjectMode } from '@/reducers/projectSlice';
 import { IProject, IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -314,7 +314,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         dispatch(setIsSaving(true));
         let data: IProjectRequest = dirtyFieldsToRequestObject(
           dirtyFields,
-          form as IAppForms,
+          form,
           hierarchyDistricts,
           hierarchyDivisions,
           hierarchySubDivisions,

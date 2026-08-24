@@ -1128,6 +1128,8 @@
       "description": "Hankkeen kuvaus",
       "planningStart": "Suunnittelu alkaa",
       "planningEnd": "Suunnittelu päättyy",
+      "constructionStart": "Rakentaminen alkaa",
+      "constructionEnd": "Rakentaminen päättyy",
       "planningScheduleTitle": "Suunnittelun aikataulu",
       "designCostEstimateSectionTitle": "Suunnittelun kustannusarvio",
       "costEstimate": "Kustannusarvio",
