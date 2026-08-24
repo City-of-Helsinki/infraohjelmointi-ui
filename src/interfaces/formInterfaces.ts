@@ -167,6 +167,7 @@ export interface IConstructionHandoverForm {
   name: string; // Hankkeen nimi
   description: string; // Hankkeen kuvaus
   constructionProcurementMethod: IOption; // Hankintatapa
+  staraProcurementReason: IOption | null; // Staran hankinnan peruste
   constructionStart: string | null; // Hankkeen aloituspäivämäärä
   constructionEnd: string | null; // Hankkeen lopetuspäivämäärä
   otherTimelineNotes: string; // Muut aikataulun sidoinnaisuudet ja välitavoitteet
@@ -179,6 +180,7 @@ export interface IConstructionHandoverForm {
 export interface IConstructionHandoverFinalizingForm {
   constructionProjectManager: IOption;
   constructionProcurementMethod: IOption;
+  staraProcurementReason: IOption | null;
 }
 
 export interface IAppForms

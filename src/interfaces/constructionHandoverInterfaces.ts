@@ -18,6 +18,7 @@ export interface IConstructionHandover {
   name: string | null;
   description: string | null;
   constructionProcurementMethod: IListItem | null;
+  staraProcurementReason: IListItem | null;
   constructionStart: string | null;
   constructionEnd: string | null;
   otherTimelineNotes: string;
@@ -38,12 +39,14 @@ export interface IConstructionHandoverRequest
     | 'project'
     | 'status'
     | 'constructionProcurementMethod'
+    | 'staraProcurementReason'
     | 'personPlanning'
     | 'personFinancing'
     | 'constructionHandoverFinancing'
     | 'constructionProjectManager'
   > {
   constructionProcurementMethod: string;
+  staraProcurementReason: string | null;
   personPlanning: string;
   personFinancing: string;
   constructionProjectManager?: string;

@@ -18,6 +18,7 @@ function useConstructionHandoverFormValues(
     constructionProcurementMethod: listItemToOption(
       constructionHandover?.constructionProcurementMethod,
     ),
+    staraProcurementReason: listItemToOption(constructionHandover?.staraProcurementReason),
     constructionStart: formatDateToHds(constructionHandover.constructionStart),
     constructionEnd: formatDateToHds(constructionHandover.constructionEnd),
     otherTimelineNotes: constructionHandover.otherTimelineNotes || '',

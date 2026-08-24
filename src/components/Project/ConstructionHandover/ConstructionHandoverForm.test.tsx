@@ -157,6 +157,7 @@ describe('ConstructionHandoverForm submit', () => {
           name: 'Test Handover',
           description: 'This is a test construction handover.',
           constructionProcurementMethod: '',
+          staraProcurementReason: '',
           constructionStart: '01.01.2026',
           constructionEnd: '01.02.2026',
           otherTimelineNotes: '',

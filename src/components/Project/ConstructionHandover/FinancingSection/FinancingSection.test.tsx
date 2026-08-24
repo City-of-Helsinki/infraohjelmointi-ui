@@ -130,6 +130,7 @@ const defaultValues: IConstructionHandoverForm = {
   name: 'Test Handover',
   description: 'Description',
   constructionProcurementMethod: { label: 'Method', value: 'method-1' },
+  staraProcurementReason: null,
   constructionStart: null,
   constructionEnd: null,
   otherTimelineNotes: '',

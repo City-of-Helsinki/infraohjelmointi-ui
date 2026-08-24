@@ -13,6 +13,7 @@ import {
 import { usePatchConstructionHandoverMutation } from '@/api/constructionHandoverApi';
 import { listItemToOption, personToOption } from '@/utils/common';
 import { validateRequiredSelect } from '@/utils/validation';
+import useConstructionProcurementMethod from '@/hooks/useConstructionProcurementMethod';
 
 function useHandoverFinalizingForm(constructionHandover: IConstructionHandover | null) {
   const formMethods = useForm<IConstructionHandoverFinalizingForm>({
@@ -21,6 +22,7 @@ function useHandoverFinalizingForm(constructionHandover: IConstructionHandover |
       constructionProcurementMethod: listItemToOption(
         constructionHandover?.constructionProcurementMethod,
       ),
+      staraProcurementReason: listItemToOption(constructionHandover?.staraProcurementReason),
     },
     mode: 'onBlur',
   });
@@ -34,6 +36,7 @@ function useHandoverFinalizingForm(constructionHandover: IConstructionHandover |
     const isSubmittedToConstruction =
       constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION;
     const procurementMethodId = data.constructionProcurementMethod?.value;
+    const staraProcurementReasonId = data.staraProcurementReason?.value;
 
     if (isSubmittedToConstruction) {
       requestData = {
@@ -46,10 +49,22 @@ function useHandoverFinalizingForm(constructionHandover: IConstructionHandover |
           constructionProcurementMethod: procurementMethodId,
         };
       }
+      if (staraProcurementReasonId) {
+        requestData = {
+          ...requestData,
+          staraProcurementReason: staraProcurementReasonId,
+        };
+      }
     } else {
       requestData = {
         constructionProcurementMethod: procurementMethodId,
       };
+      if (staraProcurementReasonId) {
+        requestData = {
+          ...requestData,
+          staraProcurementReason: staraProcurementReasonId,
+        };
+      }
     }
 
     patchConstructionHandover({ id: constructionHandover.id, data: requestData });
@@ -69,10 +84,19 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
   const { t } = useTranslation();
 
   const responsiblePersons = useOptions('responsiblePersons');
-  const constructionProcurementMethods = useOptions('constructionProcurementMethods');
 
   const { formMethods, submitForm } = useHandoverFinalizingForm(constructionHandover);
   const { handleSubmit } = formMethods;
+
+  const { watch, setValue } = formMethods;
+
+  const { constructionProcurementMethods, staraProcurementReasons, showStaraProcurementReason } =
+    useConstructionProcurementMethod(
+      watch,
+      setValue,
+      'constructionProcurementMethod',
+      'staraProcurementReason',
+    );
 
   const isSubmittedToConstruction =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION;
@@ -114,20 +138,34 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
                 rules={{ ...validateRequiredSelect('person', t) }}
               />
             )}
-            <SelectField
-              name="constructionProcurementMethod"
-              label="constructionHandoverForm.constructionProcurementMethod"
-              options={constructionProcurementMethods}
-              size="full"
-              required={isProjectManagerNamed}
-              rules={
-                isProjectManagerNamed
-                  ? {
-                      ...validateRequiredSelect('constructionProcurementMethod', t),
-                    }
-                  : undefined
-              }
-            />
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <SelectField
+                  name="constructionProcurementMethod"
+                  label="constructionHandoverForm.constructionProcurementMethod"
+                  options={constructionProcurementMethods}
+                  size="full"
+                  required={isProjectManagerNamed}
+                  rules={
+                    isProjectManagerNamed
+                      ? {
+                          ...validateRequiredSelect('constructionProcurementMethod', t),
+                        }
+                      : undefined
+                  }
+                />
+              </div>
+              {showStaraProcurementReason && (
+                <div className="flex-1">
+                  <SelectField
+                    name="staraProcurementReason"
+                    label="constructionHandoverForm.staraProcurementReason"
+                    options={staraProcurementReasons}
+                    clearable
+                  />
+                </div>
+              )}
+            </div>
             <Button type="submit">{buttonText}</Button>
           </div>
         </Notification>

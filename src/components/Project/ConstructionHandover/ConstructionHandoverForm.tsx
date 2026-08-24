@@ -35,6 +35,7 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
     name: formData.name,
     description: formData.description,
     constructionProcurementMethod: formData.constructionProcurementMethod.value,
+    staraProcurementReason: formData.staraProcurementReason?.value ?? null,
     constructionStart: formData.constructionStart,
     constructionEnd: formData.constructionEnd,
     otherTimelineNotes: formData.otherTimelineNotes,

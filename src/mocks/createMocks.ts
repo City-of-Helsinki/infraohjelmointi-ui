@@ -117,6 +117,7 @@ export function createConstructionHandover(
     name: 'Test Handover',
     description: 'This is a test construction handover.',
     constructionProcurementMethod: null,
+    staraProcurementReason: null,
     otherTimelineNotes: '',
     constructionStart: '2026-01-01',
     constructionEnd: '2026-12-01',

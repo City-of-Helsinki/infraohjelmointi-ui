@@ -7,6 +7,7 @@ import {
   UseFormGetValues,
   UseFormSetValue,
   UseFormTrigger,
+  UseFormWatch,
   useWatch,
 } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -23,11 +24,13 @@ import { selectProjectPhases } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { Tooltip } from 'hds-react';
 import { IProject } from '@/interfaces/projectInterfaces';
+import useConstructionProcurementMethod from '@/hooks/useConstructionProcurementMethod';
 
 interface IProjectStatusSectionProps {
   project: IProject | null;
   getValues: UseFormGetValues<IProjectForm>;
   setValue: UseFormSetValue<IProjectForm>;
+  watch: UseFormWatch<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -56,6 +59,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
   getValues,
   setValue,
+  watch,
   control,
   constructionEndYear,
   isInputDisabled,
@@ -70,8 +74,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const allPhaseDetails = useAppSelector((state: RootState) => state.lists.projectPhaseDetails);
   const categories = useOptions('categories');
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
-  const constructionProcurementMethods = useOptions('constructionProcurementMethods');
-  const staraProcurementReasons = useOptions('staraProcurementReasons');
 
   const watchedPhase = useWatchField('phase', control) as IOption | undefined;
   const currentPhase = watchedPhase?.value ?? '';
@@ -85,12 +87,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       .map((detail) => listItemToOption(detail));
   }, [allPhaseDetails, currentPhase]);
 
-  const watchedConstructionProcurementMethod = useWatchField(
-    'constructionProcurementMethod',
-    control,
-  ) as IOption | undefined;
-
-  const showStaraProcurementReason = watchedConstructionProcurementMethod?.label === 'Stara';
+  const { constructionProcurementMethods, staraProcurementReasons, showStaraProcurementReason } =
+    useConstructionProcurementMethod(
+      watch,
+      setValue,
+      'constructionProcurementMethod',
+      'staraProcurementReason',
+    );
 
   // Watch all fields that are checked in phaseRequirements so the ErrorSummary updates live
   const watchedRequiredFields = useWatch({

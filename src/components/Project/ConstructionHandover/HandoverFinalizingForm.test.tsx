@@ -23,7 +23,11 @@ jest.mock('@/hooks/useOptions', () => ({
     }
 
     if (listName === 'constructionProcurementMethods') {
-      return [{ value: 'method-1', label: 'Procurement Method' }];
+      return [{ value: 'method-1', label: 'Stara' }];
+    }
+
+    if (listName === 'staraProcurementReasons') {
+      return [{ value: 'reason-1', label: 'urgentWork' }];
     }
 
     return [];
@@ -109,7 +113,11 @@ describe('HandoverFinalizingForm', () => {
       },
       constructionProcurementMethod: {
         id: 'method-1',
-        value: 'Procurement Method',
+        value: 'Stara',
+      },
+      staraProcurementReason: {
+        id: 'reason-1',
+        value: 'urgentWork',
       },
     });
 
@@ -134,6 +142,7 @@ describe('HandoverFinalizingForm', () => {
         data: {
           constructionProjectManager: 'manager-1',
           constructionProcurementMethod: 'method-1',
+          staraProcurementReason: 'reason-1',
         },
       });
     });
