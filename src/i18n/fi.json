@@ -489,7 +489,7 @@
     "nameProjectManagerTooltip": "Eikö haluamaasi projektipäällikköä löydy listalta? Ota yhteyttä vastuuhenkilölistan ylläpitäjään.",
     "projectManagerSet": "Projektipäällikkö on jo nimetty hankkeen perustiedoissa. Haluatko käyttää tätä valintaa?",
     "moveToConstructionPreparation": "Siirrä hanke rakentamisen valmisteluun ja tarkista hankkeen hankintatapa",
-    "checkInformation": "Sinut on nimetty projektipäälliköksi. Tarkista tiedot ja siirrä hanke valmisteluun.",
+    "checkInformation": "{{projectManager}} on nimetty projektipäälliköksi. Tarkista tiedot ja siirrä hanke valmisteluun.",
     "moveToConstructionPreparationButton": "Siirrä rakentamisen valmisteluun",
     "nameProjectManagerNotification": "Nimeä urakan projektipäällikkö ennen valmisteluun siirtoa",
     "returnToDraft": "Palauta luonnokseksi",

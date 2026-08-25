@@ -121,7 +121,11 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
                 <p className="text-body mb-4">{t('constructionHandoverForm.projectManagerSet')}</p>
               )}
             {isProjectManagerNamed && (
-              <p className="text-body mb-4">{t('constructionHandoverForm.checkInformation')}</p>
+              <p className="text-body mb-4">
+                {t('constructionHandoverForm.checkInformation', {
+                  projectManager: `${constructionHandover.constructionProjectManager?.firstName} ${constructionHandover.constructionProjectManager?.lastName}`,
+                })}
+              </p>
             )}
             {isSubmittedToConstruction && (
               <SelectField

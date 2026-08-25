@@ -2,12 +2,13 @@ import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import FinancingSection from './FinancingSection';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
-import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
+import { createConstructionHandover } from '@/mocks/createMocks';
+import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -125,35 +126,22 @@ jest.mock('./FinancingDialog', () => ({
   ),
 }));
 
-const defaultValues: IConstructionHandoverForm = {
-  id: 'handover-1',
-  name: 'Test Handover',
-  description: 'Description',
-  constructionProcurementMethod: { label: 'Method', value: 'method-1' },
-  staraProcurementReason: null,
-  constructionStart: null,
-  constructionEnd: null,
-  otherTimelineNotes: '',
-  constructionHandoverFinancing: [],
-  personPlanning: { label: 'Planner', value: 'planner-1' },
-  personFinancing: { label: 'Financer', value: 'financer-1' },
-  totalCost: '',
-};
-
 const renderSection = async (
   financingRows: IConstructionHandoverForm['constructionHandoverFinancing'] = [],
 ) => {
   const TestForm = () => {
-    const formMethods = useForm<IConstructionHandoverForm>({
-      defaultValues: {
-        ...defaultValues,
-        constructionHandoverFinancing: financingRows,
-      },
+    const constructionHandover = createConstructionHandover({
+      constructionHandoverFinancing: financingRows.map((row) => ({
+        ...row,
+        financingParty: row.financer,
+        budgetItem: row.budgetItem ? { id: row.budgetItem, value: row.budgetItem } : null,
+      })),
     });
+    const formMethods = useConstructionHandoverForm(constructionHandover);
 
     return (
       <FormProvider {...formMethods}>
-        <FinancingSection handoverStatus={ConstructionHandoverStatus.DRAFT} />
+        <FinancingSection constructionHandover={constructionHandover} />
       </FormProvider>
     );
   };

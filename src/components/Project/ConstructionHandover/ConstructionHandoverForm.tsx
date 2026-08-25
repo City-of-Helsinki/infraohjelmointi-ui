@@ -6,7 +6,7 @@ import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconLink, Notification, NotificationSize } from 'hds-react';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   usePatchConstructionHandoverMutation,
@@ -20,6 +20,13 @@ import {
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
+import { isConstructionHandoverLocked } from './constructionHandoverUtils';
+import { selectUser } from '@/reducers/authSlice';
+import {
+  isUserProjectManager,
+  isUserPlanner,
+  isUserConstructionManagementLead,
+} from '@/utils/userRoleHelpers';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -64,11 +71,25 @@ function ConstructionHandoverForm({
   } = formMethods;
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
-  const canBeReturnedToDraft = [
+
+  const user = useAppSelector(selectUser);
+  const isProjectManager = isUserProjectManager(user);
+  const isPlanner = isUserPlanner(user);
+  const isConstructionManagementLead = isUserConstructionManagementLead(user);
+
+  const showSubmitToProgrammerButton =
+    constructionHandover.status === ConstructionHandoverStatus.DRAFT && isProjectManager;
+  const showSubmitToConstructionButton =
+    constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
+  const showSaveDraftButton = !isConstructionHandoverLocked(constructionHandover);
+  const showReturnToDraftButton = [
     ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
     ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
   ].includes(constructionHandover.status);
+  const showNameProjectManagerNotification =
+    constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
+    isConstructionManagementLead;
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -106,14 +127,20 @@ function ConstructionHandoverForm({
     }
   }
 
-  async function submitToProgrammer() {
+  async function submitFormBeforeStatusTransition(data: IConstructionHandoverForm) {
     if (isDirty) {
-      // If there are unsaved changes, save them before submitting to programmer
-      const error = await submitForm(formMethods.getValues());
+      // If there are unsaved changes, save them before doing the status transition
+      const error = await submitForm(data);
       if (error) {
-        // If there was an error saving the form, do not proceed with the status transition
-        return;
+        return error;
       }
+    }
+  }
+
+  async function submitToProgrammer() {
+    const error = await submitFormBeforeStatusTransition(formMethods.getValues());
+    if (error) {
+      return;
     }
 
     doStatusTransition({
@@ -122,7 +149,12 @@ function ConstructionHandoverForm({
     });
   }
 
-  function submitToConstruction() {
+  async function submitToConstruction() {
+    const error = await submitFormBeforeStatusTransition(formMethods.getValues());
+    if (error) {
+      return;
+    }
+
     doStatusTransition({
       id: constructionHandover.id,
       to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
@@ -147,29 +179,28 @@ function ConstructionHandoverForm({
           ].includes(constructionHandover.status)}
         />
         <ScheduleSection />
-        <FinancingSection handoverStatus={constructionHandover.status} />
+        <FinancingSection constructionHandover={constructionHandover} />
         <ContactsSection />
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="flex items-center gap-6">
-              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+              {showSubmitToProgrammerButton && (
                 <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
                   {t('constructionHandoverForm.submitToProgrammer')}
                 </Button>
               )}
-              {constructionHandover.status ===
-                ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && (
+              {showSubmitToConstructionButton && (
                 <Button type="button" onClick={handleSubmit(submitToConstruction)}>
                   {t('constructionHandoverForm.submitToConstruction')}
                 </Button>
               )}
-              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+              {showSaveDraftButton && (
                 <Button variant={ButtonVariant.Secondary} type="submit">
                   {t('constructionHandoverForm.saveDraft')}
                 </Button>
               )}
-              {canBeReturnedToDraft && (
+              {showReturnToDraftButton && (
                 <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
                   {t('constructionHandoverForm.returnToDraft')}
                 </Button>
@@ -182,8 +213,7 @@ function ConstructionHandoverForm({
               >
                 {t('copyLink')}
               </Button>
-              {constructionHandover.status ===
-                ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION && (
+              {showNameProjectManagerNotification && (
                 <div>
                   <Notification
                     label={t('constructionHandoverForm.nameProjectManagerNotification')}

@@ -1,12 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
-import {
-  ConstructionHandoverStatus,
-  IConstructionHandover,
-} from '@/interfaces/constructionHandoverInterfaces';
+import { IConstructionHandover } from '@/interfaces/constructionHandoverInterfaces';
 import { listItemToOption, personToOption } from '@/utils/common';
 import { formatDateToHds } from '@/utils/dates';
 import { formatBudgetEuro } from '@/utils/currencyUtils';
+import { isConstructionHandoverLocked } from '@/components/Project/ConstructionHandover/constructionHandoverUtils';
 
 function useConstructionHandoverFormValues(
   constructionHandover: IConstructionHandover,
@@ -47,7 +45,7 @@ export default function useConstructionHandoverForm(constructionHandover: IConst
   const formMethods = useForm<IConstructionHandoverForm>({
     values: formValues,
     mode: 'onBlur',
-    disabled: constructionHandover.status !== ConstructionHandoverStatus.DRAFT,
+    disabled: isConstructionHandoverLocked(constructionHandover),
   });
 
   return formMethods;

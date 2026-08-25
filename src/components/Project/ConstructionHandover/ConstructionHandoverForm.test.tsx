@@ -1,12 +1,13 @@
 import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders, withMockAuthUserAdGroups } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
 import { createConstructionHandover } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
+import { UserRole } from '@/interfaces/userInterfaces';
 
 const mockPatchConstructionHandover = jest.fn();
 const mockTransitionConstructionHandoverStatus = jest.fn();
@@ -357,9 +358,9 @@ describe('ConstructionHandoverForm status transitions', () => {
     mockPatchConstructionHandover.mockClear();
   });
 
-  it('disables form fields when handover status is not draft', async () => {
+  it('disables form fields when handover status is not draft or submitted to programmer', async () => {
     const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     });
 
     await act(async () =>
@@ -392,6 +393,9 @@ describe('ConstructionHandoverForm status transitions', () => {
           path="/"
           element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
+        {
+          preloadedState: withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+        },
       ),
     );
 
@@ -425,6 +429,9 @@ describe('ConstructionHandoverForm status transitions', () => {
           path="/"
           element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
+        {
+          preloadedState: withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+        },
       ),
     );
 
@@ -459,6 +466,9 @@ describe('ConstructionHandoverForm status transitions', () => {
           path="/"
           element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
+        {
+          preloadedState: withMockAuthUserAdGroups([UserRole.PLANNER]),
+        },
       ),
     );
 

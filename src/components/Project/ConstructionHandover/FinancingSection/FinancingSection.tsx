@@ -5,9 +5,9 @@ import { FocusEvent, memo, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
-  ConstructionHandoverStatus,
   FinancingDialogState,
   FinancingRowValues,
+  IConstructionHandover,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { DialogMode } from '@/interfaces/menuItemsInterfaces';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
@@ -17,12 +17,13 @@ import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
 import { formatBudgetEuro, parseCurrency } from '@/utils/currencyUtils';
+import { isConstructionHandoverLocked } from '../constructionHandoverUtils';
 
 interface IFinancingSectionProps {
-  handoverStatus: ConstructionHandoverStatus;
+  constructionHandover: IConstructionHandover;
 }
 
-const FinancingSection = ({ handoverStatus }: IFinancingSectionProps) => {
+const FinancingSection = ({ constructionHandover }: IFinancingSectionProps) => {
   const { t } = useTranslation();
   const { control, setValue, watch } = useFormContext<IConstructionHandoverForm>();
   const financingPartyOptions = useOptions('financingParties');
@@ -222,7 +223,7 @@ const FinancingSection = ({ handoverStatus }: IFinancingSectionProps) => {
           onEditRow={handleEdit}
           id={row.item.id}
           values={row.item}
-          disabled={handoverStatus !== ConstructionHandoverStatus.DRAFT}
+          disabled={isConstructionHandoverLocked(constructionHandover)}
         />
       ) : null,
     deleteCell:
@@ -230,7 +231,7 @@ const FinancingSection = ({ handoverStatus }: IFinancingSectionProps) => {
         <DeleteCell
           onDeleteRow={handleDelete}
           id={row.item.id}
-          disabled={handoverStatus !== ConstructionHandoverStatus.DRAFT}
+          disabled={isConstructionHandoverLocked(constructionHandover)}
         />
       ) : null,
   }));
@@ -278,7 +279,7 @@ const FinancingSection = ({ handoverStatus }: IFinancingSectionProps) => {
           <p>{t('constructionHandoverForm.financingSection.tableEmptyText')}</p>
         )}
       </div>
-      {handoverStatus === ConstructionHandoverStatus.DRAFT && (
+      {!isConstructionHandoverLocked(constructionHandover) && (
         <div className="input-wrapper">
           <Button
             variant={ButtonVariant.Secondary}
