@@ -491,6 +491,7 @@
     "checkInformation": "Sinut on nimetty projektipäälliköksi. Tarkista tiedot ja siirrä hanke valmisteluun.",
     "moveToConstructionPreparationButton": "Siirrä rakentamisen valmisteluun",
     "nameProjectManagerNotification": "Nimeä urakan projektipäällikkö ennen valmisteluun siirtoa",
+    "returnToDraft": "Palauta luonnokseksi",
     "status": {
       "draft": "Luonnos",
       "submittedToProgrammer": "Siirretty ohjelmoijalle",
@@ -639,7 +640,8 @@
       "updateSuccessful": "Tietojen siirto onnistui",
       "sessionExpired": "Istunto vanhentunut",
       "linkCopied": "Linkki kopioitu",
-      "statusTransitionSuccess": "Siirretty onnistuneesti"
+      "statusTransitionSuccess": "Siirretty onnistuneesti",
+      "returnSuccess": "Palautettu onnistuneesti"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -655,6 +657,7 @@
       "talpaProjectPatchSuccess": "Projektin avauspyyntö-excel muokattu onnistuneesti.",
       "constructionHandoverPatchSuccess": "Rakennuttamiseen siirto muokattu onnistuneesti",
       "constructionHandoverStatusTransitionSuccess": "Siirretty {{parameter}} onnistuneesti",
+      "constructionHandoverReturnedToDraft": "Palautettu luonnokseksi onnistuneesti",
       "projectProgrammeSwitchTypeSuccess": "Hankeohjelman tyyppi vaihdettu onnistuneesti.",
       "projectProgrammeSwitchTypeError": "Hankeohjelman tyypin vaihtaminen ei onnistunut.",
       "projectProgrammeCreateError": "Hankeohjelman luominen ei onnistunut.",

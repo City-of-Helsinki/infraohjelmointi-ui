@@ -6,16 +6,20 @@ interface EditCellProps {
   onEditRow: (id: string, values?: FinancingRowValues) => void;
   id: string;
   values?: FinancingRowValues;
+  disabled?: boolean;
 }
 
-const EditCell: FC<EditCellProps> = ({ onEditRow, id, values }) => {
+const EditCell: FC<EditCellProps> = ({ onEditRow, id, values, disabled }) => {
+  const iconColor = disabled ? 'var(--color-black-50)' : 'var(--color-bus)';
+
   return (
     <button
       type="button"
       onClick={() => onEditRow(id, values)}
       data-testid={`financing-row-edit-button-id-${id}`}
+      disabled={disabled}
     >
-      <IconPen color="var(--color-bus)" />
+      <IconPen color={iconColor} />
     </button>
   );
 };
@@ -23,16 +27,20 @@ const EditCell: FC<EditCellProps> = ({ onEditRow, id, values }) => {
 interface DeleteCellProps {
   onDeleteRow: (id: string) => void;
   id: string;
+  disabled?: boolean;
 }
 
-const DeleteCell: FC<DeleteCellProps> = ({ onDeleteRow, id }) => {
+const DeleteCell: FC<DeleteCellProps> = ({ onDeleteRow, id, disabled }) => {
+  const iconColor = disabled ? 'var(--color-black-50)' : 'var(--color-brick)';
+
   return (
     <button
       type="button"
       onClick={() => onDeleteRow(id)}
       data-testid={`financing-row-delete-button-id-${id}`}
+      disabled={disabled}
     >
-      <IconTrash color="var(--color-brick)" />
+      <IconTrash color={iconColor} />
     </button>
   );
 };
