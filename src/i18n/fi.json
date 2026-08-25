@@ -1037,7 +1037,7 @@
       "open": "Auki",
       "locked": "Lukittu",
       "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
-      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään, lukuun ottamatta kuluvan vuoden budjettitietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
+      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
     }
   },
   "projectCount": "Projektien määrä",
