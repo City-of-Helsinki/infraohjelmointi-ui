@@ -1,7 +1,14 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues, UseFormSetValue, useWatch } from 'react-hook-form';
+import {
+  Control,
+  UseFormGetFieldState,
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormTrigger,
+  useWatch,
+} from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { Trans, useTranslation } from 'react-i18next';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -31,6 +38,8 @@ interface IProjectStatusSectionProps {
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
+  getFieldState: UseFormGetFieldState<IProjectForm>;
+  trigger: UseFormTrigger<IProjectForm>;
   useWatchField: (
     name: keyof IProjectForm,
     control: Control<IProjectForm>,
@@ -52,6 +61,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer,
+  getFieldState,
+  trigger,
   useWatchField,
 }) => {
   const phases = useOptions('phases');
@@ -112,6 +123,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       }
     }
   }, [currentPhase, allPhaseDetails, getValues, setValue]);
+
+  // Re-run phaseDetail's validation whenever phase changes so stale errors
+  // are cleared once phaseDetail is no longer required
+  useEffect(() => {
+    if (getFieldState('phaseDetail').invalid) {
+      trigger('phaseDetail');
+    }
+  }, [currentPhase, filteredPhaseDetails.length, getFieldState, trigger]);
 
   useEffect(() => {
     if (!showStaraProcurementReason) {
@@ -258,21 +277,21 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     switch (phase) {
       case programmedPhase:
         fields.push(...fieldsIfEmpty([...programmedRequirements]));
-        if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
         break;
       case planningPhase:
       case constructionWaitPhase:
         fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
-        if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
         break;
       case constructionPreparationPhase:
       case constructionPhase:
-        fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
-        break;
       case warrantyPeriodPhase:
       case completedPhase:
         fields.push(...fieldsIfEmpty([...combinedRequirements]));
         break;
+    }
+
+    if (hasDetailsForPhase) {
+      fields.push(...fieldsIfEmpty(['phaseDetail']));
     }
 
     return fields;
