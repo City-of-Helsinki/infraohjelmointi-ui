@@ -10,7 +10,7 @@ import useProjectNoteForm from '@/forms/useNoteForm';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { usePatchNoteMutation } from '@/api/notesApi';
-import NotesFileInput from './NoteFileInput';
+import NoteFileInput from './NoteFileInput';
 import usePostNoteImages from './usePostNoteImages';
 
 interface IProjectEditNoteFormProps {
@@ -64,7 +64,7 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
               )}
             />
           </div>
-          <NotesFileInput handleChange={setFiles} />
+          <NoteFileInput handleChange={setFiles} />
         </Content>
         <ActionButtons>
           <Button type="submit" data-testid="edit-note-save">

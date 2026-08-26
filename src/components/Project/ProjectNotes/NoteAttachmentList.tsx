@@ -5,6 +5,7 @@ import AttachmentSlideshowDialog from './AttachmentSlideshowDialog';
 import { useTranslation } from 'react-i18next';
 import { INoteImage } from '@/interfaces/noteInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
+import styles from './NoteAttachmentList.module.css';
 
 interface INoteAttachmentListProps {
   attachments: INoteImage[];
@@ -76,23 +77,16 @@ export default function NoteAttachmentList({
     <div>
       <p className="font-medium">{t('noteAttachments.imageAttachments')}</p>
       {attachments.map((attachment, index) => (
-        <div
-          key={attachment.id || `${attachment.fileName}-${index}`}
-          className="flex flex-wrap justify-between gap-2 border-b border-[--color-black-30] py-6 last:border-b-0"
-        >
+        <div key={attachment.id || `${attachment.fileName}-${index}`} className={styles.listItem}>
           <div className="flex gap-4">
             <button
               type="button"
               onClick={() => handleOpenImage(index)}
               aria-label={t('noteAttachments.viewAttachment', { fileName: attachment.fileName })}
             >
-              <img
-                src={attachment.url}
-                alt=""
-                className="h-[70px] w-[70px] cursor-pointer border border-[--color-black-30] object-cover"
-              />
+              <img src={attachment.url} alt="" className={styles.listItemImage} />
             </button>
-            <div className="flex flex-col justify-center text-sm">
+            <div className={styles.listItemInfo}>
               <p className="my-0 font-medium">{t('noteAttachments.attachmentAdded')}</p>
               <p className="my-0">
                 {attachment.createdDate ? stringToDateTime(attachment.createdDate) : '-'}

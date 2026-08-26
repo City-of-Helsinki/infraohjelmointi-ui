@@ -1,6 +1,6 @@
 import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
-import { notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -65,6 +65,18 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
       query: (noteId) => ({
         url: `/notes/${noteId}/images/`,
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              message: 'noteImageGetError',
+              type: 'notification',
+            }),
+          );
+        }
+      },
       providesTags: (result, error, noteId) => [{ type: 'NoteImages', id: noteId }],
     }),
     postNoteImage: build.mutation<INoteImage[], { noteId: string; formData: FormData }>({
@@ -73,6 +85,20 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
         method: 'POST',
         data: formData,
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'saveError',
+              message: 'noteImagePostError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
       invalidatesTags: (result, error, { noteId }) => [{ type: 'NoteImages', id: noteId }],
     }),
     deleteNoteImage: build.mutation<undefined, { noteId: string; imageId: string }>({
@@ -80,6 +106,20 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
         url: `/notes/${noteId}/images/${imageId}/`,
         method: 'DELETE',
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'deleteError',
+              message: 'noteImageDeleteError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
       invalidatesTags: (result, error, { noteId }) => [{ type: 'NoteImages', id: noteId }],
     }),
   }),
