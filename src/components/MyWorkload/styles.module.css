@@ -187,6 +187,21 @@
   max-width: 100%;
 }
 
+.editDialogFieldError {
+  color: var(--color-error);
+  font-size: var(--fontsize-body-s);
+  margin: calc(var(--spacing-xs) * -1) 0 0;
+}
+
+.editDialogNotificationContent {
+  display: grid;
+  gap: var(--spacing-s);
+}
+
+.editDialogNotificationContent p {
+  margin: 0;
+}
+
 .editDialogFooterActionContainer {
   padding: 0 var(--spacing-l) var(--spacing-l);
 }

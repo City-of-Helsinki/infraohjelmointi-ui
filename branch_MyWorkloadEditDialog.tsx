@@ -2,14 +2,10 @@
 import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { selectProjectPhases } from '@/reducers/listsSlice';
-import {
-  getProjectPhaseDetailOptions,
-  phaseDetailBelongsToPhase,
-  phaseHasDetails,
-} from '@/utils/projectPhaseDetails';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useGetProjectByIdQuery, usePatchProjectMutation } from '@/api/projectApi';
 import TextField from '@/components/shared/TextField';
+import { currencyToRequestValue, formatBudgetEuro } from '@/utils/currencyUtils';
 import {
   Button,
   ButtonVariant,
@@ -18,6 +14,7 @@ import {
   Notification,
   Option,
   Select,
+  TextInput,
 } from 'hds-react';
 import {
   FC,
@@ -29,22 +26,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Controller, SubmitErrorHandler, useWatch } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from '../styles.module.css';
-import { normalizeMyWorkloadDate, toPhaseInfo } from '@/utils/myWorkloadUtils';
-import {
-  getMyWorkloadProjectRequestFields,
-  myWorkloadValuesToProjectRequest,
-} from '@/utils/myWorkloadProjectRequest';
-import { collectErrorFieldNames, scrollToFirstField } from '@/utils/formErrorHelpers';
-import useMyWorkloadEditForm, {
-  IMyWorkloadEditFormValues,
-  MyWorkloadDateFieldName,
-  mapProjectToFormValues,
-  validateMyWorkloadDateOrder,
-} from './useMyWorkloadEditForm';
+import { normalizeMyWorkloadDate } from '@/utils/myWorkloadUtils';
+import useMyWorkloadEditForm, { IMyWorkloadEditFormValues } from './useMyWorkloadEditForm';
+import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   createProjectPhaseResolver,
@@ -54,6 +42,7 @@ import {
   ProjectValidationState,
   translateProjectValidationField,
   translateProjectValidationIssue,
+  validateProjectState,
 } from '@/utils/projectValidationRules';
 import { skipToken } from '@reduxjs/toolkit/query';
 
@@ -65,11 +54,18 @@ interface MyWorkloadEditDialogProps {
   onSave: (row: MyWorkloadTableRow) => void;
 }
 
-// Fields the dialog exposes per view; anything else in the project's validation state is
-// "hidden" here, so failures on those fields are surfaced via a notification instead of inline.
+type DateFieldName =
+  | 'planningStart'
+  | 'planningEnd'
+  | 'presenceStart'
+  | 'presenceEnd'
+  | 'visibilityStart'
+  | 'visibilityEnd'
+  | 'constructionStart'
+  | 'constructionEnd';
+
 const planningVisibleValidationFields: ProjectValidationField[] = [
   'phase',
-  'phaseDetail',
   'estPlanningStart',
   'estPlanningEnd',
   'presenceStart',
@@ -80,16 +76,12 @@ const planningVisibleValidationFields: ProjectValidationField[] = [
 
 const constructionVisibleValidationFields: ProjectValidationField[] = [
   'phase',
-  'phaseDetail',
   'estConstructionStart',
   'estConstructionEnd',
 ];
 
-const validationFieldToFormFieldMap: Partial<
-  Record<ProjectValidationField, keyof IMyWorkloadEditFormValues>
-> = {
+const validationFieldToFormFieldMap: Partial<Record<ProjectValidationField, keyof IMyWorkloadEditFormValues>> = {
   phase: 'phaseId',
-  phaseDetail: 'phaseDetailId',
   estPlanningStart: 'planningStart',
   estPlanningEnd: 'planningEnd',
   presenceStart: 'presenceStart',
@@ -98,6 +90,58 @@ const validationFieldToFormFieldMap: Partial<
   visibilityEnd: 'visibilityEnd',
   estConstructionStart: 'constructionStart',
   estConstructionEnd: 'constructionEnd',
+};
+
+const mapDialogValuesToValidationState = (
+  projectData: IProject,
+  values: IMyWorkloadEditFormValues,
+): ProjectValidationState => {
+  const planningStart = values.planningStart.trim();
+  const planningEnd = values.planningEnd.trim();
+  const presenceStart = values.presenceStart.trim();
+  const presenceEnd = values.presenceEnd.trim();
+  const visibilityStart = values.visibilityStart.trim();
+  const visibilityEnd = values.visibilityEnd.trim();
+  const constructionStart = values.constructionStart.trim();
+  const constructionEnd = values.constructionEnd.trim();
+  const fallbackPlanningStart = normalizeMyWorkloadDate(projectData.estPlanningStart);
+  const fallbackPlanningEnd = normalizeMyWorkloadDate(projectData.estPlanningEnd);
+  const fallbackPresenceStart = normalizeMyWorkloadDate(projectData.presenceStart);
+  const fallbackPresenceEnd = normalizeMyWorkloadDate(projectData.presenceEnd);
+  const fallbackVisibilityStart = normalizeMyWorkloadDate(projectData.visibilityStart);
+  const fallbackVisibilityEnd = normalizeMyWorkloadDate(projectData.visibilityEnd);
+  const fallbackConstructionStart = normalizeMyWorkloadDate(projectData.estConstructionStart);
+  const fallbackConstructionEnd = normalizeMyWorkloadDate(projectData.estConstructionEnd);
+  const fallbackWarrantyStart = normalizeMyWorkloadDate(projectData.estWarrantyPhaseStart);
+  const fallbackWarrantyEnd = normalizeMyWorkloadDate(projectData.estWarrantyPhaseEnd);
+
+  return {
+    phaseId: values.phaseId.trim(),
+    phaseDetailId: projectData.phaseDetail?.id ?? '',
+    programmed: projectData.programmed,
+    planningStartYear: projectData.planningStartYear,
+    constructionEndYear: projectData.constructionEndYear,
+    estPlanningStart: planningStart ? normalizeMyWorkloadDate(planningStart) : fallbackPlanningStart,
+    estPlanningEnd: planningEnd ? normalizeMyWorkloadDate(planningEnd) : fallbackPlanningEnd,
+    presenceStart: presenceStart ? normalizeMyWorkloadDate(presenceStart) : fallbackPresenceStart,
+    presenceEnd: presenceEnd ? normalizeMyWorkloadDate(presenceEnd) : fallbackPresenceEnd,
+    visibilityStart: visibilityStart ? normalizeMyWorkloadDate(visibilityStart) : fallbackVisibilityStart,
+    visibilityEnd: visibilityEnd ? normalizeMyWorkloadDate(visibilityEnd) : fallbackVisibilityEnd,
+    estConstructionStart: constructionStart
+      ? normalizeMyWorkloadDate(constructionStart)
+      : fallbackConstructionStart,
+    estConstructionEnd: constructionEnd ? normalizeMyWorkloadDate(constructionEnd) : fallbackConstructionEnd,
+    estWarrantyPhaseStart: fallbackWarrantyStart,
+    estWarrantyPhaseEnd: fallbackWarrantyEnd,
+    personPlanningId: projectData.personPlanning?.id ?? '',
+    personConstructionId: projectData.personConstruction?.id ?? '',
+    categoryId: projectData.category?.id ?? '',
+    priorityId: projectData.priority?.id ?? '',
+    masterClassId: projectData.projectClass ?? '',
+    classId: projectData.projectClass ?? '',
+    address: projectData.address ?? '',
+    projectMode: 'edit',
+  };
 };
 
 const mapProjectToValidationState = (projectData: IProject): ProjectValidationState => ({
@@ -126,33 +170,6 @@ const mapProjectToValidationState = (projectData: IProject): ProjectValidationSt
   projectMode: 'edit',
 });
 
-// Applies the dialog's dirty values on top of the fetched project, so fields the dialog
-// doesn't expose (e.g. category, responsible persons) still validate against their real values.
-const mapDialogValuesToValidationState = (
-  projectData: IProject,
-  values: IMyWorkloadEditFormValues,
-): ProjectValidationState => {
-  const base = mapProjectToValidationState(projectData);
-  const resolveDate = (value: string, fallback: string | null | undefined) => {
-    const trimmed = value.trim();
-    return trimmed ? normalizeMyWorkloadDate(trimmed) : fallback ?? '';
-  };
-
-  return {
-    ...base,
-    phaseId: values.phaseId.trim(),
-    phaseDetailId: values.phaseDetailId.trim(),
-    estPlanningStart: resolveDate(values.planningStart, base.estPlanningStart),
-    estPlanningEnd: resolveDate(values.planningEnd, base.estPlanningEnd),
-    presenceStart: resolveDate(values.presenceStart, base.presenceStart),
-    presenceEnd: resolveDate(values.presenceEnd, base.presenceEnd),
-    visibilityStart: resolveDate(values.visibilityStart, base.visibilityStart),
-    visibilityEnd: resolveDate(values.visibilityEnd, base.visibilityEnd),
-    estConstructionStart: resolveDate(values.constructionStart, base.estConstructionStart),
-    estConstructionEnd: resolveDate(values.constructionEnd, base.estConstructionEnd),
-  };
-};
-
 const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   isOpen,
   project,
@@ -164,14 +181,12 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const phases = useAppSelector(selectProjectPhases);
-  const phaseDetails = useAppSelector((state) => state.lists.projectPhaseDetails);
   const planningPhases = useAppSelector((state) => state.lists.planningPhases);
-  const constructionPhases = useAppSelector((state) => state.lists.constructionPhases);
+  const projectPhaseDetails = useAppSelector((state) => state.lists.projectPhaseDetails);
   const [patchProject, { isLoading }] = usePatchProjectMutation();
   const { data: fullProject, isFetching: isProjectLoading } = useGetProjectByIdQuery(
     isOpen && project?.id ? project.id : skipToken,
   );
-  const dialogContentRef = useRef<HTMLDivElement | null>(null);
   const planningStartFieldRef = useRef<HTMLDivElement | null>(null);
   const planningEndFieldRef = useRef<HTMLDivElement | null>(null);
   const presenceStartFieldRef = useRef<HTMLDivElement | null>(null);
@@ -180,27 +195,15 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const visibilityEndFieldRef = useRef<HTMLDivElement | null>(null);
   const constructionStartFieldRef = useRef<HTMLDivElement | null>(null);
   const constructionEndFieldRef = useRef<HTMLDivElement | null>(null);
-  const phaseFieldRef = useRef<HTMLDivElement | null>(null);
-  const phaseDetailFieldRef = useRef<HTMLDivElement | null>(null);
-  const { control, getValues, handleSubmit, setValue, setError, clearErrors } =
+  const { control, getValues, handleSubmit, setValue, formState, clearErrors, setError } =
     useMyWorkloadEditForm(project);
-  const [hiddenValidationIssues, setHiddenValidationIssues] = useState<ProjectValidationIssue[]>(
-    [],
-  );
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [hiddenValidationIssues, setHiddenValidationIssues] = useState<ProjectValidationIssue[]>([]);
 
   const isPlanningView = viewType === 'planning';
-  const selectedPhaseId = useWatch({ control, name: 'phaseId' });
   const visibleValidationFields = useMemo(
     () => (isPlanningView ? planningVisibleValidationFields : constructionVisibleValidationFields),
     [isPlanningView],
-  );
-  const phaseResolver = useMemo(
-    () =>
-      createProjectPhaseResolver(
-        phases.map((phase) => ({ value: phase.id, label: phase.value })),
-        phaseDetails,
-      ),
-    [phases, phaseDetails],
   );
 
   const dateFieldRefs = useMemo(
@@ -217,16 +220,6 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     [],
   );
 
-  // All fields whose containers we can scroll/focus when they fail validation on submit.
-  const errorFieldRefs = useMemo(
-    () => ({
-      ...dateFieldRefs,
-      phaseId: phaseFieldRef,
-      phaseDetailId: phaseDetailFieldRef,
-    }),
-    [dateFieldRefs],
-  );
-
   const phaseOptions = useMemo(
     () =>
       phases.map((phase) => ({
@@ -234,6 +227,14 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         label: t(`option.${phase.value}`),
       })),
     [phases, t],
+  );
+  const phaseResolver = useMemo(
+    () =>
+      createProjectPhaseResolver(
+        phases.map((phase) => ({ value: phase.id, label: phase.value })),
+        projectPhaseDetails,
+      ),
+    [phases, projectPhaseDetails],
   );
 
   const planningPhaseOptions = useMemo(
@@ -244,32 +245,6 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       })),
     [planningPhases, t],
   );
-
-  const constructionPhaseOptions = useMemo(
-    () =>
-      constructionPhases.map((phase: IListItem) => ({
-        value: phase.id,
-        label: t(`option.${phase.value}`),
-      })),
-    [constructionPhases, t],
-  );
-
-  const phaseDetailOptions = useMemo(
-    () =>
-      getProjectPhaseDetailOptions(phaseDetails, selectedPhaseId).map((detail) => ({
-        ...detail,
-        label: t(`option.${detail.label}`),
-      })),
-    [phaseDetails, selectedPhaseId, t],
-  );
-
-  useEffect(() => {
-    const selectedPhaseDetailId = getValues('phaseDetailId');
-    clearErrors('phaseDetailId');
-    if (!phaseDetailBelongsToPhase(phaseDetails, selectedPhaseDetailId, selectedPhaseId)) {
-      setValue('phaseDetailId', '');
-    }
-  }, [clearErrors, getValues, phaseDetails, selectedPhaseId, setValue]);
 
   const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement>) => {
     const button = containerRef.current?.querySelector('button');
@@ -291,6 +266,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       return;
     }
 
+    setSubmitAttempted(false);
     setHiddenValidationIssues([]);
     clearErrors();
     onClose();
@@ -298,6 +274,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   }, [clearErrors, navigate, onClose, project]);
 
   const onDialogClose = useCallback(() => {
+    setSubmitAttempted(false);
     setHiddenValidationIssues([]);
     clearErrors();
     onClose();
@@ -305,6 +282,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
+      setSubmitAttempted(false);
       setHiddenValidationIssues([]);
       clearErrors();
     }
@@ -319,50 +297,109 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       setHiddenValidationIssues([]);
       clearErrors();
 
-      const originalValues = mapProjectToFormValues(project);
-      const payload = myWorkloadValuesToProjectRequest(
-        values,
-        originalValues,
-        getMyWorkloadProjectRequestFields(isPlanningView),
-      );
+      const planningStart = values.planningStart.trim();
+      const planningEnd = values.planningEnd.trim();
+      const presenceStart = values.presenceStart.trim();
+      const presenceEnd = values.presenceEnd.trim();
+      const visibilityStart = values.visibilityStart.trim();
+      const visibilityEnd = values.visibilityEnd.trim();
+      const constructionStart = values.constructionStart.trim();
+      const constructionEnd = values.constructionEnd.trim();
+      const costForecast = currencyToRequestValue(values.costForecast);
 
-      if (Object.keys(payload).length === 0) {
-        onClose();
+      const formattedPlanningStart = planningStart ? normalizeMyWorkloadDate(planningStart) : null;
+      const formattedPlanningEnd = planningEnd ? normalizeMyWorkloadDate(planningEnd) : null;
+      const formattedPresenceStart = presenceStart ? normalizeMyWorkloadDate(presenceStart) : null;
+      const formattedPresenceEnd = presenceEnd ? normalizeMyWorkloadDate(presenceEnd) : null;
+      const formattedVisibilityStart = visibilityStart
+        ? normalizeMyWorkloadDate(visibilityStart)
+        : null;
+      const formattedVisibilityEnd = visibilityEnd ? normalizeMyWorkloadDate(visibilityEnd) : null;
+      const formattedConstructionStart = constructionStart
+        ? normalizeMyWorkloadDate(constructionStart)
+        : null;
+      const formattedConstructionEnd = constructionEnd
+        ? normalizeMyWorkloadDate(constructionEnd)
+        : null;
+
+      const hasPlanningValidationErrors =
+        !formattedPlanningStart ||
+        !formattedPlanningEnd ||
+        !formattedPresenceStart ||
+        !formattedPresenceEnd ||
+        !formattedVisibilityStart ||
+        !formattedVisibilityEnd;
+
+      const hasConstructionValidationErrors =
+        !formattedConstructionStart || !formattedConstructionEnd || !costForecast;
+
+      const hasValidationErrors =
+        !values.phaseId.trim() ||
+        (isPlanningView ? hasPlanningValidationErrors : hasConstructionValidationErrors);
+
+      if (hasValidationErrors) {
         return;
       }
 
-      if (fullProject) {
-        const nextProjectState = mapDialogValuesToValidationState(fullProject, values);
-        const newIssues = getNewProjectValidationIssues({
-          originalProject: mapProjectToValidationState(fullProject),
-          nextProject: nextProjectState,
-          phaseResolver,
-          visibleFields: visibleValidationFields,
-        });
+      if (!fullProject) {
+        return;
+      }
 
-        const visibleIssues = newIssues.filter((issue) => issue.visibleInDialog);
-        const issuesHiddenInDialog = newIssues.filter((issue) => !issue.visibleInDialog);
+      const nextProjectState = mapDialogValuesToValidationState(fullProject, values);
+      const visibleValidationIssues = validateProjectState({
+        project: nextProjectState,
+        phaseResolver,
+        visibleFields: visibleValidationFields,
+      }).filter((issue) => issue.visibleInDialog);
 
-        visibleIssues.forEach((issue) => {
-          const fieldName = validationFieldToFormFieldMap[issue.field];
-          if (!fieldName) {
-            return;
-          }
+      const hiddenValidationIssuesToShow = getNewProjectValidationIssues({
+        originalProject: mapProjectToValidationState(fullProject),
+        nextProject: nextProjectState,
+        phaseResolver,
+        visibleFields: visibleValidationFields,
+      }).filter((issue) => !issue.visibleInDialog);
 
-          setError(fieldName, {
-            type: issue.rule,
-            message: translateProjectValidationIssue(issue, t),
-          });
-        });
-
-        if (issuesHiddenInDialog.length > 0) {
-          setHiddenValidationIssues(issuesHiddenInDialog);
-        }
-
-        if (visibleIssues.length > 0 || issuesHiddenInDialog.length > 0) {
+      visibleValidationIssues.forEach((issue) => {
+        const fieldName = validationFieldToFormFieldMap[issue.field];
+        if (!fieldName) {
           return;
         }
+
+        setError(fieldName, {
+          type: issue.rule,
+          message: translateProjectValidationIssue(issue, t),
+        });
+      });
+
+      if (hiddenValidationIssuesToShow.length > 0) {
+        setHiddenValidationIssues(hiddenValidationIssuesToShow);
       }
+
+      if (visibleValidationIssues.length > 0 || hiddenValidationIssuesToShow.length > 0) {
+        return;
+      }
+
+      const payload = isPlanningView
+        ? {
+            phase: values.phaseId,
+            estPlanningStart: formattedPlanningStart,
+            estPlanningEnd: formattedPlanningEnd,
+            presenceStart: formattedPresenceStart ?? '',
+            presenceEnd: formattedPresenceEnd ?? '',
+            visibilityStart: formattedVisibilityStart ?? '',
+            visibilityEnd: formattedVisibilityEnd ?? '',
+            projectCostForecast: values.projectCostForecast.trim(),
+            planningCostForecast: values.planningCostForecast.trim(),
+            planningPhase: values.planningPhaseId.trim() || null,
+            planningWorkQuantity: values.planningWorkQuantity.trim(),
+            constructionCostForecast: values.constructionCostForecast.trim(),
+          }
+        : {
+            phase: values.phaseId,
+            estConstructionStart: formattedConstructionStart,
+            estConstructionEnd: formattedConstructionEnd,
+            costForecast,
+          };
 
       try {
         const patchedProject = await patchProject({
@@ -370,67 +407,25 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           data: payload,
         }).unwrap();
 
-        const resolveDateValue = (patchedValue: string | null | undefined, fallback: string) =>
-          patchedValue === undefined ? fallback : normalizeMyWorkloadDate(patchedValue);
-
-        const resolveTextValue = (patchedValue: string | null | undefined, fallback: string) =>
-          patchedValue === undefined ? fallback : patchedValue ?? '';
-
-        const resolveOptionIdValue = (
-          patchedValue: IListItem | null | undefined,
-          fallback: string,
-        ) => (patchedValue === undefined ? fallback : patchedValue?.id ?? '');
-
-        const resolvePhaseInfo = (
-          patchedValue: IListItem | null | undefined,
-          fallback: MyWorkloadTableRow['phase'],
-        ) => (patchedValue === undefined ? fallback : toPhaseInfo(patchedValue ?? undefined, t));
-
         onSave({
           ...project,
-          planningStart: resolveDateValue(patchedProject.estPlanningStart, project.planningStart),
-          planningEnd: resolveDateValue(patchedProject.estPlanningEnd, project.planningEnd),
-          presenceStart: resolveDateValue(patchedProject.presenceStart, project.presenceStart),
-          presenceEnd: resolveDateValue(patchedProject.presenceEnd, project.presenceEnd),
-          visibilityStart: resolveDateValue(
-            patchedProject.visibilityStart,
-            project.visibilityStart,
-          ),
-          visibilityEnd: resolveDateValue(patchedProject.visibilityEnd, project.visibilityEnd),
-          constructionStart: resolveDateValue(
-            patchedProject.estConstructionStart,
-            project.constructionStart,
-          ),
-          constructionEnd: resolveDateValue(
-            patchedProject.estConstructionEnd,
-            project.constructionEnd,
-          ),
-          planningCostForecast: resolveTextValue(
-            patchedProject.planningCostForecast,
-            project.planningCostForecast,
-          ),
-          planningPhaseId: resolveOptionIdValue(
-            patchedProject.planningPhase,
-            project.planningPhaseId,
-          ),
-          planningWorkQuantity: resolveTextValue(
-            patchedProject.planningWorkQuantity,
-            project.planningWorkQuantity,
-          ),
-          constructionCostForecast: resolveTextValue(
-            patchedProject.constructionCostForecast,
-            project.constructionCostForecast,
-          ),
-          constructionPhaseId: resolveOptionIdValue(
-            patchedProject.constructionPhase,
-            project.constructionPhaseId,
-          ),
-          constructionWorkQuantity: resolveTextValue(
-            patchedProject.constructionWorkQuantity,
-            project.constructionWorkQuantity,
-          ),
-          phase: resolvePhaseInfo(patchedProject.phase, project.phase),
-          phaseDetail: resolvePhaseInfo(patchedProject.phaseDetail, project.phaseDetail),
+          planningStart: normalizeMyWorkloadDate(patchedProject.estPlanningStart),
+          planningEnd: normalizeMyWorkloadDate(patchedProject.estPlanningEnd),
+          presenceStart: normalizeMyWorkloadDate(patchedProject.presenceStart),
+          presenceEnd: normalizeMyWorkloadDate(patchedProject.presenceEnd),
+          visibilityStart: normalizeMyWorkloadDate(patchedProject.visibilityStart),
+          visibilityEnd: normalizeMyWorkloadDate(patchedProject.visibilityEnd),
+          constructionStart: normalizeMyWorkloadDate(patchedProject.estConstructionStart),
+          constructionEnd: normalizeMyWorkloadDate(patchedProject.estConstructionEnd),
+          projectCostForecast: patchedProject.projectCostForecast ?? '',
+          planningCostForecast: patchedProject.planningCostForecast ?? '',
+          planningPhaseId: patchedProject.planningPhase?.id ?? '',
+          planningWorkQuantity: patchedProject.planningWorkQuantity ?? '',
+          constructionCostForecast: patchedProject.constructionCostForecast ?? '',
+          costForecast: patchedProject.costForecast ?? '',
+          phase: patchedProject.phase?.value ? t(`option.${patchedProject.phase.value}`) : '',
+          phaseValue: patchedProject.phase?.value ?? '',
+          phaseId: patchedProject.phase?.id ?? '',
         });
 
         dispatch(
@@ -470,39 +465,45 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     ],
   );
 
-  const onFormInvalid = useCallback<SubmitErrorHandler<IMyWorkloadEditFormValues>>(
-    (errors) => {
-      const fieldNames = collectErrorFieldNames(errors);
-      const preferredElements = fieldNames
-        .map((fieldName) => errorFieldRefs[fieldName as keyof typeof errorFieldRefs]?.current)
-        .filter((element): element is HTMLDivElement => Boolean(element));
-
-      // focus: false avoids a blur-triggered revalidation loop on the HDS date inputs
-      scrollToFirstField(dialogContentRef.current, preferredElements, fieldNames, {
-        focus: false,
-      });
-    },
-    [errorFieldRefs],
-  );
-
   const onSubmit = useCallback(() => {
-    handleSubmit(onSubmitValid, onFormInvalid)();
-  }, [handleSubmit, onSubmitValid, onFormInvalid]);
+    setSubmitAttempted(true);
+    handleSubmit(onSubmitValid)();
+  }, [handleSubmit, onSubmitValid]);
 
-  const hiddenValidationFieldList = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          hiddenValidationIssues.map((issue) => translateProjectValidationField(issue.field, t)),
-        ),
-      ).join(', '),
-    [hiddenValidationIssues, t],
+  const dateFieldError = useCallback(
+    (fieldName: DateFieldName, value: string, required?: boolean) => {
+      const formError = formState.errors[fieldName]?.message as string | undefined;
+      if (formError) {
+        return formError;
+      }
+
+      if (!submitAttempted) {
+        return undefined;
+      }
+
+      if (required && !value.trim()) {
+        return t('myWorkloadView.table.requiredField');
+      }
+
+      if (value.trim() && !normalizeMyWorkloadDate(value.trim())) {
+        return t('myWorkloadView.table.invalidDate');
+      }
+
+      return undefined;
+    },
+    [formState.errors, submitAttempted, t],
   );
+
+  const hiddenValidationFieldList = useMemo(() => {
+    return Array.from(
+      new Set(hiddenValidationIssues.map((issue) => translateProjectValidationField(issue.field, t))),
+    ).join(', ');
+  }, [hiddenValidationIssues, t]);
 
   const renderDateField = (field: {
     id: string;
     label: string;
-    key: MyWorkloadDateFieldName;
+    key: DateFieldName;
     required?: boolean;
   }) => {
     const requiredMessage = t('myWorkloadView.table.requiredField');
@@ -525,14 +526,10 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
               return true;
             }
 
-            if (!normalizeMyWorkloadDate(trimmedValue)) {
-              return invalidDateMessage;
-            }
-
-            return validateMyWorkloadDateOrder(field.key, trimmedValue, getValues, t);
+            return normalizeMyWorkloadDate(trimmedValue) ? true : invalidDateMessage;
           },
         }}
-        render={({ field: controllerField, fieldState: { error } }) => (
+        render={({ field: controllerField }) => (
           <div
             ref={dateFieldRefs[field.key]}
             className={`input-wrapper date-field-wrapper ${classes.editDialogDateField}`}
@@ -547,8 +544,8 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
               placeholder=""
               language="fi"
               required={field.required}
-              invalid={Boolean(error)}
-              errorText={error?.message}
+              invalid={Boolean(dateFieldError(field.key, controllerField.value ?? '', field.required))}
+              errorText={dateFieldError(field.key, controllerField.value ?? '', field.required)}
               initialMonth={new Date()}
             />
           </div>
@@ -571,11 +568,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         title={t('myWorkloadView.table.editDialogTitle')}
       />
       <Dialog.Content>
-        <div
-          className={classes.editDialogFields}
-          id="my-workload-edit-dialog-content"
-          ref={dialogContentRef}
-        >
+        <div className={classes.editDialogFields} id="my-workload-edit-dialog-content">
           <p className={classes.editDialogProjectSubtitle}>{project?.projectName ?? ''}</p>
 
           {hiddenValidationIssues.length > 0 && (
@@ -624,11 +617,13 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
                   id: 'my-workload-edit-presence-start',
                   key: 'presenceStart',
                   label: t('projectForm.presenceStart'),
+                  required: true,
                 })}
                 {renderDateField({
                   id: 'my-workload-edit-presence-end',
                   key: 'presenceEnd',
                   label: t('projectForm.presenceEnd'),
+                  required: true,
                 })}
               </div>
 
@@ -637,14 +632,55 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
                   id: 'my-workload-edit-visibility-start',
                   key: 'visibilityStart',
                   label: t('projectForm.visibilityStart'),
+                  required: true,
                 })}
                 {renderDateField({
                   id: 'my-workload-edit-visibility-end',
                   key: 'visibilityEnd',
                   label: t('projectForm.visibilityEnd'),
+                  required: true,
                 })}
               </div>
 
+              <hr className={classes.editDialogDivider} />
+
+              <h3 className={classes.editDialogSectionTitle}>
+                {t('myWorkloadView.table.designCostEstimateSectionTitle')}
+              </h3>
+
+              <div className={classes.editDialogPlanningEstimateRow}>
+                <TextField
+                  id="my-workload-edit-planning-cost-forecast"
+                  name="planningCostForecast"
+                  label="myWorkloadView.table.costEstimate"
+                  control={control as unknown as HookFormControlType}
+                  helperText={t('keur')}
+                />
+                <Controller
+                  name="planningPhaseId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="my-workload-edit-planning-phase"
+                      className={`${classes.editDialogPlanningPhaseSelect} custom-select`}
+                      options={planningPhaseOptions}
+                      value={field.value ?? ''}
+                      onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
+                      texts={{
+                        label: t('projectForm.planningPhase'),
+                        placeholder: t('choose'),
+                      }}
+                    />
+                  )}
+                />
+                <TextField
+                  id="my-workload-edit-planning-work-quantity"
+                  name="planningWorkQuantity"
+                  label="myWorkloadView.table.workQuantity"
+                  control={control as unknown as HookFormControlType}
+                  helperText={t('m2')}
+                />
+              </div>
               <hr className={classes.editDialogDivider} />
             </>
           )}
@@ -674,139 +710,54 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
             name="phaseId"
             control={control}
             rules={{ required: t('myWorkloadView.table.requiredField') }}
-            render={({ field, fieldState: { error } }) => (
-              <div ref={phaseFieldRef}>
-                <Select
-                  id="my-workload-edit-phase"
-                  className="custom-select"
-                  options={phaseOptions}
-                  value={field.value ?? ''}
-                  onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                  invalid={Boolean(error)}
-                  texts={{
-                    label: t('myWorkloadView.table.phase'),
-                    placeholder: t('select'),
-                    error: error?.message,
-                  }}
-                  required
-                />
-              </div>
+            render={({ field }) => (
+              <Select
+                id="my-workload-edit-phase"
+                className="custom-select"
+                options={phaseOptions}
+                value={field.value ?? ''}
+                onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
+                texts={{
+                  label: t('myWorkloadView.table.phase'),
+                  placeholder: t('select'),
+                }}
+                required
+              />
             )}
           />
-
-          <Controller
-            name="phaseDetailId"
-            control={control}
-            rules={{
-              validate: (value) =>
-                phaseHasDetails(phaseDetails, selectedPhaseId) && !value
-                  ? t('validation.required', { field: t('validation.phaseDetail') })
-                  : true,
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <div ref={phaseDetailFieldRef}>
-                <Select
-                  id="my-workload-edit-phase-detail"
-                  className="custom-select"
-                  options={phaseDetailOptions}
-                  value={field.value ?? ''}
-                  onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                  invalid={Boolean(error)}
-                  texts={{
-                    label: t('projectForm.phaseDetail'),
-                    placeholder: t('select'),
-                    error: error?.message,
-                  }}
-                  disabled={phaseDetailOptions.length === 0}
-                  required={phaseDetailOptions.length > 0}
-                />
-              </div>
-            )}
-          />
-
-          <hr className={classes.editDialogDivider} />
-
-          {isPlanningView && (
-            <>
-              <h3 className={classes.editDialogSectionTitle}>
-                {t('myWorkloadView.table.designCostEstimateSectionTitle')}
-              </h3>
-
-              <div className={classes.editDialogPlanningEstimateRow}>
-                <TextField
-                  id="my-workload-edit-planning-cost-forecast"
-                  name="planningCostForecast"
-                  label="myWorkloadView.table.costEstimate"
-                  control={control}
-                  helperText={t('keur')}
-                />
-                <Controller
-                  name="planningPhaseId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      id="my-workload-edit-planning-phase"
-                      className={`${classes.editDialogPlanningPhaseSelect} custom-select`}
-                      options={planningPhaseOptions}
-                      value={field.value ?? ''}
-                      onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                      texts={{
-                        label: t('projectForm.planningPhase'),
-                        placeholder: t('choose'),
-                      }}
-                    />
-                  )}
-                />
-                <TextField
-                  id="my-workload-edit-planning-work-quantity"
-                  name="planningWorkQuantity"
-                  label="myWorkloadView.table.workQuantity"
-                  control={control}
-                  helperText={t('m2')}
-                />
-              </div>
-            </>
+          {formState.errors.phaseId && (
+            <p className={classes.editDialogFieldError}>
+              {formState.errors.phaseId.message as string}
+            </p>
           )}
 
           {!isPlanningView && (
             <>
-              <h3 className={classes.editDialogSectionTitle}>
-                {t('myWorkloadView.table.constructionCostForecast')}
-              </h3>
-
-              <div className={classes.editDialogPlanningEstimateRow}>
-                <TextField
-                  id="my-workload-edit-construction-cost-forecast"
-                  name="constructionCostForecast"
-                  label="myWorkloadView.table.costEstimate"
-                  control={control}
-                  helperText={t('keur')}
-                />
-                <Controller
-                  name="constructionPhaseId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      id="my-workload-edit-construction-phase"
-                      className={`${classes.editDialogPlanningPhaseSelect} custom-select`}
-                      options={constructionPhaseOptions}
-                      value={field.value ?? ''}
-                      onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                      texts={{
-                        label: t('projectForm.constructionPhase'),
-                        placeholder: t('choose'),
-                      }}
-                    />
-                  )}
-                />
-                <TextField
-                  id="my-workload-edit-construction-work-quantity"
-                  name="constructionWorkQuantity"
-                  label="myWorkloadView.table.workQuantity"
-                  control={control}
-                  helperText={t('m2')}
-                />
-              </div>
+              <hr className={classes.editDialogDivider} />
+              <Controller
+                name="costForecast"
+                control={control}
+                rules={{
+                  validate: (value) =>
+                    currencyToRequestValue(value ?? '')
+                      ? true
+                      : t('myWorkloadView.table.requiredField'),
+                }}
+                render={({ field }) => (
+                  <TextInput
+                    id="my-workload-edit-cost-forecast"
+                    label={t('myWorkloadView.table.totalBudget')}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    onBlur={() => {
+                      field.onBlur();
+                      setValue('costForecast', formatBudgetEuro(getValues('costForecast')));
+                    }}
+                    errorText={formState.errors.costForecast?.message as string | undefined}
+                    required
+                  />
+                )}
+              />
             </>
           )}
         </div>
