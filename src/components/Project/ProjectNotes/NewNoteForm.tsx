@@ -7,7 +7,7 @@ import { memo, useCallback, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { usePostNoteMutation } from '@/api/notesApi';
-import NotesFileInput from './NoteFileInput';
+import NoteFileInput from './NoteFileInput';
 import usePostNoteImages from './usePostNoteImages';
 
 const ProjectNewNoteForm = () => {
@@ -47,7 +47,7 @@ const ProjectNewNoteForm = () => {
             render={({ field }) => <TextArea {...field} id="textarea" label={t('writeNote')} />}
           />
         </div>
-        {isPostingNoteImage ? null : <NotesFileInput handleChange={setFiles} />}
+        {isPostingNoteImage ? null : <NoteFileInput handleChange={setFiles} />}
         <Button size={ButtonSize.Small} type="submit" disabled={!isDirty}>
           {t('save')}
         </Button>

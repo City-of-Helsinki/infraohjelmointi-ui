@@ -7,11 +7,13 @@ export interface INote {
   history: Array<INoteHistory>;
 }
 
+type INoteImageContentType = 'image/jpeg' | 'image/png';
+
 export interface INoteImage {
   id: string;
   url: string;
   fileName: string;
-  contentType: string;
+  contentType: INoteImageContentType;
   size: number;
   createdDate: string;
   order: number;

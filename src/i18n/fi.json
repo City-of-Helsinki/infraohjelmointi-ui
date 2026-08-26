@@ -701,7 +701,10 @@
       "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
       "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
       "linkCopyFailed": "Linkin kopiointi epäonnistui",
-      "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen."
+      "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
+      "noteImageGetError": "Muistiinpanoon liitetyn kuvan lataaminen epäonnistui.",
+      "noteImagePostError": "Muistiinpanoon liitetyn kuvan lisääminen epäonnistui.",
+      "noteImageDeleteError": "Muistiinpanoon liitetyn kuvan poistaminen epäonnistui."
     }
   },
   "searchOrder": {
