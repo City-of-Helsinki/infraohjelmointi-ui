@@ -6,7 +6,13 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
-import { validateAfter, validateBefore, validateSameOrAfter } from '@/utils/validation';
+import {
+  validateAfter,
+  validateBefore,
+  validateSameOrAfter,
+  validateScheduleDateOrder,
+  IScheduleDates,
+} from '@/utils/validation';
 import { createDateToStartOfYear, isBefore } from '@/utils/dates';
 
 interface IProjectScheduleSectionProps {
@@ -78,6 +84,22 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     [phases],
   );
 
+  // Resolves the current schedule dates under the canonical names validateScheduleDateOrder
+  // expects, since this form's own field names (estPlanningStart, etc.) differ from them.
+  const getScheduleDates = useCallback(
+    (): IScheduleDates => ({
+      planningStart: getValues('estPlanningStart'),
+      planningEnd: getValues('estPlanningEnd'),
+      presenceStart: getValues('presenceStart'),
+      presenceEnd: getValues('presenceEnd'),
+      visibilityStart: getValues('visibilityStart'),
+      visibilityEnd: getValues('visibilityEnd'),
+      constructionStart: getValues('estConstructionStart'),
+      constructionEnd: getValues('estConstructionEnd'),
+    }),
+    [getValues],
+  );
+
   const validateEstPlanningStart = useCallback(() => {
     return {
       validate: {
@@ -102,17 +124,11 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return t('validation.required', { field: t('validation.estPlanningStart') });
           }
 
-          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
-
-          if (beforePlanningEnd !== true) {
-            return beforePlanningEnd;
-          }
-
-          return true;
+          return validateScheduleDateOrder('planningStart', date, getScheduleDates(), t);
         },
       },
     };
-  }, [getValues, phasesThatNeedPlanning, t, getFieldState, isUserOnlyProjectManager]);
+  }, [getValues, getScheduleDates, phasesThatNeedPlanning, t, getFieldState, isUserOnlyProjectManager]);
 
   const validateEstPlanningEnd = useCallback(() => {
     return {
@@ -124,111 +140,47 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return t('validation.required', { field: t('validation.estPlanningEnd') });
           }
 
-          const afterPlanningStart = validateAfter(date, 'estPlanningStart', getValues, t);
-
-          if (afterPlanningStart !== true) {
-            return afterPlanningStart;
-          }
-
-          return true;
+          return validateScheduleDateOrder('planningEnd', date, getScheduleDates(), t);
         },
       },
     };
-  }, [getValues, phasesThatNeedPlanning, t]);
+  }, [getScheduleDates, getValues, phasesThatNeedPlanning, t]);
 
   const validatePresenceStart = useCallback(() => {
     return {
       validate: {
-        isPresenceStartValid: (date: string | null) => {
-          const beforePresenceEnd = validateBefore(date, 'presenceEnd', getValues, t);
-
-          if (beforePresenceEnd !== true) {
-            return beforePresenceEnd;
-          }
-
-          const afterPlanningStart = validateAfter(date, 'estPlanningStart', getValues, t);
-
-          if (afterPlanningStart !== true) {
-            return afterPlanningStart;
-          }
-
-          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
-
-          if (beforePlanningEnd !== true) {
-            return beforePlanningEnd;
-          }
-
-          return true;
-        },
+        isPresenceStartValid: (date: string | null) =>
+          validateScheduleDateOrder('presenceStart', date, getScheduleDates(), t),
       },
     };
-  }, [getValues, t]);
+  }, [getScheduleDates, t]);
 
   const validatePresenceEnd = useCallback(() => {
     return {
       validate: {
-        isPresenceEndValid: (date: string | null) => {
-          const afterPresenceStart = validateAfter(date, 'presenceStart', getValues, t);
-
-          if (afterPresenceStart !== true) {
-            return afterPresenceStart;
-          }
-
-          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
-
-          if (beforePlanningEnd !== true) {
-            return beforePlanningEnd;
-          }
-
-          return true;
-        },
+        isPresenceEndValid: (date: string | null) =>
+          validateScheduleDateOrder('presenceEnd', date, getScheduleDates(), t),
       },
     };
-  }, [getValues, t]);
+  }, [getScheduleDates, t]);
 
   const validateVisibilityStart = useCallback(() => {
     return {
       validate: {
-        isVisibilityStartValid: (date: string | null) => {
-          const beforeVisibilityEnd = validateBefore(date, 'visibilityEnd', getValues, t);
-
-          if (beforeVisibilityEnd !== true) {
-            return beforeVisibilityEnd;
-          }
-
-          const afterPlanningStarts = validateAfter(date, 'estPlanningStart', getValues, t);
-
-          if (afterPlanningStarts !== true) {
-            return afterPlanningStarts;
-          }
-
-          return true;
-        },
+        isVisibilityStartValid: (date: string | null) =>
+          validateScheduleDateOrder('visibilityStart', date, getScheduleDates(), t),
       },
     };
-  }, [getValues, t]);
+  }, [getScheduleDates, t]);
 
   const validateVisibilityEnd = useCallback(() => {
     return {
       validate: {
-        isVisibilityEndValid: (date: string | null) => {
-          const afterVisibilityStart = validateAfter(date, 'visibilityStart', getValues, t);
-
-          if (afterVisibilityStart !== true) {
-            return afterVisibilityStart;
-          }
-
-          const beforePlanningEnds = validateBefore(date, 'estPlanningEnd', getValues, t);
-
-          if (beforePlanningEnds !== true) {
-            return beforePlanningEnds;
-          }
-
-          return true;
-        },
+        isVisibilityEndValid: (date: string | null) =>
+          validateScheduleDateOrder('visibilityEnd', date, getScheduleDates(), t),
       },
     };
-  }, [getValues, t]);
+  }, [getScheduleDates, t]);
 
   const validateEstConstructionStart = useCallback(() => {
     return {
@@ -240,23 +192,11 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return t('validation.required', { field: t('validation.estConstructionStart') });
           }
 
-          const afterPlanningEnd = validateAfter(date, 'estPlanningEnd', getValues, t);
-
-          if (afterPlanningEnd !== true) {
-            return afterPlanningEnd;
-          }
-
-          const beforeConstructionEnd = validateBefore(date, 'estConstructionEnd', getValues, t);
-
-          if (beforeConstructionEnd !== true) {
-            return validateBefore(date, 'estConstructionEnd', getValues, t);
-          }
-
-          return true;
+          return validateScheduleDateOrder('constructionStart', date, getScheduleDates(), t);
         },
       },
     };
-  }, [getValues, phasesThatNeedConstruction, t]);
+  }, [getScheduleDates, getValues, phasesThatNeedConstruction, t]);
 
   const validateEstConstructionEnd = useCallback(() => {
     return {
@@ -279,10 +219,15 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return t('validation.required', { field: t('validation.estConstructionEnd') });
           }
 
-          const afterConstructionStart = validateAfter(date, 'estConstructionStart', getValues, t);
+          const afterConstructionStart = validateScheduleDateOrder(
+            'constructionEnd',
+            date,
+            getScheduleDates(),
+            t,
+          );
 
           if (afterConstructionStart !== true) {
-            return validateAfter(date, 'estConstructionStart', getValues, t);
+            return afterConstructionStart;
           }
 
           const warrantyPhaseStart = getValues('estWarrantyPhaseStart');
@@ -296,7 +241,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, phasesThatNeedConstruction, t, getFieldState]);
+  }, [getScheduleDates, getValues, phasesThatNeedConstruction, t, getFieldState]);
 
   const validateWarrantyPhaseStart = useCallback(() => {
     return {

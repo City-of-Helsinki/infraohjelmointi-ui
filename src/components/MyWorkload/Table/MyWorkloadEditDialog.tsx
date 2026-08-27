@@ -19,7 +19,7 @@ import {
   Select,
 } from 'hds-react';
 import { FC, MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, useWatch } from 'react-hook-form';
+import { Controller, SubmitErrorHandler, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from '../styles.module.css';
@@ -28,9 +28,12 @@ import {
   getMyWorkloadProjectRequestFields,
   myWorkloadValuesToProjectRequest,
 } from '@/utils/myWorkloadProjectRequest';
+import { collectErrorFieldNames, scrollToFirstField } from '@/utils/formErrorHelpers';
 import useMyWorkloadEditForm, {
   IMyWorkloadEditFormValues,
+  MyWorkloadDateFieldName,
   mapProjectToFormValues,
+  validateMyWorkloadDateOrder,
 } from './useMyWorkloadEditForm';
 
 interface MyWorkloadEditDialogProps {
@@ -40,16 +43,6 @@ interface MyWorkloadEditDialogProps {
   onClose: () => void;
   onSave: (row: MyWorkloadTableRow) => void;
 }
-
-type DateFieldName =
-  | 'planningStart'
-  | 'planningEnd'
-  | 'presenceStart'
-  | 'presenceEnd'
-  | 'visibilityStart'
-  | 'visibilityEnd'
-  | 'constructionStart'
-  | 'constructionEnd';
 
 const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   isOpen,
@@ -66,6 +59,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const planningPhases = useAppSelector((state) => state.lists.planningPhases);
   const constructionPhases = useAppSelector((state) => state.lists.constructionPhases);
   const [patchProject, { isLoading }] = usePatchProjectMutation();
+  const dialogContentRef = useRef<HTMLDivElement | null>(null);
   const planningStartFieldRef = useRef<HTMLDivElement | null>(null);
   const planningEndFieldRef = useRef<HTMLDivElement | null>(null);
   const presenceStartFieldRef = useRef<HTMLDivElement | null>(null);
@@ -74,6 +68,8 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const visibilityEndFieldRef = useRef<HTMLDivElement | null>(null);
   const constructionStartFieldRef = useRef<HTMLDivElement | null>(null);
   const constructionEndFieldRef = useRef<HTMLDivElement | null>(null);
+  const phaseFieldRef = useRef<HTMLDivElement | null>(null);
+  const phaseDetailFieldRef = useRef<HTMLDivElement | null>(null);
   const { control, getValues, handleSubmit, setValue, clearErrors } =
     useMyWorkloadEditForm(project);
 
@@ -92,6 +88,16 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       constructionEnd: constructionEndFieldRef,
     }),
     [],
+  );
+
+  // All fields whose containers we can scroll/focus when they fail validation on submit.
+  const errorFieldRefs = useMemo(
+    () => ({
+      ...dateFieldRefs,
+      phaseId: phaseFieldRef,
+      phaseDetailId: phaseDetailFieldRef,
+    }),
+    [dateFieldRefs],
   );
 
   const phaseOptions = useMemo(
@@ -285,14 +291,29 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     [dispatch, isPlanningView, onClose, onSave, patchProject, project, t],
   );
 
+  const onFormInvalid = useCallback<SubmitErrorHandler<IMyWorkloadEditFormValues>>(
+    (errors) => {
+      const fieldNames = collectErrorFieldNames(errors);
+      const preferredElements = fieldNames
+        .map((fieldName) => errorFieldRefs[fieldName as keyof typeof errorFieldRefs]?.current)
+        .filter((element): element is HTMLDivElement => Boolean(element));
+
+      // focus: false avoids a blur-triggered revalidation loop on the HDS date inputs
+      scrollToFirstField(dialogContentRef.current, preferredElements, fieldNames, {
+        focus: false,
+      });
+    },
+    [errorFieldRefs],
+  );
+
   const onSubmit = useCallback(() => {
-    handleSubmit(onSubmitValid)();
-  }, [handleSubmit, onSubmitValid]);
+    handleSubmit(onSubmitValid, onFormInvalid)();
+  }, [handleSubmit, onSubmitValid, onFormInvalid]);
 
   const renderDateField = (field: {
     id: string;
     label: string;
-    key: DateFieldName;
+    key: MyWorkloadDateFieldName;
     required?: boolean;
   }) => {
     const requiredMessage = t('myWorkloadView.table.requiredField');
@@ -315,7 +336,11 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
               return true;
             }
 
-            return normalizeMyWorkloadDate(trimmedValue) ? true : invalidDateMessage;
+            if (!normalizeMyWorkloadDate(trimmedValue)) {
+              return invalidDateMessage;
+            }
+
+            return validateMyWorkloadDateOrder(field.key, trimmedValue, getValues, t);
           },
         }}
         render={({ field: controllerField, fieldState: { error } }) => (
@@ -357,7 +382,11 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         title={t('myWorkloadView.table.editDialogTitle')}
       />
       <Dialog.Content>
-        <div className={classes.editDialogFields} id="my-workload-edit-dialog-content">
+        <div
+          className={classes.editDialogFields}
+          id="my-workload-edit-dialog-content"
+          ref={dialogContentRef}
+        >
           <p className={classes.editDialogProjectSubtitle}>{project?.projectName ?? ''}</p>
 
           {isPlanningView && (
@@ -437,20 +466,22 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
             control={control}
             rules={{ required: t('myWorkloadView.table.requiredField') }}
             render={({ field, fieldState: { error } }) => (
-              <Select
-                id="my-workload-edit-phase"
-                className="custom-select"
-                options={phaseOptions}
-                value={field.value ?? ''}
-                onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                invalid={Boolean(error)}
-                texts={{
-                  label: t('myWorkloadView.table.phase'),
-                  placeholder: t('select'),
-                  error: error?.message,
-                }}
-                required
-              />
+              <div ref={phaseFieldRef}>
+                <Select
+                  id="my-workload-edit-phase"
+                  className="custom-select"
+                  options={phaseOptions}
+                  value={field.value ?? ''}
+                  onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
+                  invalid={Boolean(error)}
+                  texts={{
+                    label: t('myWorkloadView.table.phase'),
+                    placeholder: t('select'),
+                    error: error?.message,
+                  }}
+                  required
+                />
+              </div>
             )}
           />
 
@@ -464,21 +495,23 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
                   : true,
             }}
             render={({ field, fieldState: { error } }) => (
-              <Select
-                id="my-workload-edit-phase-detail"
-                className="custom-select"
-                options={phaseDetailOptions}
-                value={field.value ?? ''}
-                onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
-                invalid={Boolean(error)}
-                texts={{
-                  label: t('projectForm.phaseDetail'),
-                  placeholder: t('select'),
-                  error: error?.message,
-                }}
-                disabled={phaseDetailOptions.length === 0}
-                required={phaseDetailOptions.length > 0}
-              />
+              <div ref={phaseDetailFieldRef}>
+                <Select
+                  id="my-workload-edit-phase-detail"
+                  className="custom-select"
+                  options={phaseDetailOptions}
+                  value={field.value ?? ''}
+                  onChange={(_, clickedOption: Option) => field.onChange(clickedOption.value)}
+                  invalid={Boolean(error)}
+                  texts={{
+                    label: t('projectForm.phaseDetail'),
+                    placeholder: t('select'),
+                    error: error?.message,
+                  }}
+                  disabled={phaseDetailOptions.length === 0}
+                  required={phaseDetailOptions.length > 0}
+                />
+              </div>
             )}
           />
 

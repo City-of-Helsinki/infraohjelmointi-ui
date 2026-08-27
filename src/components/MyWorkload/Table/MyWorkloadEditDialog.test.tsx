@@ -181,6 +181,24 @@ describe('MyWorkloadEditDialog', () => {
     });
   });
 
+  it('blocks submit when planning end date is set after construction start date', async () => {
+    const { user, getByRole, getByLabelText, getAllByText } = renderDialog('planning');
+
+    const planningEndInput = getByLabelText(/^myWorkloadView\.table\.planningEnd/);
+    fireEvent.input(planningEndInput, {
+      // baseProject.constructionStart is 01.04.2027
+      target: { value: '01.05.2027' },
+    });
+    fireEvent.blur(planningEndInput);
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    expect(mockPatchProject).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getAllByText('validation.isBefore').length).toBeGreaterThan(0);
+    });
+  });
+
   it('shows phase detail validation through the select when the selected phase has details', async () => {
     const constructionProject = {
       ...baseProject,
@@ -211,7 +229,7 @@ describe('MyWorkloadEditDialog', () => {
       unwrap: () =>
         Promise.resolve({
           id: baseProject.id,
-          estPlanningStart: '2026-07-01',
+          estPlanningStart: '2026-01-05',
           phase: {
             id: mockProjectPhases.data[1].id,
             value: 'design',
@@ -223,7 +241,7 @@ describe('MyWorkloadEditDialog', () => {
 
     const planningStartInput = getByLabelText(/^myWorkloadView\.table\.planningStart/);
     fireEvent.input(planningStartInput, {
-      target: { value: '1.7.2026' },
+      target: { value: '5.1.2026' },
     });
     fireEvent.blur(planningStartInput);
 
@@ -232,7 +250,7 @@ describe('MyWorkloadEditDialog', () => {
     await waitFor(() => {
       expect(mockPatchProject).toHaveBeenCalledWith({
         id: baseProject.id,
-        data: { estPlanningStart: '01.07.2026' },
+        data: { estPlanningStart: '05.01.2026' },
       });
     });
   });

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { TFunction } from 'i18next';
+import { useForm, UseFormGetValues } from 'react-hook-form';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
+import { IScheduleDates, validateScheduleDateOrder } from '@/utils/validation';
 
 export interface IMyWorkloadEditFormValues {
   planningStart: string;
@@ -20,6 +22,16 @@ export interface IMyWorkloadEditFormValues {
   phaseId: string;
   phaseDetailId: string;
 }
+
+export type MyWorkloadDateFieldName =
+  | 'planningStart'
+  | 'planningEnd'
+  | 'presenceStart'
+  | 'presenceEnd'
+  | 'visibilityStart'
+  | 'visibilityEnd'
+  | 'constructionStart'
+  | 'constructionEnd';
 
 export const emptyMyWorkloadEditFormValues: IMyWorkloadEditFormValues = {
   planningStart: '',
@@ -65,6 +77,30 @@ export const mapProjectToFormValues = (
     phaseId: project.phase.id,
     phaseDetailId: project.phaseDetail.id,
   };
+};
+
+/**
+ * Date order validation for the MyWorkload edit dialog. The actual order rules are validated in
+ * validateScheduleDateOrder, shared with ProjectForm's schedule section.
+ */
+export const validateMyWorkloadDateOrder = (
+  field: MyWorkloadDateFieldName,
+  value: string,
+  getValues: UseFormGetValues<IMyWorkloadEditFormValues>,
+  t: TFunction<'translation'>,
+): string | true => {
+  const dates: IScheduleDates = {
+    planningStart: getValues('planningStart'),
+    planningEnd: getValues('planningEnd'),
+    presenceStart: getValues('presenceStart'),
+    presenceEnd: getValues('presenceEnd'),
+    visibilityStart: getValues('visibilityStart'),
+    visibilityEnd: getValues('visibilityEnd'),
+    constructionStart: getValues('constructionStart'),
+    constructionEnd: getValues('constructionEnd'),
+  };
+
+  return validateScheduleDateOrder(field, value, dates, t);
 };
 
 const useMyWorkloadEditForm = (project: MyWorkloadTableRow | null) => {

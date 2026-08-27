@@ -38,7 +38,7 @@ import {
   collectErrorElements,
   collectErrorFieldNames,
   scrollToFirstField,
-} from './projectFormErrorHelpers';
+} from '@/utils/formErrorHelpers';
 
 interface IProjectFormProps {
   project: IProject | null;
