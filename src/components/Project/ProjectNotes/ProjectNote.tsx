@@ -1,4 +1,3 @@
-import { FormFieldLabel } from '@/components/shared';
 import { StatusLabel } from 'hds-react';
 import { Button, ButtonSize, ButtonVariant } from 'hds-react';
 import { IconAngleDown, IconAngleUp, IconPenLine, IconTrash } from 'hds-react/icons';
@@ -9,6 +8,8 @@ import DeleteNoteForm from './DeleteNoteForm';
 import EditNoteForm from './EditNoteForm';
 import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
 import { sortArrayByDates, stringToDateTime } from '@/utils/dates';
+import NoteAttachmentList from './NoteAttachmentList';
+import { useGetNoteImagesQuery, useDeleteNoteImageMutation } from '@/api/notesApi';
 
 interface IProjectNoteProps {
   note: INote;
@@ -42,13 +43,16 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
     [note.history],
   );
 
+  const { data: noteImages } = useGetNoteImagesQuery(note.id);
+  const [deleteNoteImage] = useDeleteNoteImageMutation();
+
   return (
     <div className="note-container" data-testid="note-container">
       {/* header */}
       <div className="note-header-container">
         <div className="flex flex-col">
           <span className="mb-1 text-sm font-light">{stringToDateTime(note.createdDate)}</span>
-          <FormFieldLabel text={author} />
+          <p className="font-medium">{author}</p>
         </div>
         <div>{hasHistory && <StatusLabel type="alert">{t('modified')}</StatusLabel>}</div>
       </div>
@@ -58,18 +62,6 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       </div>
       {/* footer (buttons) */}
       <div className="note-footer">
-        <div>
-          {hasHistory && (
-            <Button
-              size={ButtonSize.Small}
-              variant={ButtonVariant.Supplementary}
-              iconEnd={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
-              onClick={handleOpenModifiedInfo}
-            >
-              {t('editHistory')}
-            </Button>
-          )}
-        </div>
         <div>
           <Button
             size={ButtonSize.Small}
@@ -89,6 +81,26 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
           </Button>
         </div>
       </div>
+      {noteImages && noteImages.length > 0 && (
+        <div className="pb-8 pl-6 pr-2 pt-8">
+          <NoteAttachmentList
+            attachments={noteImages ?? []}
+            onDeleteAttachment={(imageId) => deleteNoteImage({ noteId: note.id, imageId })}
+          />
+        </div>
+      )}
+      {hasHistory && (
+        <div className="px-3 pb-4">
+          <Button
+            size={ButtonSize.Small}
+            variant={ButtonVariant.Supplementary}
+            iconEnd={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
+            onClick={handleOpenModifiedInfo}
+          >
+            {t('editHistory')}
+          </Button>
+        </div>
+      )}
       {/* history (sorted by updated) */}
       {openModifiedInfo &&
         sortedHistory()?.map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}

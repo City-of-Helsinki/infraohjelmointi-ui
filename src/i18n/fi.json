@@ -704,7 +704,10 @@
       "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
       "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
       "linkCopyFailed": "Linkin kopiointi epäonnistui",
-      "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen."
+      "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
+      "noteImageGetError": "Muistiinpanoon liitetyn kuvan lataaminen epäonnistui.",
+      "noteImagePostError": "Muistiinpanoon liitetyn kuvan lisääminen epäonnistui.",
+      "noteImageDeleteError": "Muistiinpanoon liitetyn kuvan poistaminen epäonnistui."
     }
   },
   "searchOrder": {
@@ -852,6 +855,23 @@
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
+  "noteAttachments": {
+    "dragAndDrop": "Raahaa liitetiedosto",
+    "imageAttachments": "Kuvaliitteet",
+    "attachmentAdded": "Liitetiedosto lisätty",
+    "view": "Näytä",
+    "viewAttachment": "Näytä liite {{fileName}}",
+    "deleteDialog": {
+      "title": "Poistetaanko liite?",
+      "description": "Haluatko varmasti poistaa tämän liitteen?",
+      "delete": "Poista liite"
+    }
+  },
+  "attachmentSlideshowDialog": {
+    "nextImage": "Seuraava kuva",
+    "previousImage": "Edellinen kuva",
+    "close": "Sulje"
+  },
   "report": {
     "shared": {
       "ta": "TA",
