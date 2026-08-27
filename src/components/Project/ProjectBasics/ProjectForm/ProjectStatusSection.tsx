@@ -16,7 +16,12 @@ import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
-import { listItemToOption, mapIconKey } from '@/utils/common';
+import { mapIconKey } from '@/utils/common';
+import {
+  getProjectPhaseDetailOptions,
+  phaseDetailBelongsToPhase,
+  phaseHasDetails,
+} from '@/utils/projectPhaseDetails';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
@@ -78,12 +83,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
 
-  const filteredPhaseDetails = useMemo(() => {
-    if (!currentPhase) return [];
-    return allPhaseDetails
-      .filter((detail) => detail.projectPhase?.id === currentPhase)
-      .map((detail) => listItemToOption(detail));
-  }, [allPhaseDetails, currentPhase]);
+  const filteredPhaseDetails = useMemo(
+    () => getProjectPhaseDetailOptions(allPhaseDetails, currentPhase),
+    [allPhaseDetails, currentPhase],
+  );
 
   const watchedConstructionProcurementMethod = useWatchField(
     'constructionProcurementMethod',
@@ -115,10 +118,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   useEffect(() => {
     const currentDetail = getValues('phaseDetail');
     if (currentDetail?.value) {
-      const detailBelongsToPhase = allPhaseDetails.some(
-        (d) => d.id === currentDetail.value && d.projectPhase?.id === currentPhase,
-      );
-      if (!detailBelongsToPhase) {
+      if (!phaseDetailBelongsToPhase(allPhaseDetails, currentDetail.value, currentPhase)) {
         setValue('phaseDetail', { value: '', label: '' }, { shouldDirty: true });
       }
     }
@@ -316,9 +316,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       validate: {
         isPhaseDetailValid: (phaseDetail: IOption) => {
           const phase = getValues('phase');
-          const hasDetailsForPhase = allPhaseDetails.some(
-            (d) => d.projectPhase?.id === phase.value,
-          );
+          const hasDetailsForPhase = phaseHasDetails(allPhaseDetails, phase.value);
           if (hasDetailsForPhase && (!phaseDetail || phaseDetail.value === '')) {
             return t('validation.required', { field: t('validation.phaseDetail') });
           }

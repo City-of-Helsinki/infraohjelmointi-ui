@@ -2,7 +2,8 @@ import moment from 'moment';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { MyWorkloadViewType, PhaseInfo } from '@/interfaces/myWorkloadInterfaces';
+import { IListItem } from '@/interfaces/common';
 
 const MY_WORKLOAD_DATE_FORMATS = ['DD.MM.YYYY', 'D.M.YYYY', 'YYYY-MM-DD'];
 
@@ -30,6 +31,15 @@ export const getMyWorkloadDateTimeValue = (date?: string | null): number => {
   const parsed = parseMyWorkloadDate(date);
   return parsed ? parsed.valueOf() : Number.NEGATIVE_INFINITY;
 };
+
+export const toPhaseInfo = (
+  listItem: IListItem | undefined,
+  translate: (key: string) => string,
+): PhaseInfo => ({
+  id: listItem?.id ?? '',
+  label: listItem?.value ? translate(`option.${listItem.value}`) : '',
+  value: listItem?.value ?? '',
+});
 
 const hasResponsibleEmailMatch = (emailFromProject: string | undefined, userEmail: string) =>
   emailFromProject?.toLowerCase() === userEmail;

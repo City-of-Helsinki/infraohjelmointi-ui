@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { TFunction } from 'i18next';
+import { useForm, UseFormGetValues } from 'react-hook-form';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import { formatBudgetEuro } from '@/utils/currencyUtils';
+import { IScheduleDates, validateScheduleDateOrder } from '@/utils/validation';
 
 export interface IMyWorkloadEditFormValues {
   planningStart: string;
@@ -12,14 +13,25 @@ export interface IMyWorkloadEditFormValues {
   visibilityEnd: string;
   constructionStart: string;
   constructionEnd: string;
-  projectCostForecast: string;
   planningCostForecast: string;
   planningPhaseId: string;
   planningWorkQuantity: string;
   constructionCostForecast: string;
-  costForecast: string;
+  constructionPhaseId: string;
+  constructionWorkQuantity: string;
   phaseId: string;
+  phaseDetailId: string;
 }
+
+export type MyWorkloadDateFieldName =
+  | 'planningStart'
+  | 'planningEnd'
+  | 'presenceStart'
+  | 'presenceEnd'
+  | 'visibilityStart'
+  | 'visibilityEnd'
+  | 'constructionStart'
+  | 'constructionEnd';
 
 export const emptyMyWorkloadEditFormValues: IMyWorkloadEditFormValues = {
   planningStart: '',
@@ -30,16 +42,19 @@ export const emptyMyWorkloadEditFormValues: IMyWorkloadEditFormValues = {
   visibilityEnd: '',
   constructionStart: '',
   constructionEnd: '',
-  projectCostForecast: '',
   planningCostForecast: '',
   planningPhaseId: '',
   planningWorkQuantity: '',
   constructionCostForecast: '',
-  costForecast: '',
+  constructionPhaseId: '',
+  constructionWorkQuantity: '',
   phaseId: '',
+  phaseDetailId: '',
 };
 
-const mapProjectToFormValues = (project: MyWorkloadTableRow | null): IMyWorkloadEditFormValues => {
+export const mapProjectToFormValues = (
+  project: MyWorkloadTableRow | null,
+): IMyWorkloadEditFormValues => {
   if (!project) {
     return emptyMyWorkloadEditFormValues;
   }
@@ -53,14 +68,39 @@ const mapProjectToFormValues = (project: MyWorkloadTableRow | null): IMyWorkload
     visibilityEnd: project.visibilityEnd,
     constructionStart: project.constructionStart,
     constructionEnd: project.constructionEnd,
-    projectCostForecast: project.projectCostForecast,
     planningCostForecast: project.planningCostForecast,
     planningPhaseId: project.planningPhaseId,
     planningWorkQuantity: project.planningWorkQuantity,
     constructionCostForecast: project.constructionCostForecast,
-    costForecast: formatBudgetEuro(project.costForecast),
-    phaseId: project.phaseId,
+    constructionPhaseId: project.constructionPhaseId,
+    constructionWorkQuantity: project.constructionWorkQuantity,
+    phaseId: project.phase.id,
+    phaseDetailId: project.phaseDetail.id,
   };
+};
+
+/**
+ * Date order validation for the MyWorkload edit dialog. The actual order rules are validated in
+ * validateScheduleDateOrder, shared with ProjectForm's schedule section.
+ */
+export const validateMyWorkloadDateOrder = (
+  field: MyWorkloadDateFieldName,
+  value: string,
+  getValues: UseFormGetValues<IMyWorkloadEditFormValues>,
+  t: TFunction<'translation'>,
+): string | true => {
+  const dates: IScheduleDates = {
+    planningStart: getValues('planningStart'),
+    planningEnd: getValues('planningEnd'),
+    presenceStart: getValues('presenceStart'),
+    presenceEnd: getValues('presenceEnd'),
+    visibilityStart: getValues('visibilityStart'),
+    visibilityEnd: getValues('visibilityEnd'),
+    constructionStart: getValues('constructionStart'),
+    constructionEnd: getValues('constructionEnd'),
+  };
+
+  return validateScheduleDateOrder(field, value, dates, t);
 };
 
 const useMyWorkloadEditForm = (project: MyWorkloadTableRow | null) => {

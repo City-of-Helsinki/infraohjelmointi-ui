@@ -1,9 +1,14 @@
 import mockI18next from '@/mocks/mockI18next';
-import { mockPlanningPhases, mockProjectPhases } from '@/mocks/mockLists';
+import {
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectPhaseDetails,
+  mockProjectPhases,
+} from '@/mocks/mockLists';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import { waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
@@ -41,15 +46,22 @@ const baseProject: MyWorkloadTableRow = {
   visibilityEnd: '31.10.2026',
   constructionStart: '01.04.2027',
   constructionEnd: '31.10.2027',
-  projectCostForecast: '800',
   planningCostForecast: '300',
   planningPhaseId: mockPlanningPhases.data[0].id,
   planningWorkQuantity: '150',
   constructionCostForecast: '500',
-  costForecast: '1000',
-  phase: 'option.design',
-  phaseValue: 'design',
-  phaseId: mockProjectPhases.data[1].id,
+  constructionPhaseId: mockConstructionPhases.data[0].id,
+  constructionWorkQuantity: '250',
+  phase: {
+    id: mockProjectPhases.data[1].id,
+    label: 'option.design',
+    value: 'design',
+  },
+  phaseDetail: {
+    id: '',
+    label: '',
+    value: '',
+  },
   functions: 'myWorkloadView.table.modifyInformation',
   budget: '',
   constructionProcurementMethod: undefined,
@@ -81,7 +93,9 @@ const renderDialog = (
         lists: {
           ...store.getState().lists,
           phases: mockProjectPhases.data,
+          projectPhaseDetails: mockProjectPhaseDetails.data,
           planningPhases: mockPlanningPhases.data,
+          constructionPhases: mockConstructionPhases.data,
         },
       },
     },
@@ -116,7 +130,7 @@ describe('MyWorkloadEditDialog', () => {
       planningStart: '',
     };
 
-    const { user, getByRole, queryByText } = renderDialog(
+    const { user, getByRole, getAllByText } = renderDialog(
       'planning',
       projectWithMissingRequiredDate,
     );
@@ -124,7 +138,9 @@ describe('MyWorkloadEditDialog', () => {
     await user.click(getByRole('button', { name: 'save' }));
 
     expect(mockPatchProject).not.toHaveBeenCalled();
-    expect(queryByText('myWorkloadView.table.requiredField')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getAllByText('myWorkloadView.table.requiredField').length).toBeGreaterThan(0);
+    });
   });
 
   it('clears validation errors when dialog is closed', async () => {
@@ -133,18 +149,20 @@ describe('MyWorkloadEditDialog', () => {
       planningStart: '',
     };
 
-    const { user, getByRole, queryByText, onClose } = renderDialog(
+    const { user, getByRole, getAllByText, queryAllByText, onClose } = renderDialog(
       'planning',
       projectWithMissingRequiredDate,
     );
 
     await user.click(getByRole('button', { name: 'save' }));
-    expect(queryByText('myWorkloadView.table.requiredField')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getAllByText('myWorkloadView.table.requiredField').length).toBeGreaterThan(0);
+    });
 
     await user.click(getByRole('button', { name: 'cancel' }));
 
     expect(onClose).toHaveBeenCalled();
-    expect(queryByText('myWorkloadView.table.requiredField')).not.toBeInTheDocument();
+    expect(queryAllByText('myWorkloadView.table.requiredField').length).toBe(0);
   });
 
   it('blocks submit when date format is invalid', async () => {
@@ -153,57 +171,99 @@ describe('MyWorkloadEditDialog', () => {
       planningStart: '31-12-2026',
     };
 
-    const { user, getByRole, queryByText } = renderDialog('planning', projectWithInvalidDate);
+    const { user, getByRole, getAllByText } = renderDialog('planning', projectWithInvalidDate);
 
     await user.click(getByRole('button', { name: 'save' }));
 
     expect(mockPatchProject).not.toHaveBeenCalled();
-    expect(queryByText('myWorkloadView.table.invalidDate')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getAllByText('myWorkloadView.table.invalidDate').length).toBeGreaterThan(0);
+    });
   });
 
-  it('accepts valid date format without leading zeros from datepicker and normalizes payload', async () => {
+  it('blocks submit when planning end date is set after construction start date', async () => {
+    const { user, getByRole, getByLabelText, getAllByText } = renderDialog('planning');
+
+    const planningEndInput = getByLabelText(/^myWorkloadView\.table\.planningEnd/);
+    fireEvent.input(planningEndInput, {
+      // baseProject.constructionStart is 01.04.2027
+      target: { value: '01.05.2027' },
+    });
+    fireEvent.blur(planningEndInput);
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    expect(mockPatchProject).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getAllByText('validation.isBefore').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('shows phase detail validation through the select when the selected phase has details', async () => {
+    const constructionProject = {
+      ...baseProject,
+      phase: {
+        id: mockProjectPhases.data[5].id,
+        label: 'option.construction',
+        value: 'construction',
+      },
+      phaseDetail: {
+        id: '',
+        label: '',
+        value: '',
+      },
+    };
+
+    const { user, getByRole, getAllByText } = renderDialog('construction', constructionProject);
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    await waitFor(() => {
+      expect(getAllByText('validation.required').length).toBeGreaterThan(0);
+    });
+    expect(mockPatchProject).not.toHaveBeenCalled();
+  });
+
+  it('accepts valid date format without leading zeros from datepicker and sends only the changed field', async () => {
     mockPatchProject.mockReturnValueOnce({
       unwrap: () =>
         Promise.resolve({
           id: baseProject.id,
-          estPlanningStart: '2026-07-01',
-          estPlanningEnd: '2026-12-31',
-          presenceStart: '2026-02-01',
-          presenceEnd: '2026-11-30',
-          visibilityStart: '2026-03-01',
-          visibilityEnd: '2026-10-31',
-          estConstructionStart: '2027-04-01',
-          estConstructionEnd: '2027-10-31',
-          projectCostForecast: '801',
-          planningCostForecast: '301',
-          planningPhase: { id: mockPlanningPhases.data[1].id },
-          planningWorkQuantity: '151',
-          constructionCostForecast: '501',
-          costForecast: '1001.00',
+          estPlanningStart: '2026-01-05',
           phase: {
-            id: mockProjectPhases.data[2].id,
-            value: 'programming',
+            id: mockProjectPhases.data[1].id,
+            value: 'design',
           },
         }),
     });
 
-    const projectWithSingleDigitDate = {
-      ...baseProject,
-      planningStart: '1.7.2026',
-    };
+    const { user, getByRole, getByLabelText } = renderDialog('planning');
 
-    const { user, getByRole } = renderDialog('planning', projectWithSingleDigitDate);
+    const planningStartInput = getByLabelText(/^myWorkloadView\.table\.planningStart/);
+    fireEvent.input(planningStartInput, {
+      target: { value: '5.1.2026' },
+    });
+    fireEvent.blur(planningStartInput);
 
     await user.click(getByRole('button', { name: 'save' }));
 
     await waitFor(() => {
       expect(mockPatchProject).toHaveBeenCalledWith({
         id: baseProject.id,
-        data: expect.objectContaining({
-          estPlanningStart: '01.07.2026',
-        }),
+        data: { estPlanningStart: '05.01.2026' },
       });
     });
+  });
+
+  it('does not call the API when nothing was changed', async () => {
+    const { user, getByRole, onClose } = renderDialog('planning');
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
+    expect(mockPatchProject).not.toHaveBeenCalled();
   });
 
   it('submits planning payload and maps response values back to onSave', async () => {
@@ -216,15 +276,11 @@ describe('MyWorkloadEditDialog', () => {
           presenceStart: '2026-02-01',
           presenceEnd: '2026-11-30',
           visibilityStart: '2026-03-01',
-          visibilityEnd: '2026-10-31',
           estConstructionStart: '2027-04-01',
           estConstructionEnd: '2027-10-31',
-          projectCostForecast: '801',
           planningCostForecast: '301',
           planningPhase: { id: mockPlanningPhases.data[1].id },
           planningWorkQuantity: '151',
-          constructionCostForecast: '501',
-          costForecast: '1001.00',
           phase: {
             id: mockProjectPhases.data[2].id,
             value: 'programming',
@@ -232,7 +288,11 @@ describe('MyWorkloadEditDialog', () => {
         }),
     });
 
-    const { user, getByRole, onClose, onSave, store } = renderDialog('planning');
+    const { user, getByRole, getByLabelText, onClose, onSave, store } = renderDialog('planning');
+
+    fireEvent.change(getByLabelText(/^myWorkloadView\.table\.workQuantity/), {
+      target: { value: '151' },
+    });
 
     await user.click(getByRole('button', { name: 'save' }));
 
@@ -240,18 +300,7 @@ describe('MyWorkloadEditDialog', () => {
       expect(mockPatchProject).toHaveBeenCalledWith({
         id: baseProject.id,
         data: {
-          phase: baseProject.phaseId,
-          estPlanningStart: '01.01.2026',
-          estPlanningEnd: '31.12.2026',
-          presenceStart: '01.02.2026',
-          presenceEnd: '30.11.2026',
-          visibilityStart: '01.03.2026',
-          visibilityEnd: '31.10.2026',
-          projectCostForecast: '800',
-          planningCostForecast: '300',
-          planningPhase: baseProject.planningPhaseId,
-          planningWorkQuantity: '150',
-          constructionCostForecast: '500',
+          planningWorkQuantity: '151',
         },
       });
     });
@@ -262,9 +311,11 @@ describe('MyWorkloadEditDialog', () => {
           id: baseProject.id,
           planningStart: '01.01.2026',
           planningEnd: '31.12.2026',
-          phase: 'option.programming',
-          phaseValue: 'programming',
-          phaseId: mockProjectPhases.data[2].id,
+          phase: expect.objectContaining({
+            id: mockProjectPhases.data[2].id,
+            label: 'option.programming',
+            value: 'programming',
+          }),
         }),
       );
     });
@@ -273,14 +324,52 @@ describe('MyWorkloadEditDialog', () => {
     expect(store.getState().notifications[0].message).toBe('patchSuccess');
   });
 
-  it('submits construction payload with normalized cost forecast', async () => {
+  it('keeps existing row values when patch response omits unchanged fields', async () => {
     mockPatchProject.mockReturnValueOnce({
       unwrap: () =>
         Promise.resolve({
           id: baseProject.id,
-          estConstructionStart: '2027-04-01',
-          estConstructionEnd: '2027-10-31',
-          costForecast: '1000.50',
+          planningWorkQuantity: '151',
+        }),
+    });
+
+    const { user, getByRole, getByLabelText, onSave } = renderDialog('planning');
+
+    fireEvent.change(getByLabelText(/^myWorkloadView\.table\.workQuantity/), {
+      target: { value: '151' },
+    });
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          planningWorkQuantity: '151',
+          planningEnd: baseProject.planningEnd,
+          presenceStart: baseProject.presenceStart,
+          presenceEnd: baseProject.presenceEnd,
+          visibilityStart: baseProject.visibilityStart,
+          visibilityEnd: baseProject.visibilityEnd,
+          constructionStart: baseProject.constructionStart,
+          constructionEnd: baseProject.constructionEnd,
+          planningCostForecast: baseProject.planningCostForecast,
+          planningPhaseId: baseProject.planningPhaseId,
+          constructionCostForecast: baseProject.constructionCostForecast,
+          constructionPhaseId: baseProject.constructionPhaseId,
+          constructionWorkQuantity: baseProject.constructionWorkQuantity,
+          phase: baseProject.phase,
+          phaseDetail: baseProject.phaseDetail,
+        }),
+      );
+    });
+  });
+
+  it('submits construction payload with only the changed field', async () => {
+    mockPatchProject.mockReturnValueOnce({
+      unwrap: () =>
+        Promise.resolve({
+          id: baseProject.id,
+          estConstructionStart: '2027-05-01',
           phase: {
             id: mockProjectPhases.data[7].id,
             value: 'construction',
@@ -288,11 +377,57 @@ describe('MyWorkloadEditDialog', () => {
         }),
     });
 
-    const { user, getByRole } = renderDialog('construction', {
+    const { user, getByRole, getByLabelText } = renderDialog('construction', {
       ...baseProject,
-      costForecast: '1 000,5€',
-      phaseId: mockProjectPhases.data[7].id,
-      phaseValue: 'construction',
+      phase: {
+        id: mockProjectPhases.data[7].id,
+        label: 'option.construction',
+        value: 'construction',
+      },
+    });
+
+    const constructionStartInput = getByLabelText(/^validation\.estConstructionStart/);
+    fireEvent.input(constructionStartInput, {
+      target: { value: '1.5.2027' },
+    });
+    fireEvent.blur(constructionStartInput);
+
+    await user.click(getByRole('button', { name: 'save' }));
+
+    await waitFor(() => {
+      expect(mockPatchProject).toHaveBeenCalledWith({
+        id: baseProject.id,
+        data: {
+          estConstructionStart: '01.05.2027',
+        },
+      });
+    });
+  });
+
+  it('saves the construction cost estimate row fields on the construction side', async () => {
+    mockPatchProject.mockReturnValueOnce({
+      unwrap: () =>
+        Promise.resolve({
+          id: baseProject.id,
+          constructionWorkQuantity: '999',
+          phase: {
+            id: mockProjectPhases.data[7].id,
+            value: 'construction',
+          },
+        }),
+    });
+
+    const { user, getByRole, getByLabelText } = renderDialog('construction', {
+      ...baseProject,
+      phase: {
+        id: mockProjectPhases.data[7].id,
+        label: 'option.construction',
+        value: 'construction',
+      },
+    });
+
+    fireEvent.change(getByLabelText(/^myWorkloadView\.table\.workQuantity/), {
+      target: { value: '999' },
     });
 
     await user.click(getByRole('button', { name: 'save' }));
@@ -301,10 +436,7 @@ describe('MyWorkloadEditDialog', () => {
       expect(mockPatchProject).toHaveBeenCalledWith({
         id: baseProject.id,
         data: {
-          phase: mockProjectPhases.data[7].id,
-          estConstructionStart: '01.04.2027',
-          estConstructionEnd: '31.10.2027',
-          costForecast: '1000.50',
+          constructionWorkQuantity: '999',
         },
       });
     });
@@ -315,7 +447,13 @@ describe('MyWorkloadEditDialog', () => {
       unwrap: () => Promise.reject(new Error('patch failed')),
     });
 
-    const { user, getByRole, onClose, store } = renderDialog('construction');
+    const { user, getByRole, getByLabelText, onClose, store } = renderDialog('construction');
+
+    const constructionStartInput = getByLabelText(/^validation\.estConstructionStart/);
+    fireEvent.input(constructionStartInput, {
+      target: { value: '1.5.2027' },
+    });
+    fireEvent.blur(constructionStartInput);
 
     await user.click(getByRole('button', { name: 'save' }));
 

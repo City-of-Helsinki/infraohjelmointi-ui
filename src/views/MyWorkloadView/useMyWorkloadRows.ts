@@ -10,7 +10,11 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { isRequestCanceled } from '@/utils/http';
-import { getUniqueResponsiblePersonId, normalizeMyWorkloadDate } from '@/utils/myWorkloadUtils';
+import {
+  getUniqueResponsiblePersonId,
+  normalizeMyWorkloadDate,
+  toPhaseInfo,
+} from '@/utils/myWorkloadUtils';
 
 const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewType) => {
   if (viewType === 'construction') {
@@ -36,15 +40,14 @@ const mapProjectToMyWorkloadTableRow = (
   visibilityEnd: normalizeMyWorkloadDate(project.visibilityEnd),
   constructionStart: normalizeMyWorkloadDate(project.estConstructionStart),
   constructionEnd: normalizeMyWorkloadDate(project.estConstructionEnd),
-  projectCostForecast: project.projectCostForecast ?? '',
   planningCostForecast: project.planningCostForecast ?? '',
   planningPhaseId: project.planningPhase?.id ?? '',
   planningWorkQuantity: project.planningWorkQuantity ?? '',
   constructionCostForecast: project.constructionCostForecast ?? '',
-  costForecast: project.costForecast ?? '',
-  phase: project.phase?.value ? translate(`option.${project.phase.value}`) : '',
-  phaseValue: project.phase?.value ?? '',
-  phaseId: project.phase?.id ?? '',
+  constructionPhaseId: project.constructionPhase?.id ?? '',
+  constructionWorkQuantity: project.constructionWorkQuantity ?? '',
+  phase: toPhaseInfo(project.phase, translate),
+  phaseDetail: toPhaseInfo(project.phaseDetail, translate),
   constructionProcurementMethod: project.constructionProcurementMethod?.value,
   functions: translate('myWorkloadView.table.modifyInformation'),
 });
