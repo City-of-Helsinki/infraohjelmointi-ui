@@ -14,6 +14,8 @@ import { usePatchConstructionHandoverMutation } from '@/api/constructionHandover
 import { listItemToOption, personToOption } from '@/utils/common';
 import { validateRequiredSelect } from '@/utils/validation';
 import useConstructionProcurementMethod from '@/hooks/useConstructionProcurementMethod';
+import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 function useHandoverFinalizingForm(constructionHandover: IConstructionHandover | null) {
   const formMethods = useForm<IConstructionHandoverFinalizingForm>({
@@ -78,9 +80,13 @@ function useHandoverFinalizingForm(constructionHandover: IConstructionHandover |
 
 interface IHandoverFinalizingFormProps {
   constructionHandover: IConstructionHandover;
+  project?: IProject;
 }
 
-function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFinalizingFormProps>) {
+function HandoverFinalizingForm({
+  constructionHandover,
+  project,
+}: Readonly<IHandoverFinalizingFormProps>) {
   const { t } = useTranslation();
 
   const responsiblePersons = useOptions('responsiblePersons');
@@ -98,6 +104,9 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
       'staraProcurementReason',
     );
 
+  const { isConstructionManagementLead, isConstructionResponsiblePersonForProject } =
+    useConstructionHandoverPermissions(project);
+
   const isSubmittedToConstruction =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION;
   const isProjectManagerNamed =
@@ -110,6 +119,10 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
   const buttonText = isSubmittedToConstruction
     ? t('constructionHandoverForm.saveProjectManagerButton')
     : t('constructionHandoverForm.moveToConstructionPreparationButton');
+
+  const isButtonDisabled = isSubmittedToConstruction
+    ? !isConstructionManagementLead
+    : !isConstructionResponsiblePersonForProject;
 
   return (
     <FormProvider {...formMethods}>
@@ -170,7 +183,9 @@ function HandoverFinalizingForm({ constructionHandover }: Readonly<IHandoverFina
                 </div>
               )}
             </div>
-            <Button type="submit">{buttonText}</Button>
+            <Button type="submit" disabled={isButtonDisabled}>
+              {buttonText}
+            </Button>
           </div>
         </Notification>
       </form>

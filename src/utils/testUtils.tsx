@@ -12,7 +12,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { AuthProvider } from 'react-oidc-context';
 import { UserManager } from 'oidc-client-ts';
 import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
-import { UserRole } from '@/interfaces/userInterfaces';
+import { IUser, UserRole } from '@/interfaces/userInterfaces';
 
 const oidcConfig = {
   authority: 'authority',
@@ -114,11 +114,12 @@ export const sendFinanceUpdateEvent = async (data: object) => {
 
 export const withMockAuthUserAdGroups = (
   adGroups: UserRole[],
+  userOverrides: Partial<IUser> = {},
   preloadedState: Partial<RootState> = {},
 ): Partial<RootState> => ({
   ...preloadedState,
   auth: {
-    user: createMockUserWithAdGroups(adGroups),
+    user: createMockUserWithAdGroups(adGroups, userOverrides),
     error: null,
   },
 });

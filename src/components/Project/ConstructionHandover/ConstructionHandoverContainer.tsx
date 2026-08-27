@@ -61,9 +61,7 @@ export default function ConstructionHandoverContainer() {
           project={null}
           showSaveIndicator={false}
           showPwFolderLink={false}
-          onOpenChangeHistory={
-            constructionHandover ? () => setIsHistoryOpen(true) : undefined
-          }
+          onOpenChangeHistory={constructionHandover ? () => setIsHistoryOpen(true) : undefined}
           formStatusSection={
             constructionHandover ? (
               <ConstructionHandoverStatusLabel status={constructionHandover.status} />
@@ -75,10 +73,16 @@ export default function ConstructionHandoverContainer() {
         {isConstructionHandoverStarted ? (
           <>
             {showHandoverFinalizingForm && (
-              <HandoverFinalizingForm constructionHandover={constructionHandover} />
+              <HandoverFinalizingForm
+                constructionHandover={constructionHandover}
+                project={project}
+              />
             )}
 
-            <ConstructionHandoverForm constructionHandover={constructionHandover} />
+            <ConstructionHandoverForm
+              constructionHandover={constructionHandover}
+              project={project}
+            />
           </>
         ) : (
           <StartConstructionHandover onStartHandover={handleStartHandover} />

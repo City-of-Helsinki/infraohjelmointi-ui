@@ -6,12 +6,13 @@ import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconLink, Notification, NotificationSize } from 'hds-react';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   usePatchConstructionHandoverMutation,
   useTransitionConstructionHandoverStatusMutation,
 } from '@/api/constructionHandoverApi';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   ConstructionHandoverStatus,
   IConstructionHandover,
@@ -21,12 +22,7 @@ import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
 import { isConstructionHandoverLocked } from './constructionHandoverUtils';
-import { selectUser } from '@/reducers/authSlice';
-import {
-  isUserProjectManager,
-  isUserPlanner,
-  isUserConstructionManagementLead,
-} from '@/utils/userRoleHelpers';
+import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -57,10 +53,12 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
 
 interface IConstructionHandoverFormProps {
   constructionHandover: IConstructionHandover;
+  project?: IProject;
 }
 
 function ConstructionHandoverForm({
   constructionHandover,
+  project,
 }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -72,13 +70,17 @@ function ConstructionHandoverForm({
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
 
-  const user = useAppSelector(selectUser);
-  const isProjectManager = isUserProjectManager(user);
-  const isPlanner = isUserPlanner(user);
-  const isConstructionManagementLead = isUserConstructionManagementLead(user);
+  const {
+    isProjectManager,
+    isPlanner,
+    isConstructionManagementLead,
+    isResponsiblePersonForProject,
+  } = useConstructionHandoverPermissions(project);
 
   const showSubmitToProgrammerButton =
-    constructionHandover.status === ConstructionHandoverStatus.DRAFT && isProjectManager;
+    constructionHandover.status === ConstructionHandoverStatus.DRAFT &&
+    isProjectManager &&
+    isResponsiblePersonForProject;
   const showSubmitToConstructionButton =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
   const showSaveDraftButton = !isConstructionHandoverLocked(constructionHandover);

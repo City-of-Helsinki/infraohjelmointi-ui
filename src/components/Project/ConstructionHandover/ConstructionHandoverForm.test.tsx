@@ -5,7 +5,7 @@ import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
-import { createConstructionHandover } from '@/mocks/createMocks';
+import { createConstructionHandover, createProject } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 import { UserRole } from '@/interfaces/userInterfaces';
 
@@ -44,18 +44,30 @@ jest.mock('hds-react', () => {
   };
 });
 
+function setupConstructionHandoverForm(
+  constructionHandoverOverrides = {},
+  projectOverrides = {},
+  preloadedState = {},
+) {
+  const constructionHandover = createConstructionHandover(constructionHandoverOverrides);
+  const project = createProject(projectOverrides);
+
+  return renderWithProviders(
+    <Route
+      path="/"
+      element={
+        <ConstructionHandoverForm constructionHandover={constructionHandover} project={project} />
+      }
+    />,
+    {
+      preloadedState,
+    },
+  );
+}
+
 describe('ConstructionHandoverForm copy link', () => {
   it('copies to clipboard and dispatches success notification when copy button is clicked', async () => {
-    const constructionHandover = createConstructionHandover();
-
-    const { store } = await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
-    );
+    const { store } = await act(async () => setupConstructionHandoverForm());
 
     const writeTextSpy = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
@@ -84,16 +96,7 @@ describe('ConstructionHandoverForm copy link', () => {
   });
 
   it('dispatches error notification when clipboard write fails', async () => {
-    const constructionHandover = createConstructionHandover();
-
-    const { store } = await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
-    );
+    const { store } = await act(async () => setupConstructionHandoverForm());
 
     const writeTextSpy = jest
       .spyOn(navigator.clipboard, 'writeText')
@@ -129,18 +132,11 @@ describe('ConstructionHandoverForm submit', () => {
   });
 
   it('submits form and calls patch mutation with mapped payload', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionStart: '2026-01-01',
-      constructionEnd: '2026-02-01',
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionStart: '2026-01-01',
+        constructionEnd: '2026-02-01',
+      }),
     );
 
     const submitButton = screen.getByRole('button', {
@@ -174,19 +170,12 @@ describe('ConstructionHandoverForm submit', () => {
   });
 
   it('maps totalCost as number when untouched form has initial value', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionStart: '2026-01-01',
-      constructionEnd: '2026-02-01',
-      totalCost: 75000,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionStart: '2026-01-01',
+        constructionEnd: '2026-02-01',
+        totalCost: 75000,
+      }),
     );
 
     const submitButton = screen.getByRole('button', {
@@ -209,19 +198,12 @@ describe('ConstructionHandoverForm submit', () => {
   });
 
   it('maps totalCost as null when form field is empty', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionStart: '2026-01-01',
-      constructionEnd: '2026-02-01',
-      totalCost: null,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionStart: '2026-01-01',
+        constructionEnd: '2026-02-01',
+        totalCost: null,
+      }),
     );
 
     const submitButton = screen.getByRole('button', {
@@ -244,19 +226,12 @@ describe('ConstructionHandoverForm submit', () => {
   });
 
   it('maps totalCost as null when value is not a valid number', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionStart: '2026-01-01',
-      constructionEnd: '2026-02-01',
-      totalCost: Number.NaN,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionStart: '2026-01-01',
+        constructionEnd: '2026-02-01',
+        totalCost: Number.NaN,
+      }),
     );
 
     const submitButton = screen.getByRole('button', {
@@ -279,19 +254,12 @@ describe('ConstructionHandoverForm submit', () => {
   });
 
   it('maps localized formatted totalCost value as number on submit', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionStart: '2026-01-01',
-      constructionEnd: '2026-02-01',
-      totalCost: null,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionStart: '2026-01-01',
+        constructionEnd: '2026-02-01',
+        totalCost: null,
+      }),
     );
 
     await act(async () => {
@@ -322,26 +290,19 @@ describe('ConstructionHandoverForm submit', () => {
 
 describe('ConstructionHandoverForm financing rows', () => {
   it('displays financing rows returned from API in table', async () => {
-    const constructionHandover = createConstructionHandover({
-      constructionHandoverFinancing: [
-        {
-          id: 'financing-1',
-          financingParty: 'KYMP',
-          description: '',
-          budgetItem: { id: 'budget-1', value: 'K1' },
-          projectNumber: 'HEL-2024-001',
-          budget: '150000',
-        },
-      ],
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        constructionHandoverFinancing: [
+          {
+            id: 'financing-1',
+            financingParty: 'KYMP',
+            description: '',
+            budgetItem: { id: 'budget-1', value: 'K1' },
+            projectNumber: 'HEL-2024-001',
+            budget: '150000',
+          },
+        ],
+      }),
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^KYMP/ }));
@@ -359,17 +320,10 @@ describe('ConstructionHandoverForm status transitions', () => {
   });
 
   it('disables form fields when handover status is not draft or submitted to programmer', async () => {
-    const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      }),
     );
 
     expect(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i })).toBeDisabled();
@@ -383,19 +337,26 @@ describe('ConstructionHandoverForm status transitions', () => {
   });
 
   it('submits handover to programmer when submit to programmer button is clicked', async () => {
-    const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.DRAFT,
-    });
+    const projectOverrides = {
+      personPlanning: {
+        id: 'person-1',
+        firstName: 'Planner',
+        lastName: 'User',
+        email: 'planner@example.com',
+        title: '',
+        phone: '123456789',
+      },
+    };
 
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
+      setupConstructionHandoverForm(
         {
-          preloadedState: withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+          status: ConstructionHandoverStatus.DRAFT,
         },
+        projectOverrides,
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
       ),
     );
 
@@ -419,19 +380,26 @@ describe('ConstructionHandoverForm status transitions', () => {
     const unwrap = jest.fn().mockRejectedValue(new Error('Patch failed'));
     mockPatchConstructionHandover.mockReturnValue({ unwrap });
 
-    const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.DRAFT,
-    });
+    const projectOverrides = {
+      personPlanning: {
+        id: 'person-1',
+        firstName: 'Planner',
+        lastName: 'User',
+        email: 'planner@example.com',
+        title: '',
+        phone: '123456789',
+      },
+    };
 
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
+      setupConstructionHandoverForm(
         {
-          preloadedState: withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+          status: ConstructionHandoverStatus.DRAFT,
         },
+        projectOverrides,
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
       ),
     );
 
@@ -455,20 +423,64 @@ describe('ConstructionHandoverForm status transitions', () => {
     });
   });
 
-  it('submits handover to construction when submit to construction button is clicked', async () => {
-    const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
-    });
+  it('hides submit to programmer button when user is not the planning responsible person of related project', async () => {
+    const projectOverrides = {
+      personPlanning: {
+        id: 'person-1',
+        firstName: 'Planner',
+        lastName: 'User',
+        email: 'planner@example.com',
+        title: '',
+        phone: '123456789',
+      },
+    };
 
+    setupConstructionHandoverForm(
+      {},
+      projectOverrides,
+      withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+        email: 'otheruser@example.com',
+      }),
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.submitToProgrammer' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides submit to programmer button when user is not in PROJECT_MANAGER role', async () => {
+    const projectOverrides = {
+      personPlanning: {
+        id: 'person-1',
+        firstName: 'Planner',
+        lastName: 'User',
+        email: 'planner@example.com',
+        title: '',
+        phone: '123456789',
+      },
+    };
+
+    setupConstructionHandoverForm(
+      {},
+      projectOverrides,
+      withMockAuthUserAdGroups([UserRole.CONSTRUCTION_MANAGEMENT_LEAD], {
+        email: 'planner@example.com',
+      }),
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.submitToProgrammer' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('submits handover to construction when submit to construction button is clicked', async () => {
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
+      setupConstructionHandoverForm(
         {
-          preloadedState: withMockAuthUserAdGroups([UserRole.PLANNER]),
+          status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
         },
+        {},
+        withMockAuthUserAdGroups([UserRole.PLANNER]),
       ),
     );
 
@@ -488,21 +500,26 @@ describe('ConstructionHandoverForm status transitions', () => {
     });
   });
 
+  it('hides submit to construction button when user is not in PLANNER role', async () => {
+    setupConstructionHandoverForm(
+      {
+        status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      },
+      {},
+      withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.submitToConstruction' }),
+    ).not.toBeInTheDocument();
+  });
+
   it.each([
     ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
     ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
   ])('shows return to draft button for %s status', async (status) => {
-    const constructionHandover = createConstructionHandover({ status });
-
-    await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
-    );
+    await act(async () => setupConstructionHandoverForm({ status }));
 
     expect(
       screen.getByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
@@ -512,18 +529,7 @@ describe('ConstructionHandoverForm status transitions', () => {
   it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
     'hides return to draft button for %s status',
     async (status) => {
-      const constructionHandover = createConstructionHandover({
-        status,
-      });
-
-      await act(async () =>
-        renderWithProviders(
-          <Route
-            path="/"
-            element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-          />,
-        ),
-      );
+      await act(async () => setupConstructionHandoverForm({ status }));
 
       expect(
         screen.queryByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
@@ -532,17 +538,10 @@ describe('ConstructionHandoverForm status transitions', () => {
   );
 
   it('returns handover to draft when return to draft button is clicked', async () => {
-    const constructionHandover = createConstructionHandover({
-      status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-    });
-
     await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
+      setupConstructionHandoverForm({
+        status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      }),
     );
 
     const returnToDraftButton = screen.getByRole('button', {

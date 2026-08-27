@@ -6,9 +6,13 @@ const createAdGroup = (name: UserRole, index: number) => ({
   display_name: name,
 });
 
-export const createMockUserWithAdGroups = (adGroups: UserRole[]): IUser => ({
+export const createMockUserWithAdGroups = (
+  adGroups: UserRole[],
+  userOverrides: Partial<IUser> = {},
+): IUser => ({
   ...mockUser.data,
   ad_groups: adGroups.map(createAdGroup),
+  ...userOverrides,
 });
 
 export const mockUser: { data: IUser } = {
