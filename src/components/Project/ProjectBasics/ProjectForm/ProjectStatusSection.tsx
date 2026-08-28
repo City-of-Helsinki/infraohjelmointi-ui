@@ -169,11 +169,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const {
     proposalPhase,
     designPhase,
-    programmedPhase,
-    planningPhase,
-    constructionWaitPhase,
-    constructionPreparationPhase,
-    constructionPhase,
     warrantyPeriodPhase,
     completedPhase,
     phasesThatNeedYearBounds,

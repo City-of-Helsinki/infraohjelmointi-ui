@@ -1,6 +1,6 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { TFunction } from 'i18next';
-import { createDateToStartOfYear, getToday, isBefore, isSameOrBefore, updateYear } from './dates';
+import { createDateToStartOfYear, getToday, isBefore, isSameOrBefore } from './dates';
 
 export type ProjectValidationField =
   | 'phase'
@@ -226,12 +226,6 @@ export const getProjectPhaseRequiredFields = ({
       ]);
     case phaseResolver.constructionPreparationPhase:
     case phaseResolver.constructionPhase:
-      return toUniqueArray<ProjectValidationField>([
-        ...programmedRequirements,
-        ...planningRequirements,
-        ...constructionRequirements,
-        ...phaseDetailRequirement,
-      ]);
     case phaseResolver.warrantyPeriodPhase:
     case phaseResolver.completedPhase:
       return toUniqueArray<ProjectValidationField>([
