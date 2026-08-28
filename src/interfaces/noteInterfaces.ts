@@ -7,16 +7,6 @@ export interface INote {
   history: Array<INoteHistory>;
 }
 
-export interface INoteImage {
-  id: string;
-  url: string;
-  fileName: string;
-  contentType: string;
-  size: number;
-  createdDate: string;
-  order: number;
-}
-
 export interface INoteRequest {
   id?: string;
   content?: string;

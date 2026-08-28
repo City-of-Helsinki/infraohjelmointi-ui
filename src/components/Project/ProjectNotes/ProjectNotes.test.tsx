@@ -1,81 +1,36 @@
 import mockI18next from '@/mocks/mockI18next';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
 import mockNotes from '@/mocks/mockNotes';
-import { INote, INoteImage } from '@/interfaces/noteInterfaces';
+import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { mockError } from '@/mocks/mockError';
 import { act, waitFor, within } from '@testing-library/react';
 import { stringToDateTime } from '@/utils/dates';
 import { Route } from 'react-router';
-import { useEffect, useState } from 'react';
-import mockNoteImages from '@/mocks/mockNoteImages';
+import { notesApi } from '@/api/notesApi';
+import { setupStore } from '@/store';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
-const mockUseGetNotesByProjectQuery = jest.fn();
-const mockUseGetNoteImagesQuery = jest.fn();
-const mockPostNoteTrigger = jest.fn();
-const mockDeleteNoteTrigger = jest.fn();
-const mockPatchNoteTrigger = jest.fn();
-const mockPostNoteImageTrigger = jest.fn();
-const mockDeleteNoteImageTrigger = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockedAxios = axios as jest.MockedFunction<typeof axios>;
 
-let mockNotesState: INote[] = [];
-const mockNotesSubscribers = new Set<(notes: INote[]) => void>();
+const createInternalConfig = (): InternalAxiosRequestConfig =>
+  ({ headers: {} } as InternalAxiosRequestConfig);
 
-let mockNoteImagesByNoteId: Record<string, INoteImage[]> = {};
-
-const setMockNotesState = (notes: INote[]) => {
-  mockNotesState = notes;
-  mockNotesSubscribers.forEach((subscriber) => subscriber(mockNotesState));
-};
-
-const appendMockNote = (note: INote) => setMockNotesState([...mockNotesState, note]);
-
-const removeMockNote = (noteId: string) =>
-  setMockNotesState(mockNotesState.filter((note) => note.id !== noteId));
-
-const updateMockNote = (id: string, content: string) =>
-  setMockNotesState(mockNotesState.map((note) => (note.id === id ? { ...note, content } : note)));
-
-const useMockedNotesQuery = () => {
-  const [data, setData] = useState<INote[]>(mockNotesState);
-
-  useEffect(() => {
-    setData(mockNotesState);
-
-    const subscriber = (nextNotes: INote[]) => setData([...nextNotes]);
-    mockNotesSubscribers.add(subscriber);
-
-    return () => {
-      mockNotesSubscribers.delete(subscriber);
-    };
-  }, []);
-
-  return { data };
-};
-
-jest.mock('@/api/notesApi', () => {
-  const originalModule = jest.requireActual('@/api/notesApi');
-  return {
-    ...originalModule,
-    useGetNotesByProjectQuery: (...args: unknown[]) => mockUseGetNotesByProjectQuery(...args),
-    useGetNoteImagesQuery: (...args: unknown[]) => mockUseGetNoteImagesQuery(...args),
-    usePostNoteMutation: () => [mockPostNoteTrigger, { isLoading: false }],
-    useDeleteNoteMutation: () => [mockDeleteNoteTrigger, { isLoading: false }],
-    usePatchNoteMutation: () => [mockPatchNoteTrigger, { isLoading: false }],
-    usePostNoteImageMutation: () => [mockPostNoteImageTrigger, { isLoading: false }],
-    useDeleteNoteImageMutation: () => [mockDeleteNoteImageTrigger, { isLoading: false }],
-  };
+const createAxiosResponse = <T,>(data: T): AxiosResponse<T> => ({
+  data,
+  status: 200,
+  statusText: 'OK',
+  headers: {},
+  config: createInternalConfig(),
 });
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
-  __esModule: true,
-  default: () => ({
-    isConfirmed: mockIsConfirmed,
-  }),
-}));
+const normalizeConfig = (config?: AxiosRequestConfig | string): AxiosRequestConfig =>
+  typeof config === 'string' ? { url: config } : config ?? {};
 
 const createProjectState = () => ({
   count: 1,
@@ -108,48 +63,46 @@ const renderWithNotesLoaded = async () => {
   return utils;
 };
 
+const getMethod = (config?: AxiosRequestConfig) => (config?.method ?? 'GET').toUpperCase();
+
+const getLastRequestByMethod = (method: string): AxiosRequestConfig | undefined =>
+  mockedAxios.mock.calls
+    .map(([config]) => normalizeConfig(config as AxiosRequestConfig | string | undefined))
+    .filter((config) => getMethod(config) === method.toUpperCase())
+    .pop();
+
+const createAxiosError = () => {
+  const response = createAxiosResponse(mockError);
+  response.status = mockError.status ?? 500;
+  response.statusText = 'Error';
+
+  const axiosError = new AxiosError(mockError.message);
+  axiosError.response = response;
+  axiosError.config = createInternalConfig();
+
+  return axiosError;
+};
+
+type QueryErrorResult = { error?: { status?: number; data?: unknown }; unsubscribe?: () => void };
+
+const expectQueryError = (result: QueryErrorResult) => {
+  expect(result.error).toEqual({ status: mockError.status, data: mockError });
+  result.unsubscribe?.();
+};
+
+const createTestStore = () => setupStore(getPreloadedState());
+
 describe('ProjectNotes', () => {
   beforeEach(() => {
-    mockNotesState = [...mockNotes.data];
-    mockNoteImagesByNoteId = {};
-
-    mockUseGetNotesByProjectQuery.mockImplementation(() => useMockedNotesQuery());
-    mockUseGetNoteImagesQuery.mockImplementation((noteId: string) => ({
-      data: mockNoteImagesByNoteId[noteId] ?? [],
-    }));
-
-    mockPostNoteTrigger.mockImplementation((noteRequest: Partial<INote>) => ({
-      unwrap: async () => {
-        const newNote: INote = {
-          ...(mockNotes.data[1] as INote),
-          id: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
-          content: noteRequest.content ?? '',
-        };
-        appendMockNote(newNote);
-        return newNote;
-      },
-    }));
-
-    mockDeleteNoteTrigger.mockImplementation(async (noteId: string) => {
-      removeMockNote(noteId);
-      return { data: { id: noteId } };
+    mockedAxios.mockImplementation((config?: AxiosRequestConfig | string) => {
+      normalizeConfig(config);
+      return Promise.resolve(createAxiosResponse(mockNotes.data));
     });
-
-    mockPatchNoteTrigger.mockImplementation(async ({ id, content }: Partial<INote>) => {
-      if (id && content) {
-        updateMockNote(id, content);
-      }
-      return { data: { id, content } };
-    });
-
-    mockPostNoteImageTrigger.mockResolvedValue({ data: {} });
-    mockDeleteNoteImageTrigger.mockResolvedValue({ data: {} });
-    mockIsConfirmed.mockResolvedValue(true);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
-    mockNotesSubscribers.clear();
+    mockedAxios.mockReset();
   });
 
   it('renders the component wrappers', async () => {
@@ -209,24 +162,54 @@ describe('ProjectNotes', () => {
   });
 
   it('can POST a note', async () => {
+    const responseNote = createAxiosResponse({
+      ...mockNotes.data[1],
+      id: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
+      content: 'Third note',
+    });
+    let notesState: INote[] = [...mockNotes.data];
+
+    mockedAxios.mockImplementation((config) => {
+      const axiosConfig = normalizeConfig(config);
+      const method = getMethod(axiosConfig);
+
+      if (method === 'POST') {
+        notesState = [...notesState, responseNote.data];
+        return Promise.resolve(responseNote);
+      }
+
+      return Promise.resolve(createAxiosResponse(notesState));
+    });
+
     const { user, getByRole, getByText } = await renderWithNotesLoaded();
-    const newContent = 'Third note';
 
     const textarea = getByRole('textbox', { name: 'writeNote' });
 
-    await user.type(textarea, newContent);
+    await user.type(textarea, responseNote.data.content);
     await user.click(getByRole('button', { name: 'save' }));
 
-    await waitFor(() => expect(mockPostNoteTrigger).toHaveBeenCalledTimes(1));
-    expect(mockPostNoteTrigger).toHaveBeenCalledWith(
-      expect.objectContaining({ content: newContent }),
-    );
+    await waitFor(() => expect(getLastRequestByMethod('POST')).toBeDefined());
+    const formRequest = getLastRequestByMethod('POST');
 
-    await waitFor(() => expect(getByText(newContent)).toBeInTheDocument());
+    expect((formRequest?.data as INote).content).toEqual(responseNote.data.content);
+    await waitFor(() => expect(getByText(responseNote.data.content)).toBeInTheDocument());
   });
 
   it('can DELETE a note', async () => {
     const targetNote = mockNotes.data[0];
+    let notesState: INote[] = [...mockNotes.data];
+
+    mockedAxios.mockImplementation((config) => {
+      const axiosConfig = normalizeConfig(config);
+      const method = getMethod(axiosConfig);
+
+      if (method === 'DELETE') {
+        notesState = notesState.filter((note) => note.id !== targetNote.id);
+        return Promise.resolve(createAxiosResponse({ id: targetNote.id }));
+      }
+
+      return Promise.resolve(createAxiosResponse(notesState));
+    });
 
     const { user, getByText, findByRole, queryAllByTestId, queryByText } =
       await renderWithNotesLoaded();
@@ -241,12 +224,34 @@ describe('ProjectNotes', () => {
 
     await waitFor(() => expect(queryAllByTestId('note-container')).toHaveLength(1));
     expect(queryByText(targetNote.content)).toBeNull();
-    expect(mockDeleteNoteTrigger).toHaveBeenCalledWith(targetNote.id);
+
+    const deleteRequest = getLastRequestByMethod('DELETE');
+    expect(deleteRequest?.url ?? '').toContain(targetNote.id);
   });
 
   it('can PATCH a note', async () => {
     const targetNote = mockNotes.data[1];
-    const editedContent = 'Note edit.';
+    const responseNote = createAxiosResponse({
+      ...targetNote,
+      content: 'Note edit.',
+    });
+
+    let notesState: INote[] = [...mockNotes.data];
+
+    mockedAxios.mockImplementation((config) => {
+      const axiosConfig = normalizeConfig(config);
+      const method = getMethod(axiosConfig);
+
+      if (method === 'PATCH') {
+        const payload = axiosConfig.data as Partial<INote>;
+        notesState = notesState.map((note) =>
+          note.id === payload.id ? { ...note, ...responseNote.data } : note,
+        );
+        return Promise.resolve(responseNote);
+      }
+
+      return Promise.resolve(createAxiosResponse(notesState));
+    });
 
     const { user, getByText, queryByText, getAllByTestId, findByTestId } =
       await renderWithNotesLoaded();
@@ -261,109 +266,69 @@ describe('ProjectNotes', () => {
     const textarea = await findByTestId('edit-note-textarea');
 
     await user.clear(textarea);
-    await user.type(textarea, editedContent);
+    await user.type(textarea, responseNote.data.content);
     await user.click(await findByTestId('edit-note-save'));
 
-    await waitFor(() => expect(mockPatchNoteTrigger).toHaveBeenCalledTimes(1));
-    expect(mockPatchNoteTrigger).toHaveBeenCalledWith(
-      expect.objectContaining({ id: targetNote.id, content: editedContent }),
-    );
+    await waitFor(() => expect(getLastRequestByMethod('PATCH')).toBeDefined());
+    const patchRequest = getLastRequestByMethod('PATCH');
 
     await waitFor(() => {
       expect(getAllByTestId('note-container')).toHaveLength(2);
-      expect(getByText(editedContent)).toBeInTheDocument();
+      expect((patchRequest?.data as INote).content).toEqual(responseNote.data.content);
+      expect(getByText(responseNote.data.content)).toBeInTheDocument();
       expect(queryByText(targetNote.content)).toBeNull();
     });
   });
 
-  describe('Note attachments', () => {
-    it('renders attachment sections for loaded notes', async () => {
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery
-        .mockReturnValueOnce({ data: mockNoteImages })
-        .mockReturnValue({ data: [] });
+  it('catches a bad notes GET request', async () => {
+    const store = createTestStore();
 
-      const { findByText, findAllByText } = await renderWithNotesLoaded();
+    mockedAxios.mockRejectedValueOnce(createAxiosError());
 
-      expect(await findByText('noteAttachments.imageAttachments')).toBeInTheDocument();
-      mockNoteImages.forEach(async (attachment) => {
-        expect(await findByText(attachment.fileName)).toBeInTheDocument();
-      });
-      expect((await findAllByText('noteAttachments.view')).length).toBe(2);
-    });
+    const result = (await store.dispatch(
+      notesApi.endpoints.getNotesByProject.initiate(mockProject.data.id),
+    )) as QueryErrorResult;
 
-    it('can POST a note image', async () => {
-      const newAttachment = {
-        id: 'attachment-3',
-        url: 'https://example.com/images/third-image.jpg',
-        fileName: 'third-image.jpg',
-        size: 150000,
-        contentType: 'image/jpeg',
-        createdDate: '2026-01-01T12:00:00Z',
-        order: 0,
-      };
+    expectQueryError(result);
+  });
 
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery
-        .mockReturnValueOnce({ data: [] })
-        .mockReturnValue({ data: [newAttachment] });
+  it('catches a bad notes PATCH request', async () => {
+    const store = createTestStore();
 
-      mockPostNoteImageTrigger.mockResolvedValue({ data: newAttachment });
+    mockedAxios.mockRejectedValueOnce(createAxiosError());
 
-      const { user, findByLabelText, getByRole } = await renderWithNotesLoaded();
+    const result = (await store.dispatch(
+      notesApi.endpoints.patchNote.initiate({ id: mockNotes.data[0].id }),
+    )) as QueryErrorResult;
 
-      const fileInput = (await findByLabelText('noteAttachments.dragAndDrop')) as HTMLInputElement;
-      const file = new File(['dummy content'], newAttachment.fileName, {
-        type: newAttachment.contentType,
-      });
+    expectQueryError(result);
+  });
 
-      await user.upload(fileInput, file);
-      await user.type(getByRole('textbox', { name: 'writeNote' }), 'Note with attachment');
-      await user.click(getByRole('button', { name: 'save' }));
+  it('catches a bad notes DELETE request', async () => {
+    const store = createTestStore();
 
-      await waitFor(() => expect(mockPostNoteImageTrigger).toHaveBeenCalledTimes(1));
-      const postImageRequest = mockPostNoteImageTrigger.mock.calls[0][0] as {
-        noteId: string;
-        formData: FormData;
-      };
+    mockedAxios.mockRejectedValueOnce(createAxiosError());
 
-      expect(mockPostNoteImageTrigger).toHaveBeenCalledWith(
-        expect.objectContaining({
-          noteId: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
-          formData: expect.any(FormData),
-        }),
-      );
-      expect((postImageRequest.formData.get('file') as File)?.name).toBe(newAttachment.fileName);
-    });
+    const result = (await store.dispatch(
+      notesApi.endpoints.deleteNote.initiate(mockNotes.data[0].id),
+    )) as QueryErrorResult;
 
-    it('can DELETE a note image', async () => {
-      const targetNote = mockNotes.data[0];
-      const targetAttachment = mockNoteImages[0];
+    expectQueryError(result);
+  });
 
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery.mockImplementation((noteId: string) => ({
-        data: noteId === targetNote.id ? [targetAttachment] : [],
-      }));
+  it('catches a bad notes POST request', async () => {
+    const store = createTestStore();
+    mockedAxios.mockRejectedValueOnce(createAxiosError());
 
-      const { user, findByText, findByTestId } = await renderWithNotesLoaded();
+    const noteRequest: INoteRequest = {
+      content: 'New note',
+      project: mockProject.data.id,
+    };
 
-      expect(await findByText(targetAttachment.fileName)).toBeInTheDocument();
+    const result = (await store.dispatch(
+      notesApi.endpoints.postNote.initiate(noteRequest),
+    )) as QueryErrorResult;
 
-      await user.click(await findByTestId(`delete-attachment-${targetAttachment.id}-button`));
-
-      expect(mockIsConfirmed).toHaveBeenCalledWith(
-        expect.objectContaining({
-          dialogType: 'delete',
-          confirmButtonText: 'noteAttachments.deleteDialog.delete',
-        }),
-      );
-      await waitFor(() => expect(mockDeleteNoteImageTrigger).toHaveBeenCalledTimes(1));
-      expect(mockDeleteNoteImageTrigger).toHaveBeenCalledWith(
-        expect.objectContaining({
-          noteId: targetNote.id,
-          imageId: targetAttachment.id,
-        }),
-      );
-    });
+    expectQueryError(result);
   });
 });

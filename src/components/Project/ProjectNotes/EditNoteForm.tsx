@@ -1,6 +1,6 @@
 import { Button, ButtonVariant } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react';
 import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
@@ -10,8 +10,6 @@ import useProjectNoteForm from '@/forms/useNoteForm';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { usePatchNoteMutation } from '@/api/notesApi';
-import NotesFileInput from './NoteFileInput';
-import usePostNoteImages from './usePostNoteImages';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
@@ -24,19 +22,15 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   const { formMethods } = useProjectNoteForm(note);
   const { t } = useTranslation();
   const [patchNote] = usePatchNoteMutation();
-  const [files, setFiles] = useState<File[] | null>(null);
-  const { postImages } = usePostNoteImages();
 
   const { handleSubmit, control } = formMethods;
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
       await patchNote({ content: form.content, id: form.id });
-      await postImages(form.id, files);
-      setFiles(null);
       close();
     },
-    [close, patchNote, postImages, files],
+    [close, patchNote],
   );
 
   return (
@@ -49,22 +43,19 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <Content>
-          <div className="mb-6">
-            <Controller
-              name="content"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  id="textarea"
-                  label={t('writeNote')}
-                  data-testid="edit-note-textarea"
-                  required
-                />
-              )}
-            />
-          </div>
-          <NotesFileInput handleChange={setFiles} />
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <TextArea
+                {...field}
+                id="textarea"
+                label={t('writeNote')}
+                data-testid="edit-note-textarea"
+                required
+              />
+            )}
+          />
         </Content>
         <ActionButtons>
           <Button type="submit" data-testid="edit-note-save">

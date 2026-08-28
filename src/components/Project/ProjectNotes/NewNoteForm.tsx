@@ -3,12 +3,10 @@ import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { INoteRequest } from '@/interfaces/noteInterfaces';
 import { Button, ButtonSize } from 'hds-react';
 import { TextArea } from 'hds-react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { usePostNoteMutation } from '@/api/notesApi';
-import NotesFileInput from './NoteFileInput';
-import usePostNoteImages from './usePostNoteImages';
 
 const ProjectNewNoteForm = () => {
   const { formMethods, formValues } = useProjectNoteForm();
@@ -20,21 +18,17 @@ const ProjectNewNoteForm = () => {
     formState: { isDirty },
   } = formMethods;
   const [postNote] = usePostNoteMutation();
-  const [files, setFiles] = useState<File[] | null>(null);
-  const { postImages, isPostingNoteImage } = usePostNoteImages();
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
       try {
-        const note = await postNote(form as INoteRequest).unwrap();
-        await postImages(note.id, files);
+        await postNote(form as INoteRequest);
         reset(formValues);
-        setFiles(null);
       } catch (e) {
         console.log('Error posting note: ', e);
       }
     },
-    [formValues, reset, postNote, postImages, files],
+    [formValues, reset, postNote],
   );
 
   return (
@@ -47,7 +41,6 @@ const ProjectNewNoteForm = () => {
             render={({ field }) => <TextArea {...field} id="textarea" label={t('writeNote')} />}
           />
         </div>
-        {isPostingNoteImage ? null : <NotesFileInput handleChange={setFiles} />}
         <Button size={ButtonSize.Small} type="submit" disabled={!isDirty}>
           {t('save')}
         </Button>
