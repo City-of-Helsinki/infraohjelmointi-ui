@@ -1,20 +1,12 @@
 import { memo } from 'react';
-import { FieldPath, useFieldArray, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconPlus, Tooltip } from 'hds-react';
 import { FormSectionTitle, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
-import { IProjectProgrammeForm } from '@/forms/useProjectProgrammeForm';
 import { validateMaxLength } from '@/utils/validation';
-
-export function getFieldProps(name: FieldPath<IProjectProgrammeForm>) {
-  const fieldName = name.split('.').at(-1) ?? name;
-
-  return {
-    name,
-    label: `projectProgrammeForm.${fieldName}`,
-  };
-}
+import { getFieldPropsForProjectProgrammeForm, requiredRule } from '@/utils/projectProgrammeUtils';
+import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 
 interface IProjectProgrammeBasicInfoFormProps {
   briefProgramme: boolean;
@@ -31,10 +23,6 @@ function ProjectProgrammeBasicInfoForm({
     keyName: 'formId',
   });
 
-  const requiredRule = (labelKey: string) => ({
-    required: t('validation.required', { field: t(labelKey) }),
-  });
-
   const tooltip = (fieldName: string) => (
     <Tooltip>{t(`projectProgrammeForm.${fieldName}Tooltip`)}</Tooltip>
   );
@@ -47,106 +35,114 @@ function ProjectProgrammeBasicInfoForm({
       />
       <p className="mb-8">{t('projectProgrammeForm.basicInfoSectionText')}</p>
       <TextField
-        {...getFieldProps('basicInfo.projectName')}
+        {...getFieldPropsForProjectProgrammeForm('basicInfo.projectName')}
         size="full"
         rules={{
           ...validateMaxLength(200, t),
-          ...requiredRule('projectProgrammeForm.projectName'),
+          ...requiredRule('projectProgrammeForm.projectName', t),
         }}
       />
       <div className="flex w-full gap-6">
         <div className="flex-1">
           <TextField
-            {...getFieldProps('basicInfo.district')}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.district')}
             size="full"
             rules={{
               ...validateMaxLength(200, t),
-              ...requiredRule('projectProgrammeForm.district'),
+              ...requiredRule('projectProgrammeForm.district', t),
             }}
           />
         </div>
         <div className="flex-1">
           <TextField
-            {...getFieldProps('basicInfo.projectProgrammeCompiler')}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.projectProgrammeCompiler')}
             size="full"
             rules={{
               ...validateMaxLength(100, t),
-              ...requiredRule('projectProgrammeForm.projectProgrammeCompiler'),
+              ...requiredRule('projectProgrammeForm.projectProgrammeCompiler', t),
             }}
           />
         </div>
       </div>
       <TextField
-        {...getFieldProps('basicInfo.personsInvolved')}
+        {...getFieldPropsForProjectProgrammeForm('basicInfo.personsInvolved')}
         size="full"
         rules={{
           ...validateMaxLength(200, t),
-          ...requiredRule('projectProgrammeForm.personsInvolved'),
+          ...requiredRule('projectProgrammeForm.personsInvolved', t),
         }}
       />
       {briefProgramme && (
         <TextField
-          {...getFieldProps('basicInfo.estimatedCosts')}
+          {...getFieldPropsForProjectProgrammeForm('basicInfo.estimatedCosts')}
           size="full"
           rules={{
             ...validateMaxLength(200, t),
-            ...requiredRule('projectProgrammeForm.estimatedCosts'),
+            ...requiredRule('projectProgrammeForm.estimatedCosts', t),
           }}
         />
       )}
       <TextField
-        {...getFieldProps('basicInfo.inspector')}
+        {...getFieldPropsForProjectProgrammeForm('basicInfo.inspector')}
         size="full"
         rules={{
           ...validateMaxLength(100, t),
-          ...(briefProgramme && requiredRule('projectProgrammeForm.inspector')),
+          ...(briefProgramme && requiredRule('projectProgrammeForm.inspector', t)),
         }}
       />
       <TextAreaField
-        {...getFieldProps('basicInfo.summary')}
-        rules={{ ...requiredRule('projectProgrammeForm.summary') }}
+        {...getFieldPropsForProjectProgrammeForm('basicInfo.summary')}
+        rules={{ ...requiredRule('projectProgrammeForm.summary', t) }}
         tooltip={tooltip('summary')}
       />
       {!briefProgramme && (
         <>
           <TextAreaField
-            {...getFieldProps('basicInfo.strategyGoals')}
-            rules={{ ...requiredRule('projectProgrammeForm.strategyGoals') }}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.strategyGoals')}
+            rules={{ ...requiredRule('projectProgrammeForm.strategyGoals', t) }}
             tooltip={tooltip('strategyGoals')}
           />
           <TextAreaField
-            {...getFieldProps('basicInfo.costClass')}
-            rules={{ ...requiredRule('projectProgrammeForm.costClass') }}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.costClass')}
+            rules={{ ...requiredRule('projectProgrammeForm.costClass', t) }}
             tooltip={tooltip('costClass')}
           />
           <TextField
-            {...getFieldProps('basicInfo.projectSize')}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.projectSize')}
             size="full"
             rules={{
               ...validateMaxLength(200, t),
-              ...requiredRule('projectProgrammeForm.projectSize'),
+              ...requiredRule('projectProgrammeForm.projectSize', t),
             }}
           />
           <TextAreaField
-            {...getFieldProps('basicInfo.risks')}
-            rules={{ ...requiredRule('projectProgrammeForm.risks') }}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.risks')}
+            rules={{ ...requiredRule('projectProgrammeForm.risks', t) }}
             tooltip={tooltip('risks')}
           />
           <TextAreaField
-            {...getFieldProps('basicInfo.studyAndPlanningNeeds')}
-            rules={{ ...requiredRule('projectProgrammeForm.studyAndPlanningNeeds') }}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.studyAndPlanningNeeds')}
+            rules={{ ...requiredRule('projectProgrammeForm.studyAndPlanningNeeds', t) }}
             tooltip={tooltip('studyAndPlanningNeeds')}
           />
           <TextAreaField
-            {...getFieldProps('basicInfo.planningAndImplementationFeasibility')}
-            rules={{ ...requiredRule('projectProgrammeForm.planningAndImplementationFeasibility') }}
+            {...getFieldPropsForProjectProgrammeForm(
+              'basicInfo.planningAndImplementationFeasibility',
+            )}
+            rules={{
+              ...requiredRule('projectProgrammeForm.planningAndImplementationFeasibility', t),
+            }}
             tooltip={tooltip('planningAndImplementationFeasibility')}
           />
           <TextAreaField
-            {...getFieldProps('basicInfo.specialConsiderations')}
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.specialConsiderations')}
+            rules={{ ...requiredRule('projectProgrammeForm.specialConsiderations', t) }}
             tooltip={tooltip('specialConsiderations')}
           />
-          <TextAreaField {...getFieldProps('basicInfo.otherConsiderations')} />
+          <TextAreaField
+            {...getFieldPropsForProjectProgrammeForm('basicInfo.otherConsiderations')}
+            rules={{ ...requiredRule('projectProgrammeForm.otherConsiderations', t) }}
+          />
         </>
       )}
 

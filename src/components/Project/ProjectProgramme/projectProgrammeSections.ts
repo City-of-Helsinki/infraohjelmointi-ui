@@ -1,13 +1,14 @@
 import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
 
-export type ProjectProgrammeSectionId = 'basicInfo';
+export type ProjectProgrammeSectionId = 'basicInfo' | 'designCriteria';
 
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;
-  labelKey: string;
-  textKey: string;
-  actionKey: string;
+  label: string;
+  cardText: string;
+  actionText: string;
   showInBrief: boolean;
+  sectionIsStarted: boolean;
 }
 
 // Fields only editable/required in the extended (non-brief) basic info form
@@ -28,18 +29,26 @@ export function hasExtendedBasicInfoContent(
   return EXTENDED_ONLY_BASIC_INFO_FIELDS.some((field) => Boolean(basicInfo?.[field]));
 }
 
-export const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
-  {
-    id: 'basicInfo',
-    labelKey: 'projectProgrammeForm.basicInfoCardTitle',
-    textKey: 'projectProgrammeForm.basicInfoCardText',
-    actionKey: 'projectProgrammeForm.fillBasicInfo',
-    showInBrief: true,
-  },
-];
+// export const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
+//   {
+//     id: 'basicInfo',
+//     labelKey: 'projectProgrammeForm.basicInfoCardTitle',
+//     textKey: 'projectProgrammeForm.basicInfoCardText',
+//     actionKey: 'projectProgrammeForm.fillBasicInfo',
+//     showInBrief: true,
+//   },
+//   {
+//     id: 'designCriteria',
+//     labelKey: 'projectProgrammeForm.designCriteriaCardTitle',
+//     textKey: 'projectProgrammeForm.designCriteriaCardText',
+//     actionKey: 'projectProgrammeForm.fillDesignCriteria',
+//     showInBrief: true,
+//   },
+// ];
 
 const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
   basicInfo: 'basic-info',
+  designCriteria: 'design-criteria',
 };
 
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {

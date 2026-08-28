@@ -1,33 +1,10 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
-
-export interface IProjectProgrammeLinkFormItem {
-  value: string;
-}
-
-export interface IProjectProgrammeBasicInfoForm {
-  projectName: string;
-  district: string;
-  projectProgrammeCompiler: string;
-  personsInvolved: string;
-  estimatedCosts: string;
-  inspector: string;
-  summary: string;
-  strategyGoals: string;
-  costClass: string;
-  projectSize: string;
-  risks: string;
-  studyAndPlanningNeeds: string;
-  planningAndImplementationFeasibility: string;
-  specialConsiderations: string;
-  otherConsiderations: string;
-  links: IProjectProgrammeLinkFormItem[];
-}
-
-export interface IProjectProgrammeForm {
-  basicInfo: IProjectProgrammeBasicInfoForm;
-}
+import type {
+  IProjectProgrammeBasicInfo,
+  IProjectProgrammeForm,
+  IProjectProgrammeLinkFormItem,
+} from '@/interfaces/projectProgrammeInterfaces';
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
   if (!district) {

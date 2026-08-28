@@ -5,6 +5,7 @@ export interface IProjectProgramme {
   status?: ProjectProgrammeStatus;
   briefProjectProgramme?: boolean;
   basicInfo?: IProjectProgrammeBasicInfo | null;
+  designCriteria?: IProjectProgrammeDesignCriteria | null;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -28,4 +29,39 @@ export interface IProjectProgrammeBasicInfo {
   specialConsiderations?: string | null;
   otherConsiderations?: string | null;
   links?: Array<string | { value?: string | null }> | null;
+}
+
+export interface IProjectProgrammeDesignCriteria {
+  guidingZoningRegulations?: string | null;
+  siteValuesProtectionAndSignificance?: string | null;
+  relationshipToPublicAreaServices?: string | null;
+}
+
+export interface IProjectProgrammeLinkFormItem {
+  value: string;
+}
+
+export interface IProjectProgrammeBasicInfoForm {
+  projectName: string;
+  district: string;
+  projectProgrammeCompiler: string;
+  personsInvolved: string;
+  estimatedCosts: string;
+  inspector: string;
+  summary: string;
+  strategyGoals: string;
+  costClass: string;
+  projectSize: string;
+  risks: string;
+  studyAndPlanningNeeds: string;
+  planningAndImplementationFeasibility: string;
+  specialConsiderations: string;
+  otherConsiderations: string;
+  links: IProjectProgrammeLinkFormItem[];
+}
+
+export interface IProjectProgrammeForm {
+  basicInfo: IProjectProgrammeBasicInfoForm;
+  designCriteria: IProjectProgrammeDesignCriteria;
+  links: IProjectProgrammeLinkFormItem[];
 }
