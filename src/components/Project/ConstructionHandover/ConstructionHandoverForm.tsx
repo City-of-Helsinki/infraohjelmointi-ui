@@ -12,6 +12,7 @@ import {
   usePatchConstructionHandoverMutation,
   useTransitionConstructionHandoverStatusMutation,
 } from '@/api/constructionHandoverApi';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   ConstructionHandoverStatus,
   IConstructionHandover,
@@ -20,6 +21,8 @@ import {
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
+import { isConstructionHandoverLocked } from './constructionHandoverUtils';
+import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -35,6 +38,7 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
     name: formData.name,
     description: formData.description,
     constructionProcurementMethod: formData.constructionProcurementMethod.value,
+    staraProcurementReason: formData.staraProcurementReason?.value ?? null,
     constructionStart: formData.constructionStart,
     constructionEnd: formData.constructionEnd,
     otherTimelineNotes: formData.otherTimelineNotes,
@@ -49,10 +53,12 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
 
 interface IConstructionHandoverFormProps {
   constructionHandover: IConstructionHandover;
+  project?: IProject;
 }
 
 function ConstructionHandoverForm({
   constructionHandover,
+  project,
 }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -63,11 +69,29 @@ function ConstructionHandoverForm({
   } = formMethods;
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
-  const canBeReturnedToDraft = [
+
+  const {
+    isProjectManager,
+    isPlanner,
+    isConstructionManagementLead,
+    isResponsiblePersonForProject,
+  } = useConstructionHandoverPermissions(project);
+
+  const showSubmitToProgrammerButton =
+    constructionHandover.status === ConstructionHandoverStatus.DRAFT &&
+    isProjectManager &&
+    isResponsiblePersonForProject;
+  const showSubmitToConstructionButton =
+    constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
+  const showSaveDraftButton = !isConstructionHandoverLocked(constructionHandover);
+  const showReturnToDraftButton = [
     ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
     ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
   ].includes(constructionHandover.status);
+  const showNameProjectManagerNotification =
+    constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
+    isConstructionManagementLead;
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -105,14 +129,20 @@ function ConstructionHandoverForm({
     }
   }
 
-  async function submitToProgrammer() {
+  async function submitFormBeforeStatusTransition(data: IConstructionHandoverForm) {
     if (isDirty) {
-      // If there are unsaved changes, save them before submitting to programmer
-      const error = await submitForm(formMethods.getValues());
+      // If there are unsaved changes, save them before doing the status transition
+      const error = await submitForm(data);
       if (error) {
-        // If there was an error saving the form, do not proceed with the status transition
-        return;
+        return error;
       }
+    }
+  }
+
+  async function submitToProgrammer() {
+    const error = await submitFormBeforeStatusTransition(formMethods.getValues());
+    if (error) {
+      return;
     }
 
     doStatusTransition({
@@ -121,7 +151,12 @@ function ConstructionHandoverForm({
     });
   }
 
-  function submitToConstruction() {
+  async function submitToConstruction() {
+    const error = await submitFormBeforeStatusTransition(formMethods.getValues());
+    if (error) {
+      return;
+    }
+
     doStatusTransition({
       id: constructionHandover.id,
       to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
@@ -146,29 +181,28 @@ function ConstructionHandoverForm({
           ].includes(constructionHandover.status)}
         />
         <ScheduleSection />
-        <FinancingSection handoverStatus={constructionHandover.status} />
+        <FinancingSection constructionHandover={constructionHandover} />
         <ContactsSection />
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="flex items-center gap-6">
-              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+              {showSubmitToProgrammerButton && (
                 <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
                   {t('constructionHandoverForm.submitToProgrammer')}
                 </Button>
               )}
-              {constructionHandover.status ===
-                ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && (
+              {showSubmitToConstructionButton && (
                 <Button type="button" onClick={handleSubmit(submitToConstruction)}>
                   {t('constructionHandoverForm.submitToConstruction')}
                 </Button>
               )}
-              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+              {showSaveDraftButton && (
                 <Button variant={ButtonVariant.Secondary} type="submit">
                   {t('constructionHandoverForm.saveDraft')}
                 </Button>
               )}
-              {canBeReturnedToDraft && (
+              {showReturnToDraftButton && (
                 <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
                   {t('constructionHandoverForm.returnToDraft')}
                 </Button>
@@ -181,8 +215,7 @@ function ConstructionHandoverForm({
               >
                 {t('copyLink')}
               </Button>
-              {constructionHandover.status ===
-                ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION && (
+              {showNameProjectManagerNotification && (
                 <div>
                   <Notification
                     label={t('constructionHandoverForm.nameProjectManagerNotification')}

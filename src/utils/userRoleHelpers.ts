@@ -85,3 +85,11 @@ export const isUserOnlyProjectManager = (user: IUser | null) => {
 
   return !isUserProjectAreaPlanner(user) && isUserProjectManager(user);
 };
+
+export const isUserConstructionManagementLead = (user: IUser | null) => {
+  if (!user) {
+    return false;
+  }
+
+  return user.ad_groups.some((ag) => ag.name === UserRole.CONSTRUCTION_MANAGEMENT_LEAD);
+};

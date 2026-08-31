@@ -12,6 +12,10 @@ describe('useConstructionHandoverForm', () => {
         id: '7eedb495-7d42-4511-b4bf-c54f3698d415',
         value: 'Yhteistoiminnalliset',
       },
+      staraProcurementReason: {
+        id: '8eedb495-7d42-4511-b4bf-c54f3698d415',
+        value: 'urgentWork',
+      },
       constructionStart: '2026-01-01',
       constructionEnd: '2028-09-30',
       otherTimelineNotes: '',
@@ -44,6 +48,14 @@ describe('useConstructionHandoverForm', () => {
       constructionProcurementMethod: {
         label: 'Yhteistoiminnalliset',
         value: '7eedb495-7d42-4511-b4bf-c54f3698d415',
+        selected: false,
+        isGroupLabel: false,
+        visible: true,
+        disabled: false,
+      },
+      staraProcurementReason: {
+        label: 'urgentWork',
+        value: '8eedb495-7d42-4511-b4bf-c54f3698d415',
         selected: false,
         isGroupLabel: false,
         visible: true,
