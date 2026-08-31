@@ -33,7 +33,7 @@ function ProjectProgrammeBasicInfoForm({
         name="projectProgrammeBasicInfo"
         label="projectProgrammeForm.basicInfoSectionTitle"
       />
-      <p className="mb-8">{t('projectProgrammeForm.basicInfoSectionText')}</p>
+      <p className="mb-8">{t('projectProgrammeForm.requiredSectionHelperText')}</p>
       <TextField
         {...getFieldPropsForProjectProgrammeForm('basicInfo.projectName')}
         size="full"
@@ -136,12 +136,11 @@ function ProjectProgrammeBasicInfoForm({
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.specialConsiderations')}
-            rules={{ ...requiredRule('projectProgrammeForm.specialConsiderations', t) }}
             tooltip={tooltip('specialConsiderations')}
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.otherConsiderations')}
-            rules={{ ...requiredRule('projectProgrammeForm.otherConsiderations', t) }}
+            tooltip={tooltip('otherConsiderations')}
           />
         </>
       )}

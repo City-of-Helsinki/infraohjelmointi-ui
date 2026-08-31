@@ -244,8 +244,7 @@ function ProjectProgramme() {
           <ProjectProgrammeForm
             projectProgrammeId={projectProgrammeId}
             activeSection={activeSection}
-            basicInfo={effectiveProjectProgramme?.basicInfo ?? {}}
-            designCriteria={effectiveProjectProgramme?.designCriteria ?? {}}
+            effectiveProjectProgramme={effectiveProjectProgramme}
             briefProgramme={briefProgramme}
             onClose={handleCloseSection}
           />

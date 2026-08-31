@@ -1,11 +1,13 @@
+import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/projectProgrammeSections';
+
 export type ProjectProgrammeStatus = 'DRAFT' | 'COMPLETE';
 
 export interface IProjectProgramme {
   id: string;
   status?: ProjectProgrammeStatus;
   briefProjectProgramme?: boolean;
-  basicInfo?: IProjectProgrammeBasicInfo | null;
-  designCriteria?: IProjectProgrammeDesignCriteria | null;
+  basicInfo?: IProjectProgrammeBasicInfo;
+  designCriteria?: IProjectProgrammeDesignCriteria;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -28,7 +30,7 @@ export interface IProjectProgrammeBasicInfo {
   planningAndImplementationFeasibility?: string | null;
   specialConsiderations?: string | null;
   otherConsiderations?: string | null;
-  links?: Array<string | { value?: string | null }> | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
 export interface IProjectProgrammeDesignCriteria {
@@ -42,26 +44,15 @@ export interface IProjectProgrammeLinkFormItem {
   value: string;
 }
 
-export interface IProjectProgrammeBasicInfoForm {
-  projectName: string;
-  district: string;
-  projectProgrammeCompiler: string;
-  personsInvolved: string;
-  estimatedCosts: string;
-  inspector: string;
-  summary: string;
-  strategyGoals: string;
-  costClass: string;
-  projectSize: string;
-  risks: string;
-  studyAndPlanningNeeds: string;
-  planningAndImplementationFeasibility: string;
-  specialConsiderations: string;
-  otherConsiderations: string;
-  links?: IProjectProgrammeLinkFormItem[] | null;
+export interface IProjectProgrammeForm {
+  basicInfo?: IProjectProgrammeBasicInfo;
+  designCriteria?: IProjectProgrammeDesignCriteria;
 }
 
-export interface IProjectProgrammeForm {
-  basicInfo?: IProjectProgrammeBasicInfoForm;
-  designCriteria?: IProjectProgrammeDesignCriteria;
+export interface IProjectProgrammeFormProps {
+  projectProgrammeId: string;
+  activeSection: ProjectProgrammeSectionId;
+  effectiveProjectProgramme?: IProjectProgrammeForm;
+  briefProgramme: boolean;
+  onClose: () => void;
 }

@@ -3,7 +3,7 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectProgrammeForm, {
-  pickChangedBasicInfoFields,
+  pickChangedFormFields,
   pickChangedLinks,
 } from './ProjectProgrammeForm';
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
@@ -66,8 +66,7 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData.basicInfo}
-              designCriteria={baseFormData.designCriteria}
+              effectiveProjectProgramme={baseFormData}
               briefProgramme
               onClose={jest.fn()}
             />
@@ -99,8 +98,7 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData.basicInfo ?? {}}
-              designCriteria={baseFormData.designCriteria ?? {}}
+              effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               onClose={jest.fn()}
             />
@@ -136,7 +134,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('maps only dirty basic info fields for save payload', () => {
-    const payload = pickChangedBasicInfoFields(baseFormData, {
+    const payload = pickChangedFormFields(baseFormData, 'basicInfo', {
       projectName: true,
       summary: true,
     });
@@ -151,7 +149,6 @@ describe('ProjectProgrammeForm save logic', () => {
   it('trims and filters empty links when links are dirty', () => {
     const links = pickChangedLinks(
       'basicInfo',
-
       {
         ...baseFormData,
         basicInfo: {
@@ -176,8 +173,7 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData.basicInfo}
-              designCriteria={baseFormData.designCriteria}
+              effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               onClose={onClose}
             />
@@ -223,8 +219,7 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData.basicInfo}
-              designCriteria={baseFormData.designCriteria}
+              effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               onClose={onClose}
             />

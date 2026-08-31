@@ -51,7 +51,7 @@ function getLinksValue(
   return [{ value: '' }];
 }
 
-export default function useProjectProgrammeForm(formData: IProjectProgrammeForm | null) {
+export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm) {
   const formMethods = useForm<IProjectProgrammeForm>({
     defaultValues: {
       basicInfo: {

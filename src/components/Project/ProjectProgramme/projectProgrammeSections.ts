@@ -54,3 +54,63 @@ const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {
   return SECTION_ID_TO_API_ROUTE[sectionId];
 }
+
+export type ProjectProgrammeFormSectionConfig = {
+  fields: readonly string[];
+  toApiField: Record<string, string>;
+};
+
+export const PROJECT_PROGRAMME_FORM_SECTION_CONFIG: Record<
+  ProjectProgrammeSectionId,
+  ProjectProgrammeFormSectionConfig
+> = {
+  basicInfo: {
+    fields: [
+      'projectName',
+      'district',
+      'projectProgrammeCompiler',
+      'personsInvolved',
+      'estimatedCosts',
+      'inspector',
+      'summary',
+      'strategyGoals',
+      'costClass',
+      'projectSize',
+      'risks',
+      'studyAndPlanningNeeds',
+      'planningAndImplementationFeasibility',
+      'specialConsiderations',
+      'otherConsiderations',
+    ],
+    toApiField: {
+      projectName: 'projectName',
+      district: 'district',
+      projectProgrammeCompiler: 'projectProgrammeCompiler',
+      personsInvolved: 'personsInvolved',
+      estimatedCosts: 'estimatedCosts',
+      inspector: 'inspector',
+      summary: 'summary',
+      strategyGoals: 'strategyGoals',
+      costClass: 'costClass',
+      projectSize: 'projectSize',
+      risks: 'risks',
+      studyAndPlanningNeeds: 'studyAndPlanningNeeds',
+      planningAndImplementationFeasibility: 'planningAndImplementationFeasibility',
+      specialConsiderations: 'specialConsiderations',
+      otherConsiderations: 'otherConsiderations',
+    },
+  },
+
+  designCriteria: {
+    fields: [
+      'guidingZoningRegulations',
+      'siteValuesProtectionAndSignificance',
+      'relationshipToPublicAreaServices',
+    ],
+    toApiField: {
+      guidingZoningRegulations: 'guidingZoningRegulations',
+      siteValuesProtectionAndSignificance: 'siteValuesProtectionAndSignificance',
+      relationshipToPublicAreaServices: 'relationshipToPublicAreaServices',
+    },
+  },
+};

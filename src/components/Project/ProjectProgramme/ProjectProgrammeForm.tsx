@@ -7,96 +7,35 @@ import { usePatchProjectProgrammeSectionMutation } from '@/api/projectProgrammeA
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
-import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
 import {
-  IProjectProgrammeBasicInfo,
-  IProjectProgrammeDesignCriteria,
+  mapSectionIdToApiRoute,
+  PROJECT_PROGRAMME_FORM_SECTION_CONFIG,
+  ProjectProgrammeSectionId,
+} from './projectProgrammeSections';
+import {
   IProjectProgrammeForm,
+  IProjectProgrammeFormProps,
 } from '@/interfaces/projectProgrammeInterfaces';
+import type { FieldNamesMarkedBoolean } from 'react-hook-form';
+import DesignCriteriaForm from './DesignCriteriaForm';
 
-interface IProjectProgrammeFormProps {
-  projectProgrammeId: string;
-  activeSection: ProjectProgrammeSectionId;
-  basicInfo?: IProjectProgrammeBasicInfo;
-  designCriteria?: IProjectProgrammeDesignCriteria;
-  briefProgramme: boolean;
-  onClose: () => void;
-}
+type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
-type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
-type BasicInfoDirtyFields = Partial<Record<BasicInfoFormField, boolean>> & { links?: unknown };
-
-const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoFormField, string> = {
-  projectName: 'projectName',
-  district: 'district',
-  projectProgrammeCompiler: 'projectProgrammeCompiler',
-  personsInvolved: 'personsInvolved',
-  estimatedCosts: 'estimatedCosts',
-  inspector: 'inspector',
-  summary: 'summary',
-  strategyGoals: 'strategyGoals',
-  costClass: 'costClass',
-  projectSize: 'projectSize',
-  risks: 'risks',
-  studyAndPlanningNeeds: 'studyAndPlanningNeeds',
-  planningAndImplementationFeasibility: 'planningAndImplementationFeasibility',
-  specialConsiderations: 'specialConsiderations',
-  otherConsiderations: 'otherConsiderations',
-};
-
-const BASIC_INFO_FORM_FIELDS: BasicInfoFormField[] = [
-  'projectName',
-  'district',
-  'projectProgrammeCompiler',
-  'personsInvolved',
-  'estimatedCosts',
-  'inspector',
-  'summary',
-  'strategyGoals',
-  'costClass',
-  'projectSize',
-  'risks',
-  'studyAndPlanningNeeds',
-  'planningAndImplementationFeasibility',
-  'specialConsiderations',
-  'otherConsiderations',
-];
-
-type DesignCriteriaFormField = Exclude<keyof IProjectProgrammeForm['designCriteria'], 'links'>;
-type DesignCriteriaDirtyFields = Partial<Record<DesignCriteriaFormField, boolean>> & {
-  links?: unknown;
-};
-
-const DESIGN_CRITERIA_FORM_TO_API_FIELD: Record<DesignCriteriaFormField, string> = {
-  guidingZoningRegulations: 'guidingZoningRegulations',
-  siteValuesProtectionAndSignificance: 'siteValuesProtectionAndSignificance',
-  relationshipToPublicAreaServices: 'relationshipToPublicAreaServices',
-};
-
-const DESIGN_CRITERIA_FORM_FIELDS: DesignCriteriaFormField[] = [
-  'guidingZoningRegulations',
-  'siteValuesProtectionAndSignificance',
-  'relationshipToPublicAreaServices',
-];
-
-export function pickChangedBasicInfoFields(
+export function pickChangedFormFields(
   formData: IProjectProgrammeForm,
-  basicInfoDirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
-  designCriteriaDirtyFields?: Partial<Record<DesignCriteriaFormField, boolean>>,
+  activeSection: ProjectProgrammeSectionId,
+  dirtyFields: Record<string, boolean> | undefined,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
+  const config = PROJECT_PROGRAMME_FORM_SECTION_CONFIG[activeSection];
 
-  BASIC_INFO_FORM_FIELDS.forEach((field) => {
-    if (basicInfoDirtyFields[field]) {
-      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo?.[field];
-    }
-  });
+  for (const field of config.fields) {
+    if (dirtyFields?.[field]) {
+      const value = (formData[activeSection] as Record<string, unknown> | undefined)?.[field];
 
-  DESIGN_CRITERIA_FORM_FIELDS.forEach((field) => {
-    if (designCriteriaDirtyFields?.[field]) {
-      payload[DESIGN_CRITERIA_FORM_TO_API_FIELD[field]] = formData.designCriteria?.[field];
+      payload[config.toApiField[field]] = value;
     }
-  });
+  }
 
   return payload;
 }
@@ -104,45 +43,43 @@ export function pickChangedBasicInfoFields(
 export function pickChangedLinks(
   formSection: ProjectProgrammeSectionId,
   formData: IProjectProgrammeForm,
-  dirtyFields: BasicInfoDirtyFields | DesignCriteriaDirtyFields,
+  dirtyFields: DirtyFields[ProjectProgrammeSectionId] | undefined,
 ): string[] | undefined {
-  if (!dirtyFields.links) {
+  if (!dirtyFields?.links) {
     return undefined;
   }
 
   return (
-    formData[formSection]?.links
-      ?.map((link) => link.value.trim())
-      .filter((linkValue) => linkValue.length > 0) ?? undefined
+    formData[formSection]?.links?.map((link) => link.value.trim()).filter(Boolean) ?? undefined
   );
 }
 
 function ProjectProgrammeForm({
   projectProgrammeId,
   activeSection,
-  basicInfo,
-  designCriteria,
+  effectiveProjectProgramme,
   briefProgramme,
   onClose,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useProjectProgrammeForm({ basicInfo, designCriteria });
+  const formMethods = useProjectProgrammeForm(effectiveProjectProgramme);
   const {
     handleSubmit,
     formState: { isDirty, dirtyFields },
   } = formMethods;
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
 
-  async function submitDraft(data: IProjectProgrammeForm) {
-    if (activeSection !== 'basicInfo') return;
-
-    const requestData: Record<string, unknown> = pickChangedBasicInfoFields(
+  async function submitDraft(
+    data: IProjectProgrammeForm,
+    activeSection: keyof IProjectProgrammeForm,
+  ) {
+    const requestData: Record<string, unknown> = pickChangedFormFields(
       data,
-      dirtyFields.basicInfo ?? {},
-      dirtyFields.designCriteria ?? {},
+      activeSection,
+      dirtyFields?.[activeSection] as Record<string, boolean> | undefined,
     );
-    const linksPayload = pickChangedLinks('basicInfo', data, dirtyFields.basicInfo ?? {});
+    const linksPayload = pickChangedLinks(activeSection, data, dirtyFields?.[activeSection]);
 
     if (linksPayload !== undefined) {
       requestData.links = linksPayload;
@@ -192,7 +129,7 @@ function ProjectProgrammeForm({
     <FormProvider {...formMethods}>
       <form
         className="project-form mx-auto max-w-xl"
-        onSubmit={handleSubmit(submitDraft)}
+        onSubmit={handleSubmit((data) => submitDraft(data, activeSection))}
         noValidate
       >
         <div className="mb-4">
@@ -204,6 +141,8 @@ function ProjectProgrammeForm({
         {activeSection === 'basicInfo' && (
           <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
         )}
+
+        {activeSection === 'designCriteria' && <DesignCriteriaForm />}
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">

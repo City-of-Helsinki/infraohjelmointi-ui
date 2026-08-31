@@ -26,7 +26,7 @@ function DesignCriteriaForm() {
         name="projectProgrammeDesignCriteria"
         label="projectProgrammeForm.designCriteriaSectionTitle"
       />
-      <p className="mb-8">{t('projectProgrammeForm.designCriteriaSectionText')}</p>
+      <p className="mb-8">{t('projectProgrammeForm.requiredSectionHelperText')}</p>
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('designCriteria.guidingZoningRegulations')}
         rules={{ ...requiredRule('projectProgrammeForm.guidingZoningRegulations', t) }}
