@@ -4,6 +4,7 @@ import type {
   IProjectProgrammeBasicInfo,
   IProjectProgrammeForm,
   IProjectProgrammeLinkFormItem,
+  IProjectProgrammeDesignCriteria,
 } from '@/interfaces/projectProgrammeInterfaces';
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
@@ -27,7 +28,7 @@ function hasItems<T>(items?: T[] | null): items is T[] {
 }
 
 function getLinksValue(
-  links?: IProjectProgrammeBasicInfo['links'],
+  links?: IProjectProgrammeBasicInfo['links'] | IProjectProgrammeDesignCriteria['links'],
 ): IProjectProgrammeLinkFormItem[] {
   if (!hasItems(links)) {
     return [{ value: '' }];
@@ -50,7 +51,7 @@ function getLinksValue(
   return [{ value: '' }];
 }
 
-export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasicInfo | null) {
+export default function useProjectProgrammeForm(formData: IProjectProgrammeForm | null) {
   const formMethods = useForm<IProjectProgrammeForm>({
     defaultValues: {
       basicInfo: {
@@ -80,27 +81,27 @@ export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasi
   useEffect(() => {
     reset({
       basicInfo: {
-        projectName: getTextValue(basicInfo?.projectName),
-        district: getDistrictValue(basicInfo?.district),
-        projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
-        personsInvolved: getTextValue(basicInfo?.personsInvolved),
-        estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
-        inspector: getTextValue(basicInfo?.inspector),
-        summary: getTextValue(basicInfo?.summary),
-        strategyGoals: getTextValue(basicInfo?.strategyGoals),
-        costClass: getTextValue(basicInfo?.costClass),
-        projectSize: getTextValue(basicInfo?.projectSize),
-        risks: getTextValue(basicInfo?.risks),
-        studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
+        projectName: getTextValue(formData?.basicInfo?.projectName),
+        district: getDistrictValue(formData?.basicInfo?.district),
+        projectProgrammeCompiler: getTextValue(formData?.basicInfo?.projectProgrammeCompiler),
+        personsInvolved: getTextValue(formData?.basicInfo?.personsInvolved),
+        estimatedCosts: getTextValue(formData?.basicInfo?.estimatedCosts),
+        inspector: getTextValue(formData?.basicInfo?.inspector),
+        summary: getTextValue(formData?.basicInfo?.summary),
+        strategyGoals: getTextValue(formData?.basicInfo?.strategyGoals),
+        costClass: getTextValue(formData?.basicInfo?.costClass),
+        projectSize: getTextValue(formData?.basicInfo?.projectSize),
+        risks: getTextValue(formData?.basicInfo?.risks),
+        studyAndPlanningNeeds: getTextValue(formData?.basicInfo?.studyAndPlanningNeeds),
         planningAndImplementationFeasibility: getTextValue(
-          basicInfo?.planningAndImplementationFeasibility,
+          formData?.basicInfo?.planningAndImplementationFeasibility,
         ),
-        specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
-        otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
-        links: getLinksValue(basicInfo?.links),
+        specialConsiderations: getTextValue(formData?.basicInfo?.specialConsiderations),
+        otherConsiderations: getTextValue(formData?.basicInfo?.otherConsiderations),
+        links: getLinksValue(formData?.basicInfo?.links),
       },
     });
-  }, [basicInfo, reset]);
+  }, [formData, reset]);
 
   return formMethods;
 }

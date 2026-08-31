@@ -2,24 +2,29 @@ import { Button, ButtonVariant, IconPen, StatusLabel } from 'hds-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
-import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
-import useProjectProgrammeForm, { IProjectProgrammeForm } from '@/forms/useProjectProgrammeForm';
+import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import { usePatchProjectProgrammeSectionMutation } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
 import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
-
-type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
-type BasicInfoDirtyFields = Partial<Record<BasicInfoFormField, boolean>> & { links?: unknown };
+import {
+  IProjectProgrammeBasicInfo,
+  IProjectProgrammeDesignCriteria,
+  IProjectProgrammeForm,
+} from '@/interfaces/projectProgrammeInterfaces';
 
 interface IProjectProgrammeFormProps {
   projectProgrammeId: string;
   activeSection: ProjectProgrammeSectionId;
-  basicInfo: IProjectProgrammeBasicInfo | null;
+  basicInfo?: IProjectProgrammeBasicInfo;
+  designCriteria?: IProjectProgrammeDesignCriteria;
   briefProgramme: boolean;
   onClose: () => void;
 }
+
+type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
+type BasicInfoDirtyFields = Partial<Record<BasicInfoFormField, boolean>> & { links?: unknown };
 
 const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoFormField, string> = {
   projectName: 'projectName',
@@ -57,15 +62,39 @@ const BASIC_INFO_FORM_FIELDS: BasicInfoFormField[] = [
   'otherConsiderations',
 ];
 
+type DesignCriteriaFormField = Exclude<keyof IProjectProgrammeForm['designCriteria'], 'links'>;
+type DesignCriteriaDirtyFields = Partial<Record<DesignCriteriaFormField, boolean>> & {
+  links?: unknown;
+};
+
+const DESIGN_CRITERIA_FORM_TO_API_FIELD: Record<DesignCriteriaFormField, string> = {
+  guidingZoningRegulations: 'guidingZoningRegulations',
+  siteValuesProtectionAndSignificance: 'siteValuesProtectionAndSignificance',
+  relationshipToPublicAreaServices: 'relationshipToPublicAreaServices',
+};
+
+const DESIGN_CRITERIA_FORM_FIELDS: DesignCriteriaFormField[] = [
+  'guidingZoningRegulations',
+  'siteValuesProtectionAndSignificance',
+  'relationshipToPublicAreaServices',
+];
+
 export function pickChangedBasicInfoFields(
   formData: IProjectProgrammeForm,
-  dirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
+  basicInfoDirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
+  designCriteriaDirtyFields?: Partial<Record<DesignCriteriaFormField, boolean>>,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
 
   BASIC_INFO_FORM_FIELDS.forEach((field) => {
-    if (dirtyFields[field]) {
-      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo[field];
+    if (basicInfoDirtyFields[field]) {
+      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo?.[field];
+    }
+  });
+
+  DESIGN_CRITERIA_FORM_FIELDS.forEach((field) => {
+    if (designCriteriaDirtyFields?.[field]) {
+      payload[DESIGN_CRITERIA_FORM_TO_API_FIELD[field]] = formData.designCriteria?.[field];
     }
   });
 
@@ -73,28 +102,32 @@ export function pickChangedBasicInfoFields(
 }
 
 export function pickChangedLinks(
+  formSection: ProjectProgrammeSectionId,
   formData: IProjectProgrammeForm,
-  dirtyFields: BasicInfoDirtyFields,
-): string[] | null {
+  dirtyFields: BasicInfoDirtyFields | DesignCriteriaDirtyFields,
+): string[] | undefined {
   if (!dirtyFields.links) {
-    return null;
+    return undefined;
   }
 
-  return formData.basicInfo.links
-    .map((link) => link.value.trim())
-    .filter((linkValue) => linkValue.length > 0);
+  return (
+    formData[formSection]?.links
+      ?.map((link) => link.value.trim())
+      .filter((linkValue) => linkValue.length > 0) ?? undefined
+  );
 }
 
 function ProjectProgrammeForm({
   projectProgrammeId,
   activeSection,
   basicInfo,
+  designCriteria,
   briefProgramme,
   onClose,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useProjectProgrammeForm(basicInfo);
+  const formMethods = useProjectProgrammeForm({ basicInfo, designCriteria });
   const {
     handleSubmit,
     formState: { isDirty, dirtyFields },
@@ -107,13 +140,11 @@ function ProjectProgrammeForm({
     const requestData: Record<string, unknown> = pickChangedBasicInfoFields(
       data,
       dirtyFields.basicInfo ?? {},
+      dirtyFields.designCriteria ?? {},
     );
-    const linksPayload = pickChangedLinks(
-      data,
-      dirtyFields.basicInfo ?? {},
-    );
+    const linksPayload = pickChangedLinks('basicInfo', data, dirtyFields.basicInfo ?? {});
 
-    if (linksPayload !== null) {
+    if (linksPayload !== undefined) {
       requestData.links = linksPayload;
     }
 

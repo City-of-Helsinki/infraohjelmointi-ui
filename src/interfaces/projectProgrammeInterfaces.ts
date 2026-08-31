@@ -35,6 +35,7 @@ export interface IProjectProgrammeDesignCriteria {
   guidingZoningRegulations?: string | null;
   siteValuesProtectionAndSignificance?: string | null;
   relationshipToPublicAreaServices?: string | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
 export interface IProjectProgrammeLinkFormItem {
@@ -57,11 +58,10 @@ export interface IProjectProgrammeBasicInfoForm {
   planningAndImplementationFeasibility: string;
   specialConsiderations: string;
   otherConsiderations: string;
-  links: IProjectProgrammeLinkFormItem[];
+  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
 export interface IProjectProgrammeForm {
-  basicInfo: IProjectProgrammeBasicInfoForm;
-  designCriteria: IProjectProgrammeDesignCriteria;
-  links: IProjectProgrammeLinkFormItem[];
+  basicInfo?: IProjectProgrammeBasicInfoForm;
+  designCriteria?: IProjectProgrammeDesignCriteria;
 }

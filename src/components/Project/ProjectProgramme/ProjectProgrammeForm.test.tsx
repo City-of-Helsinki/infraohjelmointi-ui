@@ -6,7 +6,7 @@ import ProjectProgrammeForm, {
   pickChangedBasicInfoFields,
   pickChangedLinks,
 } from './ProjectProgrammeForm';
-import { IProjectProgrammeForm } from '@/forms/useProjectProgrammeForm';
+import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 
 const mockDispatch = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
@@ -42,6 +42,12 @@ const baseFormData: IProjectProgrammeForm = {
     otherConsiderations: 'Other considerations',
     links: [{ value: 'https://old-link.fi' }],
   },
+  designCriteria: {
+    guidingZoningRegulations: 'Guiding zoning regulations',
+    siteValuesProtectionAndSignificance: 'Site values protection and significance',
+    relationshipToPublicAreaServices: 'Relationship to public area services',
+    links: [{ value: 'https://old-design-link.fi' }],
+  },
 };
 
 describe('ProjectProgrammeForm save logic', () => {
@@ -61,6 +67,7 @@ describe('ProjectProgrammeForm save logic', () => {
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
               basicInfo={baseFormData.basicInfo}
+              designCriteria={baseFormData.designCriteria}
               briefProgramme
               onClose={jest.fn()}
             />
@@ -92,7 +99,8 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
-              basicInfo={baseFormData.basicInfo}
+              basicInfo={baseFormData.basicInfo ?? {}}
+              designCriteria={baseFormData.designCriteria ?? {}}
               briefProgramme={false}
               onClose={jest.fn()}
             />
@@ -106,8 +114,12 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(
       screen.queryByRole('textbox', { name: /projectProgrammeForm\.estimatedCosts/ }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.costClass/ })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ })).not.toBeRequired();
+    expect(
+      screen.getByRole('textbox', { name: /projectProgrammeForm\.costClass/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ }),
+    ).not.toBeRequired();
     [
       'strategyGoals',
       'projectSize',
@@ -138,6 +150,8 @@ describe('ProjectProgrammeForm save logic', () => {
 
   it('trims and filters empty links when links are dirty', () => {
     const links = pickChangedLinks(
+      'basicInfo',
+
       {
         ...baseFormData,
         basicInfo: {
@@ -163,6 +177,7 @@ describe('ProjectProgrammeForm save logic', () => {
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
               basicInfo={baseFormData.basicInfo}
+              designCriteria={baseFormData.designCriteria}
               briefProgramme={false}
               onClose={onClose}
             />
@@ -209,6 +224,7 @@ describe('ProjectProgrammeForm save logic', () => {
               projectProgrammeId="programme-1"
               activeSection="basicInfo"
               basicInfo={baseFormData.basicInfo}
+              designCriteria={baseFormData.designCriteria}
               briefProgramme={false}
               onClose={onClose}
             />
