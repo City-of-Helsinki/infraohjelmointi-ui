@@ -15,6 +15,7 @@ import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
   hasExtendedBasicInfoContent,
   IProjectProgrammeSectionConfig,
+  isSectionStarted,
   mapSectionIdToApiRoute,
   ProjectProgrammeSectionId,
 } from './projectProgrammeSections';
@@ -64,8 +65,11 @@ function ProjectProgramme() {
     projectProgrammeQueryStatus !== undefined &&
     projectProgrammeQueryStatus !== 404;
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
-  const hasBasicInfo = Boolean(effectiveProjectProgramme?.basicInfo);
-  const hasDesignCriteria = Boolean(effectiveProjectProgramme?.designCriteria);
+  const hasBasicInfo = isSectionStarted('basicInfo', effectiveProjectProgramme?.basicInfo);
+  const hasDesignCriteria = isSectionStarted(
+    'designCriteria',
+    effectiveProjectProgramme?.designCriteria,
+  );
 
   const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
     {
@@ -90,9 +94,7 @@ function ProjectProgramme() {
 
   const hasSavedExtendedSection =
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
-    PROJECT_PROGRAMME_SECTIONS.some(
-      (section) => !section.showInBrief && Boolean(effectiveProjectProgramme?.[section.id]),
-    );
+    PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;
