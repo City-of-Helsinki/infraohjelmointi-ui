@@ -253,6 +253,324 @@ const createIssue = (
   visibleInDialog: visibleFields.has(field),
 });
 
+type ProjectValidationIssueAdder = (
+  field: ProjectValidationField,
+  rule: string,
+  messageKey: string,
+  messageParams?: ProjectValidationIssueParams,
+) => void;
+
+const getProjectValidationFieldValues = (
+  project: ProjectValidationState,
+): Record<ProjectValidationField, string | number | boolean | null | undefined> => ({
+  phase: project.phaseId,
+  phaseDetail: project.phaseDetailId,
+  programmed: project.programmed,
+  planningStartYear: project.planningStartYear,
+  constructionEndYear: project.constructionEndYear,
+  estPlanningStart: project.estPlanningStart,
+  estPlanningEnd: project.estPlanningEnd,
+  presenceStart: project.presenceStart,
+  presenceEnd: project.presenceEnd,
+  visibilityStart: project.visibilityStart,
+  visibilityEnd: project.visibilityEnd,
+  estConstructionStart: project.estConstructionStart,
+  estConstructionEnd: project.estConstructionEnd,
+  estWarrantyPhaseStart: project.estWarrantyPhaseStart,
+  estWarrantyPhaseEnd: project.estWarrantyPhaseEnd,
+  personPlanning: project.personPlanningId,
+  personConstruction: project.personConstructionId,
+  category: project.categoryId,
+  priority: project.priorityId,
+  masterClass: project.masterClassId,
+  class: project.classId,
+  address: project.address,
+});
+
+const validateRequiredFields = (
+  project: ProjectValidationState,
+  phaseResolver: ProjectPhaseResolver,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  const valuesByField = getProjectValidationFieldValues(project);
+  const requiredFields = getProjectPhaseRequiredFields({
+    phaseId: project.phaseId,
+    projectMode: project.projectMode,
+    phaseResolver,
+  });
+
+  for (const field of requiredFields) {
+    if (!hasValue(valuesByField[field])) {
+      addIssue(field, `${field}-required`, 'validation.required', { field });
+    }
+  }
+
+  for (const field of ['category', 'priority'] as const) {
+    if (!hasValue(valuesByField[field])) {
+      addIssue(field, `${field}-required`, 'validation.required', { field });
+    }
+  }
+};
+
+const validateProgrammedState = (
+  project: ProjectValidationState,
+  phaseResolver: ProjectPhaseResolver,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  if (project.phaseDetailId === 'suspended') {
+    return;
+  }
+
+  if ([phaseResolver.proposalPhase, phaseResolver.designPhase, ''].includes(project.phaseId)) {
+    if (project.programmed) {
+      addIssue('programmed', 'programmed-must-be-false', 'validation.requiredFalse', {
+        field: 'programmed',
+      });
+    }
+    return;
+  }
+
+  if (project.programmed !== true) {
+    addIssue('programmed', 'programmed-must-be-true', 'validation.requiredTrue', {
+      field: 'programmed',
+    });
+  }
+};
+
+const validateYearBounds = (
+  planningStartYear: number | null,
+  constructionEndYear: number | null,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  if (
+    planningStartYear !== null &&
+    constructionEndYear !== null &&
+    planningStartYear > constructionEndYear
+  ) {
+    addIssue(
+      'planningStartYear',
+      'planning-start-year-before-construction-end-year',
+      'validation.isBefore',
+      { value: 'constructionEndYear' },
+    );
+  }
+
+  if (
+    planningStartYear !== null &&
+    constructionEndYear !== null &&
+    constructionEndYear < planningStartYear
+  ) {
+    addIssue(
+      'constructionEndYear',
+      'construction-end-year-after-planning-start-year',
+      'validation.isAfter',
+      { value: 'planningStartYear' },
+    );
+  }
+};
+
+const validateYearMatchesDate = (
+  year: number | null,
+  date: string | null | undefined,
+  field: 'planningStartYear' | 'constructionEndYear',
+  rule: string,
+  messageKey: string,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  const yearFromDate = date?.split('.').at(2);
+  if (hasValue(year) && yearFromDate && yearFromDate !== String(year)) {
+    addIssue(field, rule, messageKey);
+  }
+};
+
+const validateScheduleDateOrder = (
+  project: ProjectValidationState,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  if (!isBefore(project.estPlanningStart, project.estPlanningEnd)) {
+    addIssue('estPlanningStart', 'planning-start-before-planning-end', 'validation.isBefore', {
+      value: 'estPlanningEnd',
+    });
+  }
+
+  if (!isBefore(project.estPlanningStart, project.presenceStart)) {
+    addIssue('presenceStart', 'presence-start-after-planning-start', 'validation.isAfter', {
+      value: 'estPlanningStart',
+    });
+  }
+
+  if (!isBefore(project.presenceStart, project.presenceEnd)) {
+    addIssue('presenceStart', 'presence-start-before-presence-end', 'validation.isBefore', {
+      value: 'presenceEnd',
+    });
+    addIssue('presenceEnd', 'presence-end-after-presence-start', 'validation.isAfter', {
+      value: 'presenceStart',
+    });
+  }
+
+  if (!isBefore(project.presenceStart, project.estPlanningEnd)) {
+    addIssue('presenceStart', 'presence-start-before-planning-end', 'validation.isBefore', {
+      value: 'estPlanningEnd',
+    });
+  }
+
+  if (!isBefore(project.presenceEnd, project.estPlanningEnd)) {
+    addIssue('presenceEnd', 'presence-end-before-planning-end', 'validation.isBefore', {
+      value: 'estPlanningEnd',
+    });
+  }
+
+  if (!isBefore(project.estPlanningStart, project.visibilityStart)) {
+    addIssue('visibilityStart', 'visibility-start-after-planning-start', 'validation.isAfter', {
+      value: 'estPlanningStart',
+    });
+  }
+
+  if (!isBefore(project.visibilityStart, project.visibilityEnd)) {
+    addIssue('visibilityStart', 'visibility-start-before-visibility-end', 'validation.isBefore', {
+      value: 'visibilityEnd',
+    });
+    addIssue('visibilityEnd', 'visibility-end-after-visibility-start', 'validation.isAfter', {
+      value: 'visibilityStart',
+    });
+  }
+
+  if (!isBefore(project.visibilityEnd, project.estPlanningEnd)) {
+    addIssue('visibilityEnd', 'visibility-end-before-planning-end', 'validation.isBefore', {
+      value: 'estPlanningEnd',
+    });
+  }
+
+  if (!isBefore(project.estPlanningEnd, project.estConstructionStart)) {
+    addIssue(
+      'estConstructionStart',
+      'construction-start-after-planning-end',
+      'validation.isAfter',
+      { value: 'estPlanningEnd' },
+    );
+  }
+
+  if (!isBefore(project.estConstructionStart, project.estConstructionEnd)) {
+    addIssue(
+      'estConstructionStart',
+      'construction-start-before-construction-end',
+      'validation.isBefore',
+      { value: 'estConstructionEnd' },
+    );
+    addIssue(
+      'estConstructionEnd',
+      'construction-end-after-construction-start',
+      'validation.isAfter',
+      { value: 'estConstructionStart' },
+    );
+  }
+};
+
+const validateWarrantyDates = (
+  project: ProjectValidationState,
+  constructionEndYear: number | null,
+  phaseResolver: ProjectPhaseResolver,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  if (
+    project.estConstructionEnd &&
+    project.estWarrantyPhaseStart &&
+    isBefore(project.estWarrantyPhaseStart, project.estConstructionEnd)
+  ) {
+    addIssue(
+      'estConstructionEnd',
+      'construction-end-before-warranty-start',
+      'validation.isBefore',
+      { value: 'estWarrantyPhaseStart' },
+    );
+  }
+
+  const constructionEndYearStartDate =
+    constructionEndYear === null ? null : createDateToStartOfYear(constructionEndYear);
+  if (
+    project.estWarrantyPhaseStart &&
+    constructionEndYearStartDate &&
+    isBefore(project.estWarrantyPhaseStart, constructionEndYearStartDate)
+  ) {
+    addIssue(
+      'estWarrantyPhaseStart',
+      'warranty-start-after-construction-end-year',
+      'validation.isSameOrAfter',
+      { value: 'constructionEndYear' },
+    );
+  }
+
+  if (!isSameOrBefore(project.estConstructionEnd, project.estWarrantyPhaseStart)) {
+    addIssue(
+      'estWarrantyPhaseStart',
+      'warranty-start-same-or-after-construction-end',
+      'validation.isSameOrAfter',
+      { value: 'estConstructionEnd' },
+    );
+  }
+
+  if (!isBefore(project.estWarrantyPhaseStart, project.estWarrantyPhaseEnd)) {
+    addIssue('estWarrantyPhaseStart', 'warranty-start-before-warranty-end', 'validation.isBefore', {
+      value: 'estWarrantyPhaseEnd',
+    });
+    addIssue('estWarrantyPhaseEnd', 'warranty-end-after-warranty-start', 'validation.isAfter', {
+      value: 'estWarrantyPhaseStart',
+    });
+  }
+
+  if (
+    project.phaseId === phaseResolver.warrantyPeriodPhase &&
+    !hasValue(project.estWarrantyPhaseEnd)
+  ) {
+    addIssue('estWarrantyPhaseEnd', 'warranty-end-required', 'validation.required', {
+      field: 'estWarrantyPhaseEnd',
+    });
+  }
+
+  if (
+    project.estWarrantyPhaseEnd &&
+    constructionEndYearStartDate &&
+    isBefore(project.estWarrantyPhaseEnd, constructionEndYearStartDate)
+  ) {
+    addIssue(
+      'estWarrantyPhaseEnd',
+      'warranty-end-after-construction-end-year',
+      'validation.isSameOrAfter',
+      { value: 'constructionEndYear' },
+    );
+  }
+};
+
+const validatePhaseTiming = (
+  project: ProjectValidationState,
+  phaseResolver: ProjectPhaseResolver,
+  today: string,
+  addIssue: ProjectValidationIssueAdder,
+) => {
+  if (
+    project.phaseId === phaseResolver.warrantyPeriodPhase &&
+    isBefore(today, project.estConstructionEnd)
+  ) {
+    addIssue('phase', 'warranty-phase-too-early', 'validation.phaseTooEarly', {
+      phaseLabel: phaseResolver.getPhaseLabelById(project.phaseId),
+    });
+  }
+
+  if (project.phaseId !== phaseResolver.completedPhase) {
+    return;
+  }
+
+  if (isBefore(today, project.estConstructionEnd)) {
+    addIssue('phase', 'completed-phase-before-construction-end', 'validation.phaseTooEarly', {
+      phaseLabel: phaseResolver.getPhaseLabelById(project.phaseId),
+    });
+  }
+
+  if (project.estWarrantyPhaseEnd && isBefore(today, project.estWarrantyPhaseEnd)) {
+    addIssue('phase', 'completed-phase-before-warranty-end', 'validation.completedPhaseTooEarly');
+  }
+};
+
 export const validateProjectState = ({
   project,
   phaseResolver,
@@ -266,11 +584,10 @@ export const validateProjectState = ({
 }): ProjectValidationIssue[] => {
   const issues: ProjectValidationIssue[] = [];
   const visibleFieldSet = new Set(visibleFields);
-  const phaseId = project.phaseId;
   const planningStartYear = parseYear(project.planningStartYear);
   const constructionEndYear = parseYear(project.constructionEndYear);
 
-  const pushIssue = (
+  const addIssue: ProjectValidationIssueAdder = (
     field: ProjectValidationField,
     rule: string,
     messageKey: string,
@@ -283,312 +600,33 @@ export const validateProjectState = ({
     issues.push(createIssue(visibleFieldSet, field, rule, messageKey, messageParams));
   };
 
-  if (!hasValue(phaseId)) {
-    pushIssue('phase', 'phase-required', 'validation.required', { field: 'phase' });
+  if (!hasValue(project.phaseId)) {
+    addIssue('phase', 'phase-required', 'validation.required', { field: 'phase' });
     return issues;
   }
 
-  for (const field of getProjectPhaseRequiredFields({
-    phaseId,
-    projectMode: project.projectMode,
-    phaseResolver,
-  })) {
-    const valueByField: Record<
-      ProjectValidationField,
-      string | number | boolean | null | undefined
-    > = {
-      phase: project.phaseId,
-      phaseDetail: project.phaseDetailId,
-      programmed: project.programmed,
-      planningStartYear: project.planningStartYear,
-      constructionEndYear: project.constructionEndYear,
-      estPlanningStart: project.estPlanningStart,
-      estPlanningEnd: project.estPlanningEnd,
-      presenceStart: project.presenceStart,
-      presenceEnd: project.presenceEnd,
-      visibilityStart: project.visibilityStart,
-      visibilityEnd: project.visibilityEnd,
-      estConstructionStart: project.estConstructionStart,
-      estConstructionEnd: project.estConstructionEnd,
-      estWarrantyPhaseStart: project.estWarrantyPhaseStart,
-      estWarrantyPhaseEnd: project.estWarrantyPhaseEnd,
-      personPlanning: project.personPlanningId,
-      personConstruction: project.personConstructionId,
-      category: project.categoryId,
-      priority: project.priorityId,
-      masterClass: project.masterClassId,
-      class: project.classId,
-      address: project.address,
-    };
-
-    if (!hasValue(valueByField[field])) {
-      pushIssue(field, `${field}-required`, 'validation.required', { field });
-    }
-  }
-
-  if (!hasValue(project.categoryId)) {
-    pushIssue('category', 'category-required', 'validation.required', { field: 'category' });
-  }
-
-  if (!hasValue(project.priorityId)) {
-    pushIssue('priority', 'priority-required', 'validation.required', { field: 'priority' });
-  }
-
-  const isSuspended = project.phaseDetailId === 'suspended';
-  if (!isSuspended) {
-    if ([phaseResolver.proposalPhase, phaseResolver.designPhase, ''].includes(phaseId)) {
-      if (project.programmed) {
-        pushIssue('programmed', 'programmed-must-be-false', 'validation.requiredFalse', {
-          field: 'programmed',
-        });
-      }
-    } else if (project.programmed !== true) {
-      pushIssue('programmed', 'programmed-must-be-true', 'validation.requiredTrue', {
-        field: 'programmed',
-      });
-    }
-  }
-
-  if (
-    planningStartYear !== null &&
-    constructionEndYear !== null &&
-    planningStartYear > constructionEndYear
-  ) {
-    pushIssue(
-      'planningStartYear',
-      'planning-start-year-before-construction-end-year',
-      'validation.isBefore',
-      {
-        value: 'constructionEndYear',
-      },
-    );
-  }
-
-  if (
-    planningStartYear !== null &&
-    constructionEndYear !== null &&
-    constructionEndYear < planningStartYear
-  ) {
-    pushIssue(
-      'constructionEndYear',
-      'construction-end-year-after-planning-start-year',
-      'validation.isAfter',
-      {
-        value: 'planningStartYear',
-      },
-    );
-  }
-
-  if (project.estPlanningStart) {
-    const planningStartYearFromDate = project.estPlanningStart.split('.').at(2);
-    if (
-      hasValue(planningStartYear) &&
-      planningStartYearFromDate &&
-      planningStartYearFromDate !== String(planningStartYear)
-    ) {
-      pushIssue(
-        'planningStartYear',
-        'planning-start-year-must-match-planning-start-date',
-        'validation.planningStartYearChangingValidator',
-      );
-    }
-  }
-
-  if (project.estConstructionEnd) {
-    const constructionEndYearFromDate = project.estConstructionEnd.split('.').at(2);
-    if (
-      hasValue(constructionEndYear) &&
-      constructionEndYearFromDate &&
-      constructionEndYearFromDate !== String(constructionEndYear)
-    ) {
-      pushIssue(
-        'constructionEndYear',
-        'construction-end-year-must-match-construction-end-date',
-        'validation.constructionEndYearValidator',
-      );
-    }
-  }
-
-  if (!isBefore(project.estPlanningStart, project.estPlanningEnd)) {
-    pushIssue('estPlanningStart', 'planning-start-before-planning-end', 'validation.isBefore', {
-      value: 'estPlanningEnd',
-    });
-  }
-
-  if (!isBefore(project.estPlanningStart, project.presenceStart)) {
-    pushIssue('presenceStart', 'presence-start-after-planning-start', 'validation.isAfter', {
-      value: 'estPlanningStart',
-    });
-  }
-
-  if (!isBefore(project.presenceStart, project.presenceEnd)) {
-    pushIssue('presenceStart', 'presence-start-before-presence-end', 'validation.isBefore', {
-      value: 'presenceEnd',
-    });
-  }
-
-  if (!isBefore(project.presenceStart, project.estPlanningEnd)) {
-    pushIssue('presenceStart', 'presence-start-before-planning-end', 'validation.isBefore', {
-      value: 'estPlanningEnd',
-    });
-  }
-
-  if (!isBefore(project.presenceStart, project.presenceEnd)) {
-    pushIssue('presenceEnd', 'presence-end-after-presence-start', 'validation.isAfter', {
-      value: 'presenceStart',
-    });
-  }
-
-  if (!isBefore(project.presenceEnd, project.estPlanningEnd)) {
-    pushIssue('presenceEnd', 'presence-end-before-planning-end', 'validation.isBefore', {
-      value: 'estPlanningEnd',
-    });
-  }
-
-  if (!isBefore(project.estPlanningStart, project.visibilityStart)) {
-    pushIssue('visibilityStart', 'visibility-start-after-planning-start', 'validation.isAfter', {
-      value: 'estPlanningStart',
-    });
-  }
-
-  if (!isBefore(project.visibilityStart, project.visibilityEnd)) {
-    pushIssue('visibilityStart', 'visibility-start-before-visibility-end', 'validation.isBefore', {
-      value: 'visibilityEnd',
-    });
-  }
-
-  if (!isBefore(project.visibilityStart, project.visibilityEnd)) {
-    pushIssue('visibilityEnd', 'visibility-end-after-visibility-start', 'validation.isAfter', {
-      value: 'visibilityStart',
-    });
-  }
-
-  if (!isBefore(project.visibilityEnd, project.estPlanningEnd)) {
-    pushIssue('visibilityEnd', 'visibility-end-before-planning-end', 'validation.isBefore', {
-      value: 'estPlanningEnd',
-    });
-  }
-
-  if (!isBefore(project.estPlanningEnd, project.estConstructionStart)) {
-    pushIssue(
-      'estConstructionStart',
-      'construction-start-after-planning-end',
-      'validation.isAfter',
-      { value: 'estPlanningEnd' },
-    );
-  }
-
-  if (!isBefore(project.estConstructionStart, project.estConstructionEnd)) {
-    pushIssue(
-      'estConstructionStart',
-      'construction-start-before-construction-end',
-      'validation.isBefore',
-      { value: 'estConstructionEnd' },
-    );
-    pushIssue(
-      'estConstructionEnd',
-      'construction-end-after-construction-start',
-      'validation.isAfter',
-      { value: 'estConstructionStart' },
-    );
-  }
-
-  if (
-    project.estConstructionEnd &&
-    project.estWarrantyPhaseStart &&
-    isBefore(project.estWarrantyPhaseStart, project.estConstructionEnd)
-  ) {
-    pushIssue(
-      'estConstructionEnd',
-      'construction-end-before-warranty-start',
-      'validation.isBefore',
-      { value: 'estWarrantyPhaseStart' },
-    );
-  }
-
-  if (project.estWarrantyPhaseStart && constructionEndYear !== null) {
-    const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
-    if (
-      constructionEndYearStartDate &&
-      isBefore(project.estWarrantyPhaseStart, constructionEndYearStartDate)
-    ) {
-      pushIssue(
-        'estWarrantyPhaseStart',
-        'warranty-start-after-construction-end-year',
-        'validation.isSameOrAfter',
-        { value: 'constructionEndYear' },
-      );
-    }
-  }
-
-  if (!isSameOrBefore(project.estConstructionEnd, project.estWarrantyPhaseStart)) {
-    pushIssue(
-      'estWarrantyPhaseStart',
-      'warranty-start-same-or-after-construction-end',
-      'validation.isSameOrAfter',
-      { value: 'estConstructionEnd' },
-    );
-  }
-
-  if (!isBefore(project.estWarrantyPhaseStart, project.estWarrantyPhaseEnd)) {
-    pushIssue(
-      'estWarrantyPhaseStart',
-      'warranty-start-before-warranty-end',
-      'validation.isBefore',
-      {
-        value: 'estWarrantyPhaseEnd',
-      },
-    );
-    pushIssue('estWarrantyPhaseEnd', 'warranty-end-after-warranty-start', 'validation.isAfter', {
-      value: 'estWarrantyPhaseStart',
-    });
-  }
-
-  if (phaseId === phaseResolver.warrantyPeriodPhase && !hasValue(project.estWarrantyPhaseEnd)) {
-    pushIssue('estWarrantyPhaseEnd', 'warranty-end-required', 'validation.required', {
-      field: 'estWarrantyPhaseEnd',
-    });
-  }
-
-  if (project.estWarrantyPhaseEnd && constructionEndYear !== null) {
-    const constructionEndYearStartDate = createDateToStartOfYear(constructionEndYear);
-    if (
-      constructionEndYearStartDate &&
-      isBefore(project.estWarrantyPhaseEnd, constructionEndYearStartDate)
-    ) {
-      pushIssue(
-        'estWarrantyPhaseEnd',
-        'warranty-end-after-construction-end-year',
-        'validation.isSameOrAfter',
-        { value: 'constructionEndYear' },
-      );
-    }
-  }
-
-  if (
-    phaseId === phaseResolver.warrantyPeriodPhase &&
-    isBefore(today, project.estConstructionEnd)
-  ) {
-    pushIssue('phase', 'warranty-phase-too-early', 'validation.phaseTooEarly', {
-      phaseLabel: phaseResolver.getPhaseLabelById(phaseId),
-    });
-  }
-
-  if (phaseId === phaseResolver.completedPhase) {
-    if (isBefore(today, project.estConstructionEnd)) {
-      pushIssue('phase', 'completed-phase-before-construction-end', 'validation.phaseTooEarly', {
-        phaseLabel: phaseResolver.getPhaseLabelById(phaseId),
-      });
-    }
-
-    if (project.estWarrantyPhaseEnd && isBefore(today, project.estWarrantyPhaseEnd)) {
-      pushIssue(
-        'phase',
-        'completed-phase-before-warranty-end',
-        'validation.completedPhaseTooEarly',
-      );
-    }
-  }
+  validateRequiredFields(project, phaseResolver, addIssue);
+  validateProgrammedState(project, phaseResolver, addIssue);
+  validateYearBounds(planningStartYear, constructionEndYear, addIssue);
+  validateYearMatchesDate(
+    planningStartYear,
+    project.estPlanningStart,
+    'planningStartYear',
+    'planning-start-year-must-match-planning-start-date',
+    'validation.planningStartYearChangingValidator',
+    addIssue,
+  );
+  validateYearMatchesDate(
+    constructionEndYear,
+    project.estConstructionEnd,
+    'constructionEndYear',
+    'construction-end-year-must-match-construction-end-date',
+    'validation.constructionEndYearValidator',
+    addIssue,
+  );
+  validateScheduleDateOrder(project, addIssue);
+  validateWarrantyDates(project, constructionEndYear, phaseResolver, addIssue);
+  validatePhaseTiming(project, phaseResolver, today, addIssue);
 
   return issues;
 };
