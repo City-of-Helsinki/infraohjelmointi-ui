@@ -578,26 +578,6 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         >
           <p className={classes.editDialogProjectSubtitle}>{project?.projectName ?? ''}</p>
 
-          {hiddenValidationIssues.length > 0 && (
-            <Notification
-              type="error"
-              label={t('myWorkloadView.table.projectBasicsValidationNotificationTitle')}
-            >
-              <div className={classes.editDialogNotificationContent}>
-                <p>
-                  {t('myWorkloadView.table.projectBasicsValidationNotificationText', {
-                    fields: hiddenValidationFieldList,
-                  })}
-                </p>
-                <div>
-                  <Button variant={ButtonVariant.Secondary} onClick={onGoToProjectCardClick}>
-                    {t('myWorkloadView.table.goToProjectBasicsToFixValidation')}
-                  </Button>
-                </div>
-              </div>
-            </Notification>
-          )}
-
           {isPlanningView && (
             <>
               <h3 className={classes.editDialogSectionTitle}>
@@ -808,6 +788,25 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
                 />
               </div>
             </>
+          )}
+          {hiddenValidationIssues.length > 0 && (
+            <Notification
+              type="error"
+              label={t('myWorkloadView.table.projectBasicsValidationNotificationTitle')}
+            >
+              <div className={classes.editDialogNotificationContent}>
+                <p>
+                  {t('myWorkloadView.table.projectBasicsValidationNotificationText', {
+                    fields: hiddenValidationFieldList,
+                  })}
+                </p>
+                <div>
+                  <Button variant={ButtonVariant.Secondary} onClick={onGoToProjectCardClick}>
+                    {t('myWorkloadView.table.goToProjectBasicsToFixValidation')}
+                  </Button>
+                </div>
+              </div>
+            </Notification>
           )}
         </div>
       </Dialog.Content>
