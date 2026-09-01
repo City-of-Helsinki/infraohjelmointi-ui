@@ -51,72 +51,62 @@ function getLinksValue(
   return [{ value: '' }];
 }
 
+function getBasicInfoValues(basicInfo?: IProjectProgrammeBasicInfo): IProjectProgrammeBasicInfo {
+  return {
+    projectName: getTextValue(basicInfo?.projectName),
+    district: getDistrictValue(basicInfo?.district),
+    projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
+    personsInvolved: getTextValue(basicInfo?.personsInvolved),
+    estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
+    inspector: getTextValue(basicInfo?.inspector),
+    summary: getTextValue(basicInfo?.summary),
+    strategyGoals: getTextValue(basicInfo?.strategyGoals),
+    costClass: getTextValue(basicInfo?.costClass),
+    projectSize: getTextValue(basicInfo?.projectSize),
+    risks: getTextValue(basicInfo?.risks),
+    studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
+    planningAndImplementationFeasibility: getTextValue(
+      basicInfo?.planningAndImplementationFeasibility,
+    ),
+    specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
+    otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
+    links: getLinksValue(basicInfo?.links),
+  };
+}
+
+function getDesignCriteriaValues(
+  designCriteria?: IProjectProgrammeDesignCriteria,
+): IProjectProgrammeDesignCriteria {
+  return {
+    guidingZoningRegulations: getTextValue(designCriteria?.guidingZoningRegulations),
+    siteValuesProtectionAndSignificance: getTextValue(
+      designCriteria?.siteValuesProtectionAndSignificance,
+    ),
+    relationshipToPublicAreaServices: getTextValue(
+      designCriteria?.relationshipToPublicAreaServices,
+    ),
+    links: getLinksValue(designCriteria?.links),
+  };
+}
+
+// Every section has to be listed here, reset() replaces the whole form value object.
+function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm {
+  return {
+    basicInfo: getBasicInfoValues(formData?.basicInfo),
+    designCriteria: getDesignCriteriaValues(formData?.designCriteria),
+  };
+}
+
 export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm) {
   const formMethods = useForm<IProjectProgrammeForm>({
-    defaultValues: {
-      basicInfo: {
-        projectName: '',
-        district: '',
-        projectProgrammeCompiler: '',
-        personsInvolved: '',
-        estimatedCosts: '',
-        inspector: '',
-        summary: '',
-        strategyGoals: '',
-        costClass: '',
-        projectSize: '',
-        risks: '',
-        studyAndPlanningNeeds: '',
-        planningAndImplementationFeasibility: '',
-        specialConsiderations: '',
-        otherConsiderations: '',
-        links: [{ value: '' }],
-      },
-      designCriteria: {
-        guidingZoningRegulations: '',
-        siteValuesProtectionAndSignificance: '',
-        relationshipToPublicAreaServices: '',
-        links: [{ value: '' }],
-      },
-    },
+    defaultValues: getFormValues(),
     mode: 'onBlur',
   });
 
   const { reset } = formMethods;
 
   useEffect(() => {
-    reset({
-      basicInfo: {
-        projectName: getTextValue(formData?.basicInfo?.projectName),
-        district: getDistrictValue(formData?.basicInfo?.district),
-        projectProgrammeCompiler: getTextValue(formData?.basicInfo?.projectProgrammeCompiler),
-        personsInvolved: getTextValue(formData?.basicInfo?.personsInvolved),
-        estimatedCosts: getTextValue(formData?.basicInfo?.estimatedCosts),
-        inspector: getTextValue(formData?.basicInfo?.inspector),
-        summary: getTextValue(formData?.basicInfo?.summary),
-        strategyGoals: getTextValue(formData?.basicInfo?.strategyGoals),
-        costClass: getTextValue(formData?.basicInfo?.costClass),
-        projectSize: getTextValue(formData?.basicInfo?.projectSize),
-        risks: getTextValue(formData?.basicInfo?.risks),
-        studyAndPlanningNeeds: getTextValue(formData?.basicInfo?.studyAndPlanningNeeds),
-        planningAndImplementationFeasibility: getTextValue(
-          formData?.basicInfo?.planningAndImplementationFeasibility,
-        ),
-        specialConsiderations: getTextValue(formData?.basicInfo?.specialConsiderations),
-        otherConsiderations: getTextValue(formData?.basicInfo?.otherConsiderations),
-        links: getLinksValue(formData?.basicInfo?.links),
-      },
-      designCriteria: {
-        guidingZoningRegulations: getTextValue(formData?.designCriteria?.guidingZoningRegulations),
-        siteValuesProtectionAndSignificance: getTextValue(
-          formData?.designCriteria?.siteValuesProtectionAndSignificance,
-        ),
-        relationshipToPublicAreaServices: getTextValue(
-          formData?.designCriteria?.relationshipToPublicAreaServices,
-        ),
-        links: getLinksValue(formData?.designCriteria?.links),
-      },
-    });
+    reset(getFormValues(formData));
   }, [formData, reset]);
 
   return formMethods;

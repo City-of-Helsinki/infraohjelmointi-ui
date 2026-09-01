@@ -7,11 +7,7 @@ import { usePatchProjectProgrammeSectionMutation } from '@/api/projectProgrammeA
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
-import {
-  mapSectionIdToApiRoute,
-  PROJECT_PROGRAMME_FORM_SECTION_CONFIG,
-  ProjectProgrammeSectionId,
-} from './projectProgrammeSections';
+import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
 import {
   IProjectProgrammeForm,
   IProjectProgrammeFormProps,
@@ -24,16 +20,18 @@ type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 export function pickChangedFormFields(
   formData: IProjectProgrammeForm,
   activeSection: ProjectProgrammeSectionId,
-  dirtyFields: Record<string, boolean> | undefined,
+  dirtyFields: DirtyFields[ProjectProgrammeSectionId] | undefined,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
-  const config = PROJECT_PROGRAMME_FORM_SECTION_CONFIG[activeSection];
+  const dirtyFieldNames = new Set(
+    Object.entries(dirtyFields ?? {})
+      .filter(([field, isDirty]) => field !== 'links' && isDirty === true)
+      .map(([field]) => field),
+  );
 
-  for (const field of config.fields) {
-    if (dirtyFields?.[field]) {
-      const value = (formData[activeSection] as Record<string, unknown> | undefined)?.[field];
-
-      payload[config.toApiField[field]] = value;
+  for (const [field, value] of Object.entries(formData[activeSection] ?? {})) {
+    if (dirtyFieldNames.has(field)) {
+      payload[field] = value;
     }
   }
 
@@ -77,7 +75,7 @@ function ProjectProgrammeForm({
     const requestData: Record<string, unknown> = pickChangedFormFields(
       data,
       activeSection,
-      dirtyFields?.[activeSection] as Record<string, boolean> | undefined,
+      dirtyFields?.[activeSection],
     );
     const linksPayload = pickChangedLinks(activeSection, data, dirtyFields?.[activeSection]);
 

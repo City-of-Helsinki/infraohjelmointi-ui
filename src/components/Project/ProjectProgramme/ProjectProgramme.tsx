@@ -268,24 +268,22 @@ function ProjectProgramme() {
                 </div>
               </Notification>
             )}
-            <>
-              {PROJECT_PROGRAMME_SECTIONS.filter(
-                (section) => !briefProgramme || section.showInBrief,
-              ).map((section) => {
-                return (
-                  <ProjectProgrammeSectionCard
-                    key={section.id}
-                    briefProgramme={briefProgramme}
-                    sectionIsStarted={section.sectionIsStarted}
-                    handleOpenSection={handleOpenSection}
-                    label={section.label}
-                    cardText={section.cardText}
-                    actionText={section.actionText}
-                    sectionId={section.id}
-                  />
-                );
-              })}
-            </>
+            {PROJECT_PROGRAMME_SECTIONS.filter(
+              (section) => !briefProgramme || section.showInBrief,
+            ).map((section) => {
+              return (
+                <ProjectProgrammeSectionCard
+                  key={section.id}
+                  briefProgramme={briefProgramme}
+                  sectionIsStarted={section.sectionIsStarted}
+                  handleOpenSection={handleOpenSection}
+                  label={section.label}
+                  cardText={section.cardText}
+                  actionText={section.actionText}
+                  sectionId={section.id}
+                />
+              );
+            })}
             <ProjectProgrammeBottomBar
               isBriefProgramme={briefProgramme}
               hasSavedExtendedSection={hasSavedExtendedSection}

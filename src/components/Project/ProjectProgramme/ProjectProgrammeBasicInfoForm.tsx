@@ -1,12 +1,12 @@
 import { memo } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant, IconPlus, Tooltip } from 'hds-react';
 import { FormSectionTitle, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { validateMaxLength } from '@/utils/validation';
 import { getFieldPropsForProjectProgrammeForm, requiredRule } from '@/utils/projectProgrammeUtils';
-import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
+import ProjectProgrammeLinksField, {
+  useProjectProgrammeTooltip,
+} from './ProjectProgrammeLinksField';
 
 interface IProjectProgrammeBasicInfoFormProps {
   briefProgramme: boolean;
@@ -16,16 +16,7 @@ function ProjectProgrammeBasicInfoForm({
   briefProgramme,
 }: Readonly<IProjectProgrammeBasicInfoFormProps>) {
   const { t } = useTranslation();
-  const { control } = useFormContext<IProjectProgrammeForm>();
-  const { fields: linkFields, append } = useFieldArray({
-    control,
-    name: 'basicInfo.links',
-    keyName: 'formId',
-  });
-
-  const tooltip = (fieldName: string) => (
-    <Tooltip>{t(`projectProgrammeForm.${fieldName}Tooltip`)}</Tooltip>
-  );
+  const tooltip = useProjectProgrammeTooltip();
 
   return (
     <div className="mb-12" data-testid="project-programme-basic-info-form">
@@ -145,30 +136,7 @@ function ProjectProgrammeBasicInfoForm({
         </>
       )}
 
-      <div className="input-wrapper" id="projectProgrammeLinksTitle">
-        <h4 className="text-heading-s">{t('projectProgrammeForm.links')}</h4>
-      </div>
-      {linkFields.map((field, index) => {
-        const translatedLabel = `${t('projectProgrammeForm.linkLabel')} ${index + 1}`;
-        return (
-          <TextField
-            key={field.formId}
-            name={`basicInfo.links.${index}.value`}
-            label={translatedLabel}
-            size="full"
-          />
-        );
-      })}
-      <div className="input-wrapper" id="projectProgrammeAddLinkButton">
-        <Button
-          type="button"
-          variant={ButtonVariant.Secondary}
-          iconStart={<IconPlus />}
-          onClick={() => append({ value: '' })}
-        >
-          {t('projectProgrammeForm.addNewLink')}
-        </Button>
-      </div>
+      <ProjectProgrammeLinksField section="basicInfo" />
     </div>
   );
 }
