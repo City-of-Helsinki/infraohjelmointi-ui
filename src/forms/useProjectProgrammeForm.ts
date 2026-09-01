@@ -72,6 +72,12 @@ export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm
         otherConsiderations: '',
         links: [{ value: '' }],
       },
+      designCriteria: {
+        guidingZoningRegulations: '',
+        siteValuesProtectionAndSignificance: '',
+        relationshipToPublicAreaServices: '',
+        links: [{ value: '' }],
+      },
     },
     mode: 'onBlur',
   });
@@ -99,6 +105,16 @@ export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm
         specialConsiderations: getTextValue(formData?.basicInfo?.specialConsiderations),
         otherConsiderations: getTextValue(formData?.basicInfo?.otherConsiderations),
         links: getLinksValue(formData?.basicInfo?.links),
+      },
+      designCriteria: {
+        guidingZoningRegulations: getTextValue(formData?.designCriteria?.guidingZoningRegulations),
+        siteValuesProtectionAndSignificance: getTextValue(
+          formData?.designCriteria?.siteValuesProtectionAndSignificance,
+        ),
+        relationshipToPublicAreaServices: getTextValue(
+          formData?.designCriteria?.relationshipToPublicAreaServices,
+        ),
+        links: getLinksValue(formData?.designCriteria?.links),
       },
     });
   }, [formData, reset]);

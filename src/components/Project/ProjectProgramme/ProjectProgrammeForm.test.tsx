@@ -207,6 +207,115 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('submits changed fields and links for design criteria section', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Guiding zoning regulations'), {
+      target: { value: 'Updated zoning regulations' },
+    });
+    fireEvent.change(screen.getByDisplayValue('https://old-design-link.fi'), {
+      target: { value: '  https://new-design-link.fi  ' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPatchProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        data: {
+          guidingZoningRegulations: 'Updated zoning regulations',
+          links: ['https://new-design-link.fi'],
+        },
+      });
+    });
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('renders saved design criteria values into the fields', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(
+      screen.getByRole('textbox', { name: /projectProgrammeForm\.guidingZoningRegulations/ }),
+    ).toHaveValue('Guiding zoning regulations');
+    expect(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.siteValuesProtectionAndSignificance/,
+      }),
+    ).toHaveValue('Site values protection and significance');
+    expect(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.relationshipToPublicAreaServices/,
+      }),
+    ).toHaveValue('Relationship to public area services');
+    expect(screen.getByDisplayValue('https://old-design-link.fi')).toBeInTheDocument();
+  });
+
+  it('does not send anything and closes when nothing was changed', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' });
+
+    expect(saveButton).toBeDisabled();
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+  });
+
   it('dispatches form save error and keeps form open on failed submit', async () => {
     const onClose = jest.fn();
     mockPatchProjectProgrammeSection.mockRejectedValue({ status: 400 });

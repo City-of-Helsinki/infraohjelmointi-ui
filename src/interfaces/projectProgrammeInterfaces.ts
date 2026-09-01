@@ -41,6 +41,9 @@ export interface IProjectProgrammeDesignCriteria {
 }
 
 export interface IProjectProgrammeLinkFormItem {
+  id?: string;
+  contentType?: number;
+  objectId?: string;
   value: string;
 }
 
