@@ -4,8 +4,6 @@ import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { MyWorkloadViewType, PhaseInfo } from '@/interfaces/myWorkloadInterfaces';
 import { IListItem } from '@/interfaces/common';
-import { FieldPath } from 'react-hook-form';
-import { TFunction } from 'i18next';
 
 const MY_WORKLOAD_DATE_FORMATS = ['DD.MM.YYYY', 'D.M.YYYY', 'YYYY-MM-DD'];
 
