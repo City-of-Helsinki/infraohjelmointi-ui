@@ -1,3 +1,5 @@
+import { ProjectTaskType } from './projectInterfaces';
+
 export interface PhaseInfo {
   id: string;
   label: string;
@@ -37,6 +39,7 @@ export interface MyWorkloadTaskItem {
   constructionPeriod: string;
   constructionProcurementMethod: string;
   taskDescription: string;
+  taskType: ProjectTaskType;
 }
 
 export type MyWorkloadViewType = 'planning' | 'construction';

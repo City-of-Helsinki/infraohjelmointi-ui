@@ -473,3 +473,24 @@ export interface IProjectCell {
    */
   projectEstDates: IProjectEstDates;
 }
+
+// NOTE: It's planned that more task types will be added in the future
+export enum ProjectTaskType {
+  // Nimeä rakennuttamisen projektipäällikkö
+  NAME_CONSTRUCTION_PROJECT_MANAGER = 'NAME_CONSTRUCTION_PROJECT_MANAGER',
+}
+
+export interface IProjectTask
+  extends Pick<
+    IProject,
+    | 'id'
+    | 'name'
+    | 'estPlanningStart'
+    | 'estPlanningEnd'
+    | 'estConstructionStart'
+    | 'estConstructionEnd'
+    | 'budget'
+    | 'constructionProcurementMethod'
+  > {
+  taskType: ProjectTaskType;
+}

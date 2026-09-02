@@ -1,17 +1,23 @@
-import { FC } from 'react';
+import { Pagination, SupportedLanguage } from 'hds-react';
+import { FC, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import MyWorkloadTaskCard from './MyWorkloadTaskCard';
 import { useTranslation } from 'react-i18next';
 import classes from '../styles.module.css';
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
+import type { IProjectTask } from '@/interfaces/projectInterfaces';
+import { formatMyWorkloadDateForDisplay } from '@/utils/myWorkloadUtils';
 
 interface MyWorkloadTasksProps {
-  listOfTasks: MyWorkloadTableRow[];
+  listOfTasks: IProjectTask[];
 }
 
-const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
-  const { t } = useTranslation();
+const TASKS_PER_PAGE = 10;
+const pageHref = () => '#';
 
-  const dateTextFormatter = (startDate: string, endDate: string): string => {
+const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
+  const { t, i18n } = useTranslation();
+  const [page, setPage] = useState(0);
+
+  const dateTextFormatter = (startDate: string | null, endDate: string | null): string => {
     if (!startDate && !endDate) {
       return t('myWorkloadView.tasks.infoNotAvailable');
     } else {
@@ -29,20 +35,49 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
     }
   };
 
-  // Todo: Find out where the task description = the action button text comes from
   const tasks = listOfTasks.map((project) => ({
     id: project.id,
     budget: project.budget ?? '',
-    projectName: project.projectName,
-    planningPeriod: dateTextFormatter(project.planningStart, project.planningEnd),
-    constructionPeriod: dateTextFormatter(project.constructionStart, project.constructionEnd),
-    constructionProcurementMethod: constructionProcurementMethodTextFormatter(
-      project.constructionProcurementMethod,
+    projectName: project.name,
+    planningPeriod: dateTextFormatter(
+      formatMyWorkloadDateForDisplay(project.estPlanningStart),
+      formatMyWorkloadDateForDisplay(project.estPlanningEnd),
     ),
-    taskDescription: t('myWorkloadView.tasks.taskDescription', {
-      projectName: project.projectName,
-    }),
+    constructionPeriod: dateTextFormatter(
+      formatMyWorkloadDateForDisplay(project.estConstructionStart),
+      formatMyWorkloadDateForDisplay(project.estConstructionEnd),
+    ),
+    constructionProcurementMethod: constructionProcurementMethodTextFormatter(
+      project.constructionProcurementMethod.value,
+    ),
+    taskDescription: t(`myWorkloadView.tasks.taskDescription.${project.taskType}`),
+    taskType: project.taskType,
   }));
+
+  const pageCount = useMemo(() => Math.ceil(tasks.length / TASKS_PER_PAGE), [tasks.length]);
+  const paginatedTasks = useMemo(() => {
+    const firstItem = page * TASKS_PER_PAGE;
+    return tasks.slice(firstItem, firstItem + TASKS_PER_PAGE);
+  }, [tasks, page]);
+
+  useEffect(() => {
+    if (page >= pageCount && page > 0) {
+      setPage(pageCount - 1);
+      return;
+    }
+
+    if (tasks.length === 0 && page !== 0) {
+      setPage(0);
+    }
+  }, [tasks.length, page, pageCount]);
+
+  const handlePageChange = useCallback(
+    (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>, selectedPage: number) => {
+      event.preventDefault();
+      setPage(selectedPage);
+    },
+    [],
+  );
 
   return (
     <>
@@ -50,12 +85,26 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
         {t('myWorkloadView.tasks.title')}
       </h2>
       <ul className={classes.taskList}>
-        {tasks.map((task) => (
+        {paginatedTasks.map((task) => (
           <li key={task.id} className={classes.taskListItem}>
             <MyWorkloadTaskCard task={task} />
           </li>
         ))}
       </ul>
+      {pageCount > 1 && (
+        <div className="mt-8" data-testid="my-workload-tasks-pagination-container">
+          <Pagination
+            data-testid="my-workload-tasks-pagination"
+            language={i18n.language as SupportedLanguage}
+            onChange={handlePageChange}
+            pageCount={pageCount}
+            pageHref={pageHref}
+            pageIndex={page}
+            paginationAriaLabel={t('myWorkloadView.tasks.paginationAriaLabel')}
+            siblingCount={2}
+          />
+        </div>
+      )}
     </>
   );
 };
