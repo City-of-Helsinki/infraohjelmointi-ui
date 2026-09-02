@@ -122,11 +122,14 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
       return;
     }
 
+    const savedTalpaProjectId = (result.payload as ITalpaProjectOpening).id;
+
     // Clears the dirty state so that the saved values from the store can be applied again,
     // as dirty fields are preserved when the form is re-synced with external data.
-    reset(data);
+    // The id from the response is required so that a re-submit patches instead of creating a duplicate.
+    reset({ ...data, id: savedTalpaProjectId });
 
-    const excelFile = await downloadExcel((result.payload as ITalpaProjectOpening).id);
+    const excelFile = await downloadExcel(savedTalpaProjectId);
 
     if (excelFile?.blob) {
       const fileName = excelFile.fileName;
