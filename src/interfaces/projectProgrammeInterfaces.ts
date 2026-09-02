@@ -8,6 +8,8 @@ export interface IProjectProgramme {
   briefProjectProgramme?: boolean;
   basicInfo?: IProjectProgrammeBasicInfo;
   designCriteria?: IProjectProgrammeDesignCriteria;
+  trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
+  urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -40,6 +42,31 @@ export interface IProjectProgrammeDesignCriteria {
   links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
+export interface IProjectProgrammeTrafficPlanningCriteria {
+  pedestrianTraffic?: string | null;
+  bicycleTraffic?: string | null;
+  serviceAndPickupTraffic?: string | null;
+  otherTraffic?: string | null;
+  accessibility?: string | null;
+  noiseManagement?: string | null;
+  winterMaintenance?: string | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
+}
+
+export interface IProjectProgrammeUrbanSpacingPlanningCriteria {
+  targetUrbanAppearance?: string | null;
+  surfaceMaterials?: string | null;
+  structures?: string | null;
+  technicalNetworksAndSystems?: string | null;
+  lighting?: string | null;
+  greenery?: string | null;
+  lumoConsiderationAndProtection?: string | null;
+  natureTypes?: string | null;
+  equipmentAndFurnishings?: string | null;
+  waters?: string | null;
+  stormwaterManagement?: string | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
+}
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
@@ -50,6 +77,8 @@ export interface IProjectProgrammeLinkFormItem {
 export interface IProjectProgrammeForm {
   basicInfo?: IProjectProgrammeBasicInfo;
   designCriteria?: IProjectProgrammeDesignCriteria;
+  trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
+  urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
 }
 
 export interface IProjectProgrammeFormProps {

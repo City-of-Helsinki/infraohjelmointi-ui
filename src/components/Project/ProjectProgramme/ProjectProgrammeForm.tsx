@@ -17,6 +17,8 @@ import {
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import DesignCriteriaForm from './DesignCriteriaSection';
+import TrafficPlanningCriteriaForm from './TrafficPlanningCriteriaForm';
+import UrbanSpacingPlanningCriteriaForm from './UrbanSpacingPlanningCriteriaForm';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
@@ -151,8 +153,9 @@ function ProjectProgrammeForm({
         {activeSection === 'basicInfo' && (
           <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
         )}
-
         {activeSection === 'designCriteria' && <DesignCriteriaForm />}
+        {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaForm />}
+        {activeSection === 'urbanSpacingPlanningCriteria' && <UrbanSpacingPlanningCriteriaForm />}
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">

@@ -1,6 +1,10 @@
 import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
 
-export type ProjectProgrammeSectionId = 'basicInfo' | 'designCriteria';
+export type ProjectProgrammeSectionId =
+  | 'basicInfo'
+  | 'designCriteria'
+  | 'trafficPlanningCriteria'
+  | 'urbanSpacingPlanningCriteria';
 
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;
@@ -84,6 +88,8 @@ export function isSectionStarted(value: unknown): boolean {
 const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
   basicInfo: 'basic-info',
   designCriteria: 'design-criteria',
+  trafficPlanningCriteria: 'traffic-planning-criteria',
+  urbanSpacingPlanningCriteria: 'urban-spacing-planning-criteria',
 };
 
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {

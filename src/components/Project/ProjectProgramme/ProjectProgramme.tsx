@@ -64,6 +64,12 @@ function ProjectProgramme() {
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
   const hasBasicInfo = isSectionStarted(effectiveProjectProgramme?.basicInfo);
   const hasDesignCriteria = isSectionStarted(effectiveProjectProgramme?.designCriteria);
+  const hasTrafficPlanningCriteria = isSectionStarted(
+    effectiveProjectProgramme?.trafficPlanningCriteria,
+  );
+  const hasUrbanSpacingPlanningCriteria = isSectionStarted(
+    effectiveProjectProgramme?.urbanSpacingPlanningCriteria,
+  );
 
   const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
     {
@@ -83,6 +89,22 @@ function ProjectProgramme() {
       actionText: t('projectProgrammeForm.fillDesignCriteria'),
       showInBrief: false,
       sectionIsStarted: hasDesignCriteria,
+    },
+    {
+      id: 'trafficPlanningCriteria',
+      label: t('projectProgrammeForm.trafficPlanningCriteriaCardTitle'),
+      cardText: t('projectProgrammeForm.trafficPlanningCriteriaCardText'),
+      actionText: t('projectProgrammeForm.fillTrafficPlanningCriteria'),
+      showInBrief: false,
+      sectionIsStarted: hasTrafficPlanningCriteria,
+    },
+    {
+      id: 'urbanSpacingPlanningCriteria',
+      label: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardTitle'),
+      cardText: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardText'),
+      actionText: t('projectProgrammeForm.fillUrbanSpacingPlanningCriteria'),
+      showInBrief: false,
+      sectionIsStarted: hasUrbanSpacingPlanningCriteria,
     },
   ];
 
