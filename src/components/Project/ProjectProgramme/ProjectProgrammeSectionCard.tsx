@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ProjectProgrammeSectionId } from './projectProgrammeSections';
 
 interface ProjectProgrammeSectionCardProps {
-  briefProgramme: boolean;
   sectionIsStarted: boolean;
-  handleOpenSection(sectionId: ProjectProgrammeSectionId): Promise<void>;
+  handleOpenSection(sectionId: ProjectProgrammeSectionId): void;
   label: string;
   cardText: string;
   actionText: string;

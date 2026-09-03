@@ -2,10 +2,11 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormSectionTitle } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
-import { getFieldPropsForProjectProgrammeForm, requiredRule } from '@/utils/projectProgrammeUtils';
+import { getFieldPropsForProjectProgrammeForm } from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
+import { requiredTrimmedRule } from '@/utils/projectProgrammerUtils';
 
 function DesignCriteriaForm() {
   const { t } = useTranslation();
@@ -20,19 +21,23 @@ function DesignCriteriaForm() {
       <p className="mb-8">{t('projectProgrammeForm.requiredSectionHelperText')}</p>
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('designCriteria.guidingZoningRegulations')}
-        rules={{ ...requiredRule('projectProgrammeForm.guidingZoningRegulations', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.guidingZoningRegulations', t) }}
         tooltip={tooltip('guidingZoningRegulations')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('designCriteria.relationshipToPublicAreaServices')}
-        rules={{ ...requiredRule('projectProgrammeForm.relationshipToPublicAreaServices', t) }}
+        rules={{
+          ...requiredTrimmedRule('projectProgrammeForm.relationshipToPublicAreaServices', t),
+        }}
         tooltip={tooltip('relationshipToPublicAreaServices')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm(
           'designCriteria.siteValuesProtectionAndSignificance',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.siteValuesProtectionAndSignificance', t) }}
+        rules={{
+          ...requiredTrimmedRule('projectProgrammeForm.siteValuesProtectionAndSignificance', t),
+        }}
         tooltip={tooltip('siteValuesProtectionAndSignificance')}
       />
       <ProjectProgrammeLinksField section="designCriteria" />

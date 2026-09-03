@@ -9,6 +9,7 @@ import ProjectProgrammeForm, {
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 
 const mockDispatch = jest.fn();
+const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
@@ -18,6 +19,9 @@ jest.mock('@/hooks/common', () => ({
 }));
 
 jest.mock('@/api/projectProgrammeApi', () => ({
+  usePostProjectProgrammeSectionMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockPostProjectProgrammeSection(...args) }),
+  ],
   usePatchProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPatchProjectProgrammeSection(...args) }),
   ],
@@ -53,7 +57,9 @@ const baseFormData: IProjectProgrammeForm = {
 describe('ProjectProgrammeForm save logic', () => {
   beforeEach(() => {
     mockDispatch.mockReset();
+    mockPostProjectProgrammeSection.mockReset();
     mockPatchProjectProgrammeSection.mockReset();
+    mockPostProjectProgrammeSection.mockResolvedValue({});
     mockPatchProjectProgrammeSection.mockResolvedValue({});
   });
 
@@ -252,6 +258,64 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('creates a missing section when the user submits its first changes', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.guidingZoningRegulations/,
+      }),
+      { target: { value: 'New zoning regulations' } },
+    );
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.relationshipToPublicAreaServices/,
+      }),
+      { target: { value: 'New public area relationship' } },
+    );
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.siteValuesProtectionAndSignificance/,
+      }),
+      { target: { value: 'New site values' } },
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        data: {
+          guidingZoningRegulations: 'New zoning regulations',
+          relationshipToPublicAreaServices: 'New public area relationship',
+          siteValuesProtectionAndSignificance: 'New site values',
+        },
+      });
+    });
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('renders saved design criteria values into the fields', async () => {
     await act(async () =>
       renderWithProviders(
@@ -314,6 +378,46 @@ describe('ProjectProgrammeForm save logic', () => {
 
     expect(saveButton).toBeDisabled();
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+  });
+
+  it('blocks whitespace-only values in required fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const zoningField = screen.getByRole('textbox', {
+      name: /projectProgrammeForm\.guidingZoningRegulations/,
+    });
+    fireEvent.change(zoningField, { target: { value: '   ' } });
+
+    expect(zoningField).toHaveValue('   ');
+    const saveButton = screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' });
+    expect(saveButton).toBeEnabled();
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('validation.required')).not.toHaveLength(0);
+    });
+    expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('dispatches form save error and keeps form open on failed submit', async () => {

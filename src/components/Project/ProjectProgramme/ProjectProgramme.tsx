@@ -7,7 +7,6 @@ import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   useGetProjectProgrammeByProjectQuery,
-  usePostProjectProgrammeSectionMutation,
   usePostProjectProgrammeMutation,
   usePostSwitchProjectProgrammeTypeMutation,
 } from '@/api/projectProgrammeApi';
@@ -16,7 +15,6 @@ import {
   hasExtendedBasicInfoContent,
   IProjectProgrammeSectionConfig,
   isSectionStarted,
-  mapSectionIdToApiRoute,
   ProjectProgrammeSectionId,
 } from './projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
@@ -48,7 +46,6 @@ function ProjectProgramme() {
   } = useGetProjectProgrammeByProjectQuery(project?.id ?? skipToken);
 
   const [postProjectProgramme] = usePostProjectProgrammeMutation();
-  const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
 
@@ -65,11 +62,8 @@ function ProjectProgramme() {
     projectProgrammeQueryStatus !== undefined &&
     projectProgrammeQueryStatus !== 404;
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
-  const hasBasicInfo = isSectionStarted('basicInfo', effectiveProjectProgramme?.basicInfo);
-  const hasDesignCriteria = isSectionStarted(
-    'designCriteria',
-    effectiveProjectProgramme?.designCriteria,
-  );
+  const hasBasicInfo = isSectionStarted(effectiveProjectProgramme?.basicInfo);
+  const hasDesignCriteria = isSectionStarted(effectiveProjectProgramme?.designCriteria);
 
   const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
     {
@@ -171,42 +165,13 @@ function ProjectProgramme() {
     }
   }
 
-  async function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
+  function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
     if (!effectiveProjectProgramme?.id) {
       notifyMissingProject();
       return;
     }
 
-    if (sectionId && effectiveProjectProgramme[sectionId]) {
-      setActiveSection(sectionId);
-      return;
-    }
-
-    try {
-      await postProjectProgrammeSection({
-        id: effectiveProjectProgramme.id,
-        section: mapSectionIdToApiRoute(sectionId),
-      }).unwrap();
-
-      setActiveSection(sectionId);
-      return;
-    } catch (error) {
-      const status = getErrorStatus(error);
-
-      if (status === 409) {
-        await refetchProjectProgramme();
-        setActiveSection(sectionId);
-        return;
-      }
-
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeBasicInfoError',
-          type: 'toast',
-        }),
-      );
-    }
+    setActiveSection(sectionId);
   }
 
   function handleCloseSection() {
@@ -276,7 +241,6 @@ function ProjectProgramme() {
               return (
                 <ProjectProgrammeSectionCard
                   key={section.id}
-                  briefProgramme={briefProgramme}
                   sectionIsStarted={section.sectionIsStarted}
                   handleOpenSection={handleOpenSection}
                   label={section.label}

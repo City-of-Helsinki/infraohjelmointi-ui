@@ -3,7 +3,10 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
 import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
-import { usePatchProjectProgrammeSectionMutation } from '@/api/projectProgrammeApi';
+import {
+  usePatchProjectProgrammeSectionMutation,
+  usePostProjectProgrammeSectionMutation,
+} from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
@@ -16,6 +19,10 @@ import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import DesignCriteriaForm from './DesignCriteriaForm';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
+
+function normalizeTextValue(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
+}
 
 export function pickChangedFormFields(
   formData: IProjectProgrammeForm,
@@ -31,7 +38,7 @@ export function pickChangedFormFields(
 
   for (const [field, value] of Object.entries(formData[activeSection] ?? {})) {
     if (dirtyFieldNames.has(field)) {
-      payload[field] = value;
+      payload[field] = normalizeTextValue(value);
     }
   }
 
@@ -47,9 +54,7 @@ export function pickChangedLinks(
     return undefined;
   }
 
-  return (
-    formData[formSection]?.links?.map((link) => link.value.trim()).filter(Boolean) ?? undefined
-  );
+  return formData[formSection]?.links?.map((link) => link.value.trim()).filter(Boolean) ?? [];
 }
 
 function ProjectProgrammeForm({
@@ -66,6 +71,7 @@ function ProjectProgrammeForm({
     handleSubmit,
     formState: { isDirty, dirtyFields },
   } = formMethods;
+  const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
 
   async function submitDraft(
@@ -89,11 +95,17 @@ function ProjectProgrammeForm({
     }
 
     try {
-      await patchProjectProgrammeSection({
+      const request = {
         id: projectProgrammeId,
         section: mapSectionIdToApiRoute(activeSection),
         data: requestData,
-      }).unwrap();
+      };
+
+      if (effectiveProjectProgramme?.[activeSection]) {
+        await patchProjectProgrammeSection(request).unwrap();
+      } else {
+        await postProjectProgrammeSection(request).unwrap();
+      }
       dispatch(
         notifySuccess({
           title: 'saveSuccess',

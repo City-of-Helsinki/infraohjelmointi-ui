@@ -168,6 +168,21 @@ describe('ProjectProgramme', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the fill action when basic info has no user-entered content', async () => {
+    mockProjectProgramme(false, {
+      id: 'basic-info-1',
+      projectProgramme: 'programme-1',
+      projectName: ' ',
+      district: null,
+      links: [{ value: '' }],
+    });
+    await render();
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.fillBasicInfo' }),
+    ).toBeInTheDocument();
+  });
+
   it('hides switching to brief once extended-only basic info content is saved', async () => {
     mockProjectProgramme(false, {
       projectName: 'Mock project',
@@ -181,7 +196,20 @@ describe('ProjectProgramme', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('creates basic info section when it does not exist yet', async () => {
+  it('keeps switching to brief available when extended-only data is whitespace', async () => {
+    mockProjectProgramme(false, {
+      projectName: 'Mock project',
+      district: 'Keskinen',
+      strategyGoals: '   ',
+    });
+    await render();
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not create basic info when it is opened and cancelled without changes', async () => {
     mockProjectProgramme(false, null);
     await render();
 
@@ -193,11 +221,16 @@ describe('ProjectProgramme', () => {
       fillBasicInfoButton.click();
     });
 
-    expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
-      id: 'programme-1',
-      section: 'basic-info',
-    });
+    expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
     expect(screen.getByTestId('project-programme-basic-info-form')).toBeInTheDocument();
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.cancel' }).click();
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.fillBasicInfo' }),
+    ).toBeInTheDocument();
   });
 
   it('returns from basic info form back to overview when close button is clicked', async () => {
@@ -227,7 +260,7 @@ describe('ProjectProgramme', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('creates the design criteria section when it does not exist yet', async () => {
+  it('does not create design criteria when it is opened and cancelled without changes', async () => {
     mockProjectProgramme(false);
     await render();
 
@@ -235,11 +268,35 @@ describe('ProjectProgramme', () => {
       screen.getByRole('button', { name: 'projectProgrammeForm.fillDesignCriteria' }).click();
     });
 
-    expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
-      id: 'programme-1',
-      section: 'design-criteria',
-    });
+    expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
     expect(screen.getByTestId('project-programme-design-criteria-form')).toBeInTheDocument();
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.cancel' }).click();
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.fillDesignCriteria' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the fill action when design criteria has no user-entered content', async () => {
+    mockProjectProgramme(false, null, {
+      id: 'design-criteria-1',
+      projectProgramme: 'programme-1',
+      guidingZoningRegulations: '',
+      siteValuesProtectionAndSignificance: null,
+      relationshipToPublicAreaServices: '   ',
+      links: [{ value: '' }],
+    });
+    await render();
+
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.fillDesignCriteria' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.modifyInformation' }),
+    ).not.toBeInTheDocument();
   });
 
   it('opens saved design criteria without posting and shows the stored values', async () => {

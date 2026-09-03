@@ -26,50 +26,59 @@ const EXTENDED_ONLY_BASIC_INFO_FIELDS: (keyof IProjectProgrammeBasicInfo)[] = [
 export function hasExtendedBasicInfoContent(
   basicInfo?: IProjectProgrammeBasicInfo | null,
 ): boolean {
-  return EXTENDED_ONLY_BASIC_INFO_FIELDS.some((field) => Boolean(basicInfo?.[field]));
+  return EXTENDED_ONLY_BASIC_INFO_FIELDS.some((field) => {
+    const value = basicInfo?.[field];
+    return typeof value === 'string' && value.trim().length > 0;
+  });
 }
 
-// Sections whose record already carries meaningful data as soon as it's created
-// (e.g. basicInfo is pre-filled from the project), so mere existence means "started".
-// Any section NOT listed here is only "started" once one of its own fields (or a
-// link) actually has a value - opening/auto-creating an empty section doesn't count.
-const EXISTENCE_BASED_SECTIONS = new Set<ProjectProgrammeSectionId>(['basicInfo']);
-
-// Fields returned by the API on every section that aren't user-entered content.
-const NON_CONTENT_FIELDS = new Set([
+const SECTION_METADATA_FIELDS = new Set([
   'id',
+  'projectProgramme',
   'project_programme',
   'createdDate',
   'updatedDate',
   'createdBy',
   'updatedBy',
+  'contentType',
+  'objectId',
 ]);
 
-// Add a new section id to EXISTENCE_BASED_SECTIONS above only if its record is
-// pre-populated with real data on creation; otherwise this works out of the box.
-export function isSectionStarted(
-  sectionId: ProjectProgrammeSectionId,
-  sectionData?: object | null,
-): boolean {
-  if (!sectionData) {
-    return false;
-  }
+export function isSectionStarted(value: unknown): boolean {
+  const valuesToCheck: unknown[] = [value];
 
-  if (EXISTENCE_BASED_SECTIONS.has(sectionId)) {
+  while (valuesToCheck.length > 0) {
+    const currentValue = valuesToCheck.pop();
+
+    if (currentValue === null || currentValue === undefined || currentValue === false) {
+      continue;
+    }
+
+    if (typeof currentValue === 'string') {
+      if (currentValue.trim().length > 0) {
+        return true;
+      }
+      continue;
+    }
+
+    if (Array.isArray(currentValue)) {
+      valuesToCheck.push(...currentValue);
+      continue;
+    }
+
+    if (typeof currentValue === 'object') {
+      Object.entries(currentValue).forEach(([field, fieldValue]) => {
+        if (!SECTION_METADATA_FIELDS.has(field)) {
+          valuesToCheck.push(fieldValue);
+        }
+      });
+      continue;
+    }
+
     return true;
   }
 
-  return Object.entries(sectionData as Record<string, unknown>).some(([field, value]) => {
-    if (NON_CONTENT_FIELDS.has(field)) {
-      return false;
-    }
-
-    if (field === 'links') {
-      return Array.isArray(value) && value.length > 0;
-    }
-
-    return Boolean(value);
-  });
+  return false;
 }
 
 const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
