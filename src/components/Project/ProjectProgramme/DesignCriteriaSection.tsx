@@ -1,14 +1,13 @@
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useProjectProgrammeTooltip } from '@/hooks/useProjectProgrammeTooltip';
 import { FormSectionTitle } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import {
   getFieldPropsForProjectProgrammeForm,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
-import ProjectProgrammeLinksField, {
-  useProjectProgrammeTooltip,
-} from './ProjectProgrammeLinksField';
+import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
 
 function DesignCriteriaSection() {
   const { t } = useTranslation();

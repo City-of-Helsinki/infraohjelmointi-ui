@@ -1,15 +1,14 @@
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormSectionTitle, TextField } from '@/components/shared';
+import { useProjectProgrammeTooltip } from '@/hooks/useProjectProgrammeTooltip';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { validateMaxLength } from '@/utils/validation';
 import {
   getFieldPropsForProjectProgrammeForm,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
-import ProjectProgrammeLinksField, {
-  useProjectProgrammeTooltip,
-} from './ProjectProgrammeLinksField';
+import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
 
 interface IBasicInfoSectionProps {
   briefProgramme: boolean;

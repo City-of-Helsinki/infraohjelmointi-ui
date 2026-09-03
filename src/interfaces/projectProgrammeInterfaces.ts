@@ -8,8 +8,11 @@ export interface IProjectProgramme {
   briefProjectProgramme?: boolean;
   basicInfo?: IProjectProgrammeBasicInfo;
   designCriteria?: IProjectProgrammeDesignCriteria;
+<<<<<<< HEAD
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
+=======
+>>>>>>> develop
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -42,6 +45,7 @@ export interface IProjectProgrammeDesignCriteria {
   links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
+<<<<<<< HEAD
 export interface IProjectProgrammeTrafficPlanningCriteria {
   pedestrianTraffic?: string | null;
   bicycleTraffic?: string | null;
@@ -67,6 +71,8 @@ export interface IProjectProgrammeUrbanSpacingPlanningCriteria {
   stormwaterManagement?: string | null;
   links?: IProjectProgrammeLinkFormItem[] | null;
 }
+=======
+>>>>>>> develop
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
