@@ -14,7 +14,9 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('./MyWorkloadTaskCard', () => ({
   __esModule: true,
-  default: ({ task }: { task: { projectName: string } }) => <div>{task.projectName}</div>,
+  default: ({ task }: { task: { projectName: string; constructionProcurementMethod: string } }) => (
+    <div>{`${task.projectName} | ${task.constructionProcurementMethod}`}</div>
+  ),
 }));
 
 jest.mock('hds-react', () => ({
@@ -57,13 +59,13 @@ describe('MyWorkloadTasks', () => {
 
     render(<MyWorkloadTasks listOfTasks={tasks} />);
 
-    expect(screen.getByText('Project 1')).toBeInTheDocument();
-    expect(screen.getByText('Project 10')).toBeInTheDocument();
+    expect(screen.getByText('Project 1 | option.Kilpailutus')).toBeInTheDocument();
+    expect(screen.getByText('Project 10 | option.Kilpailutus')).toBeInTheDocument();
     expect(screen.queryByText('Project 11')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Sivu 2' }));
 
-    expect(screen.getByText('Project 11')).toBeInTheDocument();
+    expect(screen.getByText('Project 11 | option.Kilpailutus')).toBeInTheDocument();
     expect(screen.queryByText('Project 1')).not.toBeInTheDocument();
   });
 
@@ -73,5 +75,18 @@ describe('MyWorkloadTasks', () => {
     render(<MyWorkloadTasks listOfTasks={tasks} />);
 
     expect(screen.queryByTestId('my-workload-tasks-pagination-container')).not.toBeInTheDocument();
+  });
+
+  it('uses fallback text when construction procurement method is null', () => {
+    const taskWithNullProcurementMethod = {
+      ...createTask(1),
+      constructionProcurementMethod: null,
+    } as unknown as IProjectTask;
+
+    render(<MyWorkloadTasks listOfTasks={[taskWithNullProcurementMethod]} />);
+
+    expect(
+      screen.getByText('Project 1 | myWorkloadView.tasks.infoNotAvailable'),
+    ).toBeInTheDocument();
   });
 });

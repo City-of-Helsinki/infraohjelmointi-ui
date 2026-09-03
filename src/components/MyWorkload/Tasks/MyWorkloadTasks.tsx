@@ -48,7 +48,7 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
       formatMyWorkloadDateForDisplay(project.estConstructionEnd),
     ),
     constructionProcurementMethod: constructionProcurementMethodTextFormatter(
-      project.constructionProcurementMethod.value,
+      project.constructionProcurementMethod?.value,
     ),
     taskDescription: t(`myWorkloadView.tasks.taskDescription.${project.taskType}`),
     taskType: project.taskType,
