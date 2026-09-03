@@ -489,7 +489,7 @@ export interface IProjectTask
     | 'estPlanningEnd'
     | 'estConstructionStart'
     | 'estConstructionEnd'
-    | 'budget'
+    | 'costForecast'
     | 'constructionProcurementMethod'
   > {
   taskType: ProjectTaskType;
