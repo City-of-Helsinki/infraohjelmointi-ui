@@ -237,6 +237,29 @@ describe('useTalpaForm', () => {
     });
   });
 
+  it('keeps edited values when external form values are updated', () => {
+    const selectors: Record<SelectorName, unknown> = {
+      selectTalpaProject: null,
+      selectPlanningClasses: [],
+      selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [],
+    };
+
+    mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
+      return selectors[selector.name];
+    });
+
+    const project = { id: 'project-1' } as IProject;
+    const { result, rerender } = renderHook(() => useTalpaForm(project));
+
+    result.current.setValue('projectName', 'Edited by user', { shouldDirty: true });
+    selectors.selectTalpaProject = buildTalpaProject({ projectName: 'Loaded from server' });
+
+    rerender();
+
+    expect(result.current.getValues('projectName')).toBe('Edited by user');
+  });
+
   it('wraps template project label to option when budget item number is not infra investment', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {

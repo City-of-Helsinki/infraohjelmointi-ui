@@ -84,12 +84,21 @@ interface IProjectTalpaFormProps {
   project: IProject | null;
 }
 
+// The HDS DateInput only forwards a typed date to the form on blur, and Safari doesn't focus
+// buttons on click, so the focused field is blurred manually before the form is submitted.
+function blurFocusedField() {
+  const focusedElement = document.activeElement;
+  if (focusedElement instanceof HTMLElement) {
+    focusedElement.blur();
+  }
+}
+
 export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const formMethods = useTalpaForm(project);
   const { isSubmitting } = formMethods.formState;
-  const { handleSubmit, getValues } = formMethods;
+  const { handleSubmit, getValues, reset } = formMethods;
 
   const talpaProjectLocked = getValues('isLocked');
 
@@ -113,7 +122,14 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
       return;
     }
 
-    const excelFile = await downloadExcel((result.payload as ITalpaProjectOpening).id);
+    const savedTalpaProjectId = (result.payload as ITalpaProjectOpening).id;
+
+    // Clears the dirty state so that the saved values from the store can be applied again,
+    // as dirty fields are preserved when the form is re-synced with external data.
+    // The id from the response is required so that a re-submit patches instead of creating a duplicate.
+    reset({ ...data, id: savedTalpaProjectId });
+
+    const excelFile = await downloadExcel(savedTalpaProjectId);
 
     if (excelFile?.blob) {
       const fileName = excelFile.fileName;
@@ -152,6 +168,7 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
               variant={saveButtonVariant}
               disabled={saveButtonDisabled}
               iconStart={saveButtonIconStart}
+              onMouseDown={blurFocusedField}
             >
               {t('saveInformation')}
             </Button>
