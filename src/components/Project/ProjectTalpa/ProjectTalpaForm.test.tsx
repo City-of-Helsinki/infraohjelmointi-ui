@@ -11,7 +11,7 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
 import { saveAs } from 'file-saver';
@@ -235,5 +235,23 @@ describe('talpa form', () => {
         expect(saveAsMock).toHaveBeenCalledWith(excelBlob, 'talpa.xlsx');
       });
     });
+
+    it('includes a date typed in the focused date field when saving', async () => {
+      const { user } = await render();
+      const projectStart = screen.getByRole('textbox', { name: /projectStart/i });
+
+      await user.click(projectStart);
+      fireEvent.input(projectStart, { target: { value: '01.03.2026' } });
+      await user.click(screen.getByRole('button', { name: 'saveInformation' }));
+
+      await waitFor(() => {
+        expect(patchTalpaProjectOpeningMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({ projectStartDate: '2026-03-01' }),
+          }),
+        );
+      });
+    });
+
   });
 });

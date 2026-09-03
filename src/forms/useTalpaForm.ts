@@ -185,6 +185,10 @@ export default function useTalpaForm(project: IProject | null) {
 
   const formMethods = useForm<IProjectTalpaForm>({
     values: formValues,
+    // Talpa data, classes, the responsible person list and the postal code all resolve
+    // asynchronously, and every one of them makes react-hook-form re-apply `values`.
+    // Without this, fields the user has already filled in are silently wiped.
+    resetOptions: { keepDirtyValues: true },
     disabled: formValues.isLocked,
   });
 
