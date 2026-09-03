@@ -7,7 +7,7 @@ import { getFieldPropsForProjectProgrammeForm } from '@/utils/projectProgrammeUt
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
-import { requiredTrimmedRule } from './projectProgrammeValidation';
+import { requiredTrimmedRule } from '@/utils/projectProgrammeUtils';
 
 interface IProjectProgrammeBasicInfoFormProps {
   briefProgramme: boolean;

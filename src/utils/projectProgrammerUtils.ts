@@ -9,7 +9,6 @@ import {
   selectProjectDivisions,
   selectProjectSubDivisions,
 } from '@/reducers/listsSlice';
-import { TFunction } from 'i18next';
 
 // Reads backend-computed programmer with hierarchical fallback
 export function getBestProgrammerForClass(projectClass: IClass | null): IProgrammer | null {
@@ -106,9 +105,3 @@ export function useProjectProgrammer() {
 
   return { getProgrammerForClass, getProgrammerForDistrict };
 }
-
-export const requiredTrimmedRule = (labelKey: string, t: TFunction) => ({
-  required: t('validation.required', { field: t(labelKey) }),
-  validate: (value: string | null | undefined) =>
-    value?.trim() ? true : t('validation.required', { field: t(labelKey) }),
-});

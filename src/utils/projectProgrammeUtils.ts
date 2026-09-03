@@ -11,6 +11,8 @@ export function getFieldPropsForProjectProgrammeForm(name: FieldPath<IProjectPro
   };
 }
 
-export const requiredRule = (labelKey: string, t: TFunction) => ({
+export const requiredTrimmedRule = (labelKey: string, t: TFunction) => ({
   required: t('validation.required', { field: t(labelKey) }),
+  validate: (value: string | null | undefined) =>
+    value?.trim() ? true : t('validation.required', { field: t(labelKey) }),
 });

@@ -6,7 +6,7 @@ import { getFieldPropsForProjectProgrammeForm } from '@/utils/projectProgrammeUt
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
-import { requiredTrimmedRule } from '@/utils/projectProgrammerUtils';
+import { requiredTrimmedRule } from '@/utils/projectProgrammeUtils';
 
 function DesignCriteriaForm() {
   const { t } = useTranslation();
