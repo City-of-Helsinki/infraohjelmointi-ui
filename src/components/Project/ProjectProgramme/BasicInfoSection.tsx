@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { FormSectionTitle, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { validateMaxLength } from '@/utils/validation';
-import { getFieldPropsForProjectProgrammeForm } from '@/utils/projectProgrammeUtils';
+import {
+  getFieldPropsForProjectProgrammeForm,
+  requiredTrimmedRule,
+} from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
-import { requiredTrimmedRule } from '@/utils/projectProgrammeUtils';
 
-interface IProjectProgrammeBasicInfoFormProps {
+interface IBasicInfoSectionProps {
   briefProgramme: boolean;
 }
 
-function ProjectProgrammeBasicInfoForm({
-  briefProgramme,
-}: Readonly<IProjectProgrammeBasicInfoFormProps>) {
+function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) {
   const { t } = useTranslation();
   const tooltip = useProjectProgrammeTooltip();
 
@@ -145,4 +145,4 @@ function ProjectProgrammeBasicInfoForm({
   );
 }
 
-export default memo(ProjectProgrammeBasicInfoForm);
+export default memo(BasicInfoSection);

@@ -9,14 +9,14 @@ import {
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
-import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
+import ProjectProgrammeBasicInfoForm from './BasicInfoSection';
 import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
 import {
   IProjectProgrammeForm,
   IProjectProgrammeFormProps,
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
-import DesignCriteriaForm from './DesignCriteriaForm';
+import DesignCriteriaForm from './DesignCriteriaSection';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 

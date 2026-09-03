@@ -2,13 +2,15 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormSectionTitle } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
-import { getFieldPropsForProjectProgrammeForm } from '@/utils/projectProgrammeUtils';
+import {
+  getFieldPropsForProjectProgrammeForm,
+  requiredTrimmedRule,
+} from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
-import { requiredTrimmedRule } from '@/utils/projectProgrammeUtils';
 
-function DesignCriteriaForm() {
+function DesignCriteriaSection() {
   const { t } = useTranslation();
   const tooltip = useProjectProgrammeTooltip();
 
@@ -45,4 +47,4 @@ function DesignCriteriaForm() {
   );
 }
 
-export default memo(DesignCriteriaForm);
+export default memo(DesignCriteriaSection);
