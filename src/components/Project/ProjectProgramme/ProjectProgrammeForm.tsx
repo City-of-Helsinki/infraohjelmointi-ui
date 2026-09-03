@@ -17,8 +17,8 @@ import {
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import DesignCriteriaForm from './DesignCriteriaSection';
-import TrafficPlanningCriteriaForm from './TrafficPlanningCriteriaForm';
-import UrbanSpacingPlanningCriteriaForm from './UrbanSpacingPlanningCriteriaForm';
+import TrafficPlanningCriteriaForm from './TrafficPlanningCriteriaSection';
+import UrbanSpacingPlanningCriteriaForm from './UrbanSpacingPlanningCriteriaSection';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 

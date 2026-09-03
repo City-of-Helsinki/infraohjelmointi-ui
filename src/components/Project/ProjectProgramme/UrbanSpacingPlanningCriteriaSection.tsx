@@ -2,12 +2,15 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormSectionTitle } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
-import { getFieldPropsForProjectProgrammeForm, requiredRule } from '@/utils/projectProgrammeUtils';
+import {
+  getFieldPropsForProjectProgrammeForm,
+  requiredTrimmedRule,
+} from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField, {
   useProjectProgrammeTooltip,
 } from './ProjectProgrammeLinksField';
 
-function UrbanSpacingPlanningCriteriaForm() {
+function UrbanSpacingPlanningCriteriaSection() {
   const { t } = useTranslation();
   const tooltip = useProjectProgrammeTooltip();
 
@@ -22,65 +25,65 @@ function UrbanSpacingPlanningCriteriaForm() {
         {...getFieldPropsForProjectProgrammeForm(
           'urbanSpacingPlanningCriteria.targetUrbanAppearance',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.targetUrbanAppearance', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.targetUrbanAppearance', t) }}
         tooltip={tooltip('targetUrbanAppearance')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.surfaceMaterials')}
-        rules={{ ...requiredRule('projectProgrammeForm.surfaceMaterials', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.surfaceMaterials', t) }}
         tooltip={tooltip('surfaceMaterials')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.structures')}
-        rules={{ ...requiredRule('projectProgrammeForm.structures', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.structures', t) }}
         tooltip={tooltip('structures')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm(
           'urbanSpacingPlanningCriteria.technicalNetworksAndSystems',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.technicalNetworksAndSystems', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.technicalNetworksAndSystems', t) }}
         tooltip={tooltip('technicalNetworksAndSystems')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.lighting')}
-        rules={{ ...requiredRule('projectProgrammeForm.lighting', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.lighting', t) }}
         tooltip={tooltip('lighting')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.greenery')}
-        rules={{ ...requiredRule('projectProgrammeForm.greenery', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.greenery', t) }}
         tooltip={tooltip('greenery')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm(
           'urbanSpacingPlanningCriteria.lumoConsiderationAndProtection',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.lumoConsiderationAndProtection', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.lumoConsiderationAndProtection', t) }}
         tooltip={tooltip('lumoConsiderationAndProtection')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.natureTypes')}
-        rules={{ ...requiredRule('projectProgrammeForm.natureTypes', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.natureTypes', t) }}
         tooltip={tooltip('natureTypes')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm(
           'urbanSpacingPlanningCriteria.equipmentAndFurnishings',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.equipmentAndFurnishings', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.equipmentAndFurnishings', t) }}
         tooltip={tooltip('equipmentAndFurnishings')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('urbanSpacingPlanningCriteria.waters')}
-        rules={{ ...requiredRule('projectProgrammeForm.waters', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.waters', t) }}
         tooltip={tooltip('waters')}
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm(
           'urbanSpacingPlanningCriteria.stormwaterManagement',
         )}
-        rules={{ ...requiredRule('projectProgrammeForm.stormwaterManagement', t) }}
+        rules={{ ...requiredTrimmedRule('projectProgrammeForm.stormwaterManagement', t) }}
         tooltip={tooltip('stormwaterManagement')}
       />
       <ProjectProgrammeLinksField section="urbanSpacingPlanningCriteria" />
@@ -88,4 +91,4 @@ function UrbanSpacingPlanningCriteriaForm() {
   );
 }
 
-export default memo(UrbanSpacingPlanningCriteriaForm);
+export default memo(UrbanSpacingPlanningCriteriaSection);
