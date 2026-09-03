@@ -7,15 +7,14 @@ import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   useGetProjectProgrammeByProjectQuery,
-  usePostProjectProgrammeSectionMutation,
   usePostProjectProgrammeMutation,
   usePostSwitchProjectProgrammeTypeMutation,
 } from '@/api/projectProgrammeApi';
 import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
   hasExtendedBasicInfoContent,
-  mapSectionIdToApiRoute,
-  PROJECT_PROGRAMME_SECTIONS,
+  IProjectProgrammeSectionConfig,
+  isSectionStarted,
   ProjectProgrammeSectionId,
 } from './projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
@@ -47,7 +46,6 @@ function ProjectProgramme() {
   } = useGetProjectProgrammeByProjectQuery(project?.id ?? skipToken);
 
   const [postProjectProgramme] = usePostProjectProgrammeMutation();
-  const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
 
@@ -64,12 +62,33 @@ function ProjectProgramme() {
     projectProgrammeQueryStatus !== undefined &&
     projectProgrammeQueryStatus !== 404;
   const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
-  const hasBasicInfo = Boolean(effectiveProjectProgramme?.basicInfo);
+  const hasBasicInfo = isSectionStarted(effectiveProjectProgramme?.basicInfo);
+  const hasDesignCriteria = isSectionStarted(effectiveProjectProgramme?.designCriteria);
+
+  const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
+    {
+      id: 'basicInfo',
+      label: t('projectProgrammeForm.basicInfoCardTitle'),
+      cardText: `${t('projectProgrammeForm.basicInfoCardText')} ${
+        !briefProgramme ? t('projectProgrammeForm.basicInfoCardTextExtensionForExtended') : ''
+      }`,
+      actionText: t('projectProgrammeForm.fillBasicInfo'),
+      showInBrief: true,
+      sectionIsStarted: hasBasicInfo,
+    },
+    {
+      id: 'designCriteria',
+      label: t('projectProgrammeForm.designCriteriaCardTitle'),
+      cardText: t('projectProgrammeForm.designCriteriaCardText'),
+      actionText: t('projectProgrammeForm.fillDesignCriteria'),
+      showInBrief: false,
+      sectionIsStarted: hasDesignCriteria,
+    },
+  ];
+
   const hasSavedExtendedSection =
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
-    PROJECT_PROGRAMME_SECTIONS.some(
-      (section) => !section.showInBrief && Boolean(effectiveProjectProgramme?.[section.id]),
-    );
+    PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;
@@ -146,42 +165,13 @@ function ProjectProgramme() {
     }
   }
 
-  async function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
+  function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
     if (!effectiveProjectProgramme?.id) {
       notifyMissingProject();
       return;
     }
 
-    if (sectionId && effectiveProjectProgramme[sectionId]) {
-      setActiveSection(sectionId);
-      return;
-    }
-
-    try {
-      await postProjectProgrammeSection({
-        id: effectiveProjectProgramme.id,
-        section: mapSectionIdToApiRoute(sectionId),
-      }).unwrap();
-
-      setActiveSection(sectionId);
-      return;
-    } catch (error) {
-      const status = getErrorStatus(error);
-
-      if (status === 409) {
-        await refetchProjectProgramme();
-        setActiveSection(sectionId);
-        return;
-      }
-
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeBasicInfoError',
-          type: 'toast',
-        }),
-      );
-    }
+    setActiveSection(sectionId);
   }
 
   function handleCloseSection() {
@@ -191,8 +181,6 @@ function ProjectProgramme() {
   if (isLoadingProjectProgrammeByProject) {
     return null;
   }
-
-  const extendedSectionTextSuffix = t('projectProgrammeForm.basicInfoCardTextExtensionForExtended');
 
   return (
     <div className="project-programme-container">
@@ -223,7 +211,7 @@ function ProjectProgramme() {
           <ProjectProgrammeForm
             projectProgrammeId={projectProgrammeId}
             activeSection={activeSection}
-            basicInfo={effectiveProjectProgramme?.basicInfo ?? null}
+            effectiveProjectProgramme={effectiveProjectProgramme}
             briefProgramme={briefProgramme}
             onClose={handleCloseSection}
           />
@@ -247,13 +235,21 @@ function ProjectProgramme() {
                 </div>
               </Notification>
             )}
-            <ProjectProgrammeSectionCard
-              extendedSectionTextSuffix={extendedSectionTextSuffix}
-              briefProgramme={briefProgramme}
-              sectionIsStarted={hasBasicInfo}
-              isProjectProgrammeComplete={isProjectProgrammeComplete}
-              handleOpenSection={handleOpenSection}
-            />
+            {PROJECT_PROGRAMME_SECTIONS.filter(
+              (section) => !briefProgramme || section.showInBrief,
+            ).map((section) => {
+              return (
+                <ProjectProgrammeSectionCard
+                  key={section.id}
+                  sectionIsStarted={section.sectionIsStarted}
+                  handleOpenSection={handleOpenSection}
+                  label={section.label}
+                  cardText={section.cardText}
+                  actionText={section.actionText}
+                  sectionId={section.id}
+                />
+              );
+            })}
             <ProjectProgrammeBottomBar
               isBriefProgramme={briefProgramme}
               hasSavedExtendedSection={hasSavedExtendedSection}

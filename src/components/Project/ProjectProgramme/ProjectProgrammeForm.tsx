@@ -2,118 +2,90 @@ import { Button, ButtonVariant, IconPen, StatusLabel } from 'hds-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
-import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
-import useProjectProgrammeForm, { IProjectProgrammeForm } from '@/forms/useProjectProgrammeForm';
-import { usePatchProjectProgrammeSectionMutation } from '@/api/projectProgrammeApi';
+import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
+import {
+  usePatchProjectProgrammeSectionMutation,
+  usePostProjectProgrammeSectionMutation,
+} from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
-import ProjectProgrammeBasicInfoForm from './ProjectProgrammeBasicInfoForm';
+import ProjectProgrammeBasicInfoForm from './BasicInfoSection';
 import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
+import {
+  IProjectProgrammeForm,
+  IProjectProgrammeFormProps,
+} from '@/interfaces/projectProgrammeInterfaces';
+import type { FieldNamesMarkedBoolean } from 'react-hook-form';
+import DesignCriteriaForm from './DesignCriteriaSection';
 
-type BasicInfoFormField = Exclude<keyof IProjectProgrammeForm['basicInfo'], 'links'>;
-type BasicInfoDirtyFields = Partial<Record<BasicInfoFormField, boolean>> & { links?: unknown };
+type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
-interface IProjectProgrammeFormProps {
-  projectProgrammeId: string;
-  activeSection: ProjectProgrammeSectionId;
-  basicInfo: IProjectProgrammeBasicInfo | null;
-  briefProgramme: boolean;
-  onClose: () => void;
+function normalizeTextValue(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
 }
 
-const BASIC_INFO_FORM_TO_API_FIELD: Record<BasicInfoFormField, string> = {
-  projectName: 'projectName',
-  district: 'district',
-  projectProgrammeCompiler: 'projectProgrammeCompiler',
-  personsInvolved: 'personsInvolved',
-  estimatedCosts: 'estimatedCosts',
-  inspector: 'inspector',
-  summary: 'summary',
-  strategyGoals: 'strategyGoals',
-  costClass: 'costClass',
-  projectSize: 'projectSize',
-  risks: 'risks',
-  studyAndPlanningNeeds: 'studyAndPlanningNeeds',
-  planningAndImplementationFeasibility: 'planningAndImplementationFeasibility',
-  specialConsiderations: 'specialConsiderations',
-  otherConsiderations: 'otherConsiderations',
-};
-
-const BASIC_INFO_FORM_FIELDS: BasicInfoFormField[] = [
-  'projectName',
-  'district',
-  'projectProgrammeCompiler',
-  'personsInvolved',
-  'estimatedCosts',
-  'inspector',
-  'summary',
-  'strategyGoals',
-  'costClass',
-  'projectSize',
-  'risks',
-  'studyAndPlanningNeeds',
-  'planningAndImplementationFeasibility',
-  'specialConsiderations',
-  'otherConsiderations',
-];
-
-export function pickChangedBasicInfoFields(
+export function pickChangedFormFields(
   formData: IProjectProgrammeForm,
-  dirtyFields: Partial<Record<BasicInfoFormField, boolean>>,
+  activeSection: ProjectProgrammeSectionId,
+  dirtyFields: DirtyFields[ProjectProgrammeSectionId] | undefined,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
+  const dirtyFieldNames = new Set(
+    Object.entries(dirtyFields ?? {})
+      .filter(([field, isDirty]) => field !== 'links' && isDirty === true)
+      .map(([field]) => field),
+  );
 
-  BASIC_INFO_FORM_FIELDS.forEach((field) => {
-    if (dirtyFields[field]) {
-      payload[BASIC_INFO_FORM_TO_API_FIELD[field]] = formData.basicInfo[field];
+  for (const [field, value] of Object.entries(formData[activeSection] ?? {})) {
+    if (dirtyFieldNames.has(field)) {
+      payload[field] = normalizeTextValue(value);
     }
-  });
+  }
 
   return payload;
 }
 
 export function pickChangedLinks(
+  formSection: ProjectProgrammeSectionId,
   formData: IProjectProgrammeForm,
-  dirtyFields: BasicInfoDirtyFields,
-): string[] | null {
-  if (!dirtyFields.links) {
-    return null;
+  dirtyFields: DirtyFields[ProjectProgrammeSectionId] | undefined,
+): string[] | undefined {
+  if (!dirtyFields?.links) {
+    return undefined;
   }
 
-  return formData.basicInfo.links
-    .map((link) => link.value.trim())
-    .filter((linkValue) => linkValue.length > 0);
+  return formData[formSection]?.links?.map((link) => link.value.trim()).filter(Boolean) ?? [];
 }
 
 function ProjectProgrammeForm({
   projectProgrammeId,
   activeSection,
-  basicInfo,
+  effectiveProjectProgramme,
   briefProgramme,
   onClose,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useProjectProgrammeForm(basicInfo);
+  const formMethods = useProjectProgrammeForm(effectiveProjectProgramme);
   const {
     handleSubmit,
     formState: { isDirty, dirtyFields },
   } = formMethods;
+  const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
 
-  async function submitDraft(data: IProjectProgrammeForm) {
-    if (activeSection !== 'basicInfo') return;
-
-    const requestData: Record<string, unknown> = pickChangedBasicInfoFields(
+  async function submitDraft(
+    data: IProjectProgrammeForm,
+    activeSection: keyof IProjectProgrammeForm,
+  ) {
+    const requestData: Record<string, unknown> = pickChangedFormFields(
       data,
-      dirtyFields.basicInfo ?? {},
+      activeSection,
+      dirtyFields?.[activeSection],
     );
-    const linksPayload = pickChangedLinks(
-      data,
-      dirtyFields.basicInfo ?? {},
-    );
+    const linksPayload = pickChangedLinks(activeSection, data, dirtyFields?.[activeSection]);
 
-    if (linksPayload !== null) {
+    if (linksPayload !== undefined) {
       requestData.links = linksPayload;
     }
 
@@ -123,11 +95,17 @@ function ProjectProgrammeForm({
     }
 
     try {
-      await patchProjectProgrammeSection({
+      const request = {
         id: projectProgrammeId,
         section: mapSectionIdToApiRoute(activeSection),
         data: requestData,
-      }).unwrap();
+      };
+
+      if (effectiveProjectProgramme?.[activeSection]) {
+        await patchProjectProgrammeSection(request).unwrap();
+      } else {
+        await postProjectProgrammeSection(request).unwrap();
+      }
       dispatch(
         notifySuccess({
           title: 'saveSuccess',
@@ -161,7 +139,7 @@ function ProjectProgrammeForm({
     <FormProvider {...formMethods}>
       <form
         className="project-form mx-auto max-w-xl"
-        onSubmit={handleSubmit(submitDraft)}
+        onSubmit={handleSubmit((data) => submitDraft(data, activeSection))}
         noValidate
       >
         <div className="mb-4">
@@ -173,6 +151,8 @@ function ProjectProgrammeForm({
         {activeSection === 'basicInfo' && (
           <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
         )}
+
+        {activeSection === 'designCriteria' && <DesignCriteriaForm />}
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">

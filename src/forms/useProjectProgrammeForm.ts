@@ -1,33 +1,11 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
-
-export interface IProjectProgrammeLinkFormItem {
-  value: string;
-}
-
-export interface IProjectProgrammeBasicInfoForm {
-  projectName: string;
-  district: string;
-  projectProgrammeCompiler: string;
-  personsInvolved: string;
-  estimatedCosts: string;
-  inspector: string;
-  summary: string;
-  strategyGoals: string;
-  costClass: string;
-  projectSize: string;
-  risks: string;
-  studyAndPlanningNeeds: string;
-  planningAndImplementationFeasibility: string;
-  specialConsiderations: string;
-  otherConsiderations: string;
-  links: IProjectProgrammeLinkFormItem[];
-}
-
-export interface IProjectProgrammeForm {
-  basicInfo: IProjectProgrammeBasicInfoForm;
-}
+import type {
+  IProjectProgrammeBasicInfo,
+  IProjectProgrammeForm,
+  IProjectProgrammeLinkFormItem,
+  IProjectProgrammeDesignCriteria,
+} from '@/interfaces/projectProgrammeInterfaces';
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
   if (!district) {
@@ -50,7 +28,7 @@ function hasItems<T>(items?: T[] | null): items is T[] {
 }
 
 function getLinksValue(
-  links?: IProjectProgrammeBasicInfo['links'],
+  links?: IProjectProgrammeBasicInfo['links'] | IProjectProgrammeDesignCriteria['links'],
 ): IProjectProgrammeLinkFormItem[] {
   if (!hasItems(links)) {
     return [{ value: '' }];
@@ -73,57 +51,63 @@ function getLinksValue(
   return [{ value: '' }];
 }
 
-export default function useProjectProgrammeForm(basicInfo: IProjectProgrammeBasicInfo | null) {
+function getBasicInfoValues(basicInfo?: IProjectProgrammeBasicInfo): IProjectProgrammeBasicInfo {
+  return {
+    projectName: getTextValue(basicInfo?.projectName),
+    district: getDistrictValue(basicInfo?.district),
+    projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
+    personsInvolved: getTextValue(basicInfo?.personsInvolved),
+    estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
+    inspector: getTextValue(basicInfo?.inspector),
+    summary: getTextValue(basicInfo?.summary),
+    strategyGoals: getTextValue(basicInfo?.strategyGoals),
+    costClass: getTextValue(basicInfo?.costClass),
+    projectSize: getTextValue(basicInfo?.projectSize),
+    risks: getTextValue(basicInfo?.risks),
+    studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
+    planningAndImplementationFeasibility: getTextValue(
+      basicInfo?.planningAndImplementationFeasibility,
+    ),
+    specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
+    otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
+    links: getLinksValue(basicInfo?.links),
+  };
+}
+
+function getDesignCriteriaValues(
+  designCriteria?: IProjectProgrammeDesignCriteria,
+): IProjectProgrammeDesignCriteria {
+  return {
+    guidingZoningRegulations: getTextValue(designCriteria?.guidingZoningRegulations),
+    siteValuesProtectionAndSignificance: getTextValue(
+      designCriteria?.siteValuesProtectionAndSignificance,
+    ),
+    relationshipToPublicAreaServices: getTextValue(
+      designCriteria?.relationshipToPublicAreaServices,
+    ),
+    links: getLinksValue(designCriteria?.links),
+  };
+}
+
+// Every section has to be listed here, reset() replaces the whole form value object.
+function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm {
+  return {
+    basicInfo: getBasicInfoValues(formData?.basicInfo),
+    designCriteria: getDesignCriteriaValues(formData?.designCriteria),
+  };
+}
+
+export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm) {
   const formMethods = useForm<IProjectProgrammeForm>({
-    defaultValues: {
-      basicInfo: {
-        projectName: '',
-        district: '',
-        projectProgrammeCompiler: '',
-        personsInvolved: '',
-        estimatedCosts: '',
-        inspector: '',
-        summary: '',
-        strategyGoals: '',
-        costClass: '',
-        projectSize: '',
-        risks: '',
-        studyAndPlanningNeeds: '',
-        planningAndImplementationFeasibility: '',
-        specialConsiderations: '',
-        otherConsiderations: '',
-        links: [{ value: '' }],
-      },
-    },
+    defaultValues: getFormValues(),
     mode: 'onBlur',
   });
 
   const { reset } = formMethods;
 
   useEffect(() => {
-    reset({
-      basicInfo: {
-        projectName: getTextValue(basicInfo?.projectName),
-        district: getDistrictValue(basicInfo?.district),
-        projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
-        personsInvolved: getTextValue(basicInfo?.personsInvolved),
-        estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
-        inspector: getTextValue(basicInfo?.inspector),
-        summary: getTextValue(basicInfo?.summary),
-        strategyGoals: getTextValue(basicInfo?.strategyGoals),
-        costClass: getTextValue(basicInfo?.costClass),
-        projectSize: getTextValue(basicInfo?.projectSize),
-        risks: getTextValue(basicInfo?.risks),
-        studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
-        planningAndImplementationFeasibility: getTextValue(
-          basicInfo?.planningAndImplementationFeasibility,
-        ),
-        specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
-        otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
-        links: getLinksValue(basicInfo?.links),
-      },
-    });
-  }, [basicInfo, reset]);
+    reset(getFormValues(formData));
+  }, [formData, reset]);
 
   return formMethods;
 }
