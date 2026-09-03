@@ -1,21 +1,13 @@
 import { memo } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant, IconPlus, Tooltip } from 'hds-react';
+import { Button, ButtonVariant, IconPlus } from 'hds-react';
 import { TextField } from '@/components/shared';
 import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 import { ProjectProgrammeSectionId } from './projectProgrammeSections';
 
 interface IProjectProgrammeLinksFieldProps {
   section: ProjectProgrammeSectionId;
-}
-
-export function useProjectProgrammeTooltip() {
-  const { t } = useTranslation();
-
-  return function renderTooltip(fieldName: string) {
-    return <Tooltip>{t(`projectProgrammeForm.${fieldName}Tooltip`)}</Tooltip>;
-  };
 }
 
 function ProjectProgrammeLinksField({ section }: Readonly<IProjectProgrammeLinksFieldProps>) {
