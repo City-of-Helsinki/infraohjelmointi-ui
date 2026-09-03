@@ -483,7 +483,8 @@
     "constructionProjectManager": "Nimeä projektipäällikkö",
     "saveDraft": "Tallenna luonnoksena",
     "submitToProgrammer": "Siirrä ohjelmoijalle",
-    "submitToConstruction": "Siirrä rakentamiselle",
+    "submitToConstruction": "Siirrä rakennuttajalle",
+    "submitTooltip": "Toiminto tallentaa kirjatut tiedot ja siirtää ne eteenpäin seuraavalle käsittelijälle.",
     "nameProjectManager": "Nimeä rakennuttamisen projektipäällikkö ja valitse hankkeen hankintatapa.",
     "saveProjectManagerButton": "Tallenna projektipäällikkö",
     "nameProjectManagerTooltip": "Eikö haluamaasi projektipäällikköä löydy listalta? Ota yhteyttä vastuuhenkilölistan ylläpitäjään.",
@@ -502,7 +503,7 @@
     },
     "toStatus": {
       "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
-      "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
+      "SUBMITTED_TO_CONSTRUCTION": "rakennuttajalle"
     },
     "totalCost": "Kokonaiskustannus",
     "financingSection": {

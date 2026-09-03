@@ -77,7 +77,7 @@
 .project-form-banner-container::before {
   content: '';
   width: 200%;
-  @apply absolute h-full w-[200%] -translate-x-[13rem] shadow-2xl;
+  @apply pointer-events-none absolute h-full w-[200%] -translate-x-[13rem] shadow-2xl;
 }
 
 .project-form-toolbar {
