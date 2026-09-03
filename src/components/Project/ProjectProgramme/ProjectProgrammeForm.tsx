@@ -157,8 +157,6 @@ function ProjectProgrammeForm({
         {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaForm />}
         {activeSection === 'urbanSpacingPlanningCriteria' && <UrbanSpacingPlanningCriteriaForm />}
 
-        {activeSection === 'designCriteria' && <DesignCriteriaForm />}
-
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
