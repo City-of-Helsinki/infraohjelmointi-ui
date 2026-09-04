@@ -52,6 +52,27 @@ const baseFormData: IProjectProgrammeForm = {
     relationshipToPublicAreaServices: 'Relationship to public area services',
     links: [{ value: 'https://old-design-link.fi' }],
   },
+  trafficPlanningCriteria: {
+    pedestrianTraffic: 'Pedestrian traffic info',
+    bicycleTraffic: 'Bicycle traffic info',
+    accessibility: 'Accessibility info',
+    links: [{ value: 'https://old-traffic-link.fi' }],
+  },
+  urbanSpacingPlanningCriteria: {
+    targetUrbanAppearance: 'Urban appearance info',
+    lighting: 'Lighting info',
+    greenery: 'Greenery info',
+    links: [{ value: 'https://old-urban-link.fi' }],
+  },
+  maintenanceNeeds: {
+    maintenanceNeeds: 'Regular maintenance required',
+    links: [{ value: 'https://old-maintenance-link.fi' }],
+  },
+  interactionAndRelatedProjects: {
+    collaborationAndExperts: 'Collaboration with experts',
+    interactionNotes: 'Interaction notes',
+    links: [{ value: 'https://old-interaction-link.fi' }],
+  },
 };
 
 describe('ProjectProgrammeForm save logic', () => {
@@ -316,6 +337,110 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('creates traffic planning criteria from all required user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="trafficPlanningCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const trafficCriteria = {
+      pedestrianTraffic: 'Pedestrian plan',
+      bicycleTraffic: 'Bicycle plan',
+      serviceAndPickupTraffic: 'Service traffic plan',
+      otherTraffic: 'Other traffic plan',
+      accessibility: 'Accessibility plan',
+      noiseManagement: 'Noise plan',
+      winterMaintenance: 'Winter plan',
+    };
+
+    Object.entries(trafficCriteria).forEach(([field, value]) => {
+      fireEvent.change(
+        screen.getByRole('textbox', { name: new RegExp(`projectProgrammeForm\\.${field}`) }),
+        { target: { value } },
+      );
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'traffic-planning-criteria',
+        data: trafficCriteria,
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('creates urban spacing planning criteria from all required user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="urbanSpacingPlanningCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const urbanSpacingCriteria = {
+      targetUrbanAppearance: 'Target appearance',
+      surfaceMaterials: 'Surface materials',
+      structures: 'Structures',
+      technicalNetworksAndSystems: 'Technical networks',
+      lighting: 'Lighting plan',
+      greenery: 'Greenery plan',
+      lumoConsiderationAndProtection: 'LUMO plan',
+      natureTypes: 'Nature types',
+      equipmentAndFurnishings: 'Equipment plan',
+      waters: 'Waters plan',
+      stormwaterManagement: 'Stormwater plan',
+    };
+
+    Object.entries(urbanSpacingCriteria).forEach(([field, value]) => {
+      fireEvent.change(
+        screen.getByRole('textbox', { name: new RegExp(`projectProgrammeForm\\.${field}`) }),
+        { target: { value } },
+      );
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'urban-spacing-planning-criteria',
+        data: urbanSpacingCriteria,
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('renders saved design criteria values into the fields', async () => {
     await act(async () =>
       renderWithProviders(
@@ -458,5 +583,289 @@ describe('ProjectProgrammeForm save logic', () => {
     });
 
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('submits changed fields and links for maintenance needs section', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="maintenanceNeeds"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Regular maintenance required'), {
+      target: { value: 'Updated maintenance needs' },
+    });
+    fireEvent.change(screen.getByDisplayValue('https://old-maintenance-link.fi'), {
+      target: { value: '  https://new-maintenance-link.fi  ' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPatchProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'maintenance-needs',
+        data: {
+          maintenanceNeeds: 'Updated maintenance needs',
+          links: ['https://new-maintenance-link.fi'],
+        },
+      });
+    });
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('submits changed fields and links for interaction and related projects section', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="interactionAndRelatedProjects"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Collaboration with experts'), {
+      target: { value: 'Updated collaboration info' },
+    });
+    fireEvent.change(screen.getByDisplayValue('https://old-interaction-link.fi'), {
+      target: { value: '  https://new-interaction-link.fi  ' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPatchProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'interaction-and-related-projects',
+        data: {
+          collaborationAndExperts: 'Updated collaboration info',
+          links: ['https://new-interaction-link.fi'],
+        },
+      });
+    });
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('creates maintenance needs section from user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="maintenanceNeeds"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.maintenanceNeeds/,
+      }),
+      { target: { value: 'New maintenance needs' } },
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'maintenance-needs',
+        data: {
+          maintenanceNeeds: 'New maintenance needs',
+        },
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('creates interaction and related projects section from user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="interactionAndRelatedProjects"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.collaborationAndExperts/,
+      }),
+      { target: { value: 'New collaboration' } },
+    );
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: /projectProgrammeForm\.interactionNotes/,
+      }),
+      { target: { value: 'New interaction notes' } },
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'interaction-and-related-projects',
+        data: {
+          collaborationAndExperts: 'New collaboration',
+          interactionNotes: 'New interaction notes',
+        },
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('renders saved traffic planning criteria values into the fields', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="trafficPlanningCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Pedestrian traffic info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Bicycle traffic info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Accessibility info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://old-traffic-link.fi')).toBeInTheDocument();
+  });
+
+  it('renders saved urban spacing planning criteria values into the fields', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="urbanSpacingPlanningCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Urban appearance info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Lighting info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Greenery info')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://old-urban-link.fi')).toBeInTheDocument();
+  });
+
+  it('renders saved maintenance needs values into the fields', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="maintenanceNeeds"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Regular maintenance required')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://old-maintenance-link.fi')).toBeInTheDocument();
+  });
+
+  it('renders saved interaction and related projects values into the fields', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="interactionAndRelatedProjects"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Collaboration with experts')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Interaction notes')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://old-interaction-link.fi')).toBeInTheDocument();
   });
 });

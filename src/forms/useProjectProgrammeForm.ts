@@ -5,6 +5,10 @@ import type {
   IProjectProgrammeForm,
   IProjectProgrammeLinkFormItem,
   IProjectProgrammeDesignCriteria,
+  IProjectProgrammeMaintenanceNeeds,
+  IProjectProgrammeInteractionAndRelatedProjects,
+  IProjectProgrammeUrbanSpacingPlanningCriteria,
+  IProjectProgrammeTrafficPlanningCriteria,
 } from '@/interfaces/projectProgrammeInterfaces';
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
@@ -89,11 +93,76 @@ function getDesignCriteriaValues(
   };
 }
 
+function getTrafficPlanningCriteriaValues(
+  trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria,
+): IProjectProgrammeTrafficPlanningCriteria {
+  return {
+    pedestrianTraffic: getTextValue(trafficPlanningCriteria?.pedestrianTraffic),
+    bicycleTraffic: getTextValue(trafficPlanningCriteria?.bicycleTraffic),
+    serviceAndPickupTraffic: getTextValue(trafficPlanningCriteria?.serviceAndPickupTraffic),
+    otherTraffic: getTextValue(trafficPlanningCriteria?.otherTraffic),
+    accessibility: getTextValue(trafficPlanningCriteria?.accessibility),
+    noiseManagement: getTextValue(trafficPlanningCriteria?.noiseManagement),
+    winterMaintenance: getTextValue(trafficPlanningCriteria?.winterMaintenance),
+    links: getLinksValue(trafficPlanningCriteria?.links),
+  };
+}
+
+function getUrbanSpacingPlanningCriteriaValues(
+  urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria,
+): IProjectProgrammeUrbanSpacingPlanningCriteria {
+  return {
+    targetUrbanAppearance: getTextValue(urbanSpacingPlanningCriteria?.targetUrbanAppearance),
+    surfaceMaterials: getTextValue(urbanSpacingPlanningCriteria?.surfaceMaterials),
+    structures: getTextValue(urbanSpacingPlanningCriteria?.structures),
+    technicalNetworksAndSystems: getTextValue(
+      urbanSpacingPlanningCriteria?.technicalNetworksAndSystems,
+    ),
+    lighting: getTextValue(urbanSpacingPlanningCriteria?.lighting),
+    greenery: getTextValue(urbanSpacingPlanningCriteria?.greenery),
+    lumoConsiderationAndProtection: getTextValue(
+      urbanSpacingPlanningCriteria?.lumoConsiderationAndProtection,
+    ),
+    natureTypes: getTextValue(urbanSpacingPlanningCriteria?.natureTypes),
+    equipmentAndFurnishings: getTextValue(urbanSpacingPlanningCriteria?.equipmentAndFurnishings),
+    waters: getTextValue(urbanSpacingPlanningCriteria?.waters),
+    stormwaterManagement: getTextValue(urbanSpacingPlanningCriteria?.stormwaterManagement),
+    links: getLinksValue(urbanSpacingPlanningCriteria?.links),
+  };
+}
+
+function getMaintenanceNeedsValues(
+  maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds,
+): IProjectProgrammeMaintenanceNeeds {
+  return {
+    maintenanceNeeds: getTextValue(maintenanceNeeds?.maintenanceNeeds),
+    links: getLinksValue(maintenanceNeeds?.links),
+  };
+}
+
+function getInteractionAndRelatedProjectsValues(
+  interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects,
+): IProjectProgrammeInteractionAndRelatedProjects {
+  return {
+    collaborationAndExperts: getTextValue(interactionAndRelatedProjects?.collaborationAndExperts),
+    interactionNotes: getTextValue(interactionAndRelatedProjects?.interactionNotes),
+    links: getLinksValue(interactionAndRelatedProjects?.links),
+  };
+}
+
 // Every section has to be listed here, reset() replaces the whole form value object.
 function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm {
   return {
     basicInfo: getBasicInfoValues(formData?.basicInfo),
     designCriteria: getDesignCriteriaValues(formData?.designCriteria),
+    trafficPlanningCriteria: getTrafficPlanningCriteriaValues(formData?.trafficPlanningCriteria),
+    urbanSpacingPlanningCriteria: getUrbanSpacingPlanningCriteriaValues(
+      formData?.urbanSpacingPlanningCriteria,
+    ),
+    maintenanceNeeds: getMaintenanceNeedsValues(formData?.maintenanceNeeds),
+    interactionAndRelatedProjects: getInteractionAndRelatedProjectsValues(
+      formData?.interactionAndRelatedProjects,
+    ),
   };
 }
 
