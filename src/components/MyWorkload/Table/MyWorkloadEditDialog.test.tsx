@@ -14,6 +14,7 @@ import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 
 const mockNavigate = jest.fn();
 const mockPatchProject = jest.fn();
+const mockGetProjectById = jest.fn();
 let consoleErrorSpy: jest.SpyInstance;
 
 jest.mock('react-i18next', () => mockI18next());
@@ -30,6 +31,7 @@ jest.mock('@/api/projectApi', () => {
   const actualModule = jest.requireActual('@/api/projectApi');
   return {
     ...actualModule,
+    useGetProjectByIdQuery: () => mockGetProjectById(),
     usePatchProjectMutation: () => [mockPatchProject, { isLoading: false }],
   };
 });
@@ -122,6 +124,7 @@ describe('MyWorkloadEditDialog', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetProjectById.mockReturnValue({ data: undefined, isFetching: false });
   });
 
   it('blocks submit when required planning dates are missing', async () => {
@@ -440,6 +443,41 @@ describe('MyWorkloadEditDialog', () => {
         },
       });
     });
+  });
+
+  it('shows a notification instead of saving when a date edit introduces errors in hidden fields', async () => {
+    mockGetProjectById.mockReturnValue({
+      data: {
+        ...baseProject,
+        phase: mockProjectPhases.data[1],
+        phaseDetail: null,
+        programmed: false,
+        planningStartYear: 2026,
+        constructionEndYear: 2027,
+        estPlanningStart: '2026-01-01',
+        estPlanningEnd: '2026-12-31',
+        estConstructionStart: '2027-04-01',
+        estConstructionEnd: '2027-10-31',
+        category: { id: 'category-id' },
+        priority: { id: 'priority-id' },
+        projectClass: 'class-id',
+      },
+      isFetching: false,
+    });
+
+    const { user, getByRole, getByLabelText, getByText } = renderDialog('construction');
+
+    const constructionEndInput = getByLabelText(/^validation\.estConstructionEnd/);
+    fireEvent.input(constructionEndInput, { target: { value: '1.1.2028' } });
+    fireEvent.blur(constructionEndInput);
+    await user.click(getByRole('button', { name: 'save' }));
+
+    await waitFor(() => {
+      expect(
+        getByText('myWorkloadView.table.projectBasicsValidationNotificationTitle'),
+      ).toBeInTheDocument();
+    });
+    expect(mockPatchProject).not.toHaveBeenCalled();
   });
 
   it('dispatches patch error notification on failed save', async () => {
