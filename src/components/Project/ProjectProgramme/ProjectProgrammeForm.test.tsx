@@ -316,6 +316,110 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('creates traffic planning criteria from all required user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="trafficPlanningCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const trafficCriteria = {
+      pedestrianTraffic: 'Pedestrian plan',
+      bicycleTraffic: 'Bicycle plan',
+      serviceAndPickupTraffic: 'Service traffic plan',
+      otherTraffic: 'Other traffic plan',
+      accessibility: 'Accessibility plan',
+      noiseManagement: 'Noise plan',
+      winterMaintenance: 'Winter plan',
+    };
+
+    Object.entries(trafficCriteria).forEach(([field, value]) => {
+      fireEvent.change(
+        screen.getByRole('textbox', { name: new RegExp(`projectProgrammeForm\\.${field}`) }),
+        { target: { value } },
+      );
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'traffic-planning-criteria',
+        data: trafficCriteria,
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('creates urban spacing planning criteria from all required user-entered fields', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="urbanSpacingPlanningCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    const urbanSpacingCriteria = {
+      targetUrbanAppearance: 'Target appearance',
+      surfaceMaterials: 'Surface materials',
+      structures: 'Structures',
+      technicalNetworksAndSystems: 'Technical networks',
+      lighting: 'Lighting plan',
+      greenery: 'Greenery plan',
+      lumoConsiderationAndProtection: 'LUMO plan',
+      natureTypes: 'Nature types',
+      equipmentAndFurnishings: 'Equipment plan',
+      waters: 'Waters plan',
+      stormwaterManagement: 'Stormwater plan',
+    };
+
+    Object.entries(urbanSpacingCriteria).forEach(([field, value]) => {
+      fireEvent.change(
+        screen.getByRole('textbox', { name: new RegExp(`projectProgrammeForm\\.${field}`) }),
+        { target: { value } },
+      );
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'urban-spacing-planning-criteria',
+        data: urbanSpacingCriteria,
+      });
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('renders saved design criteria values into the fields', async () => {
     await act(async () =>
       renderWithProviders(

@@ -260,6 +260,38 @@ describe('ProjectProgramme', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows the new planning criteria sections only in the complete programme and opens each form', async () => {
+    mockProjectProgramme(false);
+    await render();
+
+    const fillTrafficPlanningCriteria = screen.getByRole('button', {
+      name: 'projectProgrammeForm.fillTrafficPlanningCriteria',
+    });
+    await act(async () => {
+      fillTrafficPlanningCriteria.click();
+    });
+
+    expect(
+      screen.getByTestId('project-programme-traffic-planning-criteria-form'),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.cancel' }).click();
+    });
+
+    await act(async () => {
+      screen
+        .getByRole('button', {
+          name: 'projectProgrammeForm.fillUrbanSpacingPlanningCriteria',
+        })
+        .click();
+    });
+
+    expect(
+      screen.getByTestId('project-programme-urban-spacing-planning-criteria-form'),
+    ).toBeInTheDocument();
+  });
+
   it('does not create design criteria when it is opened and cancelled without changes', async () => {
     mockProjectProgramme(false);
     await render();
