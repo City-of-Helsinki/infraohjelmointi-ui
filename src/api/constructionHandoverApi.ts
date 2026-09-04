@@ -123,7 +123,7 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
           console.error('Error transitioning construction handover status: ', error);
         }
       },
-      invalidatesTags: ['ConstructionHandovers'],
+      invalidatesTags: ['ConstructionHandovers', 'ProjectTasks'],
     }),
     deleteConstructionHandoverFinancing: build.mutation<void, string>({
       query: (id: string) => ({

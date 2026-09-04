@@ -1168,12 +1168,15 @@
     },
     "tasks": {
       "title": "Tehtävät",
-      "taskDescription": "Muokkaa hanketta {{projectName}}",
+      "taskDescription": {
+        "NAME_CONSTRUCTION_PROJECT_MANAGER": "Nimeä rakennuttamisen projektipäällikkö"
+      },
       "planningPeriod": "Suunnittelun aikataulu",
       "constructionPeriod": "Rakentamisen aikataulu",
       "budget": "Kokonaisrahoitusvaraus",
       "constructionProcurementMethod": "Rakentamisen hankintatapa",
-      "infoNotAvailable": "Ei tiedossa"
+      "infoNotAvailable": "Ei tiedossa",
+      "paginationAriaLabel": "Tehtävien sivutus"
     }
   }
 }

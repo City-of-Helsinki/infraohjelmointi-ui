@@ -45,14 +45,20 @@ export const projectApi = infraohjelmointiApi.injectEndpoints({
         method: 'PATCH',
         data: request.data,
       }),
-      invalidatesTags: (result, error, request) => [{ type: 'Projects', id: request.id }],
+      invalidatesTags: (result, error, request) => [
+        { type: 'Projects', id: request.id },
+        'ProjectTasks',
+      ],
     }),
     deleteProject: build.mutation<{ id: string }, string>({
       query: (projectId) => ({
         url: `/projects/${projectId}/`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, projectId) => [{ type: 'Projects', id: projectId }],
+      invalidatesTags: (result, error, projectId) => [
+        { type: 'Projects', id: projectId },
+        'ProjectTasks',
+      ],
     }),
   }),
   overrideExisting: false,

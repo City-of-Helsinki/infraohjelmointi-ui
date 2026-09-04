@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import classes from '../styles.module.css';
 
 import type { MyWorkloadTaskItem } from '@/interfaces/myWorkloadInterfaces';
@@ -15,6 +16,7 @@ import {
   IconPen,
 } from 'hds-react';
 import { formatBudgetEuro } from '@/utils/currencyUtils';
+import { ProjectTaskType } from '@/interfaces/projectInterfaces';
 
 interface MyWorkloadTaskCardProps {
   task: MyWorkloadTaskItem;
@@ -22,8 +24,12 @@ interface MyWorkloadTaskCardProps {
 
 const MyWorkloadTaskCard: FC<MyWorkloadTaskCardProps> = ({ task }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const onButtonClick = () => {
-    // Todo: Find out what button click is supposed to do and handle it here
+    if (task.taskType === ProjectTaskType.NAME_CONSTRUCTION_PROJECT_MANAGER) {
+      navigate(`/project/${task.id}/construction-handover`);
+    }
   };
 
   return (
@@ -58,7 +64,7 @@ const MyWorkloadTaskCard: FC<MyWorkloadTaskCardProps> = ({ task }) => {
             onClick={onButtonClick}
             iconStart={<IconPen />}
           >
-            {t(`myWorkloadView.${task.taskDescription}`)}
+            {task.taskDescription}
           </Button>
         </div>
       </div>

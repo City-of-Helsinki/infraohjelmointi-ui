@@ -10,8 +10,9 @@ import classes from './styles.module.css';
 import MyWorkloadTasks from '@/components/MyWorkload/Tasks/MyWorkloadTasks';
 import MyWorkloadTable from '@/components/MyWorkload/Table/MyWorkloadTable';
 import MyWorkloadViewTypeButtons from './MyWorkloadViewTypeButtons';
-import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { getMyWorkloadViewType } from '@/utils/myWorkloadUtils';
+import { useGetProjectTasksQuery } from '@/api/projectTasksApi';
 
 const MyWorkloadBaseView: FC = () => {
   const [viewType, setViewType] = useState<MyWorkloadViewType>('planning');
@@ -25,10 +26,7 @@ const MyWorkloadBaseView: FC = () => {
     isLoading,
     hasError,
   } = useMyWorkloadRows(viewType, !isResolvingViewType);
-
-  // TODO:Replace this with actual tasks once the backend provides them (also add correct type then).
-  // For now, we just show an empty list of tasks.
-  const tasks: MyWorkloadTableRow[] = [];
+  const { data: tasks } = useGetProjectTasksQuery(undefined, { skip: viewType === 'planning' });
 
   useEffect(() => {
     const abortController = new AbortController();
