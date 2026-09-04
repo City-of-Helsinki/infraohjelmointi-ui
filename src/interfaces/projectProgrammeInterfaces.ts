@@ -10,6 +10,7 @@ export interface IProjectProgramme {
   designCriteria?: IProjectProgrammeDesignCriteria;
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
+  maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -68,6 +69,11 @@ export interface IProjectProgrammeUrbanSpacingPlanningCriteria {
   links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
+export interface IProjectProgrammeMaintenanceNeeds {
+  maintenanceNeeds?: string | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
+}
+
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
@@ -80,6 +86,7 @@ export interface IProjectProgrammeForm {
   designCriteria?: IProjectProgrammeDesignCriteria;
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
+  maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
 }
 
 export interface IProjectProgrammeFormProps {

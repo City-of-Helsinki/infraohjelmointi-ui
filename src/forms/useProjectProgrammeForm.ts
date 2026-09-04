@@ -5,6 +5,7 @@ import type {
   IProjectProgrammeForm,
   IProjectProgrammeLinkFormItem,
   IProjectProgrammeDesignCriteria,
+  IProjectProgrammeMaintenanceNeeds,
 } from '@/interfaces/projectProgrammeInterfaces';
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
@@ -89,11 +90,21 @@ function getDesignCriteriaValues(
   };
 }
 
+function getMaintenanceNeedsValues(
+  maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds,
+): IProjectProgrammeMaintenanceNeeds {
+  return {
+    maintenanceNeeds: getTextValue(maintenanceNeeds?.maintenanceNeeds),
+    links: getLinksValue(maintenanceNeeds?.links),
+  };
+}
+
 // Every section has to be listed here, reset() replaces the whole form value object.
 function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm {
   return {
     basicInfo: getBasicInfoValues(formData?.basicInfo),
     designCriteria: getDesignCriteriaValues(formData?.designCriteria),
+    maintenanceNeeds: getMaintenanceNeedsValues(formData?.maintenanceNeeds),
   };
 }
 

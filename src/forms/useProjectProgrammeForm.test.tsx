@@ -3,7 +3,7 @@ import useProjectProgrammeForm from './useProjectProgrammeForm';
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 
 describe('useProjectProgrammeForm', () => {
-  it('returns empty defaults for both sections when there is no saved data', () => {
+  it('returns empty defaults for all sections when there is no saved data', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(undefined));
 
     expect(result.current.getValues()).toEqual({
@@ -31,6 +31,10 @@ describe('useProjectProgrammeForm', () => {
         relationshipToPublicAreaServices: '',
         links: [{ value: '' }],
       },
+      maintenanceNeeds: {
+        maintenanceNeeds: '',
+        links: [{ value: '' }],
+      },
     });
   });
 
@@ -54,6 +58,22 @@ describe('useProjectProgrammeForm', () => {
     });
   });
 
+  it('hydrates maintenance needs values from saved data', () => {
+    const formData: IProjectProgrammeForm = {
+      maintenanceNeeds: {
+        maintenanceNeeds: 'Regular maintenance required',
+        links: [{ value: 'https://maintenance.fi' }],
+      },
+    };
+
+    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+
+    expect(result.current.getValues('maintenanceNeeds')).toEqual({
+      maintenanceNeeds: 'Regular maintenance required',
+      links: [{ value: 'https://maintenance.fi' }],
+    });
+  });
+
   it('hydrates basic info values and resolves district object to its name', () => {
     const formData: IProjectProgrammeForm = {
       basicInfo: {
@@ -73,10 +93,11 @@ describe('useProjectProgrammeForm', () => {
     expect(basicInfo?.links).toEqual([{ value: 'https://basic.fi' }]);
   });
 
-  it('re-hydrates both sections when saved data changes', () => {
+  it('re-hydrates all sections when saved data changes', () => {
     const initialData: IProjectProgrammeForm = {
       basicInfo: { projectName: 'First' },
       designCriteria: { guidingZoningRegulations: 'First zoning' },
+      maintenanceNeeds: { maintenanceNeeds: 'First maintenance' },
     };
 
     const { result, rerender } = renderHook(
@@ -87,23 +108,31 @@ describe('useProjectProgrammeForm', () => {
     expect(result.current.getValues('designCriteria.guidingZoningRegulations')).toBe(
       'First zoning',
     );
+    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe(
+      'First maintenance',
+    );
 
     rerender({
       basicInfo: { projectName: 'Second' },
       designCriteria: { guidingZoningRegulations: 'Second zoning' },
+      maintenanceNeeds: { maintenanceNeeds: 'Second maintenance' },
     });
 
     expect(result.current.getValues('basicInfo.projectName')).toBe('Second');
     expect(result.current.getValues('designCriteria.guidingZoningRegulations')).toBe(
       'Second zoning',
     );
+    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe(
+      'Second maintenance',
+    );
     expect(result.current.formState.isDirty).toBe(false);
   });
 
-  it('normalizes links from strings, drops empty ones and falls back to one empty link', () => {
+  it('normalizes links from strings, drops empty ones and falls back to one empty link for all sections', () => {
     const formData = {
       basicInfo: { links: ['https://one.fi', '', 'https://two.fi'] },
       designCriteria: { links: [{ value: '' }] },
+      maintenanceNeeds: { links: ['https://maintenance.fi', '', null] },
     } as unknown as IProjectProgrammeForm;
 
     const { result } = renderHook(() => useProjectProgrammeForm(formData));
@@ -113,5 +142,8 @@ describe('useProjectProgrammeForm', () => {
       { value: 'https://two.fi' },
     ]);
     expect(result.current.getValues('designCriteria.links')).toEqual([{ value: '' }]);
+    expect(result.current.getValues('maintenanceNeeds.links')).toEqual([
+      { value: 'https://maintenance.fi' },
+    ]);
   });
 });

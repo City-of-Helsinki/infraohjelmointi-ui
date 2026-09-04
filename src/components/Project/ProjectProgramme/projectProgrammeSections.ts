@@ -1,10 +1,12 @@
 import { IProjectProgrammeBasicInfo } from '@/interfaces/projectProgrammeInterfaces';
+import { TFunction } from 'i18next';
 
 export type ProjectProgrammeSectionId =
   | 'basicInfo'
   | 'designCriteria'
   | 'trafficPlanningCriteria'
-  | 'urbanSpacingPlanningCriteria';
+  | 'urbanSpacingPlanningCriteria'
+  | 'maintenanceNeeds';
 
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;
@@ -90,8 +92,62 @@ const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
   designCriteria: 'design-criteria',
   trafficPlanningCriteria: 'traffic-planning-criteria',
   urbanSpacingPlanningCriteria: 'urban-spacing-planning-criteria',
+  maintenanceNeeds: 'maintenance-needs',
 };
 
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {
   return SECTION_ID_TO_API_ROUTE[sectionId];
 }
+
+export const getProjectProgrammeSections = (
+  t: TFunction,
+  briefProgramme: boolean,
+  hasBasicInfo: boolean,
+  hasDesignCriteria: boolean,
+  hasTrafficPlanningCriteria: boolean,
+  hasUrbanSpacingPlanningCriteria: boolean,
+  hasMaintenanceNeeds: boolean,
+): IProjectProgrammeSectionConfig[] => [
+  {
+    id: 'basicInfo',
+    label: t('projectProgrammeForm.basicInfoCardTitle'),
+    cardText: `${t('projectProgrammeForm.basicInfoCardText')} ${
+      !briefProgramme ? t('projectProgrammeForm.basicInfoCardTextExtensionForExtended') : ''
+    }`,
+    actionText: t('projectProgrammeForm.fillBasicInfo'),
+    showInBrief: true,
+    sectionIsStarted: hasBasicInfo,
+  },
+  {
+    id: 'designCriteria',
+    label: t('projectProgrammeForm.designCriteriaCardTitle'),
+    cardText: t('projectProgrammeForm.designCriteriaCardText'),
+    actionText: t('projectProgrammeForm.fillDesignCriteria'),
+    showInBrief: false,
+    sectionIsStarted: hasDesignCriteria,
+  },
+  {
+    id: 'trafficPlanningCriteria',
+    label: t('projectProgrammeForm.trafficPlanningCriteriaCardTitle'),
+    cardText: t('projectProgrammeForm.trafficPlanningCriteriaCardText'),
+    actionText: t('projectProgrammeForm.fillTrafficPlanningCriteria'),
+    showInBrief: false,
+    sectionIsStarted: hasTrafficPlanningCriteria,
+  },
+  {
+    id: 'urbanSpacingPlanningCriteria',
+    label: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardTitle'),
+    cardText: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardText'),
+    actionText: t('projectProgrammeForm.fillUrbanSpacingPlanningCriteria'),
+    showInBrief: false,
+    sectionIsStarted: hasUrbanSpacingPlanningCriteria,
+  },
+  {
+    id: 'maintenanceNeeds',
+    label: t('projectProgrammeForm.maintenanceNeedsCardTitle'),
+    cardText: t('projectProgrammeForm.maintenanceNeedsCardText'),
+    actionText: t('projectProgrammeForm.fillMaintenanceNeeds'),
+    showInBrief: false,
+    sectionIsStarted: hasMaintenanceNeeds,
+  },
+];

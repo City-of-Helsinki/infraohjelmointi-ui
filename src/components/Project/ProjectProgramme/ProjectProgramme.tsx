@@ -12,6 +12,7 @@ import {
 } from '@/api/projectProgrammeApi';
 import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
+  getProjectProgrammeSections,
   hasExtendedBasicInfoContent,
   IProjectProgrammeSectionConfig,
   isSectionStarted,
@@ -70,43 +71,17 @@ function ProjectProgramme() {
   const hasUrbanSpacingPlanningCriteria = isSectionStarted(
     effectiveProjectProgramme?.urbanSpacingPlanningCriteria,
   );
+  const hasMaintenanceNeeds = isSectionStarted(effectiveProjectProgramme?.maintenanceNeeds);
 
-  const PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[] = [
-    {
-      id: 'basicInfo',
-      label: t('projectProgrammeForm.basicInfoCardTitle'),
-      cardText: `${t('projectProgrammeForm.basicInfoCardText')} ${
-        !briefProgramme ? t('projectProgrammeForm.basicInfoCardTextExtensionForExtended') : ''
-      }`,
-      actionText: t('projectProgrammeForm.fillBasicInfo'),
-      showInBrief: true,
-      sectionIsStarted: hasBasicInfo,
-    },
-    {
-      id: 'designCriteria',
-      label: t('projectProgrammeForm.designCriteriaCardTitle'),
-      cardText: t('projectProgrammeForm.designCriteriaCardText'),
-      actionText: t('projectProgrammeForm.fillDesignCriteria'),
-      showInBrief: false,
-      sectionIsStarted: hasDesignCriteria,
-    },
-    {
-      id: 'trafficPlanningCriteria',
-      label: t('projectProgrammeForm.trafficPlanningCriteriaCardTitle'),
-      cardText: t('projectProgrammeForm.trafficPlanningCriteriaCardText'),
-      actionText: t('projectProgrammeForm.fillTrafficPlanningCriteria'),
-      showInBrief: false,
-      sectionIsStarted: hasTrafficPlanningCriteria,
-    },
-    {
-      id: 'urbanSpacingPlanningCriteria',
-      label: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardTitle'),
-      cardText: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardText'),
-      actionText: t('projectProgrammeForm.fillUrbanSpacingPlanningCriteria'),
-      showInBrief: false,
-      sectionIsStarted: hasUrbanSpacingPlanningCriteria,
-    },
-  ];
+  const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(
+    t,
+    briefProgramme,
+    hasBasicInfo,
+    hasDesignCriteria,
+    hasTrafficPlanningCriteria,
+    hasUrbanSpacingPlanningCriteria,
+    hasMaintenanceNeeds,
+  );
 
   const hasSavedExtendedSection =
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
