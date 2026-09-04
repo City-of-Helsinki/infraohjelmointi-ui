@@ -1159,6 +1159,9 @@
       "modifyInformation": "Muokkaa tietoja",
       "editDialogTitle": "Muokkaa hankkeen tietoja",
       "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
+      "projectBasicsValidationNotificationTitle": "Täydennä hankkeen perustiedot",
+      "projectBasicsValidationNotificationText": "Tietoja ei voi tallentaa tässä näkymässä. Tarkista tai täydennä hankkeen perustiedoista seuraavat kentät: {{fields}}.",
+      "goToProjectBasicsToFixValidation": "Siirry hankkeen perustietoihin",
       "requiredField": "Pakollinen kenttä",
       "invalidDate": "Päivämäärä on virheellinen",
       "emptyText": "Hankkeita ei löytynyt"

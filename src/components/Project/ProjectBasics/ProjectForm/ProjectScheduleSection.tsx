@@ -14,6 +14,7 @@ import {
   IScheduleDates,
 } from '@/utils/validation';
 import { createDateToStartOfYear, isBefore } from '@/utils/dates';
+import { createProjectPhaseResolver } from '@/utils/projectValidationRules';
 
 interface IProjectScheduleSectionProps {
   control: Control<IProjectForm>;
@@ -40,49 +41,13 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
 
   const phases = useOptions('phases');
 
-  // IO-863: the validators below compare against getValues('phase').value, which is
-  // the phase *id*. So resolve these phase-value sets to their option ids via the
-  // option label (listItemToOption maps label = phase value, value = phase id).
-  // This replaces fragile index slicing (slice(3,…) / slice(7,…)) that broke when the
-  // three planning phases were merged into one `planning` phase.
-  const phasesThatNeedPlanning = useMemo(
-    () =>
-      phases
-        .filter((p) =>
-          [
-            'designPlanning',
-            'constructionWait',
-            'constructionPreparation',
-            'construction',
-            'warrantyPeriod',
-            'completed',
-          ].includes(p.label),
-        )
-        .map((p) => p.value),
-    [phases],
-  );
-
-  const phasesThatNeedConstruction = useMemo(
-    () =>
-      phases
-        .filter((p) =>
-          ['constructionPreparation', 'construction', 'warrantyPeriod', 'completed'].includes(
-            p.label,
-          ),
-        )
-        .map((p) => p.value),
-    [phases],
-  );
+  const phaseResolver = useMemo(() => createProjectPhaseResolver(phases), [phases]);
+  const { phasesThatNeedPlanning, phasesThatNeedConstruction, warrantyPeriodPhase } = phaseResolver;
 
   const currentPhase = useWatch({
     control,
     name: 'phase',
   })?.value;
-
-  const warrantyPeriodPhase = useMemo(
-    () => phases.find(({ label }) => label === 'warrantyPeriod')?.value ?? '',
-    [phases],
-  );
 
   // Resolves the current schedule dates under the canonical names validateScheduleDateOrder
   // expects, since this form's own field names (estPlanningStart, etc.) differ from them.
@@ -128,7 +93,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, getScheduleDates, phasesThatNeedPlanning, t, getFieldState, isUserOnlyProjectManager]);
+  }, [
+    getValues,
+    getScheduleDates,
+    phasesThatNeedPlanning,
+    t,
+    getFieldState,
+    isUserOnlyProjectManager,
+  ]);
 
   const validateEstPlanningEnd = useCallback(() => {
     return {

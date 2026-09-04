@@ -30,6 +30,10 @@ import { RootState } from '@/store';
 import { Tooltip } from 'hds-react';
 import { IProject } from '@/interfaces/projectInterfaces';
 import useConstructionProcurementMethod from '@/hooks/useConstructionProcurementMethod';
+import {
+  createProjectPhaseResolver,
+  getProjectPhaseRequiredFields,
+} from '@/utils/projectValidationRules';
 
 interface IProjectStatusSectionProps {
   project: IProject | null;
@@ -84,6 +88,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const currentPhase = watchedPhase?.value ?? '';
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
+  const phaseResolver = useMemo(
+    () => createProjectPhaseResolver(phases, allPhaseDetails),
+    [allPhaseDetails, phases],
+  );
 
   const filteredPhaseDetails = useMemo(
     () => getProjectPhaseDetailOptions(allPhaseDetails, currentPhase),
@@ -158,40 +166,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     );
   }, [getValues]);
 
-  const phaseByValue = useCallback(
-    (val: string) => phases.find((phase) => phase.label === val)?.value ?? '',
-    [phases],
-  );
-  const proposalPhase = phaseByValue('proposal');
-  const designPhase = phaseByValue('design');
-  const programmedPhase = phaseByValue('programming');
-  const planningPhase = phaseByValue('designPlanning');
-  const constructionWaitPhase = phaseByValue('constructionWait');
-  const constructionPreparationPhase = phaseByValue('constructionPreparation');
-  const constructionPhase = phaseByValue('construction');
-  const warrantyPeriodPhase = phaseByValue('warrantyPeriod');
-  const completedPhase = phaseByValue('completed');
-  const phasesThatNeedYearBounds = useMemo(
-    () =>
-      [
-        programmedPhase,
-        planningPhase,
-        constructionWaitPhase,
-        constructionPreparationPhase,
-        constructionPhase,
-        warrantyPeriodPhase,
-        completedPhase,
-      ].filter((phase): phase is string => phase !== ''),
-    [
-      programmedPhase,
-      planningPhase,
-      constructionWaitPhase,
-      constructionPreparationPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
-  );
+  const {
+    proposalPhase,
+    designPhase,
+    warrantyPeriodPhase,
+    completedPhase,
+    phasesThatNeedYearBounds,
+  } = phaseResolver;
 
   const validatePhase = useMemo(
     () => ({
@@ -247,69 +228,18 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const phaseRequirements = useMemo(() => {
     const phase = getValues('phase').value;
     const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
-    const fields: Array<string> = [];
-
-    const programmedRequirements = [
-      'planningStartYear',
-      'constructionEndYear',
-      'estPlanningStart',
-      'estConstructionEnd',
-      'category',
-      'masterClass',
-      'class',
-    ];
-
-    if (projectMode === 'new') {
-      programmedRequirements.push('address');
-    }
-
-    const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
-    const generalConstructionRequirements = [
-      'estConstructionStart',
-      'estConstructionEnd',
-      'personConstruction',
-    ];
-    const combinedRequirements = [
-      ...programmedRequirements,
-      ...planningRequirements,
-      ...generalConstructionRequirements,
-    ];
-
-    const hasDetailsForPhase = allPhaseDetails.some((d) => d.projectPhase?.id === phase);
-
-    switch (phase) {
-      case programmedPhase:
-        fields.push(...fieldsIfEmpty([...programmedRequirements]));
-        break;
-      case planningPhase:
-      case constructionWaitPhase:
-        fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
-        break;
-      case constructionPreparationPhase:
-      case constructionPhase:
-      case warrantyPeriodPhase:
-      case completedPhase:
-        fields.push(...fieldsIfEmpty([...combinedRequirements]));
-        break;
-    }
-
-    if (hasDetailsForPhase) {
-      fields.push(...fieldsIfEmpty(['phaseDetail']));
-    }
-
-    return fields;
+    return fieldsIfEmpty(
+      getProjectPhaseRequiredFields({
+        phaseId: phase,
+        projectMode,
+        phaseResolver,
+      }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    allPhaseDetails,
     getValues,
     projectMode,
-    programmedPhase,
-    planningPhase,
-    constructionWaitPhase,
-    constructionPreparationPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
+    phaseResolver,
     // watchedRequiredFields causes recomputation when any of the watched fields change
     watchedRequiredFields,
   ]);

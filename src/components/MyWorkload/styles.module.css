@@ -187,6 +187,15 @@
   max-width: 100%;
 }
 
+.editDialogNotificationContent {
+  display: grid;
+  gap: var(--spacing-s);
+}
+
+.editDialogNotificationContent p {
+  margin: 0;
+}
+
 .editDialogFooterActionContainer {
   padding: 0 var(--spacing-l) var(--spacing-l);
 }
