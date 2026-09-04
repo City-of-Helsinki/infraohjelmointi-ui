@@ -6,7 +6,8 @@ export type ProjectProgrammeSectionId =
   | 'designCriteria'
   | 'trafficPlanningCriteria'
   | 'urbanSpacingPlanningCriteria'
-  | 'maintenanceNeeds';
+  | 'maintenanceNeeds'
+  | 'interactionAndRelatedProjects';
 
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;
@@ -93,6 +94,7 @@ const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
   trafficPlanningCriteria: 'traffic-planning-criteria',
   urbanSpacingPlanningCriteria: 'urban-spacing-planning-criteria',
   maintenanceNeeds: 'maintenance-needs',
+  interactionAndRelatedProjects: 'interaction-and-related-projects',
 };
 
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {
@@ -107,6 +109,7 @@ export const getProjectProgrammeSections = (
   hasTrafficPlanningCriteria: boolean,
   hasUrbanSpacingPlanningCriteria: boolean,
   hasMaintenanceNeeds: boolean,
+  hasInteractionAndRelatedProjects: boolean,
 ): IProjectProgrammeSectionConfig[] => [
   {
     id: 'basicInfo',
@@ -149,5 +152,13 @@ export const getProjectProgrammeSections = (
     actionText: t('projectProgrammeForm.fillMaintenanceNeeds'),
     showInBrief: false,
     sectionIsStarted: hasMaintenanceNeeds,
+  },
+  {
+    id: 'interactionAndRelatedProjects',
+    label: t('projectProgrammeForm.interactionAndRelatedProjectsCardTitle'),
+    cardText: t('projectProgrammeForm.interactionAndRelatedProjectsCardText'),
+    actionText: t('projectProgrammeForm.fillInteractionAndRelatedProjects'),
+    showInBrief: false,
+    sectionIsStarted: hasInteractionAndRelatedProjects,
   },
 ];

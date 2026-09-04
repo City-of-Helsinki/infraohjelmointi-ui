@@ -11,6 +11,7 @@ export interface IProjectProgramme {
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
+  interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -74,6 +75,12 @@ export interface IProjectProgrammeMaintenanceNeeds {
   links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
+export interface IProjectProgrammeInteractionAndRelatedProjects {
+  collaborationAndExperts?: string | null;
+  interactionNotes?: string | null;
+  links?: IProjectProgrammeLinkFormItem[] | null;
+}
+
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
@@ -87,6 +94,7 @@ export interface IProjectProgrammeForm {
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
+  interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
 }
 
 export interface IProjectProgrammeFormProps {

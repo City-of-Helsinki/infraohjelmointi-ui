@@ -14,7 +14,6 @@ import ProjectProgrammeForm from './ProjectProgrammeForm';
 import {
   getProjectProgrammeSections,
   hasExtendedBasicInfoContent,
-  IProjectProgrammeSectionConfig,
   isSectionStarted,
   ProjectProgrammeSectionId,
 } from './projectProgrammeSections';
@@ -72,6 +71,9 @@ function ProjectProgramme() {
     effectiveProjectProgramme?.urbanSpacingPlanningCriteria,
   );
   const hasMaintenanceNeeds = isSectionStarted(effectiveProjectProgramme?.maintenanceNeeds);
+  const hasInteractionAndRelatedProjects = isSectionStarted(
+    effectiveProjectProgramme?.interactionAndRelatedProjects,
+  );
 
   const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(
     t,
@@ -81,6 +83,7 @@ function ProjectProgramme() {
     hasTrafficPlanningCriteria,
     hasUrbanSpacingPlanningCriteria,
     hasMaintenanceNeeds,
+    hasInteractionAndRelatedProjects,
   );
 
   const hasSavedExtendedSection =
