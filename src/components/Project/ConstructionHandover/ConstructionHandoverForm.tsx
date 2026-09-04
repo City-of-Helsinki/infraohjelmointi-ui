@@ -5,7 +5,14 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant, IconLink, Notification, NotificationSize } from 'hds-react';
+import {
+  Button,
+  ButtonVariant,
+  IconLink,
+  Notification,
+  NotificationSize,
+  Tooltip,
+} from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
@@ -92,6 +99,7 @@ function ConstructionHandoverForm({
   const showNameProjectManagerNotification =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;
+  const showSubmitTooltip = showSubmitToProgrammerButton || showSubmitToConstructionButton;
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -187,6 +195,9 @@ function ConstructionHandoverForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="flex items-center gap-6">
+              {showSubmitTooltip && (
+                <Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>
+              )}
               {showSubmitToProgrammerButton && (
                 <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
                   {t('constructionHandoverForm.submitToProgrammer')}
