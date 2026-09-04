@@ -101,15 +101,19 @@ export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): st
   return SECTION_ID_TO_API_ROUTE[sectionId];
 }
 
+interface StartedSections {
+  hasBasicInfo: boolean;
+  hasDesignCriteria: boolean;
+  hasTrafficPlanningCriteria: boolean;
+  hasUrbanSpacingPlanningCriteria: boolean;
+  hasMaintenanceNeeds: boolean;
+  hasInteractionAndRelatedProjects: boolean;
+}
+
 export const getProjectProgrammeSections = (
   t: TFunction,
   briefProgramme: boolean,
-  hasBasicInfo: boolean,
-  hasDesignCriteria: boolean,
-  hasTrafficPlanningCriteria: boolean,
-  hasUrbanSpacingPlanningCriteria: boolean,
-  hasMaintenanceNeeds: boolean,
-  hasInteractionAndRelatedProjects: boolean,
+  startedSections: StartedSections,
 ): IProjectProgrammeSectionConfig[] => [
   {
     id: 'basicInfo',
@@ -119,7 +123,7 @@ export const getProjectProgrammeSections = (
     }`,
     actionText: t('projectProgrammeForm.fillBasicInfo'),
     showInBrief: true,
-    sectionIsStarted: hasBasicInfo,
+    sectionIsStarted: startedSections.hasBasicInfo,
   },
   {
     id: 'designCriteria',
@@ -127,7 +131,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.designCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillDesignCriteria'),
     showInBrief: false,
-    sectionIsStarted: hasDesignCriteria,
+    sectionIsStarted: startedSections.hasDesignCriteria,
   },
   {
     id: 'trafficPlanningCriteria',
@@ -135,7 +139,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.trafficPlanningCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillTrafficPlanningCriteria'),
     showInBrief: false,
-    sectionIsStarted: hasTrafficPlanningCriteria,
+    sectionIsStarted: startedSections.hasTrafficPlanningCriteria,
   },
   {
     id: 'urbanSpacingPlanningCriteria',
@@ -143,7 +147,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillUrbanSpacingPlanningCriteria'),
     showInBrief: false,
-    sectionIsStarted: hasUrbanSpacingPlanningCriteria,
+    sectionIsStarted: startedSections.hasUrbanSpacingPlanningCriteria,
   },
   {
     id: 'maintenanceNeeds',
@@ -151,7 +155,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.maintenanceNeedsCardText'),
     actionText: t('projectProgrammeForm.fillMaintenanceNeeds'),
     showInBrief: false,
-    sectionIsStarted: hasMaintenanceNeeds,
+    sectionIsStarted: startedSections.hasMaintenanceNeeds,
   },
   {
     id: 'interactionAndRelatedProjects',
@@ -159,6 +163,6 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.interactionAndRelatedProjectsCardText'),
     actionText: t('projectProgrammeForm.fillInteractionAndRelatedProjects'),
     showInBrief: false,
-    sectionIsStarted: hasInteractionAndRelatedProjects,
+    sectionIsStarted: startedSections.hasInteractionAndRelatedProjects,
   },
 ];

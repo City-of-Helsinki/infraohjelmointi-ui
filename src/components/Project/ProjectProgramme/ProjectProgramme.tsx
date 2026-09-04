@@ -75,16 +75,14 @@ function ProjectProgramme() {
     effectiveProjectProgramme?.interactionAndRelatedProjects,
   );
 
-  const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(
-    t,
-    briefProgramme,
+  const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(t, briefProgramme, {
     hasBasicInfo,
     hasDesignCriteria,
     hasTrafficPlanningCriteria,
     hasUrbanSpacingPlanningCriteria,
     hasMaintenanceNeeds,
     hasInteractionAndRelatedProjects,
-  );
+  });
 
   const hasSavedExtendedSection =
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
