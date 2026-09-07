@@ -676,7 +676,9 @@
     "natureTypesTooltip": "Mahdolliset lutu- ja rytykartoitukset",
     "equipmentAndFurnishingsTooltip": "Noudatetaan kaupunkikalusteohjetta ja puitesopimuksia. (POIS). Jos on jotain erityistä (esim. säilytettävää) tai muita erityisiä tavoitteita.",
     "watersTooltip": "Kirjaa suunnittelualueen vesielementit ja niihin liittyvät erityishuomiot: lähteet, pienvedet, pohja- ja orsivedet, rannat, kosteikot ja avosuot.",
-    "stormwaterManagementTooltip": "Tarkista nykyinen hulevestilanne Vipusesta. Kirjaa tunnistetut tarpeet hulevesien imeytyksen, viivytyksen, tulvareittien ja uomien osalta sekä muutokset nykyiseen kuivausjärjestelmään."
+    "stormwaterManagementTooltip": "Tarkista nykyinen hulevestilanne Vipusesta. Kirjaa tunnistetut tarpeet hulevesien imeytyksen, viivytyksen, tulvareittien ja uomien osalta sekä muutokset nykyiseen kuivausjärjestelmään.",
+    "draftStateLabel": "Hankeohjelma on luonnostilassa",
+    "draftStateSections": "Luonnostilassa olevat osiot:"
   },
   "notification": {
     "title": {

@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, Notification } from 'hds-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
@@ -20,6 +20,7 @@ import {
 import StartProjectProgramme from './StartProjectProgramme';
 import ProjectProgrammeBottomBar from './ProjectProgrammeBottomBar';
 import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
+import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
 
 const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
   return projectProgramme.briefProjectProgramme ?? true;
@@ -87,6 +88,14 @@ function ProjectProgramme() {
   const hasSavedExtendedSection =
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
     PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
+
+  const sectionsInDraftState = useMemo(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
+        (section) => effectiveProjectProgramme?.[section.id]?.status === 'DRAFT',
+      ),
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+  );
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;
@@ -233,6 +242,12 @@ function ProjectProgramme() {
                 </div>
               </Notification>
             )}
+            <ProjectProgrammeDraftStateNotification
+              sectionsInDraftState={sectionsInDraftState}
+              onOpenSection={handleOpenSection}
+              isProjectProgrammeComplete={isProjectProgrammeComplete}
+              effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+            />
             {PROJECT_PROGRAMME_SECTIONS.filter(
               (section) => !briefProgramme || section.showInBrief,
             ).map((section) => {
