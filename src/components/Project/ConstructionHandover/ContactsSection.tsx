@@ -11,7 +11,7 @@ export default function ContactsSection() {
   const programmers = useOptions('programmers');
 
   return (
-    <div className="mb-12">
+    <div className="mb-48">
       <FormSectionTitle
         label="constructionHandoverForm.contacts"
         name="constructionHandoverContacts"
@@ -24,6 +24,7 @@ export default function ContactsSection() {
           wrapperClassName="flex-1"
           required
           rules={{ ...validateRequiredSelect('person', t) }}
+          visibleOptions={3.5}
         />
         <SelectField
           {...getFieldProps('personFinancing')}
@@ -32,6 +33,7 @@ export default function ContactsSection() {
           wrapperClassName="flex-1"
           required
           rules={{ ...validateRequiredSelect('person', t) }}
+          visibleOptions={3.5}
         />
       </div>
     </div>
