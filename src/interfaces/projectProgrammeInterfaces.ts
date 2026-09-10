@@ -1,5 +1,5 @@
 import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/projectProgrammeSections';
-
+import { IProject } from './projectInterfaces';
 export type ProjectProgrammeStatus = 'DRAFT' | 'COMPLETE';
 
 export interface IProjectProgramme {
@@ -103,4 +103,5 @@ export interface IProjectProgrammeFormProps {
   effectiveProjectProgramme?: IProjectProgrammeForm;
   briefProgramme: boolean;
   onClose: () => void;
+  project?: IProject;
 }
