@@ -14,7 +14,7 @@ export const parseCurrency = (value?: string | number | null): number | null => 
   return normalized !== '' && Number.isFinite(number) ? number : null;
 };
 
-export const formatBudgetEuro = (value?: string): string => {
+export const formatBudgetEuro = (value?: string | number | null): string => {
   const numericValue = parseCurrency(value);
 
   if (numericValue === null) {

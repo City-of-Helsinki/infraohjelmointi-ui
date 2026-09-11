@@ -48,7 +48,9 @@ const MyWorkloadTaskCard: FC<MyWorkloadTaskCardProps> = ({ task }) => {
         <div className={classes.taskColumns}>
           <p>
             <IconMoneyBag aria-hidden="true" />
-            {`${t('myWorkloadView.tasks.budget')}: ${formatBudgetEuro(task.budget)}`}
+            {`${t(`myWorkloadView.tasks.budget.${task.taskType}`)}: ${formatBudgetEuro(
+              task.budget,
+            )}`}
           </p>
           <p>
             <IconHammers aria-hidden="true" />
