@@ -489,8 +489,9 @@ export interface IProjectTask
     | 'estPlanningEnd'
     | 'estConstructionStart'
     | 'estConstructionEnd'
-    | 'costForecast'
-    | 'constructionProcurementMethod'
   > {
+  constructionProcurementMethod: IListItem | null;
+  costForecast?: number | null;
+  budget?: number | null;
   taskType: ProjectTaskType;
 }

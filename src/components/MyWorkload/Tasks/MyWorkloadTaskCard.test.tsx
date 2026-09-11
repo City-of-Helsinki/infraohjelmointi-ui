@@ -42,7 +42,9 @@ describe('MyWorkloadTaskCard', () => {
     expect(
       screen.getByText('myWorkloadView.tasks.constructionPeriod: 11.4.2029 - 31.12.2036'),
     ).toBeInTheDocument();
-    expect(screen.getByText('myWorkloadView.tasks.budget: 1 234,00€')).toBeInTheDocument();
+    expect(
+      screen.getByText('myWorkloadView.tasks.budget.NAME_CONSTRUCTION_PROJECT_MANAGER: 1 234,00€'),
+    ).toBeInTheDocument();
     expect(
       screen.getByText('myWorkloadView.tasks.constructionProcurementMethod: Kilpailutus'),
     ).toBeInTheDocument();
