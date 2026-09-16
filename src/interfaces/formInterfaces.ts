@@ -206,3 +206,5 @@ export type HookFormRulesType = Omit<
 >;
 
 export type FormValueType = string | boolean | IOption | IOption[] | string[] | null | undefined;
+
+export type FormMode = 'view' | 'edit';
