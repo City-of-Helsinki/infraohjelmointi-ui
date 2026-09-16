@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 interface IReadonlyFieldListProps {
   fields: readonly string[];
-  pathPrefix: string;
+  pathPrefix?: string;
   translationNamespace?: string;
 }
 
@@ -20,7 +20,7 @@ export default function ReadonlyFieldList({
   }
 
   function getValue(field: string) {
-    return getValues(`${pathPrefix}.${field}`) || '';
+    return getValues(pathPrefix ? `${pathPrefix}.${field}` : field) || '';
   }
 
   return (
