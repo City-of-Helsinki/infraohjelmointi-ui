@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
 
-const MAINTENANCE_NEEDS_FIELDS = ['maintenanceNeeds'] as const;
+export const MAINTENANCE_NEEDS_FIELDS = ['maintenanceNeeds'] as const;
 
 function MaintenanceNeedsSection() {
   return (
