@@ -22,7 +22,7 @@
     "i18next": "^24.2.3",
     "i18next-browser-languagedetector": "^7.0.1",
     "i18next-http-backend": "^2.0.1",
-    "jwt-decode": "^3.1.2",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.23",
     "moment": "^2.29.4",
     "oidc-client-ts": "^2.4.0",
