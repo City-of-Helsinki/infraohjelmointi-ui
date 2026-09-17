@@ -33,6 +33,9 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
 
   const findPhase = (val: string) => phases.find((p) => p.label === val)?.value ?? '';
   const planningPhase = findPhase('designPlanning');
+  const draftInitiationPhase = findPhase('draftInitiation');
+  const draftApprovalPhase = findPhase('draftApproval');
+  const constructionPlanPhase = findPhase('constructionPlan');
   const constructionWaitPhase = findPhase('constructionWait');
   const constructionPhase = findPhase('construction');
   const warrantyPeriodPhase = findPhase('warrantyPeriod');
@@ -42,6 +45,9 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     () =>
       [
         planningPhase,
+        draftInitiationPhase,
+        draftApprovalPhase,
+        constructionPlanPhase,
         constructionWaitPhase,
         constructionPhase,
         warrantyPeriodPhase,
@@ -53,11 +59,17 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
       constructionWaitPhase,
       planningPhase,
       warrantyPeriodPhase,
+      constructionPlanPhase,
+      draftApprovalPhase,
+      draftInitiationPhase,
     ],
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () => [constructionPhase, warrantyPeriodPhase, completedPhase].filter((phase): phase is string => phase !== ''),
+    () =>
+      [constructionPhase, warrantyPeriodPhase, completedPhase].filter(
+        (phase): phase is string => phase !== '',
+      ),
     [completedPhase, constructionPhase, warrantyPeriodPhase],
   );
 

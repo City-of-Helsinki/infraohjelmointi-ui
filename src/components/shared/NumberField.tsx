@@ -22,15 +22,16 @@ const NumberField: FC<INumberFieldProps> = ({
   label,
   control,
   rules,
-  required: requiredProp,
+  required,
   readOnly,
   tooltip,
   hideLabel,
   disabled,
   size = 'l',
 }) => {
-  const required = requiredProp ?? (rules?.required ? true : false);
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
+
   return (
     <Controller
       name={name}
@@ -46,7 +47,7 @@ const NumberField: FC<INumberFieldProps> = ({
             style={{ paddingTop: hideLabel ? '1.75rem' : '0' }}
             id={label}
             readOnly={readOnly}
-            required={required}
+            required={isRequired}
             invalid={error ? true : false}
             errorText={error?.message}
             helperText={tooltip}

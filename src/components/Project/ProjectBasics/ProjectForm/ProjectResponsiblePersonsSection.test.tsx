@@ -6,6 +6,9 @@ import { fireEvent } from '@testing-library/react';
 
 const PHASES = {
   designPlanning: 'phase-id-design-planning',
+  draftInitiation: 'phase-id-draft-initiation',
+  draftApproval: 'phase-id-draft-approval',
+  constructionPlan: 'phase-id-construction-plan',
   constructionWait: 'phase-id-construction-wait',
   construction: 'phase-id-construction',
   warrantyPeriod: 'phase-id-warranty-period',
@@ -67,6 +70,9 @@ jest.mock('@/hooks/useOptions', () => ({
     if (key === 'phases') {
       return [
         { value: PHASES.designPlanning, label: 'designPlanning' },
+        { value: PHASES.draftInitiation, label: 'draftInitiation' },
+        { value: PHASES.draftApproval, label: 'draftApproval' },
+        { value: PHASES.constructionPlan, label: 'constructionPlan' },
         { value: PHASES.constructionWait, label: 'constructionWait' },
         { value: PHASES.construction, label: 'construction' },
         { value: PHASES.warrantyPeriod, label: 'warrantyPeriod' },
@@ -254,8 +260,8 @@ describe('ProjectResponsiblePersonsSection', () => {
     expect(valueInput).toHaveValue('jane.doe');
   });
 
-  it('requires planning person in planning phase using phase id', () => {
-    render(<TestComponent phase={PHASES.designPlanning} />);
+  it('requires planning person in draft initiation phase using phase id', () => {
+    render(<TestComponent phase={PHASES.draftInitiation} />);
 
     const planningSelect = screen.getByTestId('personPlanning');
     expect(planningSelect).toBeRequired();
