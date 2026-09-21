@@ -1,4 +1,4 @@
-import { IOption } from '@/interfaces/common';
+import { IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { getLocationParent, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react';
@@ -17,6 +17,28 @@ interface IProjectSearchProps {
   control: Control<IGroupForm>;
 }
 
+export const MULTIPLE_DIVISIONS_LABEL = 'Eri kaupunginosia';
+export const MULTIPLE_DISTRICTS_LABEL = 'Eri suurpiirejä';
+
+export interface IProjectSearchFilters {
+  lowerCaseSearchWord: string;
+  groupSubDivision: string;
+  groupDivisionName: string;
+  groupDivision: string;
+  groupDistrictName: string;
+  groupDistrict: string;
+  groupSubClass: string;
+  groupClass: string;
+  projectsForSubmitIds: string[];
+}
+
+interface IFilterProjectsForSearchParams {
+  projects: IProject[];
+  filters: IProjectSearchFilters;
+  projectSubDivisions: IListItem[];
+  projectDivisions: IListItem[];
+}
+
 const getProjectsUnderClass = async (groupClass: string, forcedToFrame: boolean, year: number) => {
   const groupClassParam = groupClass ? `class=${groupClass}` : '';
   const res = await getProjectsWithParams(
@@ -31,6 +53,70 @@ const getProjectsUnderClass = async (groupClass: string, forcedToFrame: boolean,
   );
   return res.results;
 };
+
+const getSearchFilters = (
+  getValues: UseFormGetValues<IGroupForm>,
+  searchWord: string,
+): IProjectSearchFilters => {
+  return {
+    lowerCaseSearchWord: searchWord.toLowerCase(),
+    groupSubDivision: getValues('subDivision.value'),
+    groupDivisionName: getValues('division.label'),
+    groupDivision: getValues('division.value'),
+    groupDistrictName: getValues('district.label'),
+    groupDistrict: getValues('district.value'),
+    groupSubClass: getValues('subClass.value'),
+    groupClass: getValues('class.value'),
+    projectsForSubmitIds: getValues('projectsForSubmit').map((project) => project.value),
+  };
+};
+
+export const filterProjectsForSearch = ({
+  projects,
+  filters,
+  projectSubDivisions,
+  projectDivisions,
+}: IFilterProjectsForSearchParams) =>
+  projects.filter((project) => {
+    const projectNameMatches = project.name.toLowerCase().startsWith(filters.lowerCaseSearchWord);
+    const classMatches =
+      project.projectClass === filters.groupSubClass || project.projectClass === filters.groupClass;
+
+    const projectDivision = getLocationParent(projectSubDivisions, project.projectDistrict);
+    const projectDistrict = getLocationParent(projectDivisions, projectDivision);
+
+    const districtMatches =
+      project.projectDistrict === filters.groupDistrict ||
+      projectDivision === filters.groupDivision ||
+      projectDistrict === filters.groupDistrict ||
+      filters.groupDistrictName === MULTIPLE_DISTRICTS_LABEL;
+
+    const divisionMatches =
+      project.projectDistrict === filters.groupDivision ||
+      projectDivision === filters.groupDivision ||
+      filters.groupDivisionName === MULTIPLE_DIVISIONS_LABEL;
+
+    const subDivisionMatches = project.projectDistrict === filters.groupSubDivision;
+    const projectNotSelectedAlready = !filters.projectsForSubmitIds.includes(project.id);
+
+    if (filters.groupSubDivision) {
+      return subDivisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+    }
+
+    if (filters.groupDivision) {
+      return divisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+    }
+
+    if (filters.groupDistrict) {
+      return districtMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+    }
+
+    if (filters.groupSubClass || filters.groupClass) {
+      return classMatches && projectNameMatches && projectNotSelectedAlready;
+    }
+
+    return false;
+  });
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
@@ -62,55 +148,17 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
   }, [groupClass, forcedToFrame, year]);
 
   useEffect(() => {
-    const lowerCaseSearchWord = searchWord.toLowerCase();
-    const groupSubDivision = getValues('subDivision.value');
-    const groupDivisionName = getValues('division.label');
-    // If selected groupDivision is Eri kaupunginosia (= Different divisions) it means that there is no specific division selected
-    // and the search should work as if there's no division selected
-    const groupDivision =
-      groupDivisionName === 'Eri kaupunginosia' ? undefined : getValues('division.value');
-    const groupDistrictName = getValues('district.label');
-    // If selected groupDistrict is Eri suurpiirejä (= Different districts) it's the same as if there was no groupDivision selected
-    const groupDistrict =
-      groupDistrictName === 'Eri suurpiirejä' ? undefined : getValues('district.value');
-    const groupSubClass = getValues('subClass.value');
-    const groupClass = getValues('class.value');
-    const projectsForSubmitIds = getValues('projectsForSubmit').map((project) => project.value);
-
-    const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
-      const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
-      const classMatches =
-        project.projectClass === groupSubClass || project.projectClass === groupClass;
-      const districtMatches =
-        project.projectDistrict === groupDistrict ||
-        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDistrict ||
-        getLocationParent(
-          projectDivisions,
-          getLocationParent(projectSubDivisions, project.projectDistrict),
-        ) === groupDistrict;
-      const divisionMatches =
-        project.projectDistrict === groupDivision ||
-        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
-      const subDivisionMatches = project.projectDistrict === groupSubDivision;
-      const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
-
-      if (groupSubDivision)
-        return (
-          subDivisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready
-        );
-      else if (groupDivision)
-        return divisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
-      else if (groupDistrict)
-        return districtMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
-      else if (groupSubClass || groupClass) {
-        return classMatches && projectNameMatches && projectNotSelectedAlready;
-      }
-      return false;
+    const filters = getSearchFilters(getValues, searchWord);
+    const projectSearchResult = filterProjectsForSearch({
+      projects: allProjectsUnderSelectedClass,
+      filters,
+      projectSubDivisions,
+      projectDivisions,
     });
 
-    const searchProjectsItemList = projectSearchResult.map((project) => ({
-      ...listItemToOption({ id: project.id, value: project.name }),
-    }));
+    const searchProjectsItemList = projectSearchResult.map((project) =>
+      listItemToOption({ id: project.id, value: project.name }),
+    );
     setSearchedProjects(searchProjectsItemList);
   }, [allProjectsUnderSelectedClass, getValues, projectDivisions, projectSubDivisions, searchWord]);
 
