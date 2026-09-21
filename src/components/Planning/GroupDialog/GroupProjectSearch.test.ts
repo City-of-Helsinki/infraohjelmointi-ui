@@ -39,203 +39,187 @@ const makeFilters = (overrides: Partial<IProjectSearchFilters>): IProjectSearchF
   ...overrides,
 });
 
+const makeProjects = (projects: Array<Partial<IProject>>): IProject[] =>
+  projects.map((project) => makeProject(project));
+
+const ALPHA_CLASS_FILTERS: Partial<IProjectSearchFilters> = {
+  lowerCaseSearchWord: 'alpha',
+  groupClass: 'class-1',
+};
+
+const getResultIds = ({
+  projects,
+  filterOverrides = {},
+}: {
+  projects: IProject[];
+  filterOverrides?: Partial<IProjectSearchFilters>;
+}): string[] =>
+  filterProjectsForSearch({
+    projects,
+    filters: makeFilters({ ...ALPHA_CLASS_FILTERS, ...filterOverrides }),
+    projectSubDivisions,
+    projectDivisions,
+  }).map((project) => project.id);
+
 describe('filterProjectsForSearch', () => {
   it('filters by class and case-insensitive startsWith for project name', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Beta Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-3',
         name: 'Alpha Park',
         projectClass: 'class-2',
         projectDistrict: 'sub-1',
+      },
+    ]);
+
+    expect(
+      getResultIds({
+        projects,
+        filterOverrides: { lowerCaseSearchWord: 'ALPHA'.toLowerCase() },
       }),
-    ];
-
-    const result = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({ lowerCaseSearchWord: 'ALPHA'.toLowerCase(), groupClass: 'class-1' }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(result.map((project) => project.id)).toEqual(['p-1']);
+    ).toEqual(['p-1']);
   });
 
   it('uses subdivision branch with highest priority when subdivision is selected', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Alpha Street 2',
         projectClass: 'class-1',
         projectDistrict: 'sub-2',
-      }),
-    ];
+      },
+    ]);
 
-    const result = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        groupDivision: 'div-1',
-        groupDistrict: 'district-1',
-        groupSubDivision: 'sub-1',
+    expect(
+      getResultIds({
+        projects,
+        filterOverrides: {
+          groupDivision: 'div-1',
+          groupDistrict: 'district-1',
+          groupSubDivision: 'sub-1',
+        },
       }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(result.map((project) => project.id)).toEqual(['p-1']);
+    ).toEqual(['p-1']);
   });
 
   it('matches project through division parent relationship', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Alpha Street 2',
         projectClass: 'class-1',
         projectDistrict: 'sub-2',
-      }),
-    ];
+      },
+    ]);
 
-    const result = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        groupDivision: 'div-1',
-      }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(result.map((project) => project.id)).toEqual(['p-1']);
+    expect(getResultIds({ projects, filterOverrides: { groupDivision: 'div-1' } })).toEqual([
+      'p-1',
+    ]);
   });
 
   it('matches all class/name results when division label is multiple divisions', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Alpha Park',
         projectClass: 'class-1',
         projectDistrict: 'sub-2',
-      }),
-    ];
+      },
+    ]);
 
-    const result = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        groupDivision: 'different-divisions',
-        groupDivisionName: MULTIPLE_DIVISIONS_LABEL,
+    expect(
+      getResultIds({
+        projects,
+        filterOverrides: {
+          groupDivision: 'different-divisions',
+          groupDivisionName: MULTIPLE_DIVISIONS_LABEL,
+        },
       }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(result.map((project) => project.id)).toEqual(['p-1', 'p-2']);
+    ).toEqual(['p-1', 'p-2']);
   });
 
   it('matches district from division hierarchy and supports multiple districts label', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Alpha Park',
         projectClass: 'class-1',
         projectDistrict: 'sub-2',
+      },
+    ]);
+
+    expect(getResultIds({ projects, filterOverrides: { groupDistrict: 'district-1' } })).toEqual([
+      'p-1',
+    ]);
+
+    expect(
+      getResultIds({
+        projects,
+        filterOverrides: {
+          groupDistrict: 'different-districts',
+          groupDistrictName: MULTIPLE_DISTRICTS_LABEL,
+        },
       }),
-    ];
-
-    const districtResult = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        groupDistrict: 'district-1',
-      }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(districtResult.map((project) => project.id)).toEqual(['p-1']);
-
-    const multipleDistrictsResult = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        groupDistrict: 'different-districts',
-        groupDistrictName: MULTIPLE_DISTRICTS_LABEL,
-      }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(multipleDistrictsResult.map((project) => project.id)).toEqual(['p-1', 'p-2']);
+    ).toEqual(['p-1', 'p-2']);
   });
 
   it('excludes already selected projects', () => {
-    const projects = [
-      makeProject({
+    const projects = makeProjects([
+      {
         id: 'p-1',
         name: 'Alpha Street',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-      makeProject({
+      },
+      {
         id: 'p-2',
         name: 'Alpha Park',
         projectClass: 'class-1',
         projectDistrict: 'sub-1',
-      }),
-    ];
+      },
+    ]);
 
-    const result = filterProjectsForSearch({
-      projects,
-      filters: makeFilters({
-        lowerCaseSearchWord: 'alpha',
-        groupClass: 'class-1',
-        projectsForSubmitIds: ['p-1'],
+    expect(
+      getResultIds({
+        projects,
+        filterOverrides: { projectsForSubmitIds: ['p-1'] },
       }),
-      projectSubDivisions,
-      projectDivisions,
-    });
-
-    expect(result.map((project) => project.id)).toEqual(['p-2']);
+    ).toEqual(['p-2']);
   });
 });
