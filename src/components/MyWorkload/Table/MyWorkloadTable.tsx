@@ -157,6 +157,13 @@ const createTableColumns = (
         ]
       : [
           {
+            key: 'planningEnd',
+            headerName: t('myWorkloadView.table.planningEnd'),
+            isSortable: true,
+            sortIconType: 'other',
+            transform: (row: MyWorkloadTableRow) => formatMyWorkloadDateForDisplay(row.planningEnd),
+          },
+          {
             key: 'constructionStart',
             headerName: t('myWorkloadView.table.constructionStart'),
             isSortable: true,
