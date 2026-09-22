@@ -422,8 +422,11 @@
         "presenceStart": "Esilläolo alkaa",
         "presenceEnd": "Esilläolo päättyy",
         "visibilityStart": "Nähtävilläolo alkaa",
-        "visibilityEnd": "Nähtävilläolo päättyy"
-      }
+        "visibilityEnd": "Nähtävilläolo päättyy",
+        "type": "Hanketyyppi",
+        "sapProject": "Projektinumero"
+      },
+      "info": "Muutoshistoria näyttää hankekortilla tehdyt muutokset seuraaviin tietoihin: hankkeen nimi ja kuvaus, kategoria, alaluokka, hanketyyppi, projektinumero, vaihe ja vaiheen tarkenne, rakentamisen hankintatapa sekä hankkeen aikataulutiedot. Jokaisesta muutoksesta näytetään muokkaaja, ajankohta sekä vanha ja uusi arvo."
     }
   },
   "searchForm": {

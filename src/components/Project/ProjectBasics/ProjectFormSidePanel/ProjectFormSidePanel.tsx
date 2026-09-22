@@ -1,5 +1,5 @@
 import { FC, memo } from 'react';
-import { Button, ButtonVariant } from 'hds-react';
+import { Button, ButtonVariant, Tooltip } from 'hds-react';
 import { IconEye } from 'hds-react/icons/';
 import { useTranslation } from 'react-i18next';
 import { SideNavigation } from '../../../shared';
@@ -46,6 +46,7 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
               >
                 {t('projectForm.changeHistory.button')}
               </Button>
+              <Tooltip placement="auto">{t('projectForm.changeHistory.info')}</Tooltip>
             </div>
           )}
           {formStatusSection && <div className="form-status-container">{formStatusSection}</div>}
