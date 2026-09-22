@@ -41,8 +41,10 @@ describe('useProjectProgrammeForm', () => {
         links: [{ value: '' }],
       },
       trafficPlanningCriteria: {
+        targetTrafficChanges: '',
         pedestrianTraffic: '',
         bicycleTraffic: '',
+        carTraffic: '',
         serviceAndPickupTraffic: '',
         otherTraffic: '',
         accessibility: '',
@@ -115,8 +117,10 @@ describe('useProjectProgrammeForm', () => {
   it('hydrates traffic planning criteria values from saved data', () => {
     const formData: IProjectProgrammeForm = {
       trafficPlanningCriteria: {
+        targetTrafficChanges: 'Target traffic changes info',
         pedestrianTraffic: 'Pedestrian info',
         bicycleTraffic: 'Bicycle info',
+        carTraffic: 'Car traffic info',
         accessibility: 'Accessibility info',
         links: [{ value: 'https://traffic.fi' }],
       },
@@ -125,8 +129,10 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('trafficPlanningCriteria')).toEqual({
+      targetTrafficChanges: 'Target traffic changes info',
       pedestrianTraffic: 'Pedestrian info',
       bicycleTraffic: 'Bicycle info',
+      carTraffic: 'Car traffic info',
       serviceAndPickupTraffic: '',
       otherTraffic: '',
       accessibility: 'Accessibility info',
