@@ -2,8 +2,10 @@ import { memo } from 'react';
 import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
 
 const TRAFFIC_PLANNING_CRITERIA_FIELDS = [
+  'targetTrafficChanges',
   'pedestrianTraffic',
   'bicycleTraffic',
+  'carTraffic',
   'serviceAndPickupTraffic',
   'otherTraffic',
   'accessibility',
@@ -22,6 +24,5 @@ function TrafficPlanningCriteriaSection() {
     />
   );
 }
-
 
 export default memo(TrafficPlanningCriteriaSection);

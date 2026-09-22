@@ -53,8 +53,10 @@ const baseFormData: IProjectProgrammeForm = {
     links: [{ value: 'https://old-design-link.fi' }],
   },
   trafficPlanningCriteria: {
+    targetTrafficChanges: 'Target traffic changes info',
     pedestrianTraffic: 'Pedestrian traffic info',
     bicycleTraffic: 'Bicycle traffic info',
+    carTraffic: 'Car traffic info',
     accessibility: 'Accessibility info',
     links: [{ value: 'https://old-traffic-link.fi' }],
   },
@@ -360,8 +362,10 @@ describe('ProjectProgrammeForm save logic', () => {
     );
 
     const trafficCriteria = {
+      targetTrafficChanges: 'Target traffic changes plan',
       pedestrianTraffic: 'Pedestrian plan',
       bicycleTraffic: 'Bicycle plan',
+      carTraffic: 'Car traffic plan',
       serviceAndPickupTraffic: 'Service traffic plan',
       otherTraffic: 'Other traffic plan',
       accessibility: 'Accessibility plan',

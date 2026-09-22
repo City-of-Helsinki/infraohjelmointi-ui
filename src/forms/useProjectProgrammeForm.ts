@@ -97,8 +97,10 @@ function getTrafficPlanningCriteriaValues(
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria,
 ): IProjectProgrammeTrafficPlanningCriteria {
   return {
+    targetTrafficChanges: getTextValue(trafficPlanningCriteria?.targetTrafficChanges),
     pedestrianTraffic: getTextValue(trafficPlanningCriteria?.pedestrianTraffic),
     bicycleTraffic: getTextValue(trafficPlanningCriteria?.bicycleTraffic),
+    carTraffic: getTextValue(trafficPlanningCriteria?.carTraffic),
     serviceAndPickupTraffic: getTextValue(trafficPlanningCriteria?.serviceAndPickupTraffic),
     otherTraffic: getTextValue(trafficPlanningCriteria?.otherTraffic),
     accessibility: getTextValue(trafficPlanningCriteria?.accessibility),
