@@ -4,6 +4,7 @@ import { act, screen, within } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import ProjectProgramme from './ProjectProgramme';
+import { ProjectProgrammeStatus } from '@/interfaces/projectProgrammeInterfaces';
 
 const mockSwitchType = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
@@ -55,6 +56,7 @@ describe('ProjectProgramme', () => {
       district: 'Keskinen',
     },
     designCriteria: Record<string, unknown> | null = null,
+    status: ProjectProgrammeStatus = 'DRAFT',
   ) {
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: {
@@ -62,6 +64,7 @@ describe('ProjectProgramme', () => {
         briefProjectProgramme,
         basicInfo,
         designCriteria,
+        status,
       },
       isLoading: false,
       refetch: mockRefetchProjectProgramme,

@@ -250,13 +250,15 @@ function ProjectProgramme() {
                 </div>
               </Notification>
             )}
-            <ProjectProgrammeDraftStateNotification
-              sectionsInCompletedState={sectionsInCompletedState}
-              sectionsInDraftState={sectionsInDraftState}
-              onOpenSection={handleOpenSection}
-              isProjectProgrammeComplete={isProjectProgrammeComplete}
-              effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
-            />
+            {effectiveProjectProgramme?.status === 'DRAFT' && (
+              <ProjectProgrammeDraftStateNotification
+                sectionsInCompletedState={sectionsInCompletedState}
+                sectionsInDraftState={sectionsInDraftState}
+                onOpenSection={handleOpenSection}
+                isProjectProgrammeComplete={isProjectProgrammeComplete}
+                effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+              />
+            )}
             {PROJECT_PROGRAMME_SECTIONS.filter(
               (section) => !briefProgramme || section.showInBrief,
             ).map((section) => {
