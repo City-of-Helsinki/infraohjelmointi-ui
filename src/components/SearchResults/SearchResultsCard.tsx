@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
 import './styles.css';
 import optionIcon from '@/utils/optionIcon';
+import { Button } from 'hds-react';
 
 const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,
@@ -13,14 +14,14 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   hashTags,
   phase,
   breadCrumbs,
-  link,
+  links,
   programmed,
 }) => {
   const { t } = useTranslation();
   const iconGroup = useMemo(() => <IconScrollGroup size={IconSize.ExtraSmall} />, []);
 
   return (
-    <Link to={link} className="color-black no-underline">
+    <Link to={links.defaultLink} className="color-black no-underline">
       <div className="search-result-card">
         {/* Title */}
         <div className="search-result-title-container">
@@ -37,13 +38,18 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
               <CustomTag color={'var(--color-bus-light	)'} text={t(`searchTag.notProgrammed`)} />
             )}
           </div>
-          {phase && (
-            <CustomTag
-              icon={optionIcon[phase as keyof typeof optionIcon]}
-              text={t(`option.${phase}`)}
-              color={'var(--color-suomenlinna-medium-light)'}
-            />
-          )}
+          <div className="search-result-tag-container">
+            <Link to={links.projectFormLink}>
+              <Button className="ml-auto">{t('goToProjectForm')}</Button>
+            </Link>
+            {phase && (
+              <CustomTag
+                icon={optionIcon[phase as keyof typeof optionIcon]}
+                text={t(`option.${phase}`)}
+                color={'var(--color-suomenlinna-medium-light)'}
+              />
+            )}
+          </div>
         </div>
         {/* Breadcrumbs */}
         <div className="search-result-breadcrumbs">
