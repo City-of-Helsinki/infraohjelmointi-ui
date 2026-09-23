@@ -26,6 +26,7 @@ describe('ProjectProgrammeDraftStateNotification', () => {
   it('renders draft state links and opens selected section', async () => {
     render(
       <ProjectProgrammeDraftStateNotification
+        sectionsInCompletedState={[]}
         sectionsInDraftState={[
           { id: 'basicInfo', label: 'Basic info' },
           { id: 'designCriteria', label: 'Design criteria' },
@@ -49,6 +50,7 @@ describe('ProjectProgrammeDraftStateNotification', () => {
   it('passes expected button overrides to action buttons', () => {
     render(
       <ProjectProgrammeDraftStateNotification
+        sectionsInCompletedState={[]}
         sectionsInDraftState={[{ id: 'basicInfo', label: 'Basic info' }]}
         onOpenSection={onOpenSection}
         isProjectProgrammeComplete={true}
@@ -81,9 +83,10 @@ describe('ProjectProgrammeDraftStateNotification', () => {
     );
   });
 
-  it('does not render when there are no draft sections', () => {
+  it('does not render section links when there are no draft sections', () => {
     render(
       <ProjectProgrammeDraftStateNotification
+        sectionsInCompletedState={[]}
         sectionsInDraftState={[]}
         onOpenSection={onOpenSection}
         isProjectProgrammeComplete={false}
@@ -93,5 +96,22 @@ describe('ProjectProgrammeDraftStateNotification', () => {
 
     expect(screen.queryByText('projectProgrammeForm.draftStateLabel')).toBeInTheDocument();
     expect(screen.queryByText('projectProgrammeForm.draftStateSections')).not.toBeInTheDocument();
+  });
+
+  it('renders completed sections above draft sections', () => {
+    render(
+      <ProjectProgrammeDraftStateNotification
+        sectionsInCompletedState={[{ id: 'basicInfo', label: 'Basic info' }]}
+        sectionsInDraftState={[{ id: 'designCriteria', label: 'Design criteria' }]}
+        onOpenSection={onOpenSection}
+        isProjectProgrammeComplete={false}
+        effectiveProjectProgrammeId="programme-1"
+      />,
+    );
+
+    const completedText = screen.getByText('projectProgrammeForm.completedStateSections');
+    const draftText = screen.getByText('projectProgrammeForm.draftStateSections');
+
+    expect(completedText.compareDocumentPosition(draftText)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 });

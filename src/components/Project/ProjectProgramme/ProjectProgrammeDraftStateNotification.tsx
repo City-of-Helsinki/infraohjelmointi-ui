@@ -6,41 +6,46 @@ import {
 } from './projectProgrammeSections';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 
+type Section = Pick<IProjectProgrammeSectionConfig, 'id' | 'label'>;
+
 interface ProjectProgrammeDraftStateNotificationProps {
-  sectionsInDraftState: Pick<IProjectProgrammeSectionConfig, 'id' | 'label'>[];
+  sectionsInCompletedState: Section[];
+  sectionsInDraftState: Section[];
   onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
 }
 
-function ProjectProgrammeDraftStateNotification({
-  sectionsInDraftState,
+interface ProjectProgrammeSectionListProps {
+  sections: Section[];
+  labelKey:
+    | 'projectProgrammeForm.completedStateSections'
+    | 'projectProgrammeForm.draftStateSections';
+  containerClassName: string;
+  onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
+}
+
+function ProjectProgrammeSectionList({
+  sections,
+  labelKey,
+  containerClassName,
   onOpenSection,
-  isProjectProgrammeComplete,
-  effectiveProjectProgrammeId,
-}: Readonly<ProjectProgrammeDraftStateNotificationProps>) {
+}: Readonly<ProjectProgrammeSectionListProps>) {
   const { t } = useTranslation();
 
-  function handleLinkClick(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    sectionId: ProjectProgrammeSectionId,
-  ) {
-    e.preventDefault();
-    onOpenSection(sectionId);
-  }
+  if (sections.length === 0) return null;
 
   return (
-    <Notification type="info" label={t('projectProgrammeForm.draftStateLabel')} className="mt-6">
-      {sectionsInDraftState.length > 0 && (
-        <p className="text-body">{t('projectProgrammeForm.draftStateSections')}</p>
-      )}
+    <div className={containerClassName}>
+      <p className="text-body">{t(labelKey)}</p>
       <ul>
-        {sectionsInDraftState.map((section) => (
+        {sections.map((section) => (
           <li key={section.id} className="mb-2">
             <Link
               href="#"
               onClick={(e) => {
-                handleLinkClick(e, section.id);
+                e.preventDefault();
+                onOpenSection(section.id);
               }}
             >
               {section.label}
@@ -48,7 +53,35 @@ function ProjectProgrammeDraftStateNotification({
           </li>
         ))}
       </ul>
-      <div className="mt-8 flex flex-wrap gap-4">
+    </div>
+  );
+}
+
+function ProjectProgrammeDraftStateNotification({
+  sectionsInCompletedState = [],
+  sectionsInDraftState = [],
+  onOpenSection,
+  isProjectProgrammeComplete,
+  effectiveProjectProgrammeId,
+}: Readonly<ProjectProgrammeDraftStateNotificationProps>) {
+  const { t } = useTranslation();
+
+  return (
+    <Notification type="info" label={t('projectProgrammeForm.draftStateLabel')} className="mt-6">
+      <ProjectProgrammeSectionList
+        sections={sectionsInCompletedState}
+        labelKey="projectProgrammeForm.completedStateSections"
+        containerClassName="mb-4"
+        onOpenSection={onOpenSection}
+      />
+      <ProjectProgrammeSectionList
+        sections={sectionsInDraftState}
+        labelKey="projectProgrammeForm.draftStateSections"
+        containerClassName="mb-8"
+        onOpenSection={onOpenSection}
+      />
+
+      <div className="flex flex-wrap gap-4">
         <ProjectProgrammeActionButtons
           isProjectProgrammeComplete={isProjectProgrammeComplete}
           effectiveProjectProgrammeId={effectiveProjectProgrammeId}

@@ -129,7 +129,7 @@ describe('ProjectProgramme', () => {
     });
   });
 
-  it('includes only draft sections in draft state notification', async () => {
+  it('includes draft and completed sections in draft state notification', async () => {
     mockProjectProgramme(
       false,
       {
@@ -150,7 +150,7 @@ describe('ProjectProgramme', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: 'projectProgrammeForm.designCriteriaCardTitle' }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   it('opens existing basic info form without posting section when section already exists', async () => {

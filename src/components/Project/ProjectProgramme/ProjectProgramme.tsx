@@ -97,6 +97,14 @@ function ProjectProgramme() {
     [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
   );
 
+  const sectionsInCompletedState = useMemo(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
+        (section) => effectiveProjectProgramme?.[section.id]?.status === 'COMPLETE',
+      ),
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+  );
+
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
   const showLoadError = hasProjectProgrammeLoadError;
   const showStartProjectProgramme = !showLoadError && !hasProjectProgramme;
@@ -243,6 +251,7 @@ function ProjectProgramme() {
               </Notification>
             )}
             <ProjectProgrammeDraftStateNotification
+              sectionsInCompletedState={sectionsInCompletedState}
               sectionsInDraftState={sectionsInDraftState}
               onOpenSection={handleOpenSection}
               isProjectProgrammeComplete={isProjectProgrammeComplete}
