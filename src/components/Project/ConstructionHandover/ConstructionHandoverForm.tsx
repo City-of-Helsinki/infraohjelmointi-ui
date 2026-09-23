@@ -192,22 +192,27 @@ function ConstructionHandoverForm({
         <FinancingSection constructionHandover={constructionHandover} />
         <ContactsSection />
 
-        <div className="project-form-banner">
+        <div
+          className="project-form-banner"
+          style={{ height: showSubmitTooltip ? '110px' : undefined }}
+        >
           <div className="project-form-banner-container">
-            <div className="flex items-center gap-6">
-              {showSubmitTooltip && (
-                <Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>
-              )}
-              {showSubmitToProgrammerButton && (
-                <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
-                  {t('constructionHandoverForm.submitToProgrammer')}
-                </Button>
-              )}
-              {showSubmitToConstructionButton && (
-                <Button type="button" onClick={handleSubmit(submitToConstruction)}>
-                  {t('constructionHandoverForm.submitToConstruction')}
-                </Button>
-              )}
+            <div className={`flex gap-6 ${showSubmitTooltip ? 'items-end' : 'items-center'}`}>
+              <div className="flex flex-col items-end">
+                {showSubmitTooltip && (
+                  <Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>
+                )}
+                {showSubmitToProgrammerButton && (
+                  <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
+                    {t('constructionHandoverForm.submitToProgrammer')}
+                  </Button>
+                )}
+                {showSubmitToConstructionButton && (
+                  <Button type="button" onClick={handleSubmit(submitToConstruction)}>
+                    {t('constructionHandoverForm.submitToConstruction')}
+                  </Button>
+                )}
+              </div>
               {showSaveDraftButton && (
                 <Button variant={ButtonVariant.Secondary} type="submit">
                   {t('constructionHandoverForm.saveDraft')}
