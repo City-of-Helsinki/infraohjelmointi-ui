@@ -1,9 +1,10 @@
 import mockI18next from '@/mocks/mockI18next';
 import { Route } from 'react-router';
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import ProjectProgramme from './ProjectProgramme';
+import { ProjectProgrammeStatus } from '@/interfaces/projectProgrammeInterfaces';
 
 const mockSwitchType = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
@@ -55,6 +56,7 @@ describe('ProjectProgramme', () => {
       district: 'Keskinen',
     },
     designCriteria: Record<string, unknown> | null = null,
+    status: ProjectProgrammeStatus = 'DRAFT',
   ) {
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: {
@@ -62,6 +64,7 @@ describe('ProjectProgramme', () => {
         briefProjectProgramme,
         basicInfo,
         designCriteria,
+        status,
       },
       isLoading: false,
       refetch: mockRefetchProjectProgramme,
@@ -124,7 +127,33 @@ describe('ProjectProgramme', () => {
     expect(
       screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }),
     ).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'projectProgrammeForm.markReady' })).toBeEnabled();
+    screen.getAllByRole('button', { name: 'projectProgrammeForm.markReady' }).forEach((button) => {
+      expect(button).toBeEnabled();
+    });
+  });
+
+  it('includes draft and completed sections in draft state notification', async () => {
+    mockProjectProgramme(
+      false,
+      {
+        projectName: 'Mock project',
+        district: 'Keskinen',
+        status: 'DRAFT',
+      },
+      {
+        guidingZoningRegulations: 'Regulation text',
+        status: 'COMPLETE',
+      },
+    );
+
+    await render();
+
+    expect(
+      screen.getByRole('link', { name: 'projectProgrammeForm.basicInfoCardTitle' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'projectProgrammeForm.designCriteriaCardTitle' }),
+    ).toBeInTheDocument();
   });
 
   it('opens existing basic info form without posting section when section already exists', async () => {
@@ -441,12 +470,26 @@ describe('ProjectProgramme', () => {
   it('shows overview bottom-bar actions', async () => {
     await render();
 
+    const projectFormBanner = Array.from(
+      document.querySelectorAll<HTMLElement>('.project-form-banner'),
+    ).find((banner) => within(banner).queryByRole('button', { name: 'copyLink' }));
+
+    expect(projectFormBanner).toBeInTheDocument();
+
+    if (!projectFormBanner) {
+      throw new Error('Expected overview actions to be inside project-form-banner');
+    }
+
     expect(
-      screen.getByRole('button', { name: 'projectProgrammeForm.markReady' }),
+      within(projectFormBanner).getByRole('button', {
+        name: 'projectProgrammeForm.markReady',
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'copyLink' })).toBeInTheDocument();
+    expect(within(projectFormBanner).getByRole('button', { name: 'copyLink' })).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'projectProgrammeForm.makePdf' }),
+      within(projectFormBanner).getByRole('button', {
+        name: 'projectProgrammeForm.makePdf',
+      }),
     ).toBeInTheDocument();
   });
 

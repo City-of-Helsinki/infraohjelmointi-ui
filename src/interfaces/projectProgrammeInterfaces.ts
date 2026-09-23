@@ -18,7 +18,12 @@ export interface IProjectProgrammeTransitionResponse {
   currentStatus: ProjectProgrammeStatus;
 }
 
-export interface IProjectProgrammeBasicInfo {
+interface IProjectProgrammeSectionShared {
+  links?: IProjectProgrammeLinkFormItem[] | null;
+  status?: ProjectProgrammeStatus;
+}
+
+export interface IProjectProgrammeBasicInfo extends IProjectProgrammeSectionShared {
   projectName?: string | null;
   district?: string | { name?: string | null } | null;
   projectProgrammeCompiler?: string | null;
@@ -34,17 +39,15 @@ export interface IProjectProgrammeBasicInfo {
   planningAndImplementationFeasibility?: string | null;
   specialConsiderations?: string | null;
   otherConsiderations?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
-export interface IProjectProgrammeDesignCriteria {
+export interface IProjectProgrammeDesignCriteria extends IProjectProgrammeSectionShared {
   guidingZoningRegulations?: string | null;
   siteValuesProtectionAndSignificance?: string | null;
   relationshipToPublicAreaServices?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
-export interface IProjectProgrammeTrafficPlanningCriteria {
+export interface IProjectProgrammeTrafficPlanningCriteria extends IProjectProgrammeSectionShared {
   pedestrianTraffic?: string | null;
   bicycleTraffic?: string | null;
   serviceAndPickupTraffic?: string | null;
@@ -52,10 +55,10 @@ export interface IProjectProgrammeTrafficPlanningCriteria {
   accessibility?: string | null;
   noiseManagement?: string | null;
   winterMaintenance?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
-export interface IProjectProgrammeUrbanSpacingPlanningCriteria {
+export interface IProjectProgrammeUrbanSpacingPlanningCriteria
+  extends IProjectProgrammeSectionShared {
   targetUrbanAppearance?: string | null;
   surfaceMaterials?: string | null;
   structures?: string | null;
@@ -67,18 +70,16 @@ export interface IProjectProgrammeUrbanSpacingPlanningCriteria {
   equipmentAndFurnishings?: string | null;
   waters?: string | null;
   stormwaterManagement?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
-export interface IProjectProgrammeMaintenanceNeeds {
+export interface IProjectProgrammeMaintenanceNeeds extends IProjectProgrammeSectionShared {
   maintenanceNeeds?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
-export interface IProjectProgrammeInteractionAndRelatedProjects {
+export interface IProjectProgrammeInteractionAndRelatedProjects
+  extends IProjectProgrammeSectionShared {
   collaborationAndExperts?: string | null;
   interactionNotes?: string | null;
-  links?: IProjectProgrammeLinkFormItem[] | null;
 }
 
 export interface IProjectProgrammeLinkFormItem {
