@@ -3,8 +3,8 @@ import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFie
 
 const DESIGN_CRITERIA_FIELDS = [
   { field: 'guidingZoningRegulations', required: false },
-  'relationshipToPublicAreaServices',
-  'siteValuesProtectionAndSignificance',
+  { field: 'relationshipToPublicAreaServices' },
+  { field: 'siteValuesProtectionAndSignificance' },
 ] as const;
 
 function DesignCriteriaSection() {
