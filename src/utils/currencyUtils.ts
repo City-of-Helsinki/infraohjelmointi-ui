@@ -1,4 +1,6 @@
-export const parseCurrency = (value?: string | number | null): number | null => {
+type CurrencyValue = string | number | null;
+
+export const parseCurrency = (value?: CurrencyValue): number | null => {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : null;
   }
@@ -14,7 +16,7 @@ export const parseCurrency = (value?: string | number | null): number | null => 
   return normalized !== '' && Number.isFinite(number) ? number : null;
 };
 
-export const formatBudgetEuro = (value?: string): string => {
+export const formatBudgetEuro = (value?: CurrencyValue): string => {
   const numericValue = parseCurrency(value);
 
   if (numericValue === null) {
@@ -31,7 +33,7 @@ export const formatBudgetEuro = (value?: string): string => {
   return `${formattedValue}€`;
 };
 
-export const currencyToRequestValue = (value?: string | number | null): string => {
+export const currencyToRequestValue = (value?: CurrencyValue): string => {
   const parsedValue = parseCurrency(value);
 
   if (parsedValue === null) {

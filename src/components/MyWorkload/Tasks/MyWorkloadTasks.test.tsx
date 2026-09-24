@@ -44,7 +44,7 @@ const createTask = (index: number): IProjectTask => ({
   estPlanningEnd: null,
   estConstructionStart: null,
   estConstructionEnd: null,
-  costForecast: '0',
+  budget: 0,
   constructionProcurementMethod: {
     id: `procurement-${index}`,
     value: 'Kilpailutus',

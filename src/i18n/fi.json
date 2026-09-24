@@ -1234,7 +1234,9 @@
       },
       "planningPeriod": "Suunnittelun aikataulu",
       "constructionPeriod": "Rakentamisen aikataulu",
-      "budget": "Kokonaisrahoitusvaraus",
+      "budget": {
+        "NAME_CONSTRUCTION_PROJECT_MANAGER": "KYMP-rahoitus"
+      },
       "constructionProcurementMethod": "Rakentamisen hankintatapa",
       "infoNotAvailable": "Ei tiedossa",
       "paginationAriaLabel": "Tehtävien sivutus"
