@@ -14,14 +14,16 @@ interface ProjectProgrammeReadonlySectionProps {
   projectProgramme?: IProjectProgramme;
 }
 
+function mapToFieldNames(fields: readonly { field: string }[]) {
+  return fields.map((field) => field.field);
+}
+
 const fields: Record<Exclude<ProjectProgrammeSectionId, 'basicInfo'>, readonly string[]> = {
-  designCriteria: DESIGN_CRITERIA_FIELDS.map((field) =>
-    typeof field === 'string' ? field : field.field,
-  ),
-  trafficPlanningCriteria: TRAFFIC_PLANNING_CRITERIA_FIELDS,
-  urbanSpacingPlanningCriteria: URBAN_SPACING_PLANNING_CRITERIA_FIELDS,
-  maintenanceNeeds: MAINTENANCE_NEEDS_FIELDS,
-  interactionAndRelatedProjects: INTERACTION_AND_RELATED_PROJECTS_FIELDS,
+  designCriteria: mapToFieldNames(DESIGN_CRITERIA_FIELDS),
+  trafficPlanningCriteria: mapToFieldNames(TRAFFIC_PLANNING_CRITERIA_FIELDS),
+  urbanSpacingPlanningCriteria: mapToFieldNames(URBAN_SPACING_PLANNING_CRITERIA_FIELDS),
+  maintenanceNeeds: mapToFieldNames(MAINTENANCE_NEEDS_FIELDS),
+  interactionAndRelatedProjects: mapToFieldNames(INTERACTION_AND_RELATED_PROJECTS_FIELDS),
 };
 
 function getFieldsForSection(
