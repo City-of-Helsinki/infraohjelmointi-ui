@@ -37,9 +37,11 @@ function ProjectProgrammeLinksField({
       {fields.map((field, index) => {
         if (mode === 'view') {
           return field.value ? (
-            <Link key={field.formId} href={field.value} external openInNewTab>
-              {field.value}
-            </Link>
+            <div key={field.formId} className="mb-4">
+              <Link href={field.value} external openInNewTab>
+                {field.value}
+              </Link>
+            </div>
           ) : null;
         }
 
