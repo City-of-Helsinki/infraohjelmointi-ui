@@ -1,6 +1,6 @@
-import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
-import { notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -61,6 +61,49 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
       },
       invalidatesTags: ['Notes'],
     }),
+    postNoteImage: build.mutation<INoteImage[], { noteId: string; formData: FormData }>({
+      query: ({ noteId, formData }) => ({
+        url: `/notes/${noteId}/images/`,
+        method: 'POST',
+        data: formData,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'saveError',
+              message: 'noteImagePostError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
+      invalidatesTags: ['Notes'],
+    }),
+    deleteNoteImage: build.mutation<undefined, { noteId: string; imageId: string }>({
+      query: ({ noteId, imageId }) => ({
+        url: `/notes/${noteId}/images/${imageId}/`,
+        method: 'DELETE',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'deleteError',
+              message: 'noteImageDeleteError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
+      invalidatesTags: ['Notes'],
+    }),
   }),
 });
 
@@ -69,4 +112,6 @@ export const {
   usePostNoteMutation,
   useDeleteNoteMutation,
   usePatchNoteMutation,
+  usePostNoteImageMutation,
+  useDeleteNoteImageMutation,
 } = notesApi;

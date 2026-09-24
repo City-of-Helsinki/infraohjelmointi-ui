@@ -5,6 +5,19 @@ export interface INote {
   project: string;
   createdDate: string;
   history: Array<INoteHistory>;
+  images: INoteImage[];
+}
+
+type INoteImageContentType = 'image/jpeg' | 'image/png';
+
+export interface INoteImage {
+  id: string;
+  url: string;
+  fileName: string;
+  contentType: INoteImageContentType;
+  size: number;
+  createdDate: string;
+  order: number;
 }
 
 export interface INoteRequest {
