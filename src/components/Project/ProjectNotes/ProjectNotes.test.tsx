@@ -3,7 +3,7 @@ import mockProject from '@/mocks/mockProject';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
 import mockNotes from '@/mocks/mockNotes';
-import { INote, INoteImage } from '@/interfaces/noteInterfaces';
+import { INote } from '@/interfaces/noteInterfaces';
 import { act, waitFor, within } from '@testing-library/react';
 import { stringToDateTime } from '@/utils/dates';
 import { Route } from 'react-router';
@@ -13,7 +13,6 @@ import mockNoteImages from '@/mocks/mockNoteImages';
 jest.mock('react-i18next', () => mockI18next());
 
 const mockUseGetNotesByProjectQuery = jest.fn();
-const mockUseGetNoteImagesQuery = jest.fn();
 const mockPostNoteTrigger = jest.fn();
 const mockDeleteNoteTrigger = jest.fn();
 const mockPatchNoteTrigger = jest.fn();
@@ -23,8 +22,6 @@ const mockIsConfirmed = jest.fn();
 
 let mockNotesState: INote[] = [];
 const mockNotesSubscribers = new Set<(notes: INote[]) => void>();
-
-let mockNoteImagesByNoteId: Record<string, INoteImage[]> = {};
 
 const setMockNotesState = (notes: INote[]) => {
   mockNotesState = notes;
@@ -38,6 +35,12 @@ const removeMockNote = (noteId: string) =>
 
 const updateMockNote = (id: string, content: string) =>
   setMockNotesState(mockNotesState.map((note) => (note.id === id ? { ...note, content } : note)));
+
+const setMockNoteImages = (noteId: string, images: INote['images']) => {
+  setMockNotesState(
+    mockNotesState.map((note) => (note.id === noteId ? { ...note, images } : note)),
+  );
+};
 
 const useMockedNotesQuery = () => {
   const [data, setData] = useState<INote[]>(mockNotesState);
@@ -61,7 +64,6 @@ jest.mock('@/api/notesApi', () => {
   return {
     ...originalModule,
     useGetNotesByProjectQuery: (...args: unknown[]) => mockUseGetNotesByProjectQuery(...args),
-    useGetNoteImagesQuery: (...args: unknown[]) => mockUseGetNoteImagesQuery(...args),
     usePostNoteMutation: () => [mockPostNoteTrigger, { isLoading: false }],
     useDeleteNoteMutation: () => [mockDeleteNoteTrigger, { isLoading: false }],
     usePatchNoteMutation: () => [mockPatchNoteTrigger, { isLoading: false }],
@@ -111,12 +113,8 @@ const renderWithNotesLoaded = async () => {
 describe('ProjectNotes', () => {
   beforeEach(() => {
     mockNotesState = [...mockNotes.data];
-    mockNoteImagesByNoteId = {};
 
     mockUseGetNotesByProjectQuery.mockImplementation(() => useMockedNotesQuery());
-    mockUseGetNoteImagesQuery.mockImplementation((noteId: string) => ({
-      data: mockNoteImagesByNoteId[noteId] ?? [],
-    }));
 
     mockPostNoteTrigger.mockImplementation((noteRequest: Partial<INote>) => ({
       unwrap: async () => {
@@ -278,10 +276,7 @@ describe('ProjectNotes', () => {
 
   describe('Note attachments', () => {
     it('renders attachment sections for loaded notes', async () => {
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery
-        .mockReturnValueOnce({ data: mockNoteImages })
-        .mockReturnValue({ data: [] });
+      setMockNoteImages(mockNotes.data[0].id, mockNoteImages);
 
       const { findByText, findAllByText } = await renderWithNotesLoaded();
 
@@ -302,11 +297,6 @@ describe('ProjectNotes', () => {
         createdDate: '2026-01-01T12:00:00Z',
         order: 0,
       };
-
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery
-        .mockReturnValueOnce({ data: [] })
-        .mockReturnValue({ data: [newAttachment] });
 
       mockPostNoteImageTrigger.mockResolvedValue({ data: newAttachment });
 
@@ -340,10 +330,7 @@ describe('ProjectNotes', () => {
       const targetNote = mockNotes.data[0];
       const targetAttachment = mockNoteImages[0];
 
-      mockUseGetNoteImagesQuery.mockReset();
-      mockUseGetNoteImagesQuery.mockImplementation((noteId: string) => ({
-        data: noteId === targetNote.id ? [targetAttachment] : [],
-      }));
+      setMockNoteImages(targetNote.id, [targetAttachment]);
 
       const { user, findByText, findByTestId } = await renderWithNotesLoaded();
 
