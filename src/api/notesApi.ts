@@ -61,24 +61,6 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
       },
       invalidatesTags: ['Notes'],
     }),
-    getNoteImages: build.query<INoteImage[], string>({
-      query: (noteId) => ({
-        url: `/notes/${noteId}/images/`,
-      }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-        } catch {
-          dispatch(
-            notifyError({
-              message: 'noteImageGetError',
-              type: 'notification',
-            }),
-          );
-        }
-      },
-      providesTags: (result, error, noteId) => [{ type: 'NoteImages', id: noteId }],
-    }),
     postNoteImage: build.mutation<INoteImage[], { noteId: string; formData: FormData }>({
       query: ({ noteId, formData }) => ({
         url: `/notes/${noteId}/images/`,
@@ -99,7 +81,7 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
           );
         }
       },
-      invalidatesTags: (result, error, { noteId }) => [{ type: 'NoteImages', id: noteId }],
+      invalidatesTags: ['Notes'],
     }),
     deleteNoteImage: build.mutation<undefined, { noteId: string; imageId: string }>({
       query: ({ noteId, imageId }) => ({
@@ -120,7 +102,7 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
           );
         }
       },
-      invalidatesTags: (result, error, { noteId }) => [{ type: 'NoteImages', id: noteId }],
+      invalidatesTags: ['Notes'],
     }),
   }),
 });
@@ -130,7 +112,6 @@ export const {
   usePostNoteMutation,
   useDeleteNoteMutation,
   usePatchNoteMutation,
-  useGetNoteImagesQuery,
   usePostNoteImageMutation,
   useDeleteNoteImageMutation,
 } = notesApi;

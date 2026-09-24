@@ -32,6 +32,7 @@ const mockNotes: { data: Array<INote> } = {
           updatedDate: '2022-12-29T19:12:25.318371+02:00',
         },
       ],
+      images: [],
     },
     {
       id: '676625bb-9ad6-454b-b4e1-2157de5a9fa2',
@@ -44,6 +45,7 @@ const mockNotes: { data: Array<INote> } = {
       createdDate: '2022-12-29T19:16:00.314528+02:00',
       project: 'mock-project-id',
       history: [],
+      images: [],
     },
   ],
 };

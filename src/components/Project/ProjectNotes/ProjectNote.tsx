@@ -9,7 +9,7 @@ import EditNoteForm from './EditNoteForm';
 import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
 import { sortArrayByDates, stringToDateTime } from '@/utils/dates';
 import NoteAttachmentList from './NoteAttachmentList';
-import { useGetNoteImagesQuery, useDeleteNoteImageMutation } from '@/api/notesApi';
+import { useDeleteNoteImageMutation } from '@/api/notesApi';
 
 interface IProjectNoteProps {
   note: INote;
@@ -43,7 +43,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
     [note.history],
   );
 
-  const { data: noteImages } = useGetNoteImagesQuery(note.id);
+  const noteImages = note.images;
   const [deleteNoteImage] = useDeleteNoteImageMutation();
 
   return (

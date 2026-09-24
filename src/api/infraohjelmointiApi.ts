@@ -59,7 +59,6 @@ export const infraohjelmointiApi = createApi({
   baseQuery: axiosBaseQuery({ baseUrl: process.env.REACT_APP_API_URL || '' }),
   tagTypes: [
     'Notes',
-    'NoteImages',
     'User',
     'Projects',
     'ConstructionHandovers',

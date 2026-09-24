@@ -5,6 +5,7 @@ export interface INote {
   project: string;
   createdDate: string;
   history: Array<INoteHistory>;
+  images: INoteImage[];
 }
 
 type INoteImageContentType = 'image/jpeg' | 'image/png';
