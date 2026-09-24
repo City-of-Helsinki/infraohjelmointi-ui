@@ -31,7 +31,7 @@ export interface ISearchResultsProject {
 
 export interface ISearchResultLink {
   defaultLink: string;
-  projectFormLink: string;
+  projectFormLink?: string;
 }
 
 export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase' | 'path'> {

@@ -18,7 +18,20 @@
 }
 
 .search-result-card {
-  @apply mb-3 border-2 border-black bg-white px-8 py-6;
+  @apply relative mb-3 border-2 border-black bg-white px-8 py-6;
+}
+
+/* Stretches the title link's clickable area to cover the whole card, without nesting anchors */
+.search-result-card-stretched-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+/* Keeps the secondary (project form) link clickable above the stretched title link */
+.search-result-card-secondary-link {
+  position: relative;
+  z-index: 1;
 }
 
 .search-result-card .search-result-title-container {
@@ -29,7 +42,7 @@
   @apply flex items-center gap-3;
 }
 
-.search-result-card-wrapper:hover .search-result-title > span {
+.search-result-card:hover .search-result-card-stretched-link {
   @apply underline;
 }
 

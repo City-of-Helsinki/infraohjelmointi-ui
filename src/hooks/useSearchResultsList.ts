@@ -24,22 +24,28 @@ const buildBreadCrumbs = (
 
 const buildLinks = (
   r: ISearchResultPayloadItem,
-): { defaultLink: string; projectFormLink: string } => {
+): { defaultLink: string; projectFormLink?: string } => {
   const linkForProgrammedProject = `/planning/?${r.path}&project=${r.id}`;
+  const linkForGroup = `/planning?${r.path}&group=${r.id}`;
   const linkToProjectForm = `/project/${r.id}/basics`;
   const fallBackLink = `/planning/?${r.path}`;
 
-  const defaultLink =
-    // Programmed projects will navigate to planning view and get the ?project= param
-    r.type === 'projects' && r.programmed
-      ? linkForProgrammedProject
-      : // Non-programmed projects will navigate to project form
-      r.type === 'projects'
-      ? linkToProjectForm
-      : // Default will navigate to planning view without the ?project= param
-        fallBackLink;
+  let defaultLink;
 
-  const projectFormLink = r.type === 'projects' ? linkToProjectForm : fallBackLink;
+  switch (r.type) {
+    case 'projects':
+      defaultLink = r.programmed ? linkForProgrammedProject : linkToProjectForm;
+      break;
+
+    case 'groups':
+      defaultLink = linkForGroup;
+      break;
+
+    default:
+      defaultLink = fallBackLink;
+  }
+
+  const projectFormLink = r.type === 'projects' ? linkToProjectForm : undefined;
 
   return { defaultLink, projectFormLink };
 };
