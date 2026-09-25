@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
+import ProjectProgrammeTextAreaFieldsSection from '../ProjectProgrammeTextAreaFieldsSection';
 
 export const DESIGN_CRITERIA_FIELDS = [
   { field: 'guidingZoningRegulations', required: false },

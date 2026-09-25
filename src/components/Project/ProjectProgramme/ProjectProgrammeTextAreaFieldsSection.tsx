@@ -10,7 +10,7 @@ import {
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 interface IProjectProgrammeTextAreaFieldsSectionProps {
   section: ProjectProgrammeSectionId;

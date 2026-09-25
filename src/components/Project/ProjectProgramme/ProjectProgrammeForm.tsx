@@ -9,18 +9,21 @@ import {
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
-import ProjectProgrammeBasicInfoForm from './BasicInfoSection';
-import { mapSectionIdToApiRoute, ProjectProgrammeSectionId } from './projectProgrammeSections';
+import ProjectProgrammeBasicInfoForm from './sections/BasicInfoSection';
+import {
+  mapSectionIdToApiRoute,
+  ProjectProgrammeSectionId,
+} from './sections/projectProgrammeSections';
 import {
   IProjectProgrammeForm,
   IProjectProgrammeFormProps,
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
-import DesignCriteriaSection from './DesignCriteriaSection';
-import TrafficPlanningCriteriaSection from './TrafficPlanningCriteriaSection';
-import UrbanSpacingPlanningCriteriaSection from './UrbanSpacingPlanningCriteriaSection';
-import MaintenanceNeedsSection from './MaintenanceNeedsSection';
-import InteractionAndRelatedProjectsSection from './InteractionAndRelatedProjectsSection';
+import DesignCriteriaSection from './sections/DesignCriteriaSection';
+import TrafficPlanningCriteriaSection from './sections/TrafficPlanningCriteriaSection';
+import UrbanSpacingPlanningCriteriaSection from './sections/UrbanSpacingPlanningCriteriaSection';
+import MaintenanceNeedsSection from './sections/MaintenanceNeedsSection';
+import InteractionAndRelatedProjectsSection from './sections/InteractionAndRelatedProjectsSection';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 

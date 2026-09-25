@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/projectProgrammeSections';
 import { IProject } from './projectInterfaces';
+=======
+import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
+import { Button, ButtonVariant } from 'hds-react';
+import { ComponentProps } from 'react';
+
+>>>>>>> 451a2708 (feat(ui): added possibility to return project programme to draft)
 export type ProjectProgrammeStatus = 'DRAFT' | 'COMPLETE';
 
 export interface IProjectProgramme {
@@ -107,4 +114,30 @@ export interface IProjectProgrammeFormProps {
   briefProgramme: boolean;
   onClose: () => void;
   project?: IProject;
+}
+
+type ActionButtonVariant = Exclude<ButtonVariant, ButtonVariant.Supplementary>;
+
+type ActionButtonVisualProps = Pick<ComponentProps<typeof Button>, 'theme' | 'style'> & {
+  variant?: ActionButtonVariant;
+};
+
+export interface ProjectProgrammeActionButtonsOverrides {
+  copyLink?: ActionButtonVisualProps;
+  makePdf?: ActionButtonVisualProps;
+}
+
+export interface ProjectProgrammeStatusTransitionButtonsOverrides {
+  markReady?: ActionButtonVisualProps;
+  markDraft?: ActionButtonVisualProps;
+}
+
+export interface ProjectProgrammeStatusTransitionButtonsProps {
+  isProjectProgrammeComplete: boolean;
+  effectiveProjectProgrammeId: string;
+  buttonOverrides?: ProjectProgrammeStatusTransitionButtonsOverrides;
+}
+
+export interface ProjectProgrammeActionButtonsProps {
+  buttonOverrides?: ProjectProgrammeActionButtonsOverrides;
 }
