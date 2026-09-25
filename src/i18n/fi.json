@@ -689,7 +689,8 @@
     "completedStateSections": "Valmiiksi merkityt osiot:",
     "draftStateSections": "Luonnostilassa olevat osiot:",
     "programmeCompletedNotificationTitle": "Hankeohjelma merkitty valmiiksi",
-    "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten."
+    "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten.",
+    "markSectionReady": "Merkitse valmiiksi"
   },
   "notification": {
     "title": {

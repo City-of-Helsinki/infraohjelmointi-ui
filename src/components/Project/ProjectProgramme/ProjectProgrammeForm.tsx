@@ -69,6 +69,7 @@ function ProjectProgrammeForm({
   activeSection,
   effectiveProjectProgramme,
   briefProgramme,
+  isProjectProgrammeComplete,
   onClose,
   project,
 }: Readonly<IProjectProgrammeFormProps>) {
@@ -180,14 +181,16 @@ function ProjectProgrammeForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              <Button
-                variant={ButtonVariant.Secondary}
-                type="button"
-                onClick={() => submitDraft(getValues(), activeSection)}
-                disabled={!isDirty}
-              >
-                {t('projectProgrammeForm.saveDraft')}
-              </Button>
+              {!isProjectProgrammeComplete && (
+                <>
+                  <Button variant={ButtonVariant.Primary} type="submit">
+                    {t('projectProgrammeForm.markSectionReady')}
+                  </Button>
+                  <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
+                    {t('projectProgrammeForm.saveDraft')}
+                  </Button>
+                </>
+              )}
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"
