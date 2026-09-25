@@ -1,6 +1,7 @@
 import { Button, ButtonVariant } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
+import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
 
 interface ProjectProgrammeBottomBarProps {
   isBriefProgramme: boolean;
@@ -23,10 +24,11 @@ function ProjectProgrammeBottomBar({
     <div className="project-form-banner">
       <div className="project-form-banner-container">
         <div className="project-programme-actions">
-          <ProjectProgrammeActionButtons
+          <ProjectProgrammeStatusTransitionButtons
             isProjectProgrammeComplete={isProjectProgrammeComplete}
             effectiveProjectProgrammeId={effectiveProjectProgrammeId}
           />
+          <ProjectProgrammeActionButtons />
           {!isBriefProgramme && !hasSavedExtendedSection && (
             <Button variant={ButtonVariant.Secondary} type="button" onClick={handleSwitchType}>
               {t('projectProgrammeForm.switchToBriefProgramme')}

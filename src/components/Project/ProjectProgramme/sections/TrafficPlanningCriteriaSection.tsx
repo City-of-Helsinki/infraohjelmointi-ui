@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
+import ProjectProgrammeTextAreaFieldsSection from '../ProjectProgrammeTextAreaFieldsSection';
 
 const TRAFFIC_PLANNING_CRITERIA_FIELDS = [
   'pedestrianTraffic',
@@ -22,6 +22,5 @@ function TrafficPlanningCriteriaSection() {
     />
   );
 }
-
 
 export default memo(TrafficPlanningCriteriaSection);

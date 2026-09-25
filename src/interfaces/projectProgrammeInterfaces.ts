@@ -1,4 +1,6 @@
-import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/projectProgrammeSections';
+import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
+import { Button, ButtonVariant } from 'hds-react';
+import { ComponentProps } from 'react';
 
 export type ProjectProgrammeStatus = 'DRAFT' | 'COMPLETE';
 
@@ -104,4 +106,30 @@ export interface IProjectProgrammeFormProps {
   effectiveProjectProgramme?: IProjectProgrammeForm;
   briefProgramme: boolean;
   onClose: () => void;
+}
+
+type ActionButtonVariant = Exclude<ButtonVariant, ButtonVariant.Supplementary>;
+
+type ActionButtonVisualProps = Pick<ComponentProps<typeof Button>, 'theme' | 'style'> & {
+  variant?: ActionButtonVariant;
+};
+
+export interface ProjectProgrammeActionButtonsOverrides {
+  copyLink?: ActionButtonVisualProps;
+  makePdf?: ActionButtonVisualProps;
+}
+
+export interface ProjectProgrammeStatusTransitionButtonsOverrides {
+  markReady?: ActionButtonVisualProps;
+  markDraft?: ActionButtonVisualProps;
+}
+
+export interface ProjectProgrammeStatusTransitionButtonsProps {
+  isProjectProgrammeComplete: boolean;
+  effectiveProjectProgrammeId: string;
+  buttonOverrides?: ProjectProgrammeStatusTransitionButtonsOverrides;
+}
+
+export interface ProjectProgrammeActionButtonsProps {
+  buttonOverrides?: ProjectProgrammeActionButtonsOverrides;
 }
