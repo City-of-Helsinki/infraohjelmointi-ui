@@ -66,6 +66,7 @@ function ProjectProgrammeForm({
   activeSection,
   effectiveProjectProgramme,
   briefProgramme,
+  isProjectProgrammeComplete,
   onClose,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
@@ -168,9 +169,16 @@ function ProjectProgrammeForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
-                {t('projectProgrammeForm.saveDraft')}
-              </Button>
+              {!isProjectProgrammeComplete && (
+                <>
+                  <Button variant={ButtonVariant.Primary} type="submit">
+                    {t('projectProgrammeForm.markSectionReady')}
+                  </Button>
+                  <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
+                    {t('projectProgrammeForm.saveDraft')}
+                  </Button>
+                </>
+              )}
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"

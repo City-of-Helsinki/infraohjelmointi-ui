@@ -103,5 +103,6 @@ export interface IProjectProgrammeFormProps {
   activeSection: ProjectProgrammeSectionId;
   effectiveProjectProgramme?: IProjectProgrammeForm;
   briefProgramme: boolean;
+  isProjectProgrammeComplete: boolean;
   onClose: () => void;
 }
