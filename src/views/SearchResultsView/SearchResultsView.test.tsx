@@ -11,7 +11,7 @@ import { RootState, setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import SearchResultsView from './SearchResultsView';
 import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
-import { waitFor, act } from '@testing-library/react';
+import { waitFor, act, within } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
 import { Route } from 'react-router';
@@ -247,7 +247,7 @@ describe('SearchResultsView', () => {
     it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { container, user, findByText, findByRole, findAllByText, queryByText } = await render(
+      const { container, user, findByText, findByRole, findAllByText } = await render(
         searchActiveState,
       );
 
@@ -282,7 +282,7 @@ describe('SearchResultsView', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { user, findByRole, findByText, queryByText, findByTestId, findAllByText } =
+      const { user, findByRole, findByText, findByTestId, findAllByText } =
         await render(searchActiveState);
 
       const orderOptions = [
@@ -328,7 +328,7 @@ describe('SearchResultsView', () => {
       // Both hashTags to renders under project card
       expect(await findByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
-      // Link rendered around project card
+      // Title renders as a link leading to the planning view (whole card is stretched over it via CSS)
       expect((await findAllByText('Planning Project 1'))[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/?masterClass=test-master-class-1&class=test-class-1&project=planning-project-1',
@@ -342,10 +342,57 @@ describe('SearchResultsView', () => {
       expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
       expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
       expect(classChildren[1]).toHaveTextContent('Koillinen');
-      // Link rendered around class card
+      // Title renders as a link leading to the planning view
       expect((await findAllByText('Koillinen'))[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/?masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8',
+      );
+    });
+
+    it('navigates to the planning view with the project query params when clicking the project card title link', async () => {
+      const { findAllByText, user } = await render(searchActiveState);
+
+      await user.click((await findAllByText('Planning Project 1'))[0]);
+
+      expect(window.location.pathname).toBe('/planning/');
+      expect(window.location.search).toBe(
+        '?masterClass=test-master-class-1&class=test-class-1&project=planning-project-1',
+      );
+    });
+
+    it('navigates to the planning view with the class query params when clicking the class card title link', async () => {
+      const { findAllByText, user } = await render(searchActiveState);
+
+      await user.click((await findAllByText('Koillinen'))[0]);
+
+      expect(window.location.pathname).toBe('/planning/');
+      expect(window.location.search).toBe(
+        '?masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8',
+      );
+    });
+
+    it('navigates to the matching group in the planning view', async () => {
+      const groupResult = {
+        ...mockSearchResults.data.results[2],
+        name: 'Test Group',
+        id: 'test-group-1',
+        type: 'groups' as const,
+        path: 'masterClass=test-master-class-1&class=test-class-1',
+      };
+      const { findByText } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: {
+            ...searchActiveState.search.searchResults,
+            results: [groupResult],
+          },
+        },
+      });
+
+      expect(await findByText('Test Group')).toHaveAttribute(
+        'href',
+        '/planning?masterClass=test-master-class-1&class=test-class-1&group=test-group-1',
       );
     });
 
@@ -375,13 +422,37 @@ describe('SearchResultsView', () => {
     });
 
     it('navigates to the project form when clicking a result project that is not programmed: ', async () => {
-      const { container, user, findByTestId } = await render(searchActiveState);
+      const { user, findByTestId, findAllByText } = await render(searchActiveState);
 
-      const projectCard = container.getElementsByClassName('search-result-card')[1];
-
-      await user.click(projectCard);
+      await user.click((await findAllByText('Non programmed project'))[0]);
 
       expect(await findByTestId('project-form')).toBeInTheDocument();
+    });
+
+    it('navigates to the project form when clicking the project form button', async () => {
+      const { user, findAllByRole, container } = await render(searchActiveState);
+
+      const projectFormButtons = await findAllByRole('button', { name: 'goToProjectForm' });
+
+      expect(projectFormButtons).toHaveLength(2);
+      expect(projectFormButtons[0].closest('a')).toHaveAttribute(
+        'href',
+        '/project/planning-project-1/basics',
+      );
+      expect(projectFormButtons[1].closest('a')).toHaveAttribute(
+        'href',
+        '/project/planning-project-2/basics',
+      );
+      const classCard = container.getElementsByClassName('search-result-card')[2] as HTMLElement;
+      expect(
+        within(classCard).queryByRole('button', {
+          name: 'goToProjectForm',
+        }),
+      ).not.toBeInTheDocument();
+
+      await user.click(projectFormButtons[0]);
+
+      expect(window.location.pathname).toBe('/project/planning-project-1/basics');
     });
   });
 

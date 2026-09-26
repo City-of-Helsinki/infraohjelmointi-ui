@@ -23,11 +23,15 @@
 .project-suggestions-card .search-result-title-container {
   @apply mb-1 flex items-center justify-between text-2xl font-medium;
 }
-.project-suggestions-card .search-result-title-container .cross-icon {
+.project-suggestions-card .search-result-title-container .search-result-tag-container .cross-icon {
   @apply cursor-pointer;
 }
 
 .project-suggestions-card .search-result-title-container .search-result-title {
+  @apply flex items-center gap-3 text-l font-normal;
+}
+
+.search-result-tag-container {
   @apply flex items-center gap-3 text-l font-normal;
 }
 

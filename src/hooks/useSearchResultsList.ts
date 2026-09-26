@@ -22,17 +22,32 @@ const buildBreadCrumbs = (
   return breadCrumbs;
 };
 
-const buildLink = (r: ISearchResultPayloadItem) => {
-  // Programmed projects will navigate to planning view and get the ?project= param
-  if (r.type === 'projects' && r.programmed) {
-    return `/planning/?${r.path}&project=${r.id}`;
+const buildLinks = (
+  r: ISearchResultPayloadItem,
+): { defaultLink: string; projectFormLink?: string } => {
+  const linkForProgrammedProject = `/planning/?${r.path}&project=${r.id}`;
+  const linkForGroup = `/planning?${r.path}&group=${r.id}`;
+  const linkToProjectForm = `/project/${r.id}/basics`;
+  const fallBackLink = `/planning/?${r.path}`;
+
+  let defaultLink;
+
+  switch (r.type) {
+    case 'projects':
+      defaultLink = r.programmed ? linkForProgrammedProject : linkToProjectForm;
+      break;
+
+    case 'groups':
+      defaultLink = linkForGroup;
+      break;
+
+    default:
+      defaultLink = fallBackLink;
   }
-  // Non-programmed projects will navigate to project form
-  else if (r.type === 'projects') {
-    return `/project/${r.id}/basics`;
-  }
-  // Default will navigate to planning view without the ?project= param
-  return `/planning/?${r.path}`;
+
+  const projectFormLink = r.type === 'projects' ? linkToProjectForm : undefined;
+
+  return { defaultLink, projectFormLink };
 };
 
 const buildSearchResultsList = (
@@ -45,7 +60,7 @@ const buildSearchResultsList = (
       ...r,
       phase: r.phase?.value ?? null,
       breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
-      link: buildLink(r),
+      links: buildLinks(r),
     };
   });
 
