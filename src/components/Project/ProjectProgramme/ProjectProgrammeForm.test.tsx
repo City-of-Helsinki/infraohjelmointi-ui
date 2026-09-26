@@ -95,6 +95,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -127,6 +128,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -202,6 +204,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -247,6 +250,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -292,6 +296,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -350,6 +355,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="trafficPlanningCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -400,6 +406,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="urbanSpacingPlanningCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -452,6 +459,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -490,6 +498,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -518,6 +527,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -559,6 +569,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -598,6 +609,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -643,6 +655,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -688,6 +701,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -731,6 +745,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -779,6 +794,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="trafficPlanningCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -805,6 +821,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="urbanSpacingPlanningCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -831,6 +848,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -855,6 +873,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }

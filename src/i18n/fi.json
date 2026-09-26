@@ -682,7 +682,8 @@
     "stormwaterManagementTooltip": "Tarkista nykyinen hulevestilanne Vipusesta. Kirjaa tunnistetut tarpeet hulevesien imeytyksen, viivytyksen, tulvareittien ja uomien osalta sekä muutokset nykyiseen kuivausjärjestelmään.",
     "draftStateLabel": "Hankeohjelma on luonnostilassa",
     "completedStateSections": "Valmiiksi merkityt osiot:",
-    "draftStateSections": "Luonnostilassa olevat osiot:"
+    "draftStateSections": "Luonnostilassa olevat osiot:",
+    "markSectionReady": "Merkitse valmiiksi"
   },
   "notification": {
     "title": {
