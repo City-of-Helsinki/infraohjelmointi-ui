@@ -48,8 +48,10 @@ export interface IProjectProgrammeDesignCriteria extends IProjectProgrammeSectio
 }
 
 export interface IProjectProgrammeTrafficPlanningCriteria extends IProjectProgrammeSectionShared {
+  targetTrafficChanges?: string | null;
   pedestrianTraffic?: string | null;
   bicycleTraffic?: string | null;
+  carTraffic?: string | null;
   serviceAndPickupTraffic?: string | null;
   otherTraffic?: string | null;
   accessibility?: string | null;

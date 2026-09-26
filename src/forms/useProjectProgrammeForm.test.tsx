@@ -32,8 +32,10 @@ describe('useProjectProgrammeForm', () => {
         links: [{ value: '' }],
       },
       trafficPlanningCriteria: {
+        targetTrafficChanges: '',
         pedestrianTraffic: '',
         bicycleTraffic: '',
+        carTraffic: '',
         serviceAndPickupTraffic: '',
         otherTraffic: '',
         accessibility: '',
@@ -106,8 +108,10 @@ describe('useProjectProgrammeForm', () => {
   it('hydrates traffic planning criteria values from saved data', () => {
     const formData: IProjectProgrammeForm = {
       trafficPlanningCriteria: {
+        targetTrafficChanges: 'Target traffic changes info',
         pedestrianTraffic: 'Pedestrian info',
         bicycleTraffic: 'Bicycle info',
+        carTraffic: 'Car traffic info',
         accessibility: 'Accessibility info',
         links: [{ value: 'https://traffic.fi' }],
       },
@@ -116,8 +120,10 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData));
 
     expect(result.current.getValues('trafficPlanningCriteria')).toEqual({
+      targetTrafficChanges: 'Target traffic changes info',
       pedestrianTraffic: 'Pedestrian info',
       bicycleTraffic: 'Bicycle info',
+      carTraffic: 'Car traffic info',
       serviceAndPickupTraffic: '',
       otherTraffic: '',
       accessibility: 'Accessibility info',
@@ -213,9 +219,7 @@ describe('useProjectProgrammeForm', () => {
     expect(result.current.getValues('trafficPlanningCriteria.pedestrianTraffic')).toBe(
       'First pedestrian',
     );
-    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe(
-      'First maintenance',
-    );
+    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe('First maintenance');
     expect(result.current.getValues('interactionAndRelatedProjects.collaborationAndExperts')).toBe(
       'First collaboration',
     );
@@ -255,7 +259,9 @@ describe('useProjectProgrammeForm', () => {
       trafficPlanningCriteria: { links: ['https://traffic.fi'] },
       urbanSpacingPlanningCriteria: { links: ['https://urban.fi', '', null] },
       maintenanceNeeds: { links: ['https://maintenance.fi', '', null] },
-      interactionAndRelatedProjects: { links: [{ value: '' }, { value: 'https://interaction.fi' }] },
+      interactionAndRelatedProjects: {
+        links: [{ value: '' }, { value: 'https://interaction.fi' }],
+      },
     } as unknown as IProjectProgrammeForm;
 
     const { result } = renderHook(() => useProjectProgrammeForm(formData));
