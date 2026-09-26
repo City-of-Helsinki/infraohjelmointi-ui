@@ -2,13 +2,13 @@ import { memo } from 'react';
 import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
 
 const TRAFFIC_PLANNING_CRITERIA_FIELDS = [
-  'pedestrianTraffic',
-  'bicycleTraffic',
-  'serviceAndPickupTraffic',
-  'otherTraffic',
-  'accessibility',
-  'noiseManagement',
-  'winterMaintenance',
+  { field: 'pedestrianTraffic' },
+  { field: 'bicycleTraffic' },
+  { field: 'serviceAndPickupTraffic' },
+  { field: 'otherTraffic' },
+  { field: 'accessibility' },
+  { field: 'noiseManagement' },
+  { field: 'winterMaintenance' },
 ] as const;
 
 function TrafficPlanningCriteriaSection() {
@@ -22,6 +22,5 @@ function TrafficPlanningCriteriaSection() {
     />
   );
 }
-
 
 export default memo(TrafficPlanningCriteriaSection);

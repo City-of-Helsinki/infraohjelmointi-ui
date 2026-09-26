@@ -1,10 +1,19 @@
+import React from 'react';
 import { renderHook } from '@testing-library/react';
+import { Provider } from 'react-redux';
 import useProjectProgrammeForm from './useProjectProgrammeForm';
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
+import { setupStore } from '@/store';
+
+const store = setupStore();
+
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <Provider store={store}>{children}</Provider>
+);
 
 describe('useProjectProgrammeForm', () => {
   it('returns empty defaults for all sections when there is no saved data', () => {
-    const { result } = renderHook(() => useProjectProgrammeForm(undefined));
+    const { result } = renderHook(() => useProjectProgrammeForm(undefined), { wrapper });
 
     expect(result.current.getValues()).toEqual({
       basicInfo: {
@@ -77,7 +86,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('designCriteria')).toEqual({
       guidingZoningRegulations: 'Zoning',
@@ -95,7 +104,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('maintenanceNeeds')).toEqual({
       maintenanceNeeds: 'Regular maintenance required',
@@ -113,7 +122,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('trafficPlanningCriteria')).toEqual({
       pedestrianTraffic: 'Pedestrian info',
@@ -137,7 +146,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('urbanSpacingPlanningCriteria')).toEqual({
       targetUrbanAppearance: 'Urban appearance',
@@ -164,7 +173,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('interactionAndRelatedProjects')).toEqual({
       collaborationAndExperts: 'Collaboration info',
@@ -183,7 +192,7 @@ describe('useProjectProgrammeForm', () => {
       },
     };
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
     const basicInfo = result.current.getValues('basicInfo');
 
     expect(basicInfo?.projectName).toBe('Mock project');
@@ -204,7 +213,7 @@ describe('useProjectProgrammeForm', () => {
 
     const { result, rerender } = renderHook(
       (formData: IProjectProgrammeForm) => useProjectProgrammeForm(formData),
-      { initialProps: initialData },
+      { initialProps: initialData, wrapper },
     );
 
     expect(result.current.getValues('designCriteria.guidingZoningRegulations')).toBe(
@@ -213,9 +222,7 @@ describe('useProjectProgrammeForm', () => {
     expect(result.current.getValues('trafficPlanningCriteria.pedestrianTraffic')).toBe(
       'First pedestrian',
     );
-    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe(
-      'First maintenance',
-    );
+    expect(result.current.getValues('maintenanceNeeds.maintenanceNeeds')).toBe('First maintenance');
     expect(result.current.getValues('interactionAndRelatedProjects.collaborationAndExperts')).toBe(
       'First collaboration',
     );
@@ -255,10 +262,12 @@ describe('useProjectProgrammeForm', () => {
       trafficPlanningCriteria: { links: ['https://traffic.fi'] },
       urbanSpacingPlanningCriteria: { links: ['https://urban.fi', '', null] },
       maintenanceNeeds: { links: ['https://maintenance.fi', '', null] },
-      interactionAndRelatedProjects: { links: [{ value: '' }, { value: 'https://interaction.fi' }] },
+      interactionAndRelatedProjects: {
+        links: [{ value: '' }, { value: 'https://interaction.fi' }],
+      },
     } as unknown as IProjectProgrammeForm;
 
-    const { result } = renderHook(() => useProjectProgrammeForm(formData));
+    const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('basicInfo.links')).toEqual([
       { value: 'https://one.fi' },

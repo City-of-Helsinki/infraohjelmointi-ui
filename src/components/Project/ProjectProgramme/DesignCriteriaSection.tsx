@@ -2,9 +2,9 @@ import { memo } from 'react';
 import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
 
 const DESIGN_CRITERIA_FIELDS = [
-  'guidingZoningRegulations',
-  'relationshipToPublicAreaServices',
-  'siteValuesProtectionAndSignificance',
+  { field: 'guidingZoningRegulations', required: false },
+  { field: 'relationshipToPublicAreaServices' },
+  { field: 'siteValuesProtectionAndSignificance' },
 ] as const;
 
 function DesignCriteriaSection() {

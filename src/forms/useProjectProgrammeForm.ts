@@ -10,6 +10,13 @@ import type {
   IProjectProgrammeUrbanSpacingPlanningCriteria,
   IProjectProgrammeTrafficPlanningCriteria,
 } from '@/interfaces/projectProgrammeInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
+import useProjectDistrict from '@/hooks/useProjectDistrict';
+
+interface IProjectNameAndDistrict {
+  name?: string;
+  projectDistrict?: string;
+}
 
 function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
   if (!district) {
@@ -55,10 +62,13 @@ function getLinksValue(
   return [{ value: '' }];
 }
 
-function getBasicInfoValues(basicInfo?: IProjectProgrammeBasicInfo): IProjectProgrammeBasicInfo {
+function getBasicInfoValues(
+  basicInfo?: IProjectProgrammeBasicInfo,
+  project?: IProjectNameAndDistrict,
+): IProjectProgrammeBasicInfo {
   return {
-    projectName: getTextValue(basicInfo?.projectName),
-    district: getDistrictValue(basicInfo?.district),
+    projectName: getTextValue(basicInfo?.projectName ?? project?.name),
+    district: getDistrictValue(basicInfo?.district ?? project?.projectDistrict),
     projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
     personsInvolved: getTextValue(basicInfo?.personsInvolved),
     estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
@@ -151,9 +161,12 @@ function getInteractionAndRelatedProjectsValues(
 }
 
 // Every section has to be listed here, reset() replaces the whole form value object.
-function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm {
+function getFormValues(
+  formData?: IProjectProgrammeForm,
+  project?: IProjectNameAndDistrict,
+): IProjectProgrammeForm {
   return {
-    basicInfo: getBasicInfoValues(formData?.basicInfo),
+    basicInfo: getBasicInfoValues(formData?.basicInfo, project),
     designCriteria: getDesignCriteriaValues(formData?.designCriteria),
     trafficPlanningCriteria: getTrafficPlanningCriteriaValues(formData?.trafficPlanningCriteria),
     urbanSpacingPlanningCriteria: getUrbanSpacingPlanningCriteriaValues(
@@ -166,7 +179,10 @@ function getFormValues(formData?: IProjectProgrammeForm): IProjectProgrammeForm 
   };
 }
 
-export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm) {
+export default function useProjectProgrammeForm(
+  formData?: IProjectProgrammeForm,
+  project?: IProject,
+) {
   const formMethods = useForm<IProjectProgrammeForm>({
     defaultValues: getFormValues(),
     mode: 'onBlur',
@@ -174,9 +190,17 @@ export default function useProjectProgrammeForm(formData?: IProjectProgrammeForm
 
   const { reset } = formMethods;
 
+  const projectDistrict = useProjectDistrict(project);
+
   useEffect(() => {
-    reset(getFormValues(formData));
-  }, [formData, reset]);
+    // Get defaults to use for project name and district.
+    // Used in basic info as default values.
+    const projectNameAndDistrict: IProjectNameAndDistrict = {
+      name: project?.name,
+      projectDistrict: projectDistrict?.value,
+    };
+    reset(getFormValues(formData, projectNameAndDistrict));
+  }, [formData, reset, project?.name, projectDistrict]);
 
   return formMethods;
 }

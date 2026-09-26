@@ -229,6 +229,7 @@ function ProjectProgramme() {
             effectiveProjectProgramme={effectiveProjectProgramme}
             briefProgramme={briefProgramme}
             onClose={handleCloseSection}
+            project={project}
           />
         )}
 

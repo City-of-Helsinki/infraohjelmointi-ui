@@ -17,7 +17,7 @@ interface IProjectProgrammeTextAreaFieldsSectionProps {
   titleName: string;
   titleLabel: string;
   testId: string;
-  fields: readonly string[];
+  fields: readonly { field: string; required?: boolean }[];
 }
 
 // Shared layout for project-programme sub-form sections made up of required text-area fields.
@@ -35,16 +35,23 @@ function ProjectProgrammeTextAreaFieldsSection({
     <div className="mb-12" data-testid={testId}>
       <FormSectionTitle name={titleName} label={titleLabel} />
       <p className="mb-8">{t('projectProgrammeForm.requiredSectionHelperText')}</p>
-      {fields.map((field) => (
-        <TextAreaField
-          key={field}
-          {...getFieldPropsForProjectProgrammeForm(
-            `${section}.${field}` as FieldPath<IProjectProgrammeForm>,
-          )}
-          rules={{ ...requiredTrimmedRule(`projectProgrammeForm.${field}`, t) }}
-          tooltip={tooltip(field)}
-        />
-      ))}
+      {fields.map((field) => {
+        const fieldName = field.field;
+        const isRequired = field.required ?? true;
+
+        return (
+          <TextAreaField
+            key={fieldName}
+            {...getFieldPropsForProjectProgrammeForm(
+              `${section}.${fieldName}` as FieldPath<IProjectProgrammeForm>,
+            )}
+            rules={{
+              ...(isRequired ? requiredTrimmedRule(`projectProgrammeForm.${fieldName}`, t) : {}),
+            }}
+            tooltip={tooltip(fieldName)}
+          />
+        );
+      })}
       <ProjectProgrammeLinksField section={section} />
     </div>
   );
