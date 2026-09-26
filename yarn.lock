@@ -6761,10 +6761,15 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
-hds-core@4.8.0, hds-core@^4.8.0:
+hds-core@4.8.0:
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.8.0.tgz#1e814d16bf55ac646020caf6b4f5a578d2885b8b"
   integrity sha512-Bdbo0SiUwLC4D1pgZtr1puORZR2h5Y6TstGE7QJ2xHWbZFn/UwTL4q2u4fGY6JH117y4hbzsJ1SWlLaSJlTMfA==
+
+hds-core@^6.0.5:
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-6.0.5.tgz#0d805aa478b9794bf4526e2095d3962fcbc167d5"
+  integrity sha512-OMI4Thr+aZKuNTx1oXi28bBQ14elqBaF/gzszaNQerlYLR8lHeI6x4nTijU9Jqj6DiVGyQ8Hky6e0pdpLmBRNg==
 
 hds-react@^4.8.0:
   version "4.8.0"
