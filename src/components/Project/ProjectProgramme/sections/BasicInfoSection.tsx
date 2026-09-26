@@ -8,7 +8,7 @@ import {
   getFieldPropsForProjectProgrammeForm,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
-import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
+import ProjectProgrammeLinksField from '../ProjectProgrammeLinksField';
 
 interface IBasicInfoSectionProps {
   briefProgramme: boolean;

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconPlus } from 'hds-react';
 import { TextField } from '@/components/shared';
 import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 interface IProjectProgrammeLinksFieldProps {
   section: ProjectProgrammeSectionId;

@@ -16,11 +16,13 @@ import {
   hasExtendedBasicInfoContent,
   isSectionStarted,
   ProjectProgrammeSectionId,
-} from './projectProgrammeSections';
+} from './sections/projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
 import ProjectProgrammeBottomBar from './ProjectProgrammeBottomBar';
 import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
 import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
+import SwitchToExtendedProgrammeNotification from './SwitchToExtendedProgrammeNotification';
+import ProgrammeCompletedNotification from './ProgrammeCompletedNotification';
 
 const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
   return projectProgramme.briefProjectProgramme ?? true;
@@ -110,6 +112,7 @@ function ProjectProgramme() {
   const showStartProjectProgramme = !showLoadError && !hasProjectProgramme;
   const showActiveSectionForm = !showLoadError && hasProjectProgramme && hasActiveSection;
   const showOverview = !showLoadError && hasProjectProgramme && !hasActiveSection;
+  const showSwitchToExtendedProgrammeNotification = briefProgramme && !isProjectProgrammeComplete;
 
   function notifyMissingProject() {
     dispatch(
@@ -218,6 +221,8 @@ function ProjectProgramme() {
           </div>
         )}
 
+        {isProjectProgrammeComplete && <ProgrammeCompletedNotification />}
+
         {showStartProjectProgramme && (
           <StartProjectProgramme onStartProjectProgramme={handleStartProjectProgramme} />
         )}
@@ -234,21 +239,8 @@ function ProjectProgramme() {
 
         {showOverview && (
           <div className="project-form mx-auto max-w-xl">
-            {briefProgramme && (
-              <Notification type="alert" label={t('projectProgrammeForm.briefNotificationTitle')}>
-                <div className="project-programme-notification-content">
-                  <p>{t('projectProgrammeForm.briefNotificationText')}</p>
-                  <div>
-                    <Button
-                      variant={ButtonVariant.Secondary}
-                      theme={{ '--background-color': 'var(--color-white)' }}
-                      onClick={handleSwitchType}
-                    >
-                      {t('projectProgrammeForm.switchToExtendedProgramme')}
-                    </Button>
-                  </div>
-                </div>
-              </Notification>
+            {showSwitchToExtendedProgrammeNotification && (
+              <SwitchToExtendedProgrammeNotification handleSwitchType={handleSwitchType} />
             )}
             {effectiveProjectProgramme?.status === 'DRAFT' && (
               <ProjectProgrammeDraftStateNotification
@@ -271,6 +263,7 @@ function ProjectProgramme() {
                   cardText={section.cardText}
                   actionText={section.actionText}
                   sectionId={section.id}
+                  programmeIsComplete={isProjectProgrammeComplete}
                 />
               );
             })}

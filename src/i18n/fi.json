@@ -587,6 +587,7 @@
     "cancel": "Peruuta",
     "draftStatus": "Luonnos",
     "markReady": "Merkitse hankeohjelma valmiiksi",
+    "returnToDraft": "Palauta hankeohjelma luonnokseksi",
     "makePdf": "Koosta pdf-tiedosto",
     "switchToBriefProgramme": "Muuta suppeaksi hankeohjelmaksi",
     "projectProgrammeLoadError": "Hankeohjelmaa ei voitu ladata. Yritä uudelleen.",
@@ -682,7 +683,9 @@
     "stormwaterManagementTooltip": "Tarkista nykyinen hulevestilanne Vipusesta. Kirjaa tunnistetut tarpeet hulevesien imeytyksen, viivytyksen, tulvareittien ja uomien osalta sekä muutokset nykyiseen kuivausjärjestelmään.",
     "draftStateLabel": "Hankeohjelma on luonnostilassa",
     "completedStateSections": "Valmiiksi merkityt osiot:",
-    "draftStateSections": "Luonnostilassa olevat osiot:"
+    "draftStateSections": "Luonnostilassa olevat osiot:",
+    "programmeCompletedNotificationTitle": "Hankeohjelma merkitty valmiiksi",
+    "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten."
   },
   "notification": {
     "title": {
@@ -745,6 +748,8 @@
       "projectProgrammeNotFound": "Hankeohjelmaa ei löytynyt tälle hankkeelle.",
       "projectProgrammeMarkReadySuccess": "Hankeohjelma merkitty valmiiksi.",
       "projectProgrammeMarkReadyError": "Hankeohjelman merkitseminen valmiiksi ei onnistunut.",
+      "projectProgrammeReturnToDraftSuccess": "Hankeohjelma palautettu luonnokseksi.",
+      "projectProgrammeReturnToDraftError": "Hankeohjelman palauttaminen luonnokseksi ei onnistunut.",
       "projectProgrammePdfGenerationNotImplemented": "PDF-koostaminen lisätään myöhemmin.",
       "projectProgrammeChangeHistoryNotImplemented": "Muutoshistoria lisätään myöhemmin.",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",

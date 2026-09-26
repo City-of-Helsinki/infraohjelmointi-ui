@@ -1,6 +1,6 @@
 import { Button, ButtonVariant, Notification } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 interface ProjectProgrammeSectionCardProps {
   sectionIsStarted: boolean;
@@ -9,6 +9,7 @@ interface ProjectProgrammeSectionCardProps {
   cardText: string;
   actionText: string;
   sectionId: ProjectProgrammeSectionId;
+  programmeIsComplete: boolean;
 }
 
 function ProjectProgrammeSectionCard({
@@ -18,6 +19,7 @@ function ProjectProgrammeSectionCard({
   actionText,
   cardText,
   sectionId,
+  programmeIsComplete,
 }: Readonly<ProjectProgrammeSectionCardProps>) {
   const { t } = useTranslation();
 
@@ -27,13 +29,15 @@ function ProjectProgrammeSectionCard({
         <div className="project-programme-notification-content">
           <p>{cardText}</p>
           <div>
-            <Button
-              variant={sectionIsStarted ? ButtonVariant.Secondary : ButtonVariant.Primary}
-              type="button"
-              onClick={() => handleOpenSection(sectionId)}
-            >
-              {sectionIsStarted ? t('projectProgrammeForm.modifyInformation') : actionText}
-            </Button>
+            {!programmeIsComplete && (
+              <Button
+                variant={sectionIsStarted ? ButtonVariant.Secondary : ButtonVariant.Primary}
+                type="button"
+                onClick={() => handleOpenSection(sectionId)}
+              >
+                {sectionIsStarted ? t('projectProgrammeForm.modifyInformation') : actionText}
+              </Button>
+            )}
           </div>
         </div>
       </Notification>
