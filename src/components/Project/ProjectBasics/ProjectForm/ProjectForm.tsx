@@ -37,7 +37,7 @@ import {
   getPwErrorMessage,
   getPwErrorMessageForCodes,
 } from '@/utils/projectErrorMessage';
-import usePwLinkConfirmation from '@/hooks/usePwLinkConfirmation';
+import usePwLinkConfirmation, { normalizeHkrId } from '@/hooks/usePwLinkConfirmation';
 import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
 import {
   collectErrorElements,
@@ -336,20 +336,44 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
         // IO-935: a new or changed hkrId must be confirmed against the PW
         // project it points to before anything is saved and synced to PW.
-        const newHkrId = data.hkrId ? String(data.hkrId).trim() : '';
-        if (newHkrId && newHkrId !== String(project?.hkrId ?? '')) {
-          // The loader overlay would otherwise sit on top of the dialog
-          dispatch(clearLoading(CREATE_NEW_PROJECT));
-          const pwLink = await confirmPwLink(newHkrId);
-          if (pwLink !== 'confirmed') {
-            if (pwLink === 'cancelled') {
-              resetField('hkrId');
-            }
-            dispatch(setIsSaving(false));
-            return;
-          }
+        let savedForm = form;
+        let unsavedHkrId: { value: string; message: string } | null = null;
+        const newHkrId = normalizeHkrId(data.hkrId);
+        if (newHkrId && newHkrId !== normalizeHkrId(project?.hkrId)) {
+          const pwLink = await confirmPwLink(newHkrId, {
+            // The loader overlay would otherwise sit on top of the dialog
+            onDialogOpen: () => dispatch(clearLoading(CREATE_NEW_PROJECT)),
+          });
           dispatch(setLoading({ text: 'Creating a new project', id: CREATE_NEW_PROJECT }));
-          data = { ...data, confirmedHkrId: newHkrId };
+
+          if (pwLink.status === 'confirmed') {
+            data = { ...data, confirmedHkrId: newHkrId };
+          } else {
+            if (pwLink.status === 'cancelled') {
+              resetField('hkrId');
+            } else {
+              unsavedHkrId = {
+                value: form.hkrId,
+                message: t(`notification.message.${pwLink.message}`),
+              };
+              setError('hkrId', { type: 'server', message: unsavedHkrId.message });
+            }
+
+            // A new project is not created without the hkrId the user entered.
+            // An existing one keeps its other edits, as it does when PW sync
+            // itself fails (IO-851); only the hkrId is left unsaved.
+            const { hkrId: _unsavedHkrId, ...otherChanges } = data;
+            if (projectMode !== 'edit' || Object.keys(otherChanges).length === 0) {
+              dispatch(setIsSaving(false));
+              dispatch(clearLoading(CREATE_NEW_PROJECT));
+              return;
+            }
+            data = otherChanges;
+            savedForm = {
+              ...form,
+              hkrId: String(formMethods.formState.defaultValues?.hkrId ?? ''),
+            };
+          }
         }
 
         // Patch project
@@ -373,7 +397,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
           try {
             await patchProject({ id: project?.id, data }).unwrap();
-            reset(form);
+            reset(savedForm);
+            if (unsavedHkrId) {
+              // Keep the hkrId the user typed, still unsaved and still flagged
+              setValue('hkrId', unsavedHkrId.value, { shouldDirty: true });
+              setError('hkrId', { type: 'server', message: unsavedHkrId.message });
+            }
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
