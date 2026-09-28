@@ -820,7 +820,8 @@ describe('projectForm', () => {
       await user.click(await findByTestId('submit-project-button'));
     };
 
-    it('does not save the hkrId when the user cancels the dialog', async () => {
+    it('saves the other changes but not the hkrId when the user cancels the dialog', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
       mockPwProjectNameLookup(() =>
         Promise.resolve({ data: { hkrId: '1234', name: 'Wrong project', syncEnabled: true } }),
       );
@@ -837,10 +838,48 @@ describe('projectForm', () => {
             .value,
         ).toBe(String(mockProject.data.hkrId)),
       );
-      const hkrIdPatches = mockedAxios.patch.mock.calls.filter(
-        ([, data]) => (data as IProjectRequest).hkrId !== undefined,
+      // setPhaseToProposalForSubmit also changed the phase, which is still saved
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
+      const patchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
+      expect(patchRequest.phase).toBeDefined();
+      expect(patchRequest).not.toHaveProperty('hkrId');
+      expect(patchRequest).not.toHaveProperty('confirmedHkrId');
+    });
+
+    it('keeps the loader up during the lookup and takes it down for the dialog', async () => {
+      let resolveLookup: (value: unknown) => void = () => undefined;
+      mockPwProjectNameLookup(
+        () =>
+          new Promise((resolve) => {
+            resolveLookup = resolve;
+          }),
       );
-      expect(hkrIdPatches).toHaveLength(0);
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, '1234');
+
+      // The overlay is what stops a second Save while PW is being asked
+      await waitFor(() => expect(getPwLookupCalls()).toHaveLength(1));
+      expect(rendered.store.getState().loader.isLoading).toBe(true);
+      expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
+
+      await act(async () =>
+        resolveLookup({ data: { hkrId: '1234', name: 'PW Kohde', syncEnabled: true } }),
+      );
+
+      expect(await rendered.findByText('projectForm.pwLinkDialog.title')).toBeInTheDocument();
+      expect(rendered.store.getState().loader.isLoading).toBe(false);
+    });
+
+    it('treats the current hkrId with a leading zero as unchanged', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, `0${mockProject.data.hkrId}`);
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      expect(getPwLookupCalls()).toHaveLength(0);
+      expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
     });
 
     it('does not look the PW project up when the hkrId is unchanged', async () => {
@@ -862,7 +901,8 @@ describe('projectForm', () => {
       ).toBeUndefined();
     });
 
-    it('shows the not-found toast and saves nothing when PW has no such project', async () => {
+    it('flags the hkrId and saves only the other changes when PW has no such project', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
       mockPwProjectNameLookup(() =>
         Promise.reject({ response: { status: 404, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } } }),
       );
@@ -876,7 +916,19 @@ describe('projectForm', () => {
         ),
       );
       expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
-      expect(mockedAxios.patch).not.toHaveBeenCalled();
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
+      expect(mockedAxios.patch.mock.lastCall[1]).not.toHaveProperty('hkrId');
+
+      // The typed hkrId stays in the field, unsaved and marked invalid
+      const hkrIdField = rendered.getByRole('spinbutton', {
+        name: getFormField('hkrId'),
+      }) as HTMLInputElement;
+      await waitFor(() =>
+        expect(rendered.getByTestId('hkrId').querySelector('[class*="invalid"]')).not.toBeNull(),
+      );
+      expect(hkrIdField.value).toBe('9999');
+      expect(rendered.getByTestId('submit-project-button')).toBeEnabled();
     });
 
     it('saves without a dialog when PW sync is disabled', async () => {

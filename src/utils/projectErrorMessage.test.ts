@@ -1,4 +1,5 @@
 import {
+  INVALID_HKR_ID_CODE,
   PW_LINK_NOT_CONFIRMED_CODE,
   PW_PROJECT_NOT_FOUND_CODE,
   PW_UNAVAILABLE_CODE,
@@ -76,6 +77,7 @@ describe('IO-935 PW error codes', () => {
   it.each([
     [PW_LINK_NOT_CONFIRMED_CODE, 'pwLinkNotConfirmed'],
     [PW_UNAVAILABLE_CODE, 'pwUnavailable'],
+    [INVALID_HKR_ID_CODE, 'pwInvalidHkrId'],
   ])('maps %s to "%s"', (code, expected) => {
     expect(getProjectPatchErrorMessage({ status: 400, data: { hkrId: [code] } })).toBe(expected);
     expect(getPwErrorMessage({ status: 400, data: { hkrId: [code] } })).toBe(expected);
