@@ -60,7 +60,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
         size="full"
         rules={{
           ...validateMaxLength(200, t),
-          ...requiredTrimmedRule('projectProgrammeForm.personsInvolved', t),
+          ...(!briefProgramme && requiredTrimmedRule('projectProgrammeForm.personsInvolved', t)),
         }}
       />
       {briefProgramme && (
@@ -78,7 +78,6 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
         size="full"
         rules={{
           ...validateMaxLength(100, t),
-          ...(briefProgramme && requiredTrimmedRule('projectProgrammeForm.inspector', t)),
         }}
       />
       <TextAreaField

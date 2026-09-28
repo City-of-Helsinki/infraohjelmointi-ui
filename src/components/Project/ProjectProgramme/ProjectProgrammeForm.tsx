@@ -67,13 +67,15 @@ function ProjectProgrammeForm({
   effectiveProjectProgramme,
   briefProgramme,
   onClose,
+  project,
 }: Readonly<IProjectProgrammeFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useProjectProgrammeForm(effectiveProjectProgramme);
+  const formMethods = useProjectProgrammeForm(effectiveProjectProgramme, project);
   const {
     handleSubmit,
     formState: { isDirty, dirtyFields },
+    getValues,
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
@@ -91,6 +93,13 @@ function ProjectProgrammeForm({
 
     if (linksPayload !== undefined) {
       requestData.links = linksPayload;
+    }
+
+    if (activeSection === 'basicInfo' && !effectiveProjectProgramme?.basicInfo) {
+      // If the basicInfo section is created,
+      // ensure projectName and district are included in the requestData.
+      requestData.projectName = data.basicInfo?.projectName || '';
+      requestData.district = data.basicInfo?.district || '';
     }
 
     if (!Object.keys(requestData).length) {
@@ -142,7 +151,7 @@ function ProjectProgrammeForm({
   return (
     <FormProvider {...formMethods}>
       <form
-        className="project-form mx-auto max-w-xl"
+        className="project-form mx-auto max-w-2xl"
         onSubmit={handleSubmit((data) => submitDraft(data, activeSection))}
         noValidate
       >
@@ -168,7 +177,12 @@ function ProjectProgrammeForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
+              <Button
+                variant={ButtonVariant.Secondary}
+                type="button"
+                onClick={() => submitDraft(getValues(), activeSection)}
+                disabled={!isDirty}
+              >
                 {t('projectProgrammeForm.saveDraft')}
               </Button>
               <Button

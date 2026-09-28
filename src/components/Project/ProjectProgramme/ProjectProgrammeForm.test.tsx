@@ -15,6 +15,7 @@ const mockPatchProjectProgrammeSection = jest.fn();
 jest.mock('react-i18next', () => mockI18next());
 
 jest.mock('@/hooks/common', () => ({
+  ...jest.requireActual('@/hooks/common'),
   useAppDispatch: () => mockDispatch,
 }));
 
@@ -84,7 +85,7 @@ describe('ProjectProgrammeForm save logic', () => {
     mockPatchProjectProgrammeSection.mockResolvedValue({});
   });
 
-  it('shows brief-only fields and requires inspector in brief programme mode', async () => {
+  it('shows brief-only fields and does not require inspector in brief programme mode', async () => {
     await act(async () =>
       renderWithProviders(
         <Route
@@ -107,7 +108,9 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(
       screen.getByRole('textbox', { name: /projectProgrammeForm\.estimatedCosts/ }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ })).toBeRequired();
+    expect(
+      screen.getByRole('textbox', { name: /projectProgrammeForm\.inspector/ }),
+    ).not.toBeRequired();
     expect(
       screen.queryByRole('textbox', { name: /projectProgrammeForm\.strategyGoals/ }),
     ).not.toBeInTheDocument();
@@ -231,7 +234,9 @@ describe('ProjectProgrammeForm save logic', () => {
       });
     });
 
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('submits changed fields and links for design criteria section', async () => {
@@ -276,7 +281,9 @@ describe('ProjectProgrammeForm save logic', () => {
       });
     });
 
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('creates a missing section when the user submits its first changes', async () => {
@@ -334,7 +341,9 @@ describe('ProjectProgrammeForm save logic', () => {
       });
     });
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('creates traffic planning criteria from all required user-entered fields', async () => {
@@ -384,7 +393,9 @@ describe('ProjectProgrammeForm save logic', () => {
         data: trafficCriteria,
       });
     });
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('creates urban spacing planning criteria from all required user-entered fields', async () => {
@@ -438,7 +449,9 @@ describe('ProjectProgrammeForm save logic', () => {
         data: urbanSpacingCriteria,
       });
     });
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('renders saved design criteria values into the fields', async () => {
@@ -505,7 +518,7 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
   });
 
-  it('blocks whitespace-only values in required fields', async () => {
+  it('trims whitespace-only values in dirty fields before submit', async () => {
     const onClose = jest.fn();
 
     await act(async () =>
@@ -538,11 +551,18 @@ describe('ProjectProgrammeForm save logic', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getAllByText('validation.required')).not.toHaveLength(0);
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        data: {
+          guidingZoningRegulations: '',
+        },
+      });
     });
-    expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
-    expect(onClose).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('dispatches form save error and keeps form open on failed submit', async () => {
@@ -627,7 +647,9 @@ describe('ProjectProgrammeForm save logic', () => {
       });
     });
 
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('submits changed fields and links for interaction and related projects section', async () => {
@@ -672,7 +694,9 @@ describe('ProjectProgrammeForm save logic', () => {
       });
     });
 
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('creates maintenance needs section from user-entered fields', async () => {
@@ -715,7 +739,9 @@ describe('ProjectProgrammeForm save logic', () => {
         },
       });
     });
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('creates interaction and related projects section from user-entered fields', async () => {
@@ -765,7 +791,9 @@ describe('ProjectProgrammeForm save logic', () => {
         },
       });
     });
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it('renders saved traffic planning criteria values into the fields', async () => {

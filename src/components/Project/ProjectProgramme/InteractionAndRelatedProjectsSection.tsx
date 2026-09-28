@@ -2,8 +2,8 @@ import { memo } from 'react';
 import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
 
 const INTERACTION_AND_RELATED_PROJECTS_FIELDS = [
-  'collaborationAndExperts',
-  'interactionNotes',
+  { field: 'collaborationAndExperts' },
+  { field: 'interactionNotes' },
 ] as const;
 
 function InteractionAndRelatedProjectsSection() {
