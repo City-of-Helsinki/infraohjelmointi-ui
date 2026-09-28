@@ -18,6 +18,7 @@ describe('ProjectProgrammeSectionCard readonly sections', () => {
     cardText: 'Please fill this section',
     actionText: 'projectProgrammeForm.fillBasicInfo',
     sectionId: 'basicInfo' as const,
+    programmeIsComplete: false,
   };
 
   const renderSectionCard = async (

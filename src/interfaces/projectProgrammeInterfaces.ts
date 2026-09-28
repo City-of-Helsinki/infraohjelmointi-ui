@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/projectProgrammeSections';
-import { IProject } from './projectInterfaces';
-=======
 import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
+import { IProject } from './projectInterfaces';
 import { Button, ButtonVariant } from 'hds-react';
 import { ComponentProps } from 'react';
 
->>>>>>> 451a2708 (feat(ui): added possibility to return project programme to draft)
 export type ProjectProgrammeStatus = 'DRAFT' | 'COMPLETE';
 
 export interface IProjectProgramme {
