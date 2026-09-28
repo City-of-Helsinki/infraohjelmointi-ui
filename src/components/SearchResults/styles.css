@@ -28,10 +28,27 @@
   inset: 0;
 }
 
+.search-result-card .search-result-title-container .search-result-tag-container {
+  min-width: min-content;
+  flex-shrink: 0;
+}
+
 /* Keeps the secondary (project form) link clickable above the stretched title link */
 .search-result-card-secondary-link {
   position: relative;
   z-index: 1;
+  /* Never squeeze the button narrower than its longest word */
+  min-width: min-content;
+  flex-shrink: 0;
+}
+
+.search-result-card-secondary-link button,
+.search-result-card-secondary-link button > span {
+  min-width: min-content;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
 }
 
 .search-result-card .search-result-title-container {
@@ -39,7 +56,11 @@
 }
 
 .search-result-card .search-result-title-container .search-result-title {
-  @apply flex items-center gap-3;
+  @apply flex min-w-0 items-center gap-3;
+}
+
+.search-result-card .search-result-title-container .search-result-title a {
+  @apply min-w-0 break-words;
 }
 
 .search-result-card:hover .search-result-card-stretched-link {
