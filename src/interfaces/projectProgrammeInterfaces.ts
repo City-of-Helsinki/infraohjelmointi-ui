@@ -21,6 +21,11 @@ export interface IProjectProgrammeTransitionResponse {
   currentStatus: ProjectProgrammeStatus;
 }
 
+export interface IProjectProgrammeSectionTransitionResponse
+  extends IProjectProgrammeTransitionResponse {
+  section: string;
+}
+
 interface IProjectProgrammeSectionShared {
   links?: IProjectProgrammeLinkFormItem[] | null;
   status?: ProjectProgrammeStatus;

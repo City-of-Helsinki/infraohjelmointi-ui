@@ -1,4 +1,4 @@
-import { Button, ButtonVariant, IconPen, StatusLabel } from 'hds-react';
+import { Button, ButtonVariant, IconCheckCircle, IconPen, StatusLabel } from 'hds-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
@@ -6,6 +6,8 @@ import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import {
   usePatchProjectProgrammeSectionMutation,
   usePostProjectProgrammeSectionMutation,
+  useTransitionProjectProgrammeSectionStatusMutation,
+  useTransitionProjectProgrammeStatusMutation,
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
@@ -83,11 +85,17 @@ function ProjectProgrammeForm({
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
+  const [transitionSectionStatus] = useTransitionProjectProgrammeSectionStatusMutation();
+  const [transitionProgrammeStatus] = useTransitionProjectProgrammeStatusMutation();
+  const activeSectionStatus = effectiveProjectProgramme?.[activeSection]?.status ?? 'DRAFT';
+  const isActiveSectionComplete = activeSectionStatus === 'COMPLETE';
+  const isFormReadOnly = isProjectProgrammeComplete || isActiveSectionComplete;
 
-  async function submitDraft(
+  async function persistSection(
     data: IProjectProgrammeForm,
     activeSection: keyof IProjectProgrammeForm,
-  ) {
+    createIfMissing = false,
+  ): Promise<boolean> {
     const requestData: Record<string, unknown> = pickChangedFormFields(
       data,
       activeSection,
@@ -99,30 +107,37 @@ function ProjectProgrammeForm({
       requestData.links = linksPayload;
     }
 
-    if (activeSection === 'basicInfo' && !effectiveProjectProgramme?.basicInfo) {
-      // If the basicInfo section is created,
-      // ensure projectName and district are included in the requestData.
-      requestData.projectName = data.basicInfo?.projectName || '';
-      requestData.district = data.basicInfo?.district || '';
+    const sectionExists = Boolean(effectiveProjectProgramme?.[activeSection]);
+    if (!Object.keys(requestData).length && (sectionExists || !createIfMissing)) {
+      return false;
     }
 
-    if (!Object.keys(requestData).length) {
-      onClose();
-      return;
+    const request = {
+      id: projectProgrammeId,
+      section: mapSectionIdToApiRoute(activeSection),
+      data: requestData,
+    };
+
+    if (sectionExists) {
+      await patchProjectProgrammeSection(request).unwrap();
+    } else {
+      await postProjectProgrammeSection(request).unwrap();
     }
 
+    return true;
+  }
+
+  async function submitDraft(
+    data: IProjectProgrammeForm,
+    activeSection: keyof IProjectProgrammeForm,
+  ) {
     try {
-      const request = {
-        id: projectProgrammeId,
-        section: mapSectionIdToApiRoute(activeSection),
-        data: requestData,
-      };
-
-      if (effectiveProjectProgramme?.[activeSection]) {
-        await patchProjectProgrammeSection(request).unwrap();
-      } else {
-        await postProjectProgrammeSection(request).unwrap();
+      const sectionWasSaved = await persistSection(data, activeSection);
+      if (!sectionWasSaved) {
+        onClose();
+        return;
       }
+
       dispatch(
         notifySuccess({
           title: 'saveSuccess',
@@ -136,6 +151,62 @@ function ProjectProgrammeForm({
         notifyError({
           title: 'saveError',
           message: 'formSaveError',
+          type: 'toast',
+        }),
+      );
+    }
+  }
+
+  async function markSectionReady(data: IProjectProgrammeForm) {
+    try {
+      await persistSection(data, activeSection, true);
+      await transitionSectionStatus({
+        id: projectProgrammeId,
+        section: mapSectionIdToApiRoute(activeSection),
+        to: 'COMPLETE',
+      }).unwrap();
+      dispatch(
+        notifySuccess({
+          title: 'saveSuccess',
+          message: 'projectProgrammeSectionMarkReadySuccess',
+          type: 'toast',
+        }),
+      );
+      onClose();
+    } catch {
+      dispatch(
+        notifyError({
+          title: 'saveError',
+          message: 'projectProgrammeSectionMarkReadyError',
+          type: 'toast',
+        }),
+      );
+    }
+  }
+
+  async function returnSectionToDraft() {
+    try {
+      if (isProjectProgrammeComplete) {
+        await transitionProgrammeStatus({ id: projectProgrammeId, to: 'DRAFT' }).unwrap();
+      }
+      await transitionSectionStatus({
+        id: projectProgrammeId,
+        section: mapSectionIdToApiRoute(activeSection),
+        to: 'DRAFT',
+      }).unwrap();
+      dispatch(
+        notifySuccess({
+          title: 'saveSuccess',
+          message: 'projectProgrammeSectionReturnToDraftSuccess',
+          type: 'toast',
+        }),
+      );
+      onClose();
+    } catch {
+      dispatch(
+        notifyError({
+          title: 'saveError',
+          message: 'projectProgrammeSectionReturnToDraftError',
           type: 'toast',
         }),
       );
@@ -160,36 +231,57 @@ function ProjectProgrammeForm({
         noValidate
       >
         <div className="mb-4">
-          <StatusLabel type="info" iconStart={<IconPen />}>
-            {t('projectProgrammeForm.draftStatus')}
+          <StatusLabel
+            type={isActiveSectionComplete ? 'success' : 'info'}
+            iconStart={isActiveSectionComplete ? <IconCheckCircle /> : <IconPen />}
+          >
+            {t(
+              isActiveSectionComplete
+                ? 'projectProgrammeForm.completeStatus'
+                : 'projectProgrammeForm.draftStatus',
+            )}
           </StatusLabel>
         </div>
 
-        {activeSection === 'basicInfo' && (
-          <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
-        )}
-        {activeSection === 'designCriteria' && <DesignCriteriaSection />}
-        {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaSection />}
-        {activeSection === 'urbanSpacingPlanningCriteria' && (
-          <UrbanSpacingPlanningCriteriaSection />
-        )}
-        {activeSection === 'maintenanceNeeds' && <MaintenanceNeedsSection />}
-        {activeSection === 'interactionAndRelatedProjects' && (
-          <InteractionAndRelatedProjectsSection />
-        )}
+        <fieldset disabled={isFormReadOnly} className="m-0 min-w-0 border-0 p-0">
+          {activeSection === 'basicInfo' && (
+            <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
+          )}
+          {activeSection === 'designCriteria' && <DesignCriteriaSection />}
+          {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaSection />}
+          {activeSection === 'urbanSpacingPlanningCriteria' && (
+            <UrbanSpacingPlanningCriteriaSection />
+          )}
+          {activeSection === 'maintenanceNeeds' && <MaintenanceNeedsSection />}
+          {activeSection === 'interactionAndRelatedProjects' && (
+            <InteractionAndRelatedProjectsSection />
+          )}
+        </fieldset>
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              {!isProjectProgrammeComplete && (
+              {!isFormReadOnly ? (
                 <>
-                  <Button variant={ButtonVariant.Primary} type="submit">
+                  <Button
+                    variant={ButtonVariant.Primary}
+                    type="button"
+                    onClick={handleSubmit(markSectionReady)}
+                  >
                     {t('projectProgrammeForm.markSectionReady')}
                   </Button>
                   <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
                     {t('projectProgrammeForm.saveDraft')}
                   </Button>
                 </>
+              ) : (
+                <Button
+                  variant={ButtonVariant.Primary}
+                  type="button"
+                  onClick={returnSectionToDraft}
+                >
+                  {t('projectProgrammeForm.returnToDraft')}
+                </Button>
               )}
               <Button
                 variant={ButtonVariant.Secondary}

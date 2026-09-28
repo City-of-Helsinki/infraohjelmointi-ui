@@ -11,6 +11,8 @@ import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 const mockDispatch = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
+const mockTransitionProjectProgrammeSectionStatus = jest.fn();
+const mockTransitionProjectProgrammeStatus = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -25,6 +27,14 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
   usePatchProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPatchProjectProgrammeSection(...args) }),
+  ],
+  useTransitionProjectProgrammeSectionStatusMutation: () => [
+    (...args: unknown[]) => ({
+      unwrap: () => mockTransitionProjectProgrammeSectionStatus(...args),
+    }),
+  ],
+  useTransitionProjectProgrammeStatusMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockTransitionProjectProgrammeStatus(...args) }),
   ],
 }));
 
@@ -83,8 +93,181 @@ describe('ProjectProgrammeForm save logic', () => {
     mockDispatch.mockReset();
     mockPostProjectProgrammeSection.mockReset();
     mockPatchProjectProgrammeSection.mockReset();
+    mockTransitionProjectProgrammeSectionStatus.mockReset();
+    mockTransitionProjectProgrammeStatus.mockReset();
     mockPostProjectProgrammeSection.mockResolvedValue({});
     mockPatchProjectProgrammeSection.mockResolvedValue({});
+    mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
+    mockTransitionProjectProgrammeStatus.mockResolvedValue({});
+  });
+
+  it('saves changed section fields before marking the section ready', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Initial project'), {
+      target: { value: 'Updated project name' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockPatchProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'basic-info',
+        data: { projectName: 'Updated project name' },
+      });
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'basic-info',
+        to: 'COMPLETE',
+      });
+    });
+    expect(mockPatchProjectProgrammeSection.mock.invocationCallOrder[0]).toBeLessThan(
+      mockTransitionProjectProgrammeSectionStatus.mock.invocationCallOrder[0],
+    );
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('marks an unchanged existing section ready without patching it', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        to: 'COMPLETE',
+      });
+    });
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+  });
+
+  it('keeps a completed section read-only and returns it to draft', async () => {
+    const completedFormData: IProjectProgrammeForm = {
+      ...baseFormData,
+      maintenanceNeeds: {
+        ...baseFormData.maintenanceNeeds,
+        status: 'COMPLETE',
+      },
+    };
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="maintenanceNeeds"
+              effectiveProjectProgramme={completedFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Regular maintenance required')).toBeDisabled();
+    expect(screen.getByText('projectProgrammeForm.completeStatus')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'maintenance-needs',
+        to: 'DRAFT',
+      });
+    });
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+  });
+
+  it('returns a completed programme to draft before reopening its section', async () => {
+    const completedFormData: IProjectProgrammeForm = {
+      ...baseFormData,
+      designCriteria: {
+        ...baseFormData.designCriteria,
+        status: 'COMPLETE',
+      },
+    };
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={completedFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        to: 'DRAFT',
+      });
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        to: 'DRAFT',
+      });
+    });
+    expect(mockTransitionProjectProgrammeStatus.mock.invocationCallOrder[0]).toBeLessThan(
+      mockTransitionProjectProgrammeSectionStatus.mock.invocationCallOrder[0],
+    );
   });
 
   it('shows brief-only fields and does not require inspector in brief programme mode', async () => {
