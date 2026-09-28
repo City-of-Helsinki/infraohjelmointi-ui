@@ -208,6 +208,21 @@ const getProjectWithShiftableFinances = ({
   };
 };
 
+const PW_PROJECT_NAME_URL = '/projects/pw-project-name/';
+
+// IO-935: answer the PW project name lookup, leave every other GET to the default mocks
+const mockPwProjectNameLookup = (respond: () => Promise<unknown>) => {
+  const defaultGet = mockedAxios.get.getMockImplementation();
+  mockedAxios.get.mockImplementation((url: string, config?: unknown) =>
+    url.endsWith(PW_PROJECT_NAME_URL)
+      ? (respond() as ReturnType<typeof mockedAxios.get>)
+      : (defaultGet?.(url, config as never) as ReturnType<typeof mockedAxios.get>),
+  );
+};
+
+const getPwLookupCalls = () =>
+  mockedAxios.get.mock.calls.filter(([url]) => String(url).endsWith(PW_PROJECT_NAME_URL));
+
 describe('projectForm', () => {
   beforeEach(() => {
     mockGetResponseProvider();
@@ -486,6 +501,9 @@ describe('projectForm', () => {
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
+    mockPwProjectNameLookup(() =>
+      Promise.resolve({ data: { hkrId: expectedValue, name: 'PW Kohde', syncEnabled: true } }),
+    );
 
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
@@ -497,9 +515,12 @@ describe('projectForm', () => {
     await user.type(hkrIdField, expectedValue);
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
+    await user.click(await findByTestId('confirm-dialog-button'));
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
     expect(formPatchRequest.hkrId).toEqual(expectedValue);
+    expect(formPatchRequest.confirmedHkrId).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
@@ -785,6 +806,119 @@ describe('projectForm', () => {
     expect(formPatchRequest.description).toEqual(expectedDescription);
     expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
     expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
+  });
+
+  describe('PW link confirmation (IO-935)', () => {
+    const changeHkrIdAndSubmit = async (
+      { user, findByTestId, findByRole }: Awaited<ReturnType<typeof render>>,
+      value: string,
+    ) => {
+      const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+      await user.clear(hkrIdField);
+      await user.type(hkrIdField, value);
+      await setPhaseToProposalForSubmit(user, findByTestId);
+      await user.click(await findByTestId('submit-project-button'));
+    };
+
+    it('does not save the hkrId when the user cancels the dialog', async () => {
+      mockPwProjectNameLookup(() =>
+        Promise.resolve({ data: { hkrId: '1234', name: 'Wrong project', syncEnabled: true } }),
+      );
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, '1234');
+      expect(await rendered.findByText('projectForm.pwLinkDialog.title')).toBeInTheDocument();
+      // HDS Dialog's buttons are not exposed by role in jsdom
+      await rendered.user.click(rendered.getByText('cancel'));
+
+      await waitFor(() =>
+        expect(
+          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+            .value,
+        ).toBe(String(mockProject.data.hkrId)),
+      );
+      const hkrIdPatches = mockedAxios.patch.mock.calls.filter(
+        ([, data]) => (data as IProjectRequest).hkrId !== undefined,
+      );
+      expect(hkrIdPatches).toHaveLength(0);
+    });
+
+    it('does not look the PW project up when the hkrId is unchanged', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
+      const rendered = await render();
+
+      const descriptionField = await rendered.findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      await rendered.user.clear(descriptionField);
+      await rendered.user.type(descriptionField, 'Only the description');
+      await setPhaseToProposalForSubmit(rendered.user, rendered.findByTestId);
+      await rendered.user.click(await rendered.findByTestId('submit-project-button'));
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      expect(getPwLookupCalls()).toHaveLength(0);
+      expect(
+        (mockedAxios.patch.mock.lastCall[1] as IProjectRequest).confirmedHkrId,
+      ).toBeUndefined();
+    });
+
+    it('shows the not-found toast and saves nothing when PW has no such project', async () => {
+      mockPwProjectNameLookup(() =>
+        Promise.reject({ response: { status: 404, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } } }),
+      );
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, '9999');
+
+      await waitFor(() =>
+        expect(rendered.store.getState().notifications.map(({ message }) => message)).toContain(
+          'pwProjectNotFound',
+        ),
+      );
+      expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
+      expect(mockedAxios.patch).not.toHaveBeenCalled();
+    });
+
+    it('saves without a dialog when PW sync is disabled', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: { ...mockProject.data, hkrId: '1234' } });
+      mockPwProjectNameLookup(() =>
+        Promise.resolve({ data: { hkrId: '1234', name: null, syncEnabled: false } }),
+      );
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, '1234');
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
+      expect((mockedAxios.patch.mock.lastCall[1] as IProjectRequest).hkrId).toBe('1234');
+    });
+
+    it('shows a PW error code from the API as text, not as the raw code', async () => {
+      mockedAxios.patch.mockRejectedValueOnce({
+        response: { status: 400, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } },
+      });
+      const rendered = await render();
+
+      const descriptionField = await rendered.findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      await rendered.user.clear(descriptionField);
+      await rendered.user.type(descriptionField, 'Triggers the orphan hkrId error');
+      await setPhaseToProposalForSubmit(rendered.user, rendered.findByTestId);
+      await rendered.user.click(await rendered.findByTestId('submit-project-button'));
+
+      await waitFor(() =>
+        expect(rendered.store.getState().notifications.map(({ message }) => message)).toContain(
+          'pwProjectNotFound',
+        ),
+      );
+      // The field is marked invalid in the same render that sets its error text.
+      // Before IO-935 that text was the raw code.
+      await waitFor(() =>
+        expect(rendered.getByTestId('hkrId').querySelector('[class*="invalid"]')).not.toBeNull(),
+      );
+      expect(rendered.queryByText('PW_PROJECT_NOT_FOUND')).not.toBeInTheDocument();
+    });
   });
 
   describe('finance updates from schedule changes', () => {

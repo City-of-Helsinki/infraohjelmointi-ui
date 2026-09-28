@@ -8,20 +8,44 @@
 // element, so that a future validator stacking another code onto the same
 // field (e.g. ["SOME_OTHER", "PW_PROJECT_NOT_FOUND"]) does not silently
 // fall through to the generic toast.
+//
+// IO-935 adds two more hkrId codes: PW_LINK_NOT_CONFIRMED (a save tried to
+// set an hkrId without confirming the PW project) and PW_UNAVAILABLE (the PW
+// project lookup could not reach PW).
 
 export const PW_PROJECT_NOT_FOUND_CODE = 'PW_PROJECT_NOT_FOUND';
+export const PW_LINK_NOT_CONFIRMED_CODE = 'PW_LINK_NOT_CONFIRMED';
+export const PW_UNAVAILABLE_CODE = 'PW_UNAVAILABLE';
 
-export type ProjectPatchErrorMessageKey = 'pwProjectNotFound' | 'formSaveError';
+export type PwErrorMessageKey = 'pwProjectNotFound' | 'pwLinkNotConfirmed' | 'pwUnavailable';
 
-export const getProjectPatchErrorMessage = (error: unknown): ProjectPatchErrorMessageKey => {
+export type ProjectPatchErrorMessageKey = PwErrorMessageKey | 'formSaveError';
+
+const PW_ERROR_MESSAGES: Array<[string, PwErrorMessageKey]> = [
+  [PW_PROJECT_NOT_FOUND_CODE, 'pwProjectNotFound'],
+  [PW_LINK_NOT_CONFIRMED_CODE, 'pwLinkNotConfirmed'],
+  [PW_UNAVAILABLE_CODE, 'pwUnavailable'],
+];
+
+/** The message key for the PW error codes of an `hkrId` field error, or null if there is none. */
+export const getPwErrorMessageForCodes = (codes: unknown): PwErrorMessageKey | null => {
+  if (!Array.isArray(codes)) {
+    return null;
+  }
+  const match = PW_ERROR_MESSAGES.find(([code]) => codes.includes(code));
+  return match ? match[1] : null;
+};
+
+/** The message key for a PW error code carried on `hkrId`, or null if there is none. */
+export const getPwErrorMessage = (error: unknown): PwErrorMessageKey | null => {
   if (error && typeof error === 'object') {
     const data = (error as { data?: unknown }).data;
     if (data && typeof data === 'object') {
-      const hkrId = (data as { hkrId?: unknown }).hkrId;
-      if (Array.isArray(hkrId) && hkrId.includes(PW_PROJECT_NOT_FOUND_CODE)) {
-        return 'pwProjectNotFound';
-      }
+      return getPwErrorMessageForCodes((data as { hkrId?: unknown }).hkrId);
     }
   }
-  return 'formSaveError';
+  return null;
 };
+
+export const getProjectPatchErrorMessage = (error: unknown): ProjectPatchErrorMessageKey =>
+  getPwErrorMessage(error) ?? 'formSaveError';

@@ -32,7 +32,12 @@ import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
-import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
+import {
+  getProjectPatchErrorMessage,
+  getPwErrorMessage,
+  getPwErrorMessageForCodes,
+} from '@/utils/projectErrorMessage';
+import usePwLinkConfirmation from '@/hooks/usePwLinkConfirmation';
 import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
 import {
   collectErrorElements,
@@ -51,6 +56,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const navigate = useNavigate();
   const [postProject] = usePostProjectMutation();
   const [patchProject] = usePatchProjectMutation();
+  const confirmPwLink = usePwLinkConfirmation();
 
   const user = useAppSelector(selectUser);
   const projectMode = useAppSelector(selectProjectMode);
@@ -70,6 +76,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     setValue,
     setError,
     reset,
+    resetField,
     trigger,
   } = formMethods;
 
@@ -121,6 +128,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
         if (!message) {
           continue;
+        }
+
+        // PW error codes on hkrId (IO-865 / IO-935) are machine codes, not text
+        const pwMessage = backendField === 'hkrId' ? getPwErrorMessageForCodes(fieldError) : null;
+        if (pwMessage) {
+          message = t(`notification.message.${pwMessage}`);
         }
 
         setError(mappedField, {
@@ -321,6 +334,24 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           hierarchySubDivisions,
         );
 
+        // IO-935: a new or changed hkrId must be confirmed against the PW
+        // project it points to before anything is saved and synced to PW.
+        const newHkrId = data.hkrId ? String(data.hkrId).trim() : '';
+        if (newHkrId && newHkrId !== String(project?.hkrId ?? '')) {
+          // The loader overlay would otherwise sit on top of the dialog
+          dispatch(clearLoading(CREATE_NEW_PROJECT));
+          const pwLink = await confirmPwLink(newHkrId);
+          if (pwLink !== 'confirmed') {
+            if (pwLink === 'cancelled') {
+              resetField('hkrId');
+            }
+            dispatch(setIsSaving(false));
+            return;
+          }
+          dispatch(setLoading({ text: 'Creating a new project', id: CREATE_NEW_PROJECT }));
+          data = { ...data, confirmedHkrId: newHkrId };
+        }
+
         // Patch project
         if (project?.id && projectMode === 'edit') {
           if (
@@ -359,12 +390,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               return;
             }
 
-            const hasBackendFieldErrors = setBackendFieldErrors(error);
+            setBackendFieldErrors(error);
             dispatch(
               notifyError({
-                message: hasBackendFieldErrors
-                  ? 'formSaveError'
-                  : getProjectPatchErrorMessage(error),
+                // A PW error on hkrId gets its own toast even though it is
+                // also shown as a field error (IO-865 / IO-935)
+                message: getProjectPatchErrorMessage(error),
                 title: 'saveError',
                 type: 'notification',
               }),
@@ -401,7 +432,9 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             dispatch(setIsSaving(false));
             dispatch(
               notifyError({
-                message: hasBackendFieldErrors ? 'formSaveError' : 'projectCreatingError',
+                message:
+                  getPwErrorMessage(error) ??
+                  (hasBackendFieldErrors ? 'formSaveError' : 'projectCreatingError'),
                 title: 'createError',
                 type: 'notification',
               }),
@@ -424,6 +457,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       projectMode,
       user,
       updateFinances,
+      confirmPwLink,
     ],
   );
 

@@ -366,6 +366,11 @@
       "title": "Oletko varma että haluat poistaa tämän hankkeen?",
       "description": "Hankkeen poistaminen on pysyvää eikä sitä voida enää palauttaa."
     },
+    "pwLinkDialog": {
+      "title": "Tarkista PW-hanke",
+      "description": "Yhdistetty ProjectWise Hankerekisterin hankkeeseen ”{{name}}”, PW-hanketunnus {{hkrId}}.",
+      "nameMissing": "nimi puuttuu PW:stä"
+    },
     "warrantyPhase": "Takuuaika",
     "estWarrantyPhaseStart": "Alkaa",
     "estWarrantyPhaseEnd": "Päättyy",
@@ -741,6 +746,8 @@
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
       "formSaveError": "Lomakkeen tallennus ei onnistunut.",
       "pwProjectNotFound": "Hankekortille merkittyä PW-hanketunnusta ei löydy – poista tai muokkaa PW-hanketunnus.",
+      "pwLinkNotConfirmed": "PW-hanketunnusta ei tallennettu, koska yhdistettyä PW-hanketta ei vahvistettu. Syötä PW-hanketunnus uudelleen.",
+      "pwUnavailable": "ProjectWiseen ei saatu yhteyttä, joten PW-hanketunnusta ei voitu tarkistaa. Yritä myöhemmin uudelleen.",
       "projectCreatingError": "Uuden hankkeen luominen epäonnistui.",
       "formFillError": "Pakollisia kenttiä puuttuu.",
       "noteAddedToClass": "Muistiinpano lisätty luokkaan {{parameter}}",
@@ -891,6 +898,7 @@
   "delete": "Poista",
   "edit": "Muokkaa",
   "cancel": "Peruuta",
+  "ok": "OK",
   "note": "Muistiinpano",
   "addNote": "Lisää muistiinpano",
   "addNewNote": "Lisää uusi muistiinpano",
