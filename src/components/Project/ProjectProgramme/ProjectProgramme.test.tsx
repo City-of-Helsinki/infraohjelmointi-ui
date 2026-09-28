@@ -8,6 +8,7 @@ import { ProjectProgrammeStatus } from '@/interfaces/projectProgrammeInterfaces'
 
 const mockSwitchType = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
+const mockTransitionProjectProgrammeSectionStatus = jest.fn();
 const mockPostProjectProgramme = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
@@ -37,6 +38,11 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
   useTransitionProjectProgrammeStatusMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockTransitionProjectProgrammeStatus(...args) }),
+  ],
+  useTransitionProjectProgrammeSectionStatusMutation: () => [
+    (...args: unknown[]) => ({
+      unwrap: () => mockTransitionProjectProgrammeSectionStatus(...args),
+    }),
   ],
   usePostProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPostProjectProgrammeSection(...args) }),
@@ -92,12 +98,14 @@ describe('ProjectProgramme', () => {
 
     mockSwitchType.mockReset();
     mockTransitionProjectProgrammeStatus.mockReset();
+    mockTransitionProjectProgrammeSectionStatus.mockReset();
     mockPostProjectProgramme.mockReset();
     mockPostProjectProgrammeSection.mockReset();
     mockPatchProjectProgrammeSection.mockReset();
     mockRefetchProjectProgramme.mockReset();
     mockSwitchType.mockResolvedValue({ id: 'programme-1', briefProjectProgramme: false });
     mockTransitionProjectProgrammeStatus.mockResolvedValue({ currentStatus: 'COMPLETE' });
+    mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
     mockPostProjectProgrammeSection.mockResolvedValue({
       projectName: 'Mock project',
       district: 'Keskinen',

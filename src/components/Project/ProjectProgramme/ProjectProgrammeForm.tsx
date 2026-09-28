@@ -80,8 +80,8 @@ function ProjectProgrammeForm({
   const formMethods = useProjectProgrammeForm(effectiveProjectProgramme, project);
   const {
     handleSubmit,
-    formState: { isDirty, dirtyFields },
     getValues,
+    formState: { isDirty, dirtyFields },
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
@@ -270,7 +270,12 @@ function ProjectProgrammeForm({
                   >
                     {t('projectProgrammeForm.markSectionReady')}
                   </Button>
-                  <Button variant={ButtonVariant.Secondary} type="submit" disabled={!isDirty}>
+                  <Button
+                    variant={ButtonVariant.Secondary}
+                    type="button"
+                    disabled={!isDirty}
+                    onClick={() => submitDraft(getValues(), activeSection)}
+                  >
                     {t('projectProgrammeForm.saveDraft')}
                   </Button>
                 </>

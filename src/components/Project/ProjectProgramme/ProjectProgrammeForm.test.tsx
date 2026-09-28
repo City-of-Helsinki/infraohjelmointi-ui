@@ -180,6 +180,39 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
   });
 
+  it('does not mark a section ready when required fields are missing', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
+      expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
+      expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('keeps a completed section read-only and returns it to draft', async () => {
     const completedFormData: IProjectProgrammeForm = {
       ...baseFormData,
@@ -714,7 +747,7 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
   });
 
-  it('trims whitespace-only values in dirty fields before submit', async () => {
+  it('saves a draft with required fields missing and trims whitespace-only dirty values', async () => {
     const onClose = jest.fn();
 
     await act(async () =>
