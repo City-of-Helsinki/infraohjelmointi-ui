@@ -1,6 +1,17 @@
-import { Button, ButtonVariant, Notification } from 'hds-react';
+import {
+  Accordion,
+  AccordionSize,
+  Button,
+  ButtonVariant,
+  Notification,
+  SupportedLanguage,
+} from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import ProjectProgrammeReadonlySection from './ProjectProgrammeReadonlySection';
+import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
+import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
+import { FormProvider } from 'react-hook-form';
 
 interface ProjectProgrammeSectionCardProps {
   sectionIsStarted: boolean;
@@ -9,6 +20,7 @@ interface ProjectProgrammeSectionCardProps {
   cardText: string;
   actionText: string;
   sectionId: ProjectProgrammeSectionId;
+  projectProgramme?: IProjectProgramme;
 }
 
 function ProjectProgrammeSectionCard({
@@ -18,8 +30,10 @@ function ProjectProgrammeSectionCard({
   actionText,
   cardText,
   sectionId,
+  projectProgramme,
 }: Readonly<ProjectProgrammeSectionCardProps>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const formMethods = useProjectProgrammeForm(projectProgramme);
 
   return (
     <div className="project-programme-section" key={sectionId}>
@@ -35,6 +49,23 @@ function ProjectProgrammeSectionCard({
               {sectionIsStarted ? t('projectProgrammeForm.modifyInformation') : actionText}
             </Button>
           </div>
+          {Boolean(projectProgramme?.[sectionId]) && (
+            <Accordion
+              heading={t('content')}
+              size={AccordionSize.Small}
+              language={i18n.language as SupportedLanguage}
+              headingLevel={3}
+            >
+              <FormProvider {...formMethods}>
+                <div className="w-full">
+                  <ProjectProgrammeReadonlySection
+                    sectionId={sectionId}
+                    projectProgramme={projectProgramme}
+                  />
+                </div>
+              </FormProvider>
+            </Accordion>
+          )}
         </div>
       </Notification>
     </div>

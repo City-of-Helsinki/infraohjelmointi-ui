@@ -272,6 +272,7 @@ function ProjectProgramme() {
                   cardText={section.cardText}
                   actionText={section.actionText}
                   sectionId={section.id}
+                  projectProgramme={effectiveProjectProgramme}
                 />
               );
             })}

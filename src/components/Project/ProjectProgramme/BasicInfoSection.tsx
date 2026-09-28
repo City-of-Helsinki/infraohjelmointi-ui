@@ -14,6 +14,33 @@ interface IBasicInfoSectionProps {
   briefProgramme: boolean;
 }
 
+export const BASIC_INFO_BRIEF_FIELDS = [
+  'projectName',
+  'district',
+  'projectProgrammeCompiler',
+  'personsInvolved',
+  'estimatedCosts',
+  'inspector',
+  'summary',
+] as const;
+
+export const BASIC_INFO_FULL_FIELDS = [
+  'projectName',
+  'district',
+  'projectProgrammeCompiler',
+  'personsInvolved',
+  'inspector',
+  'summary',
+  'strategyGoals',
+  'costClass',
+  'projectSize',
+  'risks',
+  'studyAndPlanningNeeds',
+  'planningAndImplementationFeasibility',
+  'specialConsiderations',
+  'otherConsiderations',
+] as const;
+
 function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) {
   const { t } = useTranslation();
   const tooltip = useProjectProgrammeTooltip();
