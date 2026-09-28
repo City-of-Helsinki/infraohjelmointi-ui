@@ -118,6 +118,8 @@ export interface IProjectRequest {
   description?: string;
   entityName?: string | null;
   hkrId?: string | null;
+  // IO-935: echoes hkrId once the user has confirmed the linked PW project
+  confirmedHkrId?: string;
   area?: string | null;
   hashTags?: Array<string>;
   sapProject?: string;
@@ -297,6 +299,14 @@ export interface IProjectHistoryEntry {
   endpoint: string | null;
   createdDate: string;
   updatedDate: string;
+}
+
+// IO-935: GET /projects/pw-project-name/?hkrId=
+export interface IPwProjectNameResponse {
+  hkrId: string;
+  // PW "Kohde"; null when PW sync is disabled or the field is empty in PW
+  name: string | null;
+  syncEnabled: boolean;
 }
 
 export interface IProjectHistoryResponse {

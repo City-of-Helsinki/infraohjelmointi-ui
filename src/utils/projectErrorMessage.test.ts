@@ -1,4 +1,11 @@
-import { PW_PROJECT_NOT_FOUND_CODE, getProjectPatchErrorMessage } from './projectErrorMessage';
+import {
+  PW_LINK_NOT_CONFIRMED_CODE,
+  PW_PROJECT_NOT_FOUND_CODE,
+  PW_UNAVAILABLE_CODE,
+  getProjectPatchErrorMessage,
+  getPwErrorMessage,
+  getPwErrorMessageForCodes,
+} from './projectErrorMessage';
 
 describe('getProjectPatchErrorMessage', () => {
   it('returns "pwProjectNotFound" when backend signals PW project not found', () => {
@@ -62,5 +69,27 @@ describe('getProjectPatchErrorMessage', () => {
     };
 
     expect(getProjectPatchErrorMessage(error)).toBe('pwProjectNotFound');
+  });
+});
+
+describe('IO-935 PW error codes', () => {
+  it.each([
+    [PW_LINK_NOT_CONFIRMED_CODE, 'pwLinkNotConfirmed'],
+    [PW_UNAVAILABLE_CODE, 'pwUnavailable'],
+  ])('maps %s to "%s"', (code, expected) => {
+    expect(getProjectPatchErrorMessage({ status: 400, data: { hkrId: [code] } })).toBe(expected);
+    expect(getPwErrorMessage({ status: 400, data: { hkrId: [code] } })).toBe(expected);
+  });
+
+  it('getPwErrorMessage returns null for a non-PW error', () => {
+    expect(getPwErrorMessage({ status: 400, data: { name: ['required'] } })).toBeNull();
+    expect(getPwErrorMessage({ status: 400, data: { hkrId: ['something else'] } })).toBeNull();
+    expect(getPwErrorMessage(undefined)).toBeNull();
+  });
+
+  it('getPwErrorMessageForCodes reads a bare field error array', () => {
+    expect(getPwErrorMessageForCodes([PW_PROJECT_NOT_FOUND_CODE])).toBe('pwProjectNotFound');
+    expect(getPwErrorMessageForCodes(PW_PROJECT_NOT_FOUND_CODE)).toBeNull();
+    expect(getPwErrorMessageForCodes(['Ensure this field has no more than 5 digits.'])).toBeNull();
   });
 });

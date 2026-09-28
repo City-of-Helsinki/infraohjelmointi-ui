@@ -4,6 +4,7 @@ import {
   IProjectHistoryResponse,
   IProjectPatchRequestObject,
   IProjectPostRequestObject,
+  IPwProjectNameResponse,
 } from '@/interfaces/projectInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 
@@ -31,6 +32,14 @@ export const projectApi = infraohjelmointiApi.injectEndpoints({
       },
       // Tie the history cache to the project so editing it refetches the log.
       providesTags: (result, error, { projectId }) => [{ type: 'Projects', id: projectId }],
+    }),
+    // IO-935: which PW project an hkrId points to, confirmed before saving it
+    getPwProjectName: build.query<IPwProjectNameResponse, string>({
+      query: (hkrId) => ({
+        url: '/projects/pw-project-name/',
+        params: { hkrId },
+      }),
+      keepUnusedDataFor: 0,
     }),
     postProject: build.mutation<IProject, IProjectPostRequestObject>({
       query: (request) => ({
@@ -69,6 +78,7 @@ export const {
   useLazyGetProjectByIdQuery,
   useGetProjectHistoryQuery,
   useLazyGetProjectHistoryQuery,
+  useLazyGetPwProjectNameQuery,
   usePostProjectMutation,
   usePatchProjectMutation,
   useDeleteProjectMutation,
