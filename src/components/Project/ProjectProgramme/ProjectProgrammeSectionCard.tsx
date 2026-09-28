@@ -7,7 +7,7 @@ import {
   SupportedLanguage,
 } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 import ProjectProgrammeReadonlySection from './ProjectProgrammeReadonlySection';
 import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
