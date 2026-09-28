@@ -6,6 +6,7 @@ import { setupStore } from '@/store';
 import PlanningRow from './PlanningRow';
 import { setGroupsExpanded } from '@/reducers/planningSlice';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import mockProject from '@/mocks/mockProject';
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
@@ -188,6 +189,64 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
     await waitFor(() => {
       expect(screen.getByTestId('row-test-group-1')).toBeInTheDocument();
     });
+  });
+
+  it('should expand the matching group from a group search parameter', async () => {
+    const groupWithProject = {
+      ...mockGroup,
+      projectRows: [
+        {
+          ...mockProject.data,
+          id: 'test-project-1',
+          projectGroup: 'test-group-1',
+        },
+      ],
+    };
+
+    const store = setupStore({
+      planning: {
+        selectedYears: [],
+        startYear: 2024,
+        groupsExpanded: false,
+        searchedProjectId: null,
+        selections: {
+          selectedMasterClass: null,
+          selectedClass: null,
+          selectedSubClass: null,
+          selectedDistrict: null,
+          selectedCollectiveSubLevel: null,
+          selectedSubLevelDistrict: null,
+          selectedOtherClassification: null,
+        },
+        mode: 'planning' as const,
+        projects: [],
+        projectsRequestId: { planning: null, coordination: null },
+        rows: [],
+        forcedToFrame: false,
+        isLoading: false,
+        notesDialogOpen: false,
+        notesDialogData: { name: '', id: '', selectedYear: null },
+        notesModalOpen: { isOpen: false, id: '', selectedYear: null },
+        notesModalData: { name: '', id: '' },
+        coordinatorNotes: [],
+        hoverTooltipsEnabled: true,
+        changeHistoryEnabled: false,
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/planning?group=test-group-1']}>
+          <table>
+            <tbody>
+              <PlanningRow {...groupWithProject} sapCosts={{}} />
+            </tbody>
+          </table>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    expect(await screen.findByTestId('row-test-project-1-parent-test-group-1')).toBeInTheDocument();
   });
 
   it('should maintain expansion state when search parameter is removed', async () => {

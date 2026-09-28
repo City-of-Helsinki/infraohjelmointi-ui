@@ -29,10 +29,15 @@ export interface ISearchResultsProject {
   path: string;
 }
 
+export interface ISearchResultLink {
+  defaultLink: string;
+  projectFormLink?: string;
+}
+
 export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase' | 'path'> {
   breadCrumbs: Array<string>;
   phase: string | null;
-  link: string;
+  links: ISearchResultLink;
 }
 
 export interface ISearchResults {
