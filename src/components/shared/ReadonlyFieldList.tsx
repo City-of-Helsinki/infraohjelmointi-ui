@@ -11,7 +11,7 @@ export default function ReadonlyFieldList({
   fields,
   pathPrefix,
   translationNamespace,
-}: IReadonlyFieldListProps) {
+}: Readonly<IReadonlyFieldListProps>) {
   const { t } = useTranslation();
   const { getValues } = useFormContext();
 

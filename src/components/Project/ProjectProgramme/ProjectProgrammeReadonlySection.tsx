@@ -30,13 +30,12 @@ function getFieldsForSection(
   sectionId: ProjectProgrammeSectionId,
   projectProgramme?: IProjectProgramme,
 ) {
-  switch (sectionId) {
-    case 'basicInfo':
-      return projectProgramme?.briefProjectProgramme ?? true
-        ? BASIC_INFO_BRIEF_FIELDS
-        : BASIC_INFO_FULL_FIELDS;
-    default:
-      return fields[sectionId] ?? [];
+  if (sectionId === 'basicInfo') {
+    return projectProgramme?.briefProjectProgramme ?? true
+      ? BASIC_INFO_BRIEF_FIELDS
+      : BASIC_INFO_FULL_FIELDS;
+  } else {
+    return fields[sectionId] ?? [];
   }
 }
 
