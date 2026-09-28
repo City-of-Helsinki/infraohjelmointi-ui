@@ -9,15 +9,21 @@
 // field (e.g. ["SOME_OTHER", "PW_PROJECT_NOT_FOUND"]) does not silently
 // fall through to the generic toast.
 //
-// IO-935 adds two more hkrId codes: PW_LINK_NOT_CONFIRMED (a save tried to
-// set an hkrId without confirming the PW project) and PW_UNAVAILABLE (the PW
-// project lookup could not reach PW).
+// IO-935 adds three more hkrId codes: PW_LINK_NOT_CONFIRMED (a save tried to
+// set an hkrId without confirming the PW project), PW_UNAVAILABLE (the PW
+// project lookup could not reach PW) and INVALID_HKR_ID (the lookup was given
+// something that is not a valid hkrId).
 
 export const PW_PROJECT_NOT_FOUND_CODE = 'PW_PROJECT_NOT_FOUND';
 export const PW_LINK_NOT_CONFIRMED_CODE = 'PW_LINK_NOT_CONFIRMED';
 export const PW_UNAVAILABLE_CODE = 'PW_UNAVAILABLE';
+export const INVALID_HKR_ID_CODE = 'INVALID_HKR_ID';
 
-export type PwErrorMessageKey = 'pwProjectNotFound' | 'pwLinkNotConfirmed' | 'pwUnavailable';
+export type PwErrorMessageKey =
+  | 'pwProjectNotFound'
+  | 'pwLinkNotConfirmed'
+  | 'pwUnavailable'
+  | 'pwInvalidHkrId';
 
 export type ProjectPatchErrorMessageKey = PwErrorMessageKey | 'formSaveError';
 
@@ -25,6 +31,7 @@ const PW_ERROR_MESSAGES: Array<[string, PwErrorMessageKey]> = [
   [PW_PROJECT_NOT_FOUND_CODE, 'pwProjectNotFound'],
   [PW_LINK_NOT_CONFIRMED_CODE, 'pwLinkNotConfirmed'],
   [PW_UNAVAILABLE_CODE, 'pwUnavailable'],
+  [INVALID_HKR_ID_CODE, 'pwInvalidHkrId'],
 ];
 
 /** The message key for the PW error codes of an `hkrId` field error, or null if there is none. */
