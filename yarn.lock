@@ -9094,10 +9094,10 @@ obuf@^1.0.0, obuf@^1.1.2:
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
-oidc-client-ts@^2.4.0, oidc-client-ts@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/oidc-client-ts/-/oidc-client-ts-2.4.1.tgz#5441cb90188bc07580bcab2b49ed2fd1fe1889d0"
-  integrity sha512-IxlGMsbkZPsHJGCliWT3LxjUcYzmiN21656n/Zt2jDncZlBFc//cd8WqFF0Lt681UT3AImM57E6d4N53ziTCYA==
+oidc-client-ts@^2.4.1, oidc-client-ts@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/oidc-client-ts/-/oidc-client-ts-2.5.0.tgz#7f6e469d5e95ac812cb7834848a6e8d92d1db8cc"
+  integrity sha512-JZ/Sp+AoML4sBWCn8ShAjnIMKx3GXwU/8sQY2btRPOUS8kBZltC2dFqOdN5Mimc4g7oVGSTC/bVDBviYcuud9g==
   dependencies:
     crypto-js "^4.2.0"
     jwt-decode "^3.1.2"
