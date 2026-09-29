@@ -45,9 +45,11 @@
     "test": "node ./scripts/run-tests.js --env=jsdom",
     "test:coverage": "yarn test --coverage",
     "test:ci": "CI=true yarn test:coverage --ci",
-    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}'",
-    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc.json",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,json}\"",
+    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx,json}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "node -e \"if (require('fs').existsSync('.git')) { require('fs').chmodSync('.githooks/pre-commit', 0o755); require('child_process').execFileSync('git', ['config', '--local', 'core.hooksPath', '.githooks']); }\"",
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },
   "eslintConfig": {
@@ -84,14 +86,14 @@
     "@typescript-eslint/parser": "^5.42.1",
     "css-loader": "^6.7.1",
     "eslint": "^8.27.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "5.0.0",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.9.9",
-    "prettier-plugin-tailwindcss": "^0.2.3",
+    "prettier-plugin-tailwindcss": "~0.6.14",
     "tailwindcss": "^3.2.7",
     "ts-node": "^10.9.1"
   }

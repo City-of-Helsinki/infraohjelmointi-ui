@@ -39,11 +39,7 @@ const useSearchForm = () => {
     multiListsState.subClass,
   );
 
-  const {
-    reset,
-    watch,
-    getValues,
-  } = formMethods;
+  const { reset, watch, getValues } = formMethods;
 
   const setMultiListOption = useCallback((key: string, value: IOption) => {
     switch (key) {
@@ -75,10 +71,10 @@ const useSearchForm = () => {
   // Set form values to the store when the user chnages any values on the form
   useEffect(() => {
     const subscription = watch(() => {
-      dispatch(setSearchForm(getValues()))
+      dispatch(setSearchForm(getValues()));
     });
     return () => subscription.unsubscribe();
-  }, [dispatch, getValues, watch])
+  }, [dispatch, getValues, watch]);
 
   // Set the form and the multi-selections to match the values in redux storeFormValues
   useEffect(() => {

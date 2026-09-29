@@ -13,9 +13,7 @@ export const PW_PROJECT_NOT_FOUND_CODE = 'PW_PROJECT_NOT_FOUND';
 
 export type ProjectPatchErrorMessageKey = 'pwProjectNotFound' | 'formSaveError';
 
-export const getProjectPatchErrorMessage = (
-  error: unknown,
-): ProjectPatchErrorMessageKey => {
+export const getProjectPatchErrorMessage = (error: unknown): ProjectPatchErrorMessageKey => {
   if (error && typeof error === 'object') {
     const data = (error as { data?: unknown }).data;
     if (data && typeof data === 'object') {

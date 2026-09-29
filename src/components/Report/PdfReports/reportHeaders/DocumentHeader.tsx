@@ -41,7 +41,13 @@ interface IDocumentHeaderProps {
   date?: string;
 }
 
-const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleOne, subtitleTwo, date }) => {
+const DocumentHeader: FC<IDocumentHeaderProps> = ({
+  title,
+  reportType,
+  subtitleOne,
+  subtitleTwo,
+  date,
+}) => {
   return (
     <>
       <View fixed style={styles.header}>
@@ -55,7 +61,8 @@ const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleO
         </View>
         <Text>{date}</Text>
       </View>
-      { (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
+      {(reportType === Reports.OperationalEnvironmentAnalysis ||
+        reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) && (
         <View>
           <Text style={styles.extraTableHeader}>
             {t('report.operationalEnvironmentAnalysis.tableTitle', {
@@ -64,10 +71,10 @@ const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleO
               financialPlanEndYear: new Date().getFullYear() + 3,
               investmentProgramStartYear: new Date().getFullYear() + 4,
               investmentProgramEndYear: new Date().getFullYear() + 10,
-            })}  
+            })}
           </Text>
         </View>
-      }
+      )}
     </>
   );
 };

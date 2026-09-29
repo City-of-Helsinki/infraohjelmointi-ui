@@ -16,7 +16,11 @@ import {
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { getLocationParent, listItemToOption } from '@/utils/common';
-import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import {
+  selectProjectDistricts,
+  selectProjectDivisions,
+  selectProjectSubDivisions,
+} from '@/reducers/listsSlice';
 import { selectProjects } from '@/reducers/planningSlice';
 interface ISelectionState {
   selectedClass: string | undefined;
@@ -119,7 +123,10 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const classOptions = useClassOptions(selectedClass);
   const locationOptions = useLocationOptions(selectedLocation);
 
-  const lowestSelectedLocationLevel = (divisionValue: string | undefined, subDivisionValue: string | undefined): 'subDivision' | 'division' | 'district' => {
+  const lowestSelectedLocationLevel = (
+    divisionValue: string | undefined,
+    subDivisionValue: string | undefined,
+  ): 'subDivision' | 'division' | 'district' => {
     let lowestSelectedLocationLevel: 'subDivision' | 'division' | 'district';
     if (subDivisionValue) {
       lowestSelectedLocationLevel = 'subDivision';
@@ -129,43 +136,70 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
       lowestSelectedLocationLevel = 'district';
     }
     return lowestSelectedLocationLevel;
-  }
+  };
 
-  const filterProjectsForSubmit = (projects: IOption[] | undefined, groupLocationLevel: string, groupLocationId: string | undefined, groupLocationName: string | undefined, groupDistrictName: string | undefined) => {
+  const filterProjectsForSubmit = (
+    projects: IOption[] | undefined,
+    groupLocationLevel: string,
+    groupLocationId: string | undefined,
+    groupLocationName: string | undefined,
+    groupDistrictName: string | undefined,
+  ) => {
     const filteredProjects = projects?.filter((project) => {
       const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
-      return projectAndGroupLocationMatches(groupLocationLevel, groupLocationId, groupLocationName, projecLocationId, groupDistrictName);
+      return projectAndGroupLocationMatches(
+        groupLocationLevel,
+        groupLocationId,
+        groupLocationName,
+        projecLocationId,
+        groupDistrictName,
+      );
     });
     return filteredProjects;
-  }
+  };
 
   const projectAndGroupLocationMatches = (
     groupLocationLevel: string,
     groupLocationId?: string,
     groupLocationName?: string,
     projectLocationId?: string,
-    groupDistrictName?: string
+    groupDistrictName?: string,
   ) => {
     const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
-    const divisionLevelMatchesGroupDistrict = 
+    const divisionLevelMatchesGroupDistrict =
       getLocationParent(projectDivisions, projectLocationId) === groupLocationId ||
-      (groupLocationName === "Eri kaupunginosia" && getLocationParent(projectDivisions, projectLocationId) === getLocationParent(projectDivisions, groupLocationId));
-    const subDivisionLevelMatchesGroupDivision = getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
-    const subDivisionLevelMatchesGroupDistrict = getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectLocationId)) === groupLocationId;
+      (groupLocationName === 'Eri kaupunginosia' &&
+        getLocationParent(projectDivisions, projectLocationId) ===
+          getLocationParent(projectDivisions, groupLocationId));
+    const subDivisionLevelMatchesGroupDivision =
+      getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
+    const subDivisionLevelMatchesGroupDistrict =
+      getLocationParent(
+        projectDivisions,
+        getLocationParent(projectSubDivisions, projectLocationId),
+      ) === groupLocationId;
 
-    const multipleDistrictsSelectedMatches = (projectLocationId && groupDistrictName === "Eri suurpiirejä");
-    const districtMatches = projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict || multipleDistrictsSelectedMatches;
-    
+    const multipleDistrictsSelectedMatches =
+      projectLocationId && groupDistrictName === 'Eri suurpiirejä';
+    const districtMatches =
+      projectDirectlyUnderGroupLocation ||
+      divisionLevelMatchesGroupDistrict ||
+      subDivisionLevelMatchesGroupDistrict ||
+      multipleDistrictsSelectedMatches;
 
     switch (groupLocationLevel) {
       case 'district':
         return districtMatches;
       case 'division':
-        return projectDirectlyUnderGroupLocation || subDivisionLevelMatchesGroupDivision || (groupLocationName === "Eri kaupunginosia" && districtMatches);
+        return (
+          projectDirectlyUnderGroupLocation ||
+          subDivisionLevelMatchesGroupDivision ||
+          (groupLocationName === 'Eri kaupunginosia' && districtMatches)
+        );
       case 'subDivision':
         return projectDirectlyUnderGroupLocation;
     }
-  }
+  };
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -188,7 +222,10 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
-      const lowestLocationForGroup = lowestSelectedLocationLevel(value.division?.value, value.subDivision?.value);
+      const lowestLocationForGroup = lowestSelectedLocationLevel(
+        value.division?.value,
+        value.subDivision?.value,
+      );
       switch (name) {
         case 'masterClass':
         case 'class':
@@ -227,9 +264,9 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
               lowestLocationForGroup,
               value[lowestLocationForGroup]?.value,
               value[lowestLocationForGroup]?.label,
-              value.district?.label
-            ) ?? []
-          )
+              value.district?.label,
+            ) ?? [],
+          );
           break;
         default:
       }

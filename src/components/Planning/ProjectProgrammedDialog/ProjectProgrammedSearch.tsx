@@ -104,10 +104,13 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 
         // reset duplicates
         const resultList = Object.values(
-          resultListWithDuplicates.reduce((accumulator, current) => {
-            // kep only one copy of each element
-            return { ...accumulator, [current.name]: current };
-          }, {} as Record<string, ISearchResultPayloadItem>),
+          resultListWithDuplicates.reduce(
+            (accumulator, current) => {
+              // kep only one copy of each element
+              return { ...accumulator, [current.name]: current };
+            },
+            {} as Record<string, ISearchResultPayloadItem>,
+          ),
         );
 
         // Convert the resultList to options for the suggestion dropdown

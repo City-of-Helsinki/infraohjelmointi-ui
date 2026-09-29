@@ -1,20 +1,20 @@
 # Infraohjelmointi UI
 
 - [Infraohjelmointi UI](#infraohjelmointi-ui)
-    - [Setup](#setup)
-    - [Serving the application](#serving-the-application)
-    - [Formatting and validation](#formatting-and-validation)
-        - [ESLint](#eslint)
-        - [Prettier](#prettier)
-    - [Ways of working](#ways-of-working)
-        - [Commits](#commits)
-        - [Hotfixes](#hotfixes)
-        - [Merges](#merges)
-    - [State and storage](#state-and-storage)
-    - [Routing](#routing)
-    - [Testing](#testing)
-    - [Localization](#localization)
-    - [Collection of scripts](#collection-of-scripts)
+  - [Setup](#setup)
+  - [Serving the application](#serving-the-application)
+  - [Formatting and validation](#formatting-and-validation)
+    - [ESLint](#eslint)
+    - [Prettier](#prettier)
+  - [Ways of working](#ways-of-working)
+    - [Commits](#commits)
+    - [Hotfixes](#hotfixes)
+    - [Merges](#merges)
+  - [State and storage](#state-and-storage)
+  - [Routing](#routing)
+  - [Testing](#testing)
+  - [Localization](#localization)
+  - [Collection of scripts](#collection-of-scripts)
 
 ### Setup
 
@@ -30,6 +30,7 @@
 ### Formatting and validation
 
 - To format the application with prettier: `yarn run format`
+- To check formatting without changing files: `yarn run format:check`
 - To check for linting errors: `yarn run lint`
 - To check **and fix** linting errors: `yarn run lint:fix`
 
@@ -40,6 +41,8 @@ We use [ESLint](https://eslint.org/) to validate the pattern and validity of the
 ##### Prettier
 
 We use [Prettier](https://prettier.io/) for code formatting. The [rules and configurations](https://prettier.io/docs/en/configuration.html) are defined in `.prettierrc.json`, which can be found in the project root folder.
+
+`yarn install` configures the tracked pre-commit hook to format and stage changed files with Prettier. Run `yarn run prepare` if you already installed dependencies before this hook was added. When using partial staging, note that formatting stages the entire affected file.
 
 If using VS Code, download the [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) plugin and make sure that you have Prettier as the default formatter enabled in the settings.json. Formatting the code on save is also recommended, but not necessary.
 
@@ -53,6 +56,7 @@ If using VS Code, download the [Prettier - Code formatter](https://marketplace.v
 ```
 
 ### Ways of working
+
 ##### Commits
 
 To make our commits more informative those should be written in a format of Conventional Commits i.e. a suitable prefix should be added in the beginning
@@ -100,6 +104,7 @@ We use i18next-react for localization. You can find the localization files under
 5. Approve pipeline run in azure. Deploy pipelines are triggered by the build pipeline but prod deploy needs to be approved separately (=2 approvals in total). To approve, open the pipeline run you want to approve (from menu, select pipelines, then select the correct pipeline and then select the run you need to approve) and there should be a button to approve it (pipeline run is paused until you approve).
 
 ### Adding env variables for UI
+
 New env variables need to be added to azure env variable library. Both adding and changing values of the variables requires building the corresponding environment (deploying again isn't enough). Here's instructions on how to add variables.
 
 1. Add the new variable to azure devops library for all environments correctly (they are under Pipelines -> Library)

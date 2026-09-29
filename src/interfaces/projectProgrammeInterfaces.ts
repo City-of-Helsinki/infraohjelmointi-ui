@@ -59,8 +59,7 @@ export interface IProjectProgrammeTrafficPlanningCriteria extends IProjectProgra
   winterMaintenance?: string | null;
 }
 
-export interface IProjectProgrammeUrbanSpacingPlanningCriteria
-  extends IProjectProgrammeSectionShared {
+export interface IProjectProgrammeUrbanSpacingPlanningCriteria extends IProjectProgrammeSectionShared {
   targetUrbanAppearance?: string | null;
   surfaceMaterials?: string | null;
   structures?: string | null;
@@ -78,8 +77,7 @@ export interface IProjectProgrammeMaintenanceNeeds extends IProjectProgrammeSect
   maintenanceNeeds?: string | null;
 }
 
-export interface IProjectProgrammeInteractionAndRelatedProjects
-  extends IProjectProgrammeSectionShared {
+export interface IProjectProgrammeInteractionAndRelatedProjects extends IProjectProgrammeSectionShared {
   collaborationAndExperts?: string | null;
   interactionNotes?: string | null;
 }

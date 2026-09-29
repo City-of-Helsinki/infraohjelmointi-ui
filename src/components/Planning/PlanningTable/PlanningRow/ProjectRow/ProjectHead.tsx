@@ -50,7 +50,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   });
   const projectPhase = project.phase?.value;
   const priorityTagText = project.priority?.value
-    ? PRIORITY_VALUE_MAP[project.priority.value.toLowerCase()] ?? project.priority.value
+    ? (PRIORITY_VALUE_MAP[project.priority.value.toLowerCase()] ?? project.priority.value)
     : undefined;
   const priorityBgColor = project.priority?.value
     ? PRIORITY_BG_COLOR_MAP[project.priority.value.toLowerCase()]

@@ -32,7 +32,7 @@ const makeProject = (personPlanningEmail: string | null, personConstructionEmail
           email: personConstructionEmail,
         }
       : undefined,
-  } as IProject);
+  }) as IProject;
 
 const makeResponse = (
   results: IProject[],

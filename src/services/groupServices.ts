@@ -21,9 +21,14 @@ export const getPlanningGroups = async (year: number): Promise<Array<IGroup>> =>
   }
 };
 
-export const getCoordinatorGroups = async (year: number, forcedToFrame: boolean): Promise<Array<IGroup>> => {
+export const getCoordinatorGroups = async (
+  year: number,
+  forcedToFrame: boolean,
+): Promise<Array<IGroup>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-groups/coordinator/?year=${year}&forcedToFrame=${forcedToFrame}`);
+    const res = await axios.get(
+      `${REACT_APP_API_URL}/project-groups/coordinator/?year=${year}&forcedToFrame=${forcedToFrame}`,
+    );
     return res.data;
   } catch (e) {
     return Promise.reject(e);

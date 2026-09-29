@@ -84,11 +84,11 @@ const useMultiClassOptions = (
   }, [allMasterClasses, classes, getNextClasses, selectedClassParents, subClasses]);
 
   const renameDublicateClassNames = (classes: IClass[], allParentClasses: IClass[]) => {
-    const classNameCounts = classes.reduce((acc: {[key: string]: number}, c) => {
+    const classNameCounts = classes.reduce((acc: { [key: string]: number }, c) => {
       acc[c.name] = (acc[c.name] || 0) + 1;
       return acc;
     }, {});
-  
+
     const renamedClasses = classes.map((c) => {
       const isDuplicate = classNameCounts[c.name] > 1;
       if (isDuplicate) {
@@ -99,7 +99,7 @@ const useMultiClassOptions = (
       return c;
     });
     return renamedClasses;
-  }
+  };
 
   return {
     masterClasses: classesToOptions(getNextMasterClasses()),

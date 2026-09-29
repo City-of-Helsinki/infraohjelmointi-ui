@@ -560,12 +560,7 @@ describe('reportHelpers', () => {
   // now use the full three-window-year check; the forecast report stays
   // current-year-only.
   describe('forced-to-frame budget checks (IO-896)', () => {
-    const budgetCheck = (
-      type: Reports,
-      plus0: string,
-      plus1: string,
-      plus2: string,
-    ) => ({
+    const budgetCheck = (type: Reports, plus0: string, plus1: string, plus2: string) => ({
       budgetProposalCurrentYearPlus0: plus0,
       budgetProposalCurrentYearPlus1: plus1,
       budgetProposalCurrentYearPlus2: plus2,
@@ -573,11 +568,7 @@ describe('reportHelpers', () => {
       type,
     });
 
-    const groupRow = (
-      plus0: string,
-      plus1: string,
-      plus2: string,
-    ): IConstructionProgramTableRow =>
+    const groupRow = (plus0: string, plus1: string, plus2: string): IConstructionProgramTableRow =>
       ({
         id: 'g1',
         name: 'Group',
@@ -589,7 +580,7 @@ describe('reportHelpers', () => {
         budgetProposalCurrentYearPlus1: plus1,
         budgetProposalCurrentYearPlus2: plus2,
         costForcedToFrameBudget: undefined,
-      } as unknown as IConstructionProgramTableRow);
+      }) as unknown as IConstructionProgramTableRow;
 
     describe('checkProjectHasBudgets', () => {
       it('keeps a forced-to-frame project funded only in +2 (regression)', () => {
@@ -619,9 +610,7 @@ describe('reportHelpers', () => {
       it('matches the planning report for the same finances', () => {
         const finances: [string, string, string] = ['0,0', '0,0', '200,0'];
         expect(
-          checkProjectHasBudgets(
-            budgetCheck(Reports.ConstructionProgram, ...finances),
-          ),
+          checkProjectHasBudgets(budgetCheck(Reports.ConstructionProgram, ...finances)),
         ).toBeTruthy();
         expect(
           checkProjectHasBudgets(

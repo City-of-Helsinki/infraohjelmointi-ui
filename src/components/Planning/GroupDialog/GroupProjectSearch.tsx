@@ -186,7 +186,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
   );
 
   return (
-    <div className="dialog-section " data-testid="search-project-field-section">
+    <div className="dialog-section" data-testid="search-project-field-section">
       <Controller
         name="projectsForSubmit"
         control={control}

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+git diff --cached --name-only --diff-filter=ACMR -z | xargs -0 -r ./node_modules/.bin/prettier --write --ignore-unknown
+git diff --cached --name-only --diff-filter=ACMR -z | xargs -0 -r git add --

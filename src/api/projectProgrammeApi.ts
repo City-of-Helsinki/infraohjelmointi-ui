@@ -35,9 +35,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         url: `/project-programmes/${id}/switch-type/`,
         method: 'POST',
       }),
-      invalidatesTags: (result, error, id) => [
-        { type: 'ProjectProgrammes', id },
-      ],
+      invalidatesTags: (result, error, id) => [{ type: 'ProjectProgrammes', id }],
     }),
     transitionProjectProgrammeStatus: build.mutation<
       IProjectProgrammeTransitionResponse,
@@ -48,9 +46,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         method: 'POST',
         data: { to },
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: 'ProjectProgrammes', id: arg.id },
-      ],
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
     postProjectProgrammeSection: build.mutation<
       Record<string, unknown>,
@@ -60,7 +56,11 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         data?: Record<string, unknown>;
       }
     >({
-      query: ({ id, section, data }: {
+      query: ({
+        id,
+        section,
+        data,
+      }: {
         id: string;
         section: string;
         data?: Record<string, unknown>;
@@ -69,9 +69,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         method: 'POST',
         data,
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: 'ProjectProgrammes', id: arg.id },
-      ],
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
     patchProjectProgrammeSection: build.mutation<
       Record<string, unknown>,
@@ -81,7 +79,11 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         data: Record<string, unknown>;
       }
     >({
-      query: ({ id, section, data }: {
+      query: ({
+        id,
+        section,
+        data,
+      }: {
         id: string;
         section: string;
         data: Record<string, unknown>;
@@ -90,9 +92,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         method: 'PATCH',
         data,
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: 'ProjectProgrammes', id: arg.id },
-      ],
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
   }),
   overrideExisting: false,

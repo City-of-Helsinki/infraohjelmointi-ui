@@ -33,7 +33,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
 
   const projectGroupName = useMemo(() => {
     return project?.projectGroup
-      ? groups.find((g) => g.id === project.projectGroup)?.name ?? ''
+      ? (groups.find((g) => g.id === project.projectGroup)?.name ?? '')
       : '';
   }, [groups, project?.projectGroup]);
 

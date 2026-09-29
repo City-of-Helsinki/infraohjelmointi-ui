@@ -46,7 +46,8 @@ export const loaderSlice = createSlice({
 });
 
 export const selectIsLoading = (state: RootState) => state.loader.isLoading;
-export const selectIsProjectCardLoading = (state: RootState) => state.loader.isProjectCardLoading
+export const selectIsProjectCardLoading = (state: RootState) => state.loader.isProjectCardLoading;
 
-export const { setLoading, clearLoading, setIsProjectCardLoading, clearIsProjectCardLoading } = loaderSlice.actions;
+export const { setLoading, clearLoading, setIsProjectCardLoading, clearIsProjectCardLoading } =
+  loaderSlice.actions;
 export default loaderSlice.reducer;

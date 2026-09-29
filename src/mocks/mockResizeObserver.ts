@@ -14,4 +14,4 @@ export const mockResizeObserver = () => {
   Object.defineProperty(window, 'ResizeObserver', {
     value: ResizeObserverMock,
   });
-}
+};

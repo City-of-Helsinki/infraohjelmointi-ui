@@ -236,42 +236,42 @@ export const mockCoordinatorDistricts: { data: Array<ILocation> } = {
 export const mockDistrictOptions: { data: Array<IListItem> } = {
   data: [
     {
-      id: "test-mock-district-option-1",
-      value: "Koillinen"
+      id: 'test-mock-district-option-1',
+      value: 'Koillinen',
     },
     {
-      id: "test-mock-district-option-2",
-      value: "Eteläinen"
-    }
-  ]
-}
+      id: 'test-mock-district-option-2',
+      value: 'Eteläinen',
+    },
+  ],
+};
 
 export const mockDivisionOptions: { data: Array<IListItem> } = {
   data: [
     {
-      id: "test-mock-division-option-1",
-      value: "Testarea 1",
-      parent: "test-mock-district-option-1"
+      id: 'test-mock-division-option-1',
+      value: 'Testarea 1',
+      parent: 'test-mock-district-option-1',
     },
     {
-      id: "test-mock-division-option-2",
-      value: "Testarea 2",
-      parent: "test-mock-district-option-1"
-    }
-  ]
-}
+      id: 'test-mock-division-option-2',
+      value: 'Testarea 2',
+      parent: 'test-mock-district-option-1',
+    },
+  ],
+};
 
 export const mockSubDivisionOptions: { data: Array<IListItem> } = {
   data: [
     {
-      id: "test-mock-sub-division-option-1",
-      value: "Testsubarea 1",
-      parent: "test-mock-division-option-1"
+      id: 'test-mock-sub-division-option-1',
+      value: 'Testsubarea 1',
+      parent: 'test-mock-division-option-1',
     },
     {
-      id: "test-mock-subdivision-option-2",
-      value: "Testsubarea 2",
-      parent: "test-mock-division-option-1"
-    }
-  ]
-}
+      id: 'test-mock-subdivision-option-2',
+      value: 'Testsubarea 2',
+      parent: 'test-mock-division-option-1',
+    },
+  ],
+};

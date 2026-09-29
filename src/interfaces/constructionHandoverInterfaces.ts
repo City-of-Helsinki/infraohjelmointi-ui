@@ -32,19 +32,18 @@ export interface IConstructionHandover {
   constructionHandoverFinancing: IConstructionHandoverFinancing[];
 }
 
-export interface IConstructionHandoverRequest
-  extends Omit<
-    IConstructionHandover,
-    | 'id'
-    | 'project'
-    | 'status'
-    | 'constructionProcurementMethod'
-    | 'staraProcurementReason'
-    | 'personPlanning'
-    | 'personFinancing'
-    | 'constructionHandoverFinancing'
-    | 'constructionProjectManager'
-  > {
+export interface IConstructionHandoverRequest extends Omit<
+  IConstructionHandover,
+  | 'id'
+  | 'project'
+  | 'status'
+  | 'constructionProcurementMethod'
+  | 'staraProcurementReason'
+  | 'personPlanning'
+  | 'personFinancing'
+  | 'constructionHandoverFinancing'
+  | 'constructionProjectManager'
+> {
   constructionProcurementMethod: string;
   staraProcurementReason: string | null;
   personPlanning: string;

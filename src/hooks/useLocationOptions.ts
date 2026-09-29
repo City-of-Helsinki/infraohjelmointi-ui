@@ -1,7 +1,11 @@
 import { listItemsToOption } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
-import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import {
+  selectProjectDistricts,
+  selectProjectDivisions,
+  selectProjectSubDivisions,
+} from '@/reducers/listsSlice';
 
 /**
  * Creates lists of districts, divisions and subDivisions. If filtering is used, then all
@@ -9,9 +13,7 @@ import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisio
  *
  * It only returns districts that are related to the given currentClass.
  */
-const useLocationOptions = (
-  currentLocation: string | undefined,
-) => {
+const useLocationOptions = (currentLocation: string | undefined) => {
   const allDistricts = useAppSelector(selectProjectDistricts);
   const allDivisions = useAppSelector(selectProjectDivisions);
   const allSubDivisions = useAppSelector(selectProjectSubDivisions);
