@@ -72,19 +72,22 @@ const FreeSearchForm = ({
         searchWordDuplicates = {};
 
         const resultList = Object.values(
-          resultListWithDuplicates.reduce((accumulator, current) => {
-            // catch duplicates
-            if (accumulator[current.value]) {
-              searchWordDuplicates[current.value] = [
-                ...(searchWordDuplicates[current.value] ?? []),
-                current,
-              ];
-            } else {
-              // kep only one copy of each element
-              accumulator[current.value] = current;
-            }
-            return accumulator;
-          }, {} as Record<string, FreeSearchFormListItem>),
+          resultListWithDuplicates.reduce(
+            (accumulator, current) => {
+              // catch duplicates
+              if (accumulator[current.value]) {
+                searchWordDuplicates[current.value] = [
+                  ...(searchWordDuplicates[current.value] ?? []),
+                  current,
+                ];
+              } else {
+                // kep only one copy of each element
+                accumulator[current.value] = current;
+              }
+              return accumulator;
+            },
+            {} as Record<string, FreeSearchFormListItem>,
+          ),
         );
 
         // Convert the resultList to options for the suggestion dropdown

@@ -31,7 +31,7 @@ function getFieldsForSection(
   projectProgramme?: IProjectProgramme,
 ) {
   if (sectionId === 'basicInfo') {
-    return projectProgramme?.briefProjectProgramme ?? true
+    return (projectProgramme?.briefProjectProgramme ?? true)
       ? BASIC_INFO_BRIEF_FIELDS
       : BASIC_INFO_FULL_FIELDS;
   } else {

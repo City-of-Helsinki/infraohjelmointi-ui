@@ -153,9 +153,8 @@ describe('SearchResultsView', () => {
     });
 
     it('renders empty button if there are search terms and resets the store if clicked', async () => {
-      const { user, store, findAllByTestId, queryAllByTestId, container } = await render(
-        searchActiveState,
-      );
+      const { user, store, findAllByTestId, queryAllByTestId, container } =
+        await render(searchActiveState);
 
       expect((await findAllByTestId('search-term')).length).toBe(4);
 
@@ -173,9 +172,8 @@ describe('SearchResultsView', () => {
     it('renders all terms and sends a new GET request if a term is removed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { findAllByTestId, findByText, findAllByText, user, store, container } = await render(
-        searchActiveState,
-      );
+      const { findAllByTestId, findByText, findAllByText, user, store, container } =
+        await render(searchActiveState);
 
       expect((await findAllByTestId('search-term')).length).toBe(4);
 
@@ -247,9 +245,8 @@ describe('SearchResultsView', () => {
     it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { container, user, findByText, findByRole, findAllByText } = await render(
-        searchActiveState,
-      );
+      const { container, user, findByText, findByRole, findAllByText } =
+        await render(searchActiveState);
 
       const limitDropdown = container.getElementsByClassName('limit-dropdown-container')[0];
 
@@ -282,9 +279,8 @@ describe('SearchResultsView', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { user, findByRole, findByText, findByTestId, findAllByText } = await render(
-        searchActiveState,
-      );
+      const { user, findByRole, findByText, findByTestId, findAllByText } =
+        await render(searchActiveState);
 
       const orderOptions = [
         'searchOrder.new',

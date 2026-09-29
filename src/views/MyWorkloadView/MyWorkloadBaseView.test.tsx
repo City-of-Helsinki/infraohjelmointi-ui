@@ -41,7 +41,7 @@ const makeProject = (
           email: personConstructionEmail,
         }
       : undefined,
-  } as IProject);
+  }) as IProject;
 
 const makeResponse = (results: IProject[], next: string | null = null): IProjectsResponse => ({
   count: results.length,

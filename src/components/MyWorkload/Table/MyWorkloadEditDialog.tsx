@@ -135,7 +135,7 @@ const mapDialogValuesToValidationState = (
   const base = mapProjectToValidationState(projectData);
   const resolveDate = (value: string, fallback: string | null | undefined) => {
     const trimmed = value.trim();
-    return trimmed ? normalizeMyWorkloadDate(trimmed) : fallback ?? '';
+    return trimmed ? normalizeMyWorkloadDate(trimmed) : (fallback ?? '');
   };
 
   return {
@@ -373,12 +373,12 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           patchedValue === undefined ? fallback : normalizeMyWorkloadDate(patchedValue);
 
         const resolveTextValue = (patchedValue: string | null | undefined, fallback: string) =>
-          patchedValue === undefined ? fallback : patchedValue ?? '';
+          patchedValue === undefined ? fallback : (patchedValue ?? '');
 
         const resolveOptionIdValue = (
           patchedValue: IListItem | null | undefined,
           fallback: string,
-        ) => (patchedValue === undefined ? fallback : patchedValue?.id ?? '');
+        ) => (patchedValue === undefined ? fallback : (patchedValue?.id ?? ''));
 
         const resolvePhaseInfo = (
           patchedValue: IListItem | null | undefined,

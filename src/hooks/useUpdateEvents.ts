@@ -141,8 +141,7 @@ const syncClassFinances = (
 
 const syncLocationFinances = (
   locationDataFromState:
-    | ILocationHierarchy
-    | Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>,
+    ILocationHierarchy | Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>,
   financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData,
   startYear: number,
 ) => {

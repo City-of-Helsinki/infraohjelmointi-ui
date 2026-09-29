@@ -19,8 +19,7 @@ interface ProjectProgrammeDraftStateNotificationProps {
 interface ProjectProgrammeSectionListProps {
   sections: Section[];
   labelKey:
-    | 'projectProgrammeForm.completedStateSections'
-    | 'projectProgrammeForm.draftStateSections';
+    'projectProgrammeForm.completedStateSections' | 'projectProgrammeForm.draftStateSections';
   containerClassName: string;
   onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
 }
