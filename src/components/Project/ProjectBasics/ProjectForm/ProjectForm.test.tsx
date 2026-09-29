@@ -244,22 +244,24 @@ describe('projectForm', () => {
     const expectedPersonOptions = async (persons: IPerson[]) =>
       await Promise.all(persons.map(expectPersonOption));
 
-    expectOption(project?.type?.value);
-    expectOption(project?.typeQualifier?.value);
-    expectOption(project?.projectQualityLevel?.value);
-    expectOption(project?.planningPhase?.value);
-    expectOption(project?.constructionPhase?.value);
-    expectOption(project?.phaseDetail?.value);
-    expectOption(project?.category?.value);
-    expectOption(project?.priority?.value);
-    expectPersonOption(project?.personPlanning as IPerson);
-    expectPersonOption(project?.personConstruction as IPerson);
-    expectPersonOption(project?.personProgramming as IPerson);
-    expectedPersonOptions(project?.otherPersons as IPerson[]);
-    expectRadioBoolean('programmed-0', true);
-    expectRadioBoolean('louhi-0', false);
-    expectRadioBoolean('gravel-0', false);
-    expectRadioBoolean('effectHousing-0', false);
+    await Promise.all([
+      expectOption(project?.type?.value),
+      expectOption(project?.typeQualifier?.value),
+      expectOption(project?.projectQualityLevel?.value),
+      expectOption(project?.planningPhase?.value),
+      expectOption(project?.constructionPhase?.value),
+      expectOption(project?.phaseDetail?.value),
+      expectOption(project?.category?.value),
+      expectOption(project?.priority?.value),
+      expectPersonOption(project?.personPlanning as IPerson),
+      expectPersonOption(project?.personConstruction as IPerson),
+      expectPersonOption(project?.personProgramming as IPerson),
+      expectedPersonOptions(project?.otherPersons as IPerson[]),
+      expectRadioBoolean('programmed-0', true),
+      expectRadioBoolean('louhi-0', false),
+      expectRadioBoolean('gravel-0', false),
+      expectRadioBoolean('effectHousing-0', false),
+    ]);
 
     const costForecastValue = Number(project?.costForecast).toFixed(0);
     expect(
@@ -304,24 +306,26 @@ describe('projectForm', () => {
       await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`),
     ).toBeInTheDocument();
 
-    expectDisplayValue(project?.description);
-    expectDisplayValue(project?.hkrId);
-    expectDisplayValue(project?.planningStartYear?.toString());
-    expectDisplayValue(project?.constructionEndYear?.toString());
-    expectDisplayValue(project?.estPlanningStart || '');
-    expectDisplayValue(project?.estPlanningEnd || '');
-    expectDisplayValue(project?.presenceStart);
-    expectDisplayValue(project?.presenceEnd);
-    expectDisplayValue(project?.visibilityStart);
-    expectDisplayValue(project?.visibilityEnd);
-    expectDisplayValue(project?.estConstructionStart || '');
-    expectDisplayValue(project?.estConstructionEnd || '');
-    expectDisplayValue(project?.projectWorkQuantity);
-    expectDisplayValue(project?.projectCostForecast);
-    expectDisplayValue(project?.planningCostForecast);
-    expectDisplayValue(project?.planningWorkQuantity);
-    expectDisplayValue(project?.constructionCostForecast);
-    expectDisplayValue(project?.constructionWorkQuantity);
+    await Promise.all([
+      expectDisplayValue(project?.description),
+      expectDisplayValue(project?.hkrId),
+      expectDisplayValue(project?.planningStartYear?.toString()),
+      expectDisplayValue(project?.constructionEndYear?.toString()),
+      expectDisplayValue(project?.estPlanningStart || ''),
+      expectDisplayValue(project?.estPlanningEnd || ''),
+      expectDisplayValue(project?.presenceStart),
+      expectDisplayValue(project?.presenceEnd),
+      expectDisplayValue(project?.visibilityStart),
+      expectDisplayValue(project?.visibilityEnd),
+      expectDisplayValue(project?.estConstructionStart || ''),
+      expectDisplayValue(project?.estConstructionEnd || ''),
+      expectDisplayValue(project?.projectWorkQuantity),
+      expectDisplayValue(project?.projectCostForecast),
+      expectDisplayValue(project?.planningCostForecast),
+      expectDisplayValue(project?.planningWorkQuantity),
+      expectDisplayValue(project?.constructionCostForecast),
+      expectDisplayValue(project?.constructionWorkQuantity),
+    ]);
 
     expect(project?.hashTags?.length).toBe(2);
 
@@ -329,9 +333,9 @@ describe('projectForm', () => {
       arrayHasValue(project?.hashTags, h.id),
     );
 
-    projectHashTags?.forEach(async (h) => {
+    for (const h of projectHashTags) {
       expect(await findByText(matchExact(h.value))).toBeInTheDocument();
-    });
+    }
   });
 
   it('renders hashTags modal and can search and patch hashTags', async () => {

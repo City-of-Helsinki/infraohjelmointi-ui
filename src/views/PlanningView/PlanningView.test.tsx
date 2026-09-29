@@ -1481,7 +1481,12 @@ describe('PlanningView', () => {
           await waitFor(async () => {
             const startCellInput = await findByTestId(`cell-input-${startOfTimeline}-${id}`);
             expect(startCellInput).toHaveAttribute('readonly');
-            expect(startCellInput).toHaveValue(0);
+            expect(startCellInput).toHaveValue(null);
+            expect(
+              (await findByTestId(`project-cell-${startOfTimeline}-${id}`)).classList.contains(
+                'none',
+              ),
+            ).toBeTruthy();
           });
 
           removeProjectUpdateEventListener(dispatch);
