@@ -12,8 +12,7 @@ import { useDeleteProjectMutation } from '@/api/projectApi';
 interface IProjectFormbannerProps {
   project: IProject | null;
   onSubmit: () =>
-    | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
-    | undefined;
+    ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>) | undefined;
   isDirty: boolean;
   isInputDisabled: boolean;
 }

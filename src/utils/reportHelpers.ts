@@ -715,7 +715,10 @@ export const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
   );
 };
 
-export const checkGroupHasBudgets = (group: IConstructionProgramTableRow, reportType: ReportType) => {
+export const checkGroupHasBudgets = (
+  group: IConstructionProgramTableRow,
+  reportType: ReportType,
+) => {
   if (
     reportType === Reports.ConstructionProgram ||
     reportType === Reports.ConstructionProgramForcedToFrame

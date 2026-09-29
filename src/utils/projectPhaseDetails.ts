@@ -20,6 +20,4 @@ export const phaseDetailBelongsToPhase = (
   phaseId: string,
 ): boolean =>
   !phaseDetailId ||
-  phaseDetails.some(
-    (detail) => detail.id === phaseDetailId && detail.projectPhase?.id === phaseId,
-  );
+  phaseDetails.some((detail) => detail.id === phaseDetailId && detail.projectPhase?.id === phaseId);

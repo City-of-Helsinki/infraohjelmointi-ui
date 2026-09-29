@@ -480,16 +480,15 @@ export enum ProjectTaskType {
   NAME_CONSTRUCTION_PROJECT_MANAGER = 'NAME_CONSTRUCTION_PROJECT_MANAGER',
 }
 
-export interface IProjectTask
-  extends Pick<
-    IProject,
-    | 'id'
-    | 'name'
-    | 'estPlanningStart'
-    | 'estPlanningEnd'
-    | 'estConstructionStart'
-    | 'estConstructionEnd'
-  > {
+export interface IProjectTask extends Pick<
+  IProject,
+  | 'id'
+  | 'name'
+  | 'estPlanningStart'
+  | 'estPlanningEnd'
+  | 'estConstructionStart'
+  | 'estConstructionEnd'
+> {
   constructionProcurementMethod: IListItem | null;
   costForecast?: number | null;
   budget?: number | null;

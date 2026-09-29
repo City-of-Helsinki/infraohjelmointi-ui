@@ -1,7 +1,4 @@
-import {
-  PW_PROJECT_NOT_FOUND_CODE,
-  getProjectPatchErrorMessage,
-} from './projectErrorMessage';
+import { PW_PROJECT_NOT_FOUND_CODE, getProjectPatchErrorMessage } from './projectErrorMessage';
 
 describe('getProjectPatchErrorMessage', () => {
   it('returns "pwProjectNotFound" when backend signals PW project not found', () => {
@@ -17,7 +14,7 @@ describe('getProjectPatchErrorMessage', () => {
       status: 400,
       data: {
         hkrId:
-          'Project updated successfully but failed to sync to ProjectWise: timeout. Please use \'Update to PW\' button to retry.',
+          "Project updated successfully but failed to sync to ProjectWise: timeout. Please use 'Update to PW' button to retry.",
       },
     };
     expect(getProjectPatchErrorMessage(error)).toBe('formSaveError');

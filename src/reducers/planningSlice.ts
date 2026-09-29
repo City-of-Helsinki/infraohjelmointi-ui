@@ -229,8 +229,7 @@ export const selectGroupsExpanded = (state: RootState) => state.planning.groupsE
 export const selectPlanningMode = (state: RootState) => state.planning.mode;
 export const selectForcedToFrame = (state: RootState) => state.planning.forcedToFrame;
 export const selectHoverTooltipsEnabled = (state: RootState) => state.planning.hoverTooltipsEnabled;
-export const selectChangeHistoryEnabled = (state: RootState) =>
-  state.planning.changeHistoryEnabled;
+export const selectChangeHistoryEnabled = (state: RootState) => state.planning.changeHistoryEnabled;
 export const selectIsPlanningLoading = (state: RootState) => state.planning.isLoading;
 export const selectNotesDialogOpen = (state: RootState) => state.planning.notesDialogOpen;
 export const selectNotesDialogData = (state: RootState) => state.planning.notesDialogData;

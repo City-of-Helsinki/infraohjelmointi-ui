@@ -155,8 +155,7 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   initial7?: string | number;
 }
 
-export interface IOperationalEnvironmentAnalysisCsvRow
-  extends IOperationalEnvironmentAnalysisFinanceProperties {
+export interface IOperationalEnvironmentAnalysisCsvRow extends IOperationalEnvironmentAnalysisFinanceProperties {
   id?: string;
   name: string;
   type?: ReportTableRowType;

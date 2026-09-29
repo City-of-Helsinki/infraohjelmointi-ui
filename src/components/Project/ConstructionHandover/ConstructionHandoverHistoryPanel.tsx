@@ -51,7 +51,11 @@ const ConstructionHandoverHistoryPanel: FC<IConstructionHandoverHistoryPanelProp
       fieldsOf={changedFieldsOf}
       fieldLabel={(field) => historyFieldLabel(field, t)}
       resolveValue={(entry, field, side) =>
-        resolveHistoryValue(field, (side === 'old' ? entry.old_values : entry.new_values)?.[field], t)
+        resolveHistoryValue(
+          field,
+          (side === 'old' ? entry.old_values : entry.new_values)?.[field],
+          t,
+        )
       }
       classifyAction={historyActionOf}
       entryDate={(entry) => entry.createdDate}

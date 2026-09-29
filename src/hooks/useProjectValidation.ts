@@ -98,8 +98,7 @@ export const useProjectPhaseValidation = ({
             break;
         }
 
-        const isProposalOrDesign =
-          phase.value === proposalPhase || phase.value === designPhase;
+        const isProposalOrDesign = phase.value === proposalPhase || phase.value === designPhase;
         // IO-863: suspension is now the `suspended` phaseDetail under designPlanning,
         // not a phase; mirror the API's ProgrammedValidator and waive the programmed
         // requirement when the project carries that detail.

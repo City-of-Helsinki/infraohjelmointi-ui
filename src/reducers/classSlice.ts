@@ -95,7 +95,10 @@ export const getForcedToFrameClassesThunk = createAsyncThunk(
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
-export const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator: boolean) => {
+export const separateClassesIntoHierarchy = (
+  allClasses: Array<IClass>,
+  forCoordinator: boolean,
+) => {
   const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
 
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
@@ -104,7 +107,7 @@ export const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoord
   const collectiveSubLevels = getClasses(subClasses);
   const otherClassifications = getClasses(collectiveSubLevels);
 
-  if (!forCoordinator ) {
+  if (!forCoordinator) {
     // other classifications are on the same level as districts in planning view so we need to fetch the data differently for plannig view
     const otherClassifications = getClasses(subClasses);
     return {
@@ -186,13 +189,16 @@ export const classSlice = createSlice({
         };
       }
     },
-    updateOtherClassificationSubLevel(state, action: PayloadAction<ICoordinatorClassUpdatePayload>) {
+    updateOtherClassificationSubLevel(
+      state,
+      action: PayloadAction<ICoordinatorClassUpdatePayload>,
+    ) {
       const { data, type } = action.payload;
 
       if (data) {
-        const otherClassificationSubLevels = [
-          ...state[type].otherClassificationSubLevels,
-        ].map((ocsl) => (ocsl.id === data.id ? data : ocsl));
+        const otherClassificationSubLevels = [...state[type].otherClassificationSubLevels].map(
+          (ocsl) => (ocsl.id === data.id ? data : ocsl),
+        );
         return {
           ...state,
           [type]: {
@@ -271,7 +277,8 @@ export const selectAllPlanningClasses = (state: RootState) => state.class.planni
 export const selectPlanningMasterClasses = (state: RootState) => state.class.planning.masterClasses;
 export const selectPlanningClasses = (state: RootState) => state.class.planning.classes;
 export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
-export const selectPlanningOtherClassifications = (state: RootState) => state.class.planning.otherClassifications;
+export const selectPlanningOtherClassifications = (state: RootState) =>
+  state.class.planning.otherClassifications;
 export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
 export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
 export const selectBatchedForcedToFrameClasses = (state: RootState) => state.class.forcedToFrame;

@@ -48,7 +48,11 @@ describe('ProjectCellHistory (IO-881)', () => {
     ];
     mockedUseLazyGetProjectHistoryQuery.mockReturnValue([
       trigger,
-      { data: { count: 3, next: null, previous: null, results }, isFetching: false, isUninitialized: false },
+      {
+        data: { count: 3, next: null, previous: null, results },
+        isFetching: false,
+        isUninitialized: false,
+      },
     ]);
 
     renderCell();
@@ -68,7 +72,11 @@ describe('ProjectCellHistory (IO-881)', () => {
   it('shows an empty state when the cell has no history', async () => {
     mockedUseLazyGetProjectHistoryQuery.mockReturnValue([
       trigger,
-      { data: { count: 0, next: null, previous: null, results: [] }, isFetching: false, isUninitialized: false },
+      {
+        data: { count: 0, next: null, previous: null, results: [] },
+        isFetching: false,
+        isUninitialized: false,
+      },
     ]);
 
     renderCell();

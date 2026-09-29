@@ -6,28 +6,28 @@ export const mockSapCosts: { data: Array<ISapCost> } = {
 
 export const mockAllSapCostsProject: { data: Record<string, IProjectSapCost> } = {
   data: {
-    "mock-project-id": {
-      id: "mock-project-id",
-      production_task_commitments: 0.000,
-      production_task_costs: 0.000,
-      project_task_commitments: 60387.000,
-      project_task_costs:  1100.000,
-      sap_id: "mock-project-id"
-    }
-  }
+    'mock-project-id': {
+      id: 'mock-project-id',
+      production_task_commitments: 0.0,
+      production_task_costs: 0.0,
+      project_task_commitments: 60387.0,
+      project_task_costs: 1100.0,
+      sap_id: 'mock-project-id',
+    },
+  },
 };
 
 export const mockCurrentYearSapCostsProject: { data: Record<string, IProjectSapCost> } = {
   data: {
-    "mock-project-id": {
-      id: "mock-project-id",
-      production_task_commitments: 45000.000,
-      production_task_costs: 23000.000,
-      project_task_commitments: 60387.000,
-      project_task_costs:  1100.000,
-      sap_id: "mock-project-id"
-    }
-  }
+    'mock-project-id': {
+      id: 'mock-project-id',
+      production_task_commitments: 45000.0,
+      production_task_costs: 23000.0,
+      project_task_commitments: 60387.0,
+      project_task_costs: 1100.0,
+      sap_id: 'mock-project-id',
+    },
+  },
 };
 
 export const mockSapCostforProjectCard: ISapCost = {

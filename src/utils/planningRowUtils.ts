@@ -166,7 +166,7 @@ export const buildPlanningRow = ({
   return {
     type: type,
     name: item.name,
-    path: type !== 'group' ? (item as IClass | ILocation).path : parentRowPath ?? '',
+    path: type !== 'group' ? (item as IClass | ILocation).path : (parentRowPath ?? ''),
     id: item.id,
     key: item.id,
     urlSearchParam: searchParamOrNull,

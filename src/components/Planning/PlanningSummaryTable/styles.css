@@ -4,7 +4,7 @@
 }
 .scrollable-planning-summary-table {
   /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel */
-  @apply left-0 top-0 z-[100] flex  overflow-y-hidden overflow-x-scroll;
+  @apply left-0 top-0 z-[100] flex overflow-y-hidden overflow-x-scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

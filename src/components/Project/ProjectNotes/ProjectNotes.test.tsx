@@ -19,7 +19,7 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.MockedFunction<typeof axios>;
 
 const createInternalConfig = (): InternalAxiosRequestConfig =>
-  ({ headers: {} } as InternalAxiosRequestConfig);
+  ({ headers: {} }) as InternalAxiosRequestConfig;
 
 const createAxiosResponse = <T,>(data: T): AxiosResponse<T> => ({
   data,
@@ -30,7 +30,7 @@ const createAxiosResponse = <T,>(data: T): AxiosResponse<T> => ({
 });
 
 const normalizeConfig = (config?: AxiosRequestConfig | string): AxiosRequestConfig =>
-  typeof config === 'string' ? { url: config } : config ?? {};
+  typeof config === 'string' ? { url: config } : (config ?? {});
 
 const createProjectState = () => ({
   count: 1,

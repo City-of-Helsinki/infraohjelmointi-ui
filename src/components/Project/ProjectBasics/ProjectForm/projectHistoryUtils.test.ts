@@ -19,7 +19,9 @@ const classes = [
 describe('resolveHistoryValue', () => {
   it('translates a phase stored as a UUID via the option catalogue', () => {
     // form edit → audited as the phase row UUID
-    expect(resolveHistoryValue('phase', 'phase-uuid', lists, classes, t)).toBe('option.programming');
+    expect(resolveHistoryValue('phase', 'phase-uuid', lists, classes, t)).toBe(
+      'option.programming',
+    );
   });
 
   it('translates a phase stored as an enum value via the option catalogue', () => {

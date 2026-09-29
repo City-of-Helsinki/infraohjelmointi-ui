@@ -16,8 +16,8 @@ interface ISearchResultsPagination {
 }
 
 enum ButtonText {
-  'next' = 'Seuraava',
-  'previous' = 'Edellinen',
+  next = 'Seuraava',
+  previous = 'Edellinen',
 }
 
 const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous, count }) => {

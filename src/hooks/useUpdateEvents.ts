@@ -11,8 +11,19 @@ import {
   ICoordinatorClassHierarchy,
   selectBatchedForcedToFrameClasses,
 } from '@/reducers/classSlice';
-import { selectCoordinationGroups, selectForcedToFrameGroups, selectPlanningGroups, updateGroup } from '@/reducers/groupSlice';
-import { ILocationHierarchy, selectBatchedCoordinationLocations, selectBatchedForcedToFrameLocations, selectBatchedPlanningLocations, updateDistrict } from '@/reducers/locationSlice';
+import {
+  selectCoordinationGroups,
+  selectForcedToFrameGroups,
+  selectPlanningGroups,
+  updateGroup,
+} from '@/reducers/groupSlice';
+import {
+  ILocationHierarchy,
+  selectBatchedCoordinationLocations,
+  selectBatchedForcedToFrameLocations,
+  selectBatchedPlanningLocations,
+  updateDistrict,
+} from '@/reducers/locationSlice';
 import {
   addFinanceUpdateEventListener,
   addProjectUpdateEventListener,
@@ -23,9 +34,12 @@ import {
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectFinanceUpdate, selectProjectUpdate } from '@/reducers/eventsSlice';
-import { IFinanceCoordinationData, IFinancePlanningData } from '../interfaces/eventInterfaces'
+import { IFinanceCoordinationData, IFinancePlanningData } from '../interfaces/eventInterfaces';
 import { selectProjects, selectStartYear, setProjects } from '@/reducers/planningSlice';
-import { syncUpdatedClassFinancesWithStartYear, syncUpdatedProjectFinancesWithStartYear } from '@/utils/common';
+import {
+  syncUpdatedClassFinancesWithStartYear,
+  syncUpdatedProjectFinancesWithStartYear,
+} from '@/utils/common';
 import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
@@ -33,8 +47,8 @@ import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
 const initialClassBudgets: IClassBudgets = {
   plannedBudget: 0,
   frameBudget: 0,
-  isFrameBudgetOverlap: false
-}
+  isFrameBudgetOverlap: false,
+};
 
 const initialClassFinances: IClassFinances = {
   year: new Date().getFullYear(),
@@ -49,13 +63,13 @@ const initialClassFinances: IClassFinances = {
   year7: initialClassBudgets,
   year8: initialClassBudgets,
   year9: initialClassBudgets,
-  year10: initialClassBudgets
-}
+  year10: initialClassBudgets,
+};
 
 const initialLocationFinances = {
   ...initialClassFinances,
-  parentClass: null
-}
+  parentClass: null,
+};
 
 const initalProjectFinances: IProjectFinances = {
   year: 0,
@@ -69,87 +83,160 @@ const initalProjectFinances: IProjectFinances = {
   preliminaryCurrentYearPlus7: null,
   preliminaryCurrentYearPlus8: null,
   preliminaryCurrentYearPlus9: null,
-  preliminaryCurrentYearPlus10: null
-}
+  preliminaryCurrentYearPlus10: null,
+};
 
-const getExistingClassById = (classes: Array<IClass>, classId: string) => classes.find(({ id }) => id === classId);
-const getExistingGroupById = (classes: Array<IGroup>, classId: string) => classes.find(({ id }) => id === classId);
+const getExistingClassById = (classes: Array<IClass>, classId: string) =>
+  classes.find(({ id }) => id === classId);
+const getExistingGroupById = (classes: Array<IGroup>, classId: string) =>
+  classes.find(({ id }) => id === classId);
 
-const syncClassFinances = (classDataFromState: IClassHierarchy, financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
-  const updatedFinances = {...financesFromUpdateEvent};
+const syncClassFinances = (
+  classDataFromState: IClassHierarchy,
+  financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData,
+  startYear: number,
+) => {
+  const updatedFinances = { ...financesFromUpdateEvent };
   if (updatedFinances.class?.finances) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.classes, updatedFinances.class.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(classDataFromState.classes, updatedFinances.class.id)?.finances ??
+      initialClassFinances;
     updatedFinances.class = {
       ...updatedFinances.class,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.class.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.class.finances,
+        startYear,
+      ),
     };
   }
   if (updatedFinances.masterClass?.finances) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.masterClasses, updatedFinances.masterClass.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(classDataFromState.masterClasses, updatedFinances.masterClass.id)
+        ?.finances ?? initialClassFinances;
     updatedFinances.masterClass = {
       ...updatedFinances.masterClass,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.masterClass.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.masterClass.finances,
+        startYear,
+      ),
     };
   }
   if (updatedFinances.subClass?.finances) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.subClasses, updatedFinances.subClass.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(classDataFromState.subClasses, updatedFinances.subClass.id)?.finances ??
+      initialClassFinances;
     updatedFinances.subClass = {
       ...updatedFinances.subClass,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.subClass.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.subClass.finances,
+        startYear,
+      ),
     };
   }
   return updatedFinances;
-}
+};
 
-const syncLocationFinances = (locationDataFromState: ILocationHierarchy | Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>, financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
-  const updatedFinances = {...financesFromUpdateEvent};
+const syncLocationFinances = (
+  locationDataFromState:
+    ILocationHierarchy | Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>,
+  financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData,
+  startYear: number,
+) => {
+  const updatedFinances = { ...financesFromUpdateEvent };
   if (updatedFinances.district?.finances) {
-    const financeDataToUpdate = getExistingClassById(locationDataFromState.districts, updatedFinances.district.id)?.finances ?? initialLocationFinances;
+    const financeDataToUpdate =
+      getExistingClassById(locationDataFromState.districts, updatedFinances.district.id)
+        ?.finances ?? initialLocationFinances;
     updatedFinances.district = {
       ...updatedFinances.district,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.district.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.district.finances,
+        startYear,
+      ),
     };
   }
   return updatedFinances;
-}
+};
 
-const syncGroupFinances = (groupDataFromState: IGroup[], financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
-  const updatedFinances = {...financesFromUpdateEvent};
+const syncGroupFinances = (
+  groupDataFromState: IGroup[],
+  financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData,
+  startYear: number,
+) => {
+  const updatedFinances = { ...financesFromUpdateEvent };
   if (updatedFinances.group?.finances) {
-    const financeDataToUpdate = getExistingGroupById(groupDataFromState, updatedFinances.group.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingGroupById(groupDataFromState, updatedFinances.group.id)?.finances ??
+      initialClassFinances;
     updatedFinances.group = {
       ...updatedFinances.group,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.group.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.group.finances,
+        startYear,
+      ),
     };
   }
   return updatedFinances;
-}
+};
 
-const syncCoordinationFinances = (financesFromState: ICoordinatorClassHierarchy, financesFromUpdateEvent: IFinanceCoordinationData, startYear: number) => {
-  const updatedFinances = {...financesFromUpdateEvent};
+const syncCoordinationFinances = (
+  financesFromState: ICoordinatorClassHierarchy,
+  financesFromUpdateEvent: IFinanceCoordinationData,
+  startYear: number,
+) => {
+  const updatedFinances = { ...financesFromUpdateEvent };
   if (updatedFinances.collectiveSubLevel?.finances) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.collectiveSubLevels, updatedFinances.collectiveSubLevel.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(
+        financesFromState.collectiveSubLevels,
+        updatedFinances.collectiveSubLevel.id,
+      )?.finances ?? initialClassFinances;
     updatedFinances.collectiveSubLevel = {
       ...updatedFinances.collectiveSubLevel,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.collectiveSubLevel.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.collectiveSubLevel.finances,
+        startYear,
+      ),
     };
   }
   if (updatedFinances.otherClassification?.finances) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassifications, updatedFinances.otherClassification.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(
+        financesFromState.otherClassifications,
+        updatedFinances.otherClassification.id,
+      )?.finances ?? initialClassFinances;
     updatedFinances.otherClassification = {
       ...updatedFinances.otherClassification,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.otherClassification.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.otherClassification.finances,
+        startYear,
+      ),
     };
   }
   if (updatedFinances.otherClassificationSubLevel?.finances) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassificationSubLevels, updatedFinances.otherClassificationSubLevel.id)?.finances ?? initialClassFinances;
+    const financeDataToUpdate =
+      getExistingClassById(
+        financesFromState.otherClassificationSubLevels,
+        updatedFinances.otherClassificationSubLevel.id,
+      )?.finances ?? initialClassFinances;
     updatedFinances.otherClassificationSubLevel = {
       ...updatedFinances.otherClassificationSubLevel,
-      finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.otherClassificationSubLevel.finances, startYear)
+      finances: syncUpdatedClassFinancesWithStartYear(
+        financeDataToUpdate,
+        updatedFinances.otherClassificationSubLevel.finances,
+        startYear,
+      ),
     };
   }
   return updatedFinances;
-}
+};
 
 const useUpdateEvents = () => {
   const dispatch = useAppDispatch();
@@ -209,10 +296,23 @@ const useUpdateEvents = () => {
 
       // Update all coordination finances
       if (coordination) {
-        coordination = {...coordination, ...syncClassFinances(coordinationClassDataFromState, coordination, startYear)};
-        coordination = {...coordination, ...syncLocationFinances(coordinationLocationDataFromState, coordination, startYear)};
-        coordination = {...coordination, ...syncGroupFinances(coordinationGroupDataFromState, coordination, startYear)};
-        coordination = syncCoordinationFinances(coordinationClassDataFromState, coordination, startYear);
+        coordination = {
+          ...coordination,
+          ...syncClassFinances(coordinationClassDataFromState, coordination, startYear),
+        };
+        coordination = {
+          ...coordination,
+          ...syncLocationFinances(coordinationLocationDataFromState, coordination, startYear),
+        };
+        coordination = {
+          ...coordination,
+          ...syncGroupFinances(coordinationGroupDataFromState, coordination, startYear),
+        };
+        coordination = syncCoordinationFinances(
+          coordinationClassDataFromState,
+          coordination,
+          startYear,
+        );
         const type = 'coordination';
         Promise.all([
           dispatch(updateMasterClass({ data: coordination.masterClass, type })),
@@ -220,7 +320,12 @@ const useUpdateEvents = () => {
           dispatch(updateSubClass({ data: coordination.subClass, type })),
           dispatch(updateCollectiveSubLevel({ data: coordination.collectiveSubLevel, type })),
           dispatch(updateOtherClassification({ data: coordination.otherClassification, type })),
-          dispatch(updateOtherClassificationSubLevel({ data: coordination.otherClassificationSubLevel, type })),
+          dispatch(
+            updateOtherClassificationSubLevel({
+              data: coordination.otherClassificationSubLevel,
+              type,
+            }),
+          ),
           dispatch(updateGroup({ data: coordination.group, type })),
           dispatch(updateDistrict({ data: coordination.district, type })),
         ]).catch((e) => console.log('Error updating coordination finances: ', e));
@@ -228,10 +333,23 @@ const useUpdateEvents = () => {
 
       // Update all forced to frame finances
       if (forcedToFrame) {
-        forcedToFrame = {...forcedToFrame, ...syncClassFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear)};
-        forcedToFrame = {...forcedToFrame, ...syncLocationFinances(forcedToFrameLocationDataFromState, forcedToFrame, startYear)};
-        forcedToFrame = {...forcedToFrame, ...syncGroupFinances(forcedToFrameGroupDataFromState, forcedToFrame, startYear)};
-        forcedToFrame = syncCoordinationFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear);
+        forcedToFrame = {
+          ...forcedToFrame,
+          ...syncClassFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear),
+        };
+        forcedToFrame = {
+          ...forcedToFrame,
+          ...syncLocationFinances(forcedToFrameLocationDataFromState, forcedToFrame, startYear),
+        };
+        forcedToFrame = {
+          ...forcedToFrame,
+          ...syncGroupFinances(forcedToFrameGroupDataFromState, forcedToFrame, startYear),
+        };
+        forcedToFrame = syncCoordinationFinances(
+          forcedToFrameClassDataFromState,
+          forcedToFrame,
+          startYear,
+        );
         const type = 'forcedToFrame';
         Promise.all([
           dispatch(updateMasterClass({ data: forcedToFrame.masterClass, type })),
@@ -239,26 +357,35 @@ const useUpdateEvents = () => {
           dispatch(updateSubClass({ data: forcedToFrame.subClass, type })),
           dispatch(updateCollectiveSubLevel({ data: forcedToFrame.collectiveSubLevel, type })),
           dispatch(updateOtherClassification({ data: forcedToFrame.otherClassification, type })),
-          dispatch(updateOtherClassificationSubLevel({ data: forcedToFrame.otherClassificationSubLevel, type })),
+          dispatch(
+            updateOtherClassificationSubLevel({
+              data: forcedToFrame.otherClassificationSubLevel,
+              type,
+            }),
+          ),
           dispatch(updateDistrict({ data: forcedToFrame.district, type })),
         ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }
     }
     if (projectUpdateEventData?.project) {
-      const projectUpdate: IProject = {...projectUpdateEventData.project};
-      // converting project finances to start from the selected startYear if it is 
+      const projectUpdate: IProject = { ...projectUpdateEventData.project };
+      // converting project finances to start from the selected startYear if it is
       // different than the start year from the update event
       if (projectUpdate.finances && startYear != projectUpdate.finances.year) {
         const existingProject = projects.find(({ id }) => id === projectUpdate.id);
         const projectToUpdate = existingProject?.finances ?? initalProjectFinances;
-        projectUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate, projectUpdate.finances, startYear);
+        projectUpdate['finances'] = syncUpdatedProjectFinancesWithStartYear(
+          projectToUpdate,
+          projectUpdate.finances,
+          startYear,
+        );
       }
       const updatedProjects: IProject[] = projects.map((p) => {
-        return p.id === projectUpdate.id ? projectUpdate : p
+        return p.id === projectUpdate.id ? projectUpdate : p;
       });
-      Promise.all([
-        dispatch(setProjects({projects: updatedProjects}))
-      ]).catch((e) => console.log('Error updating project data: ', e));
+      Promise.resolve(dispatch(setProjects({ projects: updatedProjects }))).catch((e) =>
+        console.log('Error updating project data: ', e),
+      );
     }
   }, [financeUpdate, projectUpdateEventData]);
 };

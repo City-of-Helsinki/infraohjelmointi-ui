@@ -88,7 +88,10 @@ const usePlanningRoutes = () => {
     const nextClass = getSelectedItemOrNull(classes, classId);
     const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
     const nextDistrict = getSelectedItemOrNull(planningDistricts, districtId) as ILocation;
-    const nextOtherClassification = getSelectedItemOrNull(otherClassifications, otherClassificationId);
+    const nextOtherClassification = getSelectedItemOrNull(
+      otherClassifications,
+      otherClassificationId,
+    );
 
     dispatch(setSelectedMasterClass(nextMasterClass));
     dispatch(setSelectedClass(nextClass));
@@ -137,7 +140,14 @@ const usePlanningRoutes = () => {
     dispatch(setSelectedCollectiveSubLevel(nextCollectiveSubLevel));
     dispatch(setSelectedSubLevelDistrict(nextSubLevelDistrict));
     dispatch(setSelectedOtherClassification(nextOtherClassification));
-  }, [mode, search, batchedPlanningClasses, coordinationDistricts, batchedCoordinatorClasses, dispatch]);
+  }, [
+    mode,
+    search,
+    batchedPlanningClasses,
+    coordinationDistricts,
+    batchedCoordinatorClasses,
+    dispatch,
+  ]);
 };
 
 export default usePlanningRoutes;
