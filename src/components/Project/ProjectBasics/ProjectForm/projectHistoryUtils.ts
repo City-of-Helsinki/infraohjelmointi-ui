@@ -91,7 +91,11 @@ export const formFieldsOf = (entry: IProjectHistoryEntry): Array<string> =>
   (entry.changed_fields ?? []).filter((field) => !isYearKey(field));
 
 export type HistoryActionKey =
-  'created' | 'deleted' | 'changedPhase' | 'editedField' | 'editedForm';
+  | 'created'
+  | 'deleted'
+  | 'changedPhase'
+  | 'editedField'
+  | 'editedForm';
 
 // Decide the human phrasing for an entry: created / deleted the project, changed
 // its phase, edited a single named field, or edited the form (several fields).

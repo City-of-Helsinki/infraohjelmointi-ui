@@ -158,7 +158,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
       onRowSaved(
         {
           ...dialogValues,
-          id: dialogState.mode === 'edit' ? dialogValues.id : (savedRowId ?? dialogValues.id),
+          id: dialogState.mode === 'edit' ? dialogValues.id : savedRowId ?? dialogValues.id,
         },
         dialogState.mode,
       );
@@ -243,8 +243,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
                       budget: formatBudgetEuro(project?.budget ?? '0'),
                     }
                   : {
-                      description:
-                        selectedFinancingParty === 'OTHER' ? (prev.description ?? '') : '',
+                      description: selectedFinancingParty === 'OTHER' ? prev.description ?? '' : '',
                       budgetItem: '',
                       projectNumber: '',
                       budget: '',

@@ -6,7 +6,9 @@ import {
 
 export const downloadCSV = (
   dataArray: (
-    IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisCsvRow
+    | IConstructionProgramCsvRow
+    | IBudgetBookSummaryCsvRow
+    | IOperationalEnvironmentAnalysisCsvRow
   )[],
   filename = 'report.csv',
 ) => {

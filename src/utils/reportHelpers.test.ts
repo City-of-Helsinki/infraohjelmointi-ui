@@ -580,7 +580,7 @@ describe('reportHelpers', () => {
         budgetProposalCurrentYearPlus1: plus1,
         budgetProposalCurrentYearPlus2: plus2,
         costForcedToFrameBudget: undefined,
-      }) as unknown as IConstructionProgramTableRow;
+      } as unknown as IConstructionProgramTableRow);
 
     describe('checkProjectHasBudgets', () => {
       it('keeps a forced-to-frame project funded only in +2 (regression)', () => {

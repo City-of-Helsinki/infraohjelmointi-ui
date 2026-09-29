@@ -47,8 +47,8 @@
     "test:ci": "CI=true yarn test:coverage --ci",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src",
     "prepare": "node -e \"if (require('fs').existsSync('.git')) { require('fs').chmodSync('.githooks/pre-commit', 0o755); require('child_process').execFileSync('git', ['config', '--local', 'core.hooksPath', '.githooks']); }\"",
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },

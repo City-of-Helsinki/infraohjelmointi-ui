@@ -8,11 +8,11 @@
 trigger: none
 
 # Pull request (PR) triggers cause a pipeline to run whenever a pull request is
-# opened with one of the specified target branches, or when updates are made to
+# opened with one of the specified target branches, or when updates are made to 
 # such a pull request.
 #
-# GitHub creates a new ref when a pull request is created. The ref points to a
-# merge commit, which is the merged code between the source and target branches
+# GitHub creates a new ref when a pull request is created. The ref points to a 
+# merge commit, which is the merged code between the source and target branches 
 # of the pull request.
 #
 # Opt out of pull request validation
@@ -20,15 +20,15 @@ pr:
   # PR target branch
   branches:
     include:
-      - develop
+    - develop
   paths:
     exclude:
-      - '*release-please*'
-      - '*.md'
-      - '.github/'
-      - 'pipelines/infraohjelmointi-ui-release.yml'
-      - 'pipelines/infraohjelmointi-ui-devtest.yml'
-      - '*compose*'
+    - '*release-please*'
+    - '*.md'
+    - '.github/'
+    - 'pipelines/infraohjelmointi-ui-release.yml'
+    - 'pipelines/infraohjelmointi-ui-devtest.yml'
+    - '*compose*'
 
 # By default, use self-hosted agents
 pool: Default
@@ -45,10 +45,10 @@ extends:
   # Filename in Azure DevOps Repository
   template: components/infraohjelmointi-ui/pipelines/infraohjelmointi-ui-review.yml@infraohjelmointi-pipelines
   # parameters:
-  # Application build arguments and config map values as key value pairs.
-  # Does not contain all buildArguments or configMap values, the rest located in infraohjelmointi-pipelines
-  # The values here will override the values defined in the infraohjelmointi-pipelines repository
-  # buildArgs:
-  #   DEBUG: 1
-  # configMap: # pod environment variables
-  #   DEBUG: 1
+    # Application build arguments and config map values as key value pairs.
+    # Does not contain all buildArguments or configMap values, the rest located in infraohjelmointi-pipelines
+    # The values here will override the values defined in the infraohjelmointi-pipelines repository
+    # buildArgs:
+    #   DEBUG: 1
+    # configMap: # pod environment variables
+    #   DEBUG: 1

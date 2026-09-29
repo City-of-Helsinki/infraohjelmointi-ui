@@ -835,7 +835,7 @@ describe('PlanningView', () => {
   });
 
   describe('PlanningRow', () => {
-    (describe('PlanningForecastSums', () => {
+    describe('PlanningForecastSums', () => {
       it('renders all the elements and 0 sums until SAP data is received from the backend ', async () => {
         const { findByTestId, user, store } = await render();
         const year = new Date().getFullYear();
@@ -867,7 +867,7 @@ describe('PlanningView', () => {
             expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
           }
         });
-      }));
+      });
 
     it('can click expand button or title to expand and hide children but doesnt navigate back', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();

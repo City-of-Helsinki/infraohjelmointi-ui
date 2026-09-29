@@ -185,7 +185,10 @@ export interface IConstructionHandoverFinalizingForm {
 }
 
 export interface IAppForms
-  extends IProjectHeaderForm, IProjectForm, IProjectNoteForm, IHashTagsForm {}
+  extends IProjectHeaderForm,
+    IProjectForm,
+    IProjectNoteForm,
+    IHashTagsForm {}
 
 export type HookFormControlType =
   | Control<FieldValues>

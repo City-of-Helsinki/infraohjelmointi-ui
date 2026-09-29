@@ -272,12 +272,12 @@ const DialogContainer: FC<IDialogProps> = memo(
                           rules={{
                             required:
                               classOptions.subClasses.length > 0
-                                ? (t('validation.required', { field: 'Alaluokka' }) ?? '')
+                                ? t('validation.required', { field: 'Alaluokka' }) ?? ''
                                 : '',
                             validate: {
                               isPopulated: (c: IOption) =>
                                 classOptions.subClasses.length > 0
-                                  ? (customValidation(c, 'Alaluokka') ?? '')
+                                  ? customValidation(c, 'Alaluokka') ?? ''
                                   : true,
                             },
                           }}
@@ -292,7 +292,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                               required: ['suurpiiri', 'östersundom'].some((subClassSubstring) =>
                                 subClassField.label.includes(subClassSubstring),
                               )
-                                ? (t('validation.required', { field: 'Suurpiiri' }) ?? '')
+                                ? t('validation.required', { field: 'Suurpiiri' }) ?? ''
                                 : '',
                               validate: {
                                 isValidDistrict: (d: IOption) =>

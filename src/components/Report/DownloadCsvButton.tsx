@@ -15,7 +15,9 @@ import { useCsvData } from '@/hooks/useCsvData';
 import { downloadCSV } from '@/utils/csvUtils';
 
 type dataTypes =
-  IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisCsvRow;
+  | IConstructionProgramCsvRow
+  | IBudgetBookSummaryCsvRow
+  | IOperationalEnvironmentAnalysisCsvRow;
 
 const downloadIcon = <IconDownload />;
 

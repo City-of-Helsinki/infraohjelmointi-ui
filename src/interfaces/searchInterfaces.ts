@@ -54,10 +54,8 @@ export interface ISearchRequest {
   order?: string;
 }
 
-export interface IProjectSearchRequest extends Omit<
-  ISearchRequest,
-  'fullPath' | 'limit' | 'order'
-> {
+export interface IProjectSearchRequest
+  extends Omit<ISearchRequest, 'fullPath' | 'limit' | 'order'> {
   direct?: boolean;
   programmed?: boolean;
   forcedToFrame?: boolean;
