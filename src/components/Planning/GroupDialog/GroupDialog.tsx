@@ -315,7 +315,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
                       {/* Divider to click */}
                       <div className="advance-fields-button">
-                        <button onClick={toggleAdvanceFields}>
+                        <button type="button" onClick={toggleAdvanceFields}>
                           {!showAdvanceFields
                             ? t(`groupForm.openAdvanceFilters`)
                             : t(`groupForm.closeAdvanceFilters`)}
