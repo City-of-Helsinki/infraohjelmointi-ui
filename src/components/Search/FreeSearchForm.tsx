@@ -12,7 +12,8 @@ import {
   IFreeSearchResults,
   IListItem,
 } from '@/interfaces/common';
-import _ from 'lodash';
+import has from 'lodash/has';
+import keyBy from 'lodash/keyBy';
 import './styles.css';
 
 type FreeSearchFormListItem = IListItem & { type: string };
@@ -99,7 +100,7 @@ const FreeSearchForm = ({
         if (freeSearchFormItemList.length > 0) {
           setSearchState((current) => ({
             ...current,
-            resultObject: _.keyBy(freeSearchFormItemList, 'label'),
+            resultObject: keyBy(freeSearchFormItemList, 'label'),
           }));
         }
 
@@ -120,7 +121,7 @@ const FreeSearchForm = ({
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
       const formValue = getValues('freeSearchParams');
-      if (!arrayHasValue(Object.keys(formValue), value) && _.has(resultObject, value)) {
+      if (!arrayHasValue(Object.keys(formValue), value) && has(resultObject, value)) {
         const nextChange = {
           ...formValue,
           [resultObject[value].label]: resultObject[value],

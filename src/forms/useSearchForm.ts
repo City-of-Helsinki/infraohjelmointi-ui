@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm, setSearchForm } from '@/reducers/searchSlice';
 import useMultiClassOptions from '@/hooks/useMultiClassOptions';
 import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { IOption } from '@/interfaces/common';
 
 const useSearchForm = () => {
@@ -62,7 +62,7 @@ const useSearchForm = () => {
    */
   useEffect(() => {
     const subscription = watch((form) => {
-      const formHasChanged = !_.isEqual(form, initialSearchForm);
+      const formHasChanged = !isEqual(form, initialSearchForm);
       setSubmitDisabled(!formHasChanged);
     });
     return () => subscription.unsubscribe();

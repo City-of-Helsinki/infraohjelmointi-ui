@@ -1,7 +1,7 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { listItemsToOption } from '@/utils/common';
 import {
   selectProjectDistricts,
@@ -43,11 +43,11 @@ const useMultiLocationOptions = (
   );
 
   const getNextDivisions = useCallback(() => {
-    if (!_.isEmpty(subDivisions)) {
+    if (!isEmpty(subDivisions)) {
       return allDivisions.filter(
         (c) => selectedSubDivisionParent.findIndex((sc) => sc === c.id) !== -1,
       );
-    } else if (!_.isEmpty(districts)) {
+    } else if (!isEmpty(districts)) {
       return allDivisions.filter((c) => districts.findIndex((mc) => mc.value === c.parent) !== -1);
     } else {
       return allDivisions;
@@ -55,11 +55,11 @@ const useMultiLocationOptions = (
   }, [allDivisions, districts, selectedSubDivisionParent, subDivisions]);
 
   const getNextSubDivisions = useCallback(() => {
-    if (!_.isEmpty(divisions)) {
+    if (!isEmpty(divisions)) {
       return allSubDivisions.filter(
         (sc) => divisions.findIndex((fc) => sc.parent === fc.value) !== -1,
       );
-    } else if (!_.isEmpty(districts)) {
+    } else if (!isEmpty(districts)) {
       return allSubDivisions.filter(
         (sc) => getNextDivisions().findIndex((fc) => sc.parent === fc.id) !== -1,
       );
@@ -69,11 +69,11 @@ const useMultiLocationOptions = (
   }, [allSubDivisions, districts, divisions, getNextDivisions]);
 
   const getNextDistricts = useCallback(() => {
-    if (!_.isEmpty(divisions)) {
+    if (!isEmpty(divisions)) {
       return allDistricts.filter(
         (mc) => selectedDivisionParent.findIndex((c) => c === mc.id) !== -1,
       );
-    } else if (!_.isEmpty(subDivisions)) {
+    } else if (!isEmpty(subDivisions)) {
       return allDistricts.filter(
         (mc) => getNextDivisions().findIndex((sc) => sc.parent === mc.id) !== -1,
       );

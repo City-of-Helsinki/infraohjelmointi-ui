@@ -383,7 +383,7 @@ const useUpdateEvents = () => {
       const updatedProjects: IProject[] = projects.map((p) => {
         return p.id === projectUpdate.id ? projectUpdate : p;
       });
-      Promise.all([dispatch(setProjects({ projects: updatedProjects }))]).catch((e) =>
+      Promise.resolve(dispatch(setProjects({ projects: updatedProjects }))).catch((e) =>
         console.log('Error updating project data: ', e),
       );
     }

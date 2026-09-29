@@ -6,7 +6,7 @@ import {
 } from '@/reducers/classSlice';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { classesToOptions } from '@/utils/common';
 import { IClass } from '@/interfaces/classInterfaces';
 
@@ -44,11 +44,11 @@ const useMultiClassOptions = (
   );
 
   const getNextClasses = useCallback(() => {
-    if (!_.isEmpty(subClasses)) {
+    if (!isEmpty(subClasses)) {
       return allClasses.filter(
         (c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1,
       );
-    } else if (!_.isEmpty(masterClasses)) {
+    } else if (!isEmpty(masterClasses)) {
       return allClasses.filter(
         (c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1,
       );
@@ -58,9 +58,9 @@ const useMultiClassOptions = (
   }, [allClasses, masterClasses, selectedSubClassParents, subClasses]);
 
   const getNextSubClasses = useCallback(() => {
-    if (!_.isEmpty(classes)) {
+    if (!isEmpty(classes)) {
       return allSubClasses.filter((sc) => classes.findIndex((fc) => sc.parent === fc.value) !== -1);
-    } else if (!_.isEmpty(masterClasses)) {
+    } else if (!isEmpty(masterClasses)) {
       return allSubClasses.filter(
         (sc) => getNextClasses().findIndex((fc) => sc.parent === fc.id) !== -1,
       );
@@ -70,11 +70,11 @@ const useMultiClassOptions = (
   }, [allSubClasses, classes, getNextClasses, masterClasses]);
 
   const getNextMasterClasses = useCallback(() => {
-    if (!_.isEmpty(classes)) {
+    if (!isEmpty(classes)) {
       return allMasterClasses.filter(
         (mc) => selectedClassParents.findIndex((c) => c === mc.id) !== -1,
       );
-    } else if (!_.isEmpty(subClasses)) {
+    } else if (!isEmpty(subClasses)) {
       return allMasterClasses.filter(
         (mc) => getNextClasses().findIndex((sc) => sc.parent === mc.id) !== -1,
       );
