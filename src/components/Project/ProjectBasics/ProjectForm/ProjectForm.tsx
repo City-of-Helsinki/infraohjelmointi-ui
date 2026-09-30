@@ -25,7 +25,7 @@ import {
 } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
-import { notifyError } from '@/reducers/notificationSlice';
+import { notifyError, notifyInfo } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
@@ -76,7 +76,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     setValue,
     setError,
     reset,
-    resetField,
     trigger,
   } = formMethods;
 
@@ -356,7 +355,18 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               projectMode === 'edit' && Object.keys(otherChanges).length > 0;
 
             if (pwLink.status === 'cancelled') {
-              resetField('hkrId');
+              // Keep what the user typed so a typo can be fixed; if the other
+              // changes are saved the field goes back to the saved hkrId, so
+              // say why it was not saved
+              if (savesOtherChanges) {
+                dispatch(
+                  notifyInfo({
+                    message: 'pwLinkNotConfirmed',
+                    title: 'pwLinkNotSaved',
+                    type: 'notification',
+                  }),
+                );
+              }
             } else {
               // If nothing else is saved, the typed hkrId stays in the field
               // with this error. If the other changes are saved, the field goes
