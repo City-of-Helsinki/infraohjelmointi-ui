@@ -1,18 +1,16 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLazyGetPwProjectNameQuery } from '@/api/projectApi';
-import { useAppDispatch } from '@/hooks/common';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
-import { notifyError } from '@/reducers/notificationSlice';
-import {
-  ProjectPatchErrorMessageKey,
-  getProjectPatchErrorMessage,
-} from '@/utils/projectErrorMessage';
+import { PwErrorMessageKey, getPwErrorMessage } from '@/utils/projectErrorMessage';
+
+/** Why the PW project could not be checked: a PW code, or a failure outside PW. */
+export type PwLinkFailureMessageKey = PwErrorMessageKey | 'pwLinkCheckFailed';
 
 export type PwLinkConfirmationResult =
   | { status: 'confirmed' }
   | { status: 'cancelled' }
-  | { status: 'failed'; message: ProjectPatchErrorMessageKey };
+  | { status: 'failed'; message: PwLinkFailureMessageKey };
 
 /**
  * An hkrId as the API stores it (a number), so "0123" and "123" compare equal.
@@ -30,7 +28,8 @@ export const normalizeHkrId = (value: unknown): string => {
  *
  * Resolves to 'confirmed' when the user clicks OK (or PW sync is disabled, in
  * which case nothing is written to PW), 'cancelled' on Peruuta, and 'failed'
- * when the lookup fails; an error toast has then already been shown.
+ * with the reason's message key when the lookup fails. The caller tells the
+ * user, since only it knows what else was saved.
  *
  * `onDialogOpen` runs right before the dialog is shown, so the caller can take
  * down a loading overlay. Keep the overlay up during the lookup itself: it is
@@ -38,7 +37,6 @@ export const normalizeHkrId = (value: unknown): string => {
  */
 const usePwLinkConfirmation = () => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   const { isConfirmed } = useConfirmDialog();
   const [getPwProjectName] = useLazyGetPwProjectNameQuery();
 
@@ -51,9 +49,7 @@ const usePwLinkConfirmation = () => {
       try {
         pwProject = await getPwProjectName(hkrId).unwrap();
       } catch (error) {
-        const message = getProjectPatchErrorMessage(error);
-        dispatch(notifyError({ message, title: 'saveError', type: 'notification' }));
-        return { status: 'failed', message };
+        return { status: 'failed', message: getPwErrorMessage(error) ?? 'pwLinkCheckFailed' };
       }
 
       if (!pwProject.syncEnabled) {
@@ -74,7 +70,7 @@ const usePwLinkConfirmation = () => {
 
       return confirmed ? { status: 'confirmed' } : { status: 'cancelled' };
     },
-    [dispatch, getPwProjectName, isConfirmed, t],
+    [getPwProjectName, isConfirmed, t],
   );
 };
 
