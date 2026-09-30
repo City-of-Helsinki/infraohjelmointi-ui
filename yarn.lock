@@ -10876,10 +10876,10 @@ react-merge-refs@1.1.0:
   resolved "https://registry.yarnpkg.com/react-merge-refs/-/react-merge-refs-1.1.0.tgz#73d88b892c6c68cbb7a66e0800faa374f4c38b06"
   integrity sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ==
 
-react-oidc-context@^2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/react-oidc-context/-/react-oidc-context-2.2.2.tgz#aa9b66596b63f1373d312007099c32b112646396"
-  integrity sha512-rke8goKuxxQhSAR11h8wVn56m7kEa1mcAfYDlIycsIgmbZOFzKA0Un0y0RodHZ/M/CG6u0JD1I8RKZHqRJjWnA==
+react-oidc-context@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-oidc-context/-/react-oidc-context-2.4.0.tgz#751ff186af5e731702e35d8b46aa66b1351885d7"
+  integrity sha512-7xbEXlBBlWBQfdSibjeA7jC5w1oKTvZVAodd9A+fmqDRt4bD+gGODWgGT8dX+a0S96Vfo7lzIrEBP7eZCFkwWw==
 
 react-popper@2.2.5:
   version "2.2.5"
