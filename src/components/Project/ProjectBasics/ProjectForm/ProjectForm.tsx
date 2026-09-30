@@ -337,7 +337,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         // IO-935: a new or changed hkrId must be confirmed against the PW
         // project it points to before anything is saved and synced to PW.
         let savedForm = form;
-        let unsavedHkrId: { value: string; message: string } | null = null;
         const newHkrId = normalizeHkrId(data.hkrId);
         if (newHkrId && newHkrId !== normalizeHkrId(project?.hkrId)) {
           const pwLink = await confirmPwLink(newHkrId, {
@@ -349,21 +348,34 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           if (pwLink.status === 'confirmed') {
             data = { ...data, confirmedHkrId: newHkrId };
           } else {
-            if (pwLink.status === 'cancelled') {
-              resetField('hkrId');
-            } else {
-              unsavedHkrId = {
-                value: form.hkrId,
-                message: t(`notification.message.${pwLink.message}`),
-              };
-              setError('hkrId', { type: 'server', message: unsavedHkrId.message });
-            }
-
             // A new project is not created without the hkrId the user entered.
             // An existing one keeps its other edits, as it does when PW sync
             // itself fails (IO-851); only the hkrId is left unsaved.
             const { hkrId: _unsavedHkrId, ...otherChanges } = data;
-            if (projectMode !== 'edit' || Object.keys(otherChanges).length === 0) {
+            const savesOtherChanges =
+              projectMode === 'edit' && Object.keys(otherChanges).length > 0;
+
+            if (pwLink.status === 'cancelled') {
+              resetField('hkrId');
+            } else {
+              // If nothing else is saved, the typed hkrId stays in the field
+              // with this error. If the other changes are saved, the field goes
+              // back to the saved hkrId (the project refresh after the save
+              // resets the form anyway), so the toast is what tells the user.
+              setError('hkrId', {
+                type: 'server',
+                message: t(`notification.message.${pwLink.message}`),
+              });
+              dispatch(
+                notifyError({
+                  message: pwLink.message,
+                  title: projectMode === 'edit' ? 'pwLinkNotSaved' : 'createError',
+                  type: 'notification',
+                }),
+              );
+            }
+
+            if (!savesOtherChanges) {
               dispatch(setIsSaving(false));
               dispatch(clearLoading(CREATE_NEW_PROJECT));
               return;
@@ -398,11 +410,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           try {
             await patchProject({ id: project?.id, data }).unwrap();
             reset(savedForm);
-            if (unsavedHkrId) {
-              // Keep the hkrId the user typed, still unsaved and still flagged
-              setValue('hkrId', unsavedHkrId.value, { shouldDirty: true });
-              setError('hkrId', { type: 'server', message: unsavedHkrId.message });
-            }
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
