@@ -34,6 +34,7 @@ export const getForcedToFrameDataForReports = async (
     return await getForcedToFrameData(year, false);
   if (type === Reports.OperationalEnvironmentAnalysisForcedToFrame)
     return await getForcedToFrameData(year, true);
+  if (type === Reports.CoordinationViewReport) return await getForcedToFrameData(year, false);
   if (type === Reports.Strategy) return await getForcedToFrameData(year, false);
   if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
   if (

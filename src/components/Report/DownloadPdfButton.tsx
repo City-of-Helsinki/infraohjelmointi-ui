@@ -2,7 +2,12 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import {
+  IConstructionProgramCsvRow,
+  IDownloadPdfButtonProps,
+  ReportType,
+  Reports,
+} from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -17,6 +22,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { getReportData } from '@/utils/reportHelpers';
 import {
   getCoordinatorAndForcedToFrameRows,
   getForcedToFrameDataForReports,
@@ -24,6 +30,7 @@ import {
 } from './common';
 import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import CoordinationViewReportPdfDocument from './PdfReports/CoordinationViewReportPdfDocument';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -106,6 +113,7 @@ const getPdfDocument = (
     ),
     budgetBookSummary: <ReportContainer data={{ rows }} reportType={Reports.BudgetBookSummary} />,
     financialStatement: <EmptyDocument />,
+    coordinationViewReport: <EmptyDocument />,
   };
 
   return pdfDocument[type];
@@ -309,6 +317,41 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
+        case Reports.CoordinationViewReport: {
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
+
+          if (viewHasProjects(res)) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+
+            const reportRows = (await getReportData(
+              t,
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              year,
+            )) as IConstructionProgramCsvRow[];
+
+            document = (
+              <CoordinationViewReportPdfDocument
+                rows={reportRows}
+                title={t('report.coordinationViewReport.rowTitle')}
+              />
+            );
+          }
+          break;
+        }
       }
 
       if (document !== undefined) {
@@ -347,6 +390,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
     projectSapCosts,
     type,
     year,
+    t,
   ]);
 
   return (

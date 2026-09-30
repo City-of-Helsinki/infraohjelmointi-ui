@@ -38,6 +38,7 @@ import {
   calculateOperationalEnvironmentAnalysisCategorySums,
 } from '@/components/Report/common';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { parseCurrency } from './currencyUtils';
 
 interface IYearCheck {
   planningStart: number;
@@ -2079,6 +2080,100 @@ export const flattenConstructionProgramForecastTableRows = (
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionForecastReportRows(tableRows).flat(Infinity);
 
+const getCoordinationViewReportColumnKeys = (year: number) => [
+  `kuluva TA ${year}`,
+  `TAE ${year + 1}`,
+  `TSE ${year + 2}`,
+  `TSE ${year + 3}`,
+  `alustava ${year + 4}`,
+  `alustava ${year + 5}`,
+  `alustava ${year + 6}`,
+  `alustava ${year + 7}`,
+  `alustava ${year + 8}`,
+  `alustava ${year + 9}`,
+  `alustava ${year + 10}`,
+];
+
+const normalizeCoordinationViewReportValue = (value?: string | null): string => {
+  if (value == null || value === '') {
+    return '';
+  }
+
+  const parsedValue = parseCurrency(value);
+
+  if (parsedValue === null) {
+    return String(value).replace(/\s/g, '');
+  }
+
+  if (Number.isInteger(parsedValue)) {
+    return parsedValue.toString();
+  }
+
+  return Math.round(parsedValue).toString();
+};
+
+const getCoordinationViewReportRowValues = (cells: IPlanningCell[], year: number) => {
+  const columns: IConstructionProgramCsvRow = {};
+  const keys = getCoordinationViewReportColumnKeys(year);
+  keys.forEach((key, index) => {
+    columns[key] = normalizeCoordinationViewReportValue(cells[index]?.plannedBudget);
+  });
+  return columns;
+};
+
+const getCoordinationViewReportProjectValues = (project: IProject, year: number) => {
+  const keys = getCoordinationViewReportColumnKeys(year);
+  const financeValues = [
+    project.finances.budgetProposalCurrentYearPlus0,
+    project.finances.budgetProposalCurrentYearPlus1,
+    project.finances.budgetProposalCurrentYearPlus2,
+    project.finances.preliminaryCurrentYearPlus3,
+    project.finances.preliminaryCurrentYearPlus4,
+    project.finances.preliminaryCurrentYearPlus5,
+    project.finances.preliminaryCurrentYearPlus6,
+    project.finances.preliminaryCurrentYearPlus7,
+    project.finances.preliminaryCurrentYearPlus8,
+    project.finances.preliminaryCurrentYearPlus9,
+    project.finances.preliminaryCurrentYearPlus10,
+  ];
+
+  return keys.reduce((acc, key, index) => {
+    acc[key] = normalizeCoordinationViewReportValue(financeValues[index]);
+    return acc;
+  }, {} as IConstructionProgramCsvRow);
+};
+
+const generateCoordinationViewReportCsvRows = (
+  rows: IPlanningRow[],
+  year: number,
+): IConstructionProgramCsvRow[] => {
+  const csvRows: IConstructionProgramCsvRow[] = [];
+
+  const walk = (planningRows: IPlanningRow[]) => {
+    planningRows.forEach((row) => {
+      // Handle hierarchy row (master class, class etc.)
+      csvRows.push({
+        [t('target')]: row.name,
+        ...getCoordinationViewReportRowValues(row.cells, year),
+      });
+
+      // Handle project rows within the hierarchy
+      row.projectRows.forEach((project) => {
+        csvRows.push({
+          [t('target')]: project.name,
+          ...getCoordinationViewReportProjectValues(project, year),
+        });
+      });
+
+      walk(row.children);
+    });
+  };
+
+  walk(rows);
+
+  return csvRows;
+};
+
 /**
  * Create report table rows without flattening
  */
@@ -2436,6 +2531,8 @@ export const getReportData = async (
           ...analysisTableRows,
         ] as IOperationalEnvironmentAnalysisCsvRow[];
       }
+      case Reports.CoordinationViewReport:
+        return generateCoordinationViewReportCsvRows(rows, year);
       default:
         return [];
     }

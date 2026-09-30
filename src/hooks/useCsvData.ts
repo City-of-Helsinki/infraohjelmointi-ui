@@ -47,6 +47,32 @@ export const useCsvData = ({
       > = [];
 
       switch (type) {
+        case Reports.CoordinationViewReport: {
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            data = await getReportData(
+              t,
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              year,
+            );
+          }
+          break;
+        }
         case Reports.BudgetBookSummary:
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame: {

@@ -63,6 +63,7 @@ export const reports = [
   'constructionProgramForcedToFrame',
   'budgetBookSummary',
   'financialStatement',
+  'coordinationViewReport',
 ] as const;
 
 export interface IConstructionProgramCsvRow {
@@ -92,6 +93,7 @@ export enum Reports {
   ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',
   FinancialStatement = 'financialStatement',
+  CoordinationViewReport = 'coordinationViewReport',
 }
 
 export type ReportType = (typeof reports)[number];

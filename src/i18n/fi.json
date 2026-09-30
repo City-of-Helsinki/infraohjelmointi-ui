@@ -943,6 +943,11 @@
     },
     "warrantyPeriodPhaseNotIncluded": "HUOM! Takuuaikaiset hankkeet eivät tulostu raportille.",
     "yearLabel": "Vuosi",
+    "coordinationViewReport": {
+      "title": "Helsingin kaupunki",
+      "rowTitle": "Koordinointinäkymä",
+      "documentName": "koordinointinäkymä"
+    },
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
       "documentName": "kategorisointiraportti - koordinointinäkymä",
