@@ -25,7 +25,7 @@ import {
 } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
-import { notifyError } from '@/reducers/notificationSlice';
+import { notifyError, notifyInfo } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
@@ -48,6 +48,17 @@ import {
 interface IProjectFormProps {
   project: IProject | null;
 }
+
+/** First human-readable string in a backend field error, or empty when there is none. */
+const readBackendFieldMessage = (fieldError: unknown): string => {
+  if (Array.isArray(fieldError)) {
+    return fieldError.find((item) => typeof item === 'string') ?? '';
+  }
+  if (typeof fieldError === 'string') {
+    return fieldError;
+  }
+  return '';
+};
 
 const ProjectForm = ({ project }: IProjectFormProps) => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName, useWatchField } =
@@ -76,7 +87,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     setValue,
     setError,
     reset,
-    resetField,
     trigger,
   } = formMethods;
 
@@ -117,15 +127,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           continue;
         }
 
-        let message: string;
-        if (Array.isArray(fieldError)) {
-          message = fieldError.find((item) => typeof item === 'string') ?? '';
-        } else if (typeof fieldError === 'string') {
-          message = fieldError;
-        } else {
-          message = '';
-        }
-
+        let message = readBackendFieldMessage(fieldError);
         if (!message) {
           continue;
         }
@@ -356,7 +358,18 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               projectMode === 'edit' && Object.keys(otherChanges).length > 0;
 
             if (pwLink.status === 'cancelled') {
-              resetField('hkrId');
+              // Keep what the user typed so a typo can be fixed; if the other
+              // changes are saved the field goes back to the saved hkrId, so
+              // say why it was not saved
+              if (savesOtherChanges) {
+                dispatch(
+                  notifyInfo({
+                    message: 'pwLinkNotConfirmed',
+                    title: 'pwLinkNotSaved',
+                    type: 'notification',
+                  }),
+                );
+              }
             } else {
               // If nothing else is saved, the typed hkrId stays in the field
               // with this error. If the other changes are saved, the field goes

@@ -14,10 +14,14 @@ export type PwLinkConfirmationResult =
 
 /**
  * An hkrId as the API stores it (a number), so "0123" and "123" compare equal.
- * Anything that is not a plain number is returned trimmed, for the API to reject.
+ * Strings and numbers are returned trimmed; anything else is empty, for the API to reject.
  */
 export const normalizeHkrId = (value: unknown): string => {
-  const hkrId = String(value ?? '').trim();
+  const raw = typeof value === 'number' ? value.toString() : value;
+  if (typeof raw !== 'string') {
+    return '';
+  }
+  const hkrId = raw.trim();
   return /^\d+$/.test(hkrId) ? hkrId.replace(/^0+(?=\d)/, '') : hkrId;
 };
 
