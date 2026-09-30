@@ -852,6 +852,39 @@ describe('projectForm', () => {
       expect(patchRequest.phase).toBeDefined();
       expect(patchRequest).not.toHaveProperty('hkrId');
       expect(patchRequest).not.toHaveProperty('confirmedHkrId');
+      expect(notificationMessages(rendered.store)).toContain('pwLinkNotConfirmed');
+      expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
+    });
+
+    it('keeps the typed hkrId when the user cancels and it is the only change', async () => {
+      mockPwProjectNameLookup(() =>
+        Promise.resolve({ data: { hkrId: '1234', name: 'Wrong project', syncEnabled: true } }),
+      );
+      // See the "only change" test below for why these fields are null
+      const rendered = await render({
+        project: {
+          ...getProjectWithShiftableFinances(),
+          phaseDetail: null,
+          onSchedule: null,
+        } as unknown as IProject,
+      });
+
+      const hkrIdField = (await rendered.findByRole('spinbutton', {
+        name: getFormField('hkrId'),
+      })) as HTMLInputElement;
+      await rendered.user.clear(hkrIdField);
+      await rendered.user.type(hkrIdField, '1234');
+      await rendered.user.click(await rendered.findByTestId('submit-project-button'));
+      expect(await rendered.findByText('projectForm.pwLinkDialog.title')).toBeInTheDocument();
+      await rendered.user.click(rendered.getByText('cancel'));
+
+      // The typed value stays so a typo can be fixed; nothing is saved
+      await waitFor(() =>
+        expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument(),
+      );
+      expect(hkrIdField.value).toBe('1234');
+      expect(mockedAxios.patch).not.toHaveBeenCalled();
+      expect(notificationTitles(rendered.store)).not.toContain('pwLinkNotSaved');
     });
 
     it('keeps the loader up during the lookup and takes it down for the dialog', async () => {
@@ -983,6 +1016,92 @@ describe('projectForm', () => {
       );
       expect(notificationMessages(rendered.store)).not.toContain('formSaveError');
       expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
+    });
+
+    describe('new project', () => {
+      // Pasting instead of typing key by key keeps these long form flows fast
+      const fillNewProjectAndSubmit = async (
+        { user, findByTestId, findByRole }: Awaited<ReturnType<typeof render>>,
+        hkrId: string,
+      ) => {
+        const paste = async (field: HTMLElement, text: string) => {
+          await user.click(field);
+          await user.paste(text);
+        };
+        await paste(await findByRole('textbox', { name: getFormField('name *') }), 'New');
+        await paste(
+          await findByRole('textbox', { name: getFormField('description *') }),
+          'New project',
+        );
+        await paste(
+          await findByRole('textbox', { name: getFormField('address *') }),
+          'Testikatu 1',
+        );
+        await setPhaseToProposalForSubmit(user, findByTestId);
+        const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+        await user.clear(hkrIdField);
+        await paste(hkrIdField, hkrId);
+        await user.click(await findByTestId('submit-project-button'));
+      };
+
+      const renderNewProject = () => render({ project: undefined, mode: 'new' });
+
+      it('sends the confirmed hkrId with the new project', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+          data: { ...mockProject.data, id: 'new-project-id', hkrId: '1234' },
+          status: 201,
+        });
+        mockPwProjectNameLookup(() =>
+          Promise.resolve({ data: { hkrId: '1234', name: 'PW Kohde', syncEnabled: true } }),
+        );
+        const rendered = await renderNewProject();
+
+        await fillNewProjectAndSubmit(rendered, '1234');
+        await rendered.user.click(await rendered.findByTestId('confirm-dialog-button'));
+
+        await waitFor(() => expect(mockedAxios.post).toHaveBeenCalled());
+        const postRequest = mockedAxios.post.mock.lastCall[1] as IProjectRequest;
+        expect(postRequest.hkrId).toBe('1234');
+        expect(postRequest.confirmedHkrId).toBe('1234');
+      }, 30000);
+
+      it('does not create the project when the user cancels, and keeps the typed hkrId', async () => {
+        mockPwProjectNameLookup(() =>
+          Promise.resolve({ data: { hkrId: '1234', name: 'Wrong project', syncEnabled: true } }),
+        );
+        const rendered = await renderNewProject();
+
+        await fillNewProjectAndSubmit(rendered, '1234');
+        expect(await rendered.findByText('projectForm.pwLinkDialog.title')).toBeInTheDocument();
+        await rendered.user.click(rendered.getByText('cancel'));
+
+        await waitFor(() =>
+          expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument(),
+        );
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+        expect(
+          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+            .value,
+        ).toBe('1234');
+      }, 30000);
+
+      it('does not create the project when PW has no such project', async () => {
+        mockPwProjectNameLookup(() =>
+          Promise.reject({ response: { status: 404, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } } }),
+        );
+        const rendered = await renderNewProject();
+
+        await fillNewProjectAndSubmit(rendered, '9999');
+
+        await waitFor(() =>
+          expect(notificationMessages(rendered.store)).toContain('pwProjectNotFound'),
+        );
+        expect(notificationTitles(rendered.store)).toContain('createError');
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+        await waitFor(() =>
+          expect(rendered.getByTestId('hkrId').querySelector('[class*="invalid"]')).not.toBeNull(),
+        );
+      }, 30000);
     });
 
     it('saves without a dialog when PW sync is disabled', async () => {

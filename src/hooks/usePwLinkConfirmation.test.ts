@@ -10,6 +10,7 @@ describe('normalizeHkrId', () => {
     [123, '123'],
     [null, ''],
     [undefined, ''],
+    [{}, ''],
     ['12a', '12a'],
     ['-5', '-5'],
   ])('normalizes %p to %p', (value, expected) => {
