@@ -9,7 +9,7 @@ import {
 } from '@/mocks/mockClasses';
 import mockI18next from '@/mocks/mockI18next';
 import { RootState, setupStore } from '@/store';
-import { renderWithProviders } from '@/utils/testUtils';
+import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import PlanningView from './PlanningView';
 import { mockCoordinatorDistricts } from '@/mocks/mockLocations';
 import { mockProjectPhases } from '@/mocks/mockLists';
@@ -71,7 +71,10 @@ const getAllRowsExpandedRoute = () => {
   return `/coordination/?masterClass=${masterClassId}&class=${classId}&subClass=${subClassId}&collectiveSubLevel=${collectiveSubLevelId}&subLevelDistrict=${subLevelDistrictId}`;
 };
 
-const render = async (customState?: object | null, customRoute?: string) =>
+const render = async (
+  customState?: object | null,
+  customRoute?: string,
+): Promise<CustomRenderResult> =>
   await act(async () =>
     renderWithProviders(
       <>

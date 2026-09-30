@@ -71,7 +71,7 @@ const PlanningViewTestApp = () => {
   );
 };
 
-const render = async () =>
+const render = async (): Promise<CustomRenderResult> =>
   await act(async () =>
     renderWithProviders(
       <>
