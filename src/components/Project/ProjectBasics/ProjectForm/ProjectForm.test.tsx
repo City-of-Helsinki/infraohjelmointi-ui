@@ -36,6 +36,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
 import * as projectApiHooks from '@/api/projectApi';
 import { mockUser } from '@/mocks/mockUsers';
+import { AppStore } from '@/store';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
@@ -219,6 +220,13 @@ const mockPwProjectNameLookup = (respond: () => Promise<unknown>) => {
       : (defaultGet?.(url, config as never) as ReturnType<typeof mockedAxios.get>),
   );
 };
+
+// `render()` loses its return type under @testing-library/react 15's `act`
+const notificationMessages = (store: AppStore) =>
+  store.getState().notifications.map(({ message }) => message);
+
+const notificationTitles = (store: AppStore) =>
+  store.getState().notifications.map(({ title }) => title);
 
 const getPwLookupCalls = () =>
   mockedAxios.get.mock.calls.filter(([url]) => String(url).endsWith(PW_PROJECT_NAME_URL));
@@ -901,7 +909,7 @@ describe('projectForm', () => {
       ).toBeUndefined();
     });
 
-    it('flags the hkrId and saves only the other changes when PW has no such project', async () => {
+    it('saves only the other changes and says why when PW has no such project', async () => {
       mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
       mockPwProjectNameLookup(() =>
         Promise.reject({ response: { status: 404, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } } }),
@@ -911,24 +919,70 @@ describe('projectForm', () => {
       await changeHkrIdAndSubmit(rendered, '9999');
 
       await waitFor(() =>
-        expect(rendered.store.getState().notifications.map(({ message }) => message)).toContain(
-          'pwProjectNotFound',
-        ),
+        expect(notificationMessages(rendered.store)).toContain('pwProjectNotFound'),
       );
       expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
+
+      expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
       expect(mockedAxios.patch.mock.lastCall[1]).not.toHaveProperty('hkrId');
 
-      // The typed hkrId stays in the field, unsaved and marked invalid
-      const hkrIdField = rendered.getByRole('spinbutton', {
+      // The field shows the saved hkrId again; the toast explains the rest
+      await waitFor(() =>
+        expect(
+          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+            .value,
+        ).toBe(String(mockProject.data.hkrId)),
+      );
+    });
+
+    it('keeps the typed hkrId flagged when it is the only change and PW has no such project', async () => {
+      mockPwProjectNameLookup(() =>
+        Promise.reject({ response: { status: 404, data: { hkrId: ['PW_PROJECT_NOT_FOUND'] } } }),
+      );
+      // Already in a phase that submits without further changes, and with the
+      // fields the form would otherwise normalise (and mark dirty) on load
+      const rendered = await render({
+        // IProject types these as non-null, but the API sends null for them
+        project: {
+          ...getProjectWithShiftableFinances(),
+          phaseDetail: null,
+          onSchedule: null,
+        } as unknown as IProject,
+      });
+
+      const hkrIdField = (await rendered.findByRole('spinbutton', {
         name: getFormField('hkrId'),
-      }) as HTMLInputElement;
+      })) as HTMLInputElement;
+      await rendered.user.clear(hkrIdField);
+      await rendered.user.type(hkrIdField, '9999');
+      await rendered.user.click(await rendered.findByTestId('submit-project-button'));
+
+      await waitFor(() =>
+        expect(notificationMessages(rendered.store)).toContain('pwProjectNotFound'),
+      );
       await waitFor(() =>
         expect(rendered.getByTestId('hkrId').querySelector('[class*="invalid"]')).not.toBeNull(),
       );
       expect(hkrIdField.value).toBe('9999');
-      expect(rendered.getByTestId('submit-project-button')).toBeEnabled();
+      expect(mockedAxios.patch).not.toHaveBeenCalled();
+    });
+
+    it('says the PW project could not be checked when the lookup fails outside PW', async () => {
+      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
+      mockPwProjectNameLookup(() =>
+        Promise.reject({ response: { status: 500, data: '<html>Server Error</html>' } }),
+      );
+      const rendered = await render();
+
+      await changeHkrIdAndSubmit(rendered, '1234');
+
+      await waitFor(() =>
+        expect(notificationMessages(rendered.store)).toContain('pwLinkCheckFailed'),
+      );
+      expect(notificationMessages(rendered.store)).not.toContain('formSaveError');
+      expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
     });
 
     it('saves without a dialog when PW sync is disabled', async () => {
@@ -960,9 +1014,7 @@ describe('projectForm', () => {
       await rendered.user.click(await rendered.findByTestId('submit-project-button'));
 
       await waitFor(() =>
-        expect(rendered.store.getState().notifications.map(({ message }) => message)).toContain(
-          'pwProjectNotFound',
-        ),
+        expect(notificationMessages(rendered.store)).toContain('pwProjectNotFound'),
       );
       // The field is marked invalid in the same render that sets its error text.
       // Before IO-935 that text was the raw code.

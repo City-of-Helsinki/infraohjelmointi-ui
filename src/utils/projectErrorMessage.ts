@@ -20,10 +20,7 @@ export const PW_UNAVAILABLE_CODE = 'PW_UNAVAILABLE';
 export const INVALID_HKR_ID_CODE = 'INVALID_HKR_ID';
 
 export type PwErrorMessageKey =
-  | 'pwProjectNotFound'
-  | 'pwLinkNotConfirmed'
-  | 'pwUnavailable'
-  | 'pwInvalidHkrId';
+  'pwProjectNotFound' | 'pwLinkNotConfirmed' | 'pwUnavailable' | 'pwInvalidHkrId';
 
 export type ProjectPatchErrorMessageKey = PwErrorMessageKey | 'formSaveError';
 
