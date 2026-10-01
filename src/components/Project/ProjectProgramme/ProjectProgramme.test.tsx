@@ -82,7 +82,7 @@ describe('ProjectProgramme', () => {
     mockGetProject.mockReturnValue({
       data: {
         id: 'project-1',
-        projectProgram: 'programme-1',
+        additionalInformation: 'Additional information',
         name: 'Mock project',
         projectDistrict: '',
       },

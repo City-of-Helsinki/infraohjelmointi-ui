@@ -21,7 +21,7 @@ const ProjectBasics = () => {
     { route: '#financial', label: t('nav.financial') },
     { route: '#responsiblePersons', label: t('nav.responsiblePersons') },
     { route: '#location', label: t('nav.location') },
-    { route: '#projectProgram', label: t('nav.projectProgram') },
+    { route: '#additionalInformation', label: t('nav.additionalInformation') },
   ];
 
   return (
