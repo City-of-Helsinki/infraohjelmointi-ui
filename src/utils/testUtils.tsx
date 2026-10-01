@@ -6,13 +6,14 @@ import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { AuthProvider } from 'react-oidc-context';
 import { UserManager } from 'oidc-client-ts';
 import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
 import { IUser, UserRole } from '@/interfaces/userInterfaces';
+
+type UserEvent = ReturnType<typeof userEvent.setup>;
 
 const oidcConfig = {
   authority: 'authority',
