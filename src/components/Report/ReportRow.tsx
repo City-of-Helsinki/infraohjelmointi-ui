@@ -37,6 +37,18 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   };
 
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
+    const fetchPaginatedProjects = async (
+      nextPath: string | null | undefined,
+      resultArray: typeof res.results,
+    ): Promise<typeof res.results> => {
+      if (nextPath == null) {
+        return resultArray;
+      }
+
+      const nextResults = await getProjectsWithParams({ fullPath: nextPath });
+      return fetchPaginatedProjects(nextResults.next, resultArray.concat(nextResults.results));
+    };
+
     // projects
     const res = await getProjectsWithParams(
       {
@@ -48,13 +60,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       },
       true,
     );
-    let resultArray = res.results;
-    let nextResultsPath = res.next;
-    while (nextResultsPath != null) {
-      const nextResults = await getProjectsWithParams({ fullPath: nextResultsPath });
-      resultArray = resultArray.concat(nextResults.results);
-      nextResultsPath = nextResults.next;
-    }
+    const resultArray = await fetchPaginatedProjects(res.next, res.results);
     const projects = resultArray.filter((p) => {
       const phaseValue = p.phase?.value;
       return phaseValue !== 'proposal' && phaseValue !== 'design';
