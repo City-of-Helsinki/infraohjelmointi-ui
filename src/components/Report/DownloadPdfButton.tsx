@@ -2,12 +2,7 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import {
-  IConstructionProgramCsvRow,
-  IDownloadPdfButtonProps,
-  ReportType,
-  Reports,
-} from '@/interfaces/reportInterfaces';
+import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -22,7 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getReportData } from '@/utils/reportHelpers';
+import { getCoordinationViewReportPdfRows } from '@/utils/reportHelpers';
 import {
   getCoordinatorAndForcedToFrameRows,
   getForcedToFrameDataForReports,
@@ -329,19 +324,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
               res.groupRes,
             );
 
-            const reportRows = (await getReportData(
-              t,
-              type,
-              coordinatorRows,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              year,
-            )) as IConstructionProgramCsvRow[];
+            const reportRows = getCoordinationViewReportPdfRows(coordinatorRows, year);
 
             document = (
               <CoordinationViewReportPdfDocument

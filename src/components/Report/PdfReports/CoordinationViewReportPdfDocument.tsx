@@ -1,6 +1,9 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { FC, memo, useMemo } from 'react';
-import { IConstructionProgramCsvRow } from '@/interfaces/reportInterfaces';
+import {
+  CoordinationViewReportHierarchyType,
+  ICoordinationViewReportPdfRow,
+} from '@/utils/reportHelpers';
 import DocumentHeader from './reportHeaders/DocumentHeader';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
 });
 
 interface ICoordinationViewReportPdfDocumentProps {
-  rows: IConstructionProgramCsvRow[];
+  rows: ICoordinationViewReportPdfRow[];
   title: string;
 }
 
@@ -93,7 +96,7 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
   title,
 }) => {
   const { t } = useTranslation();
-  const headers = useMemo(() => Object.keys(rows[0] ?? {}), [rows]);
+  const headers = useMemo(() => Object.keys(rows[0]?.values ?? {}), [rows]);
   const otherColumnWidth = headers.length > 1 ? `${66 / (headers.length - 1)}%` : '66%';
   const currentDate = moment(new Date()).format('D.MM.YYYY');
 
@@ -105,40 +108,7 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
     fontWeight: isHeader ? 'bold' : 'normal',
   });
 
-  const getRowType = (name: string) => {
-    const trimmedName = name.trim();
-    const lowerCaseName = trimmedName.toLowerCase();
-
-    if (/^\d\s\d{2}\s\d{2}\s\d{2}(\s|$)/.test(trimmedName)) {
-      return 'subClass';
-    }
-
-    if (/^\d\s\d{2}\s\d{2}(\s|$)/.test(trimmedName)) {
-      return 'class';
-    }
-
-    if (/^\d\s\d{2}(\s|$)/.test(trimmedName)) {
-      return 'masterClass';
-    }
-
-    if (
-      lowerCaseName.includes('suurpiiri') ||
-      lowerCaseName.includes('östersundom') ||
-      lowerCaseName.includes('ostersundom')
-    ) {
-      return 'district';
-    }
-
-    if (lowerCaseName.includes('yhteensä') || lowerCaseName.includes('ryhmä')) {
-      return 'group';
-    }
-
-    return 'project';
-  };
-
-  const getRowStyle = (rowName: string, index: number) => {
-    const rowType = getRowType(rowName);
-
+  const getRowStyle = (rowType: CoordinationViewReportHierarchyType, index: number) => {
     switch (rowType) {
       case 'masterClass':
         return styles.masterClassRow;
@@ -155,10 +125,8 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
     }
   };
 
-  const shouldUseClassNameCell = (rowName: string) => {
-    const rowType = getRowType(rowName);
-    return rowType !== 'project';
-  };
+  const shouldUseClassNameCell = (rowType: CoordinationViewReportHierarchyType) =>
+    rowType !== 'project';
 
   return (
     <Document title={title}>
@@ -183,10 +151,9 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
             </View>
 
             {rows.map((row, index) => {
-              const firstColumnValue = String(row[headers[0]] ?? '');
-              const rowStyle = getRowStyle(firstColumnValue, index);
-              const rowKey = `${row[headers[0]] ?? 'row'}-${index}`;
-              const firstColumnCellStyle = shouldUseClassNameCell(firstColumnValue)
+              const rowStyle = getRowStyle(row.rowType, index);
+              const rowKey = `${row.values[headers[0]] ?? 'row'}-${row.rowType}-${index}`;
+              const firstColumnCellStyle = shouldUseClassNameCell(row.rowType)
                 ? styles.firstColumnClass
                 : styles.firstColumn;
 
@@ -197,7 +164,7 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
                       key={`${rowKey}-${header}`}
                       style={headerIndex === 0 ? firstColumnCellStyle : getColumnStyle(false)}
                     >
-                      {row[header] ?? ''}
+                      {row.values[header] ?? ''}
                     </Text>
                   ))}
                 </View>

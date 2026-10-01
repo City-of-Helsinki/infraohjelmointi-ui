@@ -2143,25 +2143,60 @@ const getCoordinationViewReportProjectValues = (project: IProject, year: number)
   }, {} as IConstructionProgramCsvRow);
 };
 
-const generateCoordinationViewReportCsvRows = (
+export type CoordinationViewReportHierarchyType =
+  'masterClass' | 'class' | 'subClass' | 'district' | 'group' | 'project';
+
+export interface ICoordinationViewReportPdfRow {
+  rowType: CoordinationViewReportHierarchyType;
+  values: IConstructionProgramCsvRow;
+}
+
+const mapPlanningRowTypeToCoordinationHierarchyType = (
+  rowType: PlanningRowType,
+): CoordinationViewReportHierarchyType => {
+  switch (rowType) {
+    case 'masterClass':
+      return 'masterClass';
+    case 'class':
+      return 'class';
+    case 'subClass':
+      return 'subClass';
+    case 'subClassDistrict':
+    case 'district':
+    case 'districtPreview':
+    case 'subLevelDistrict':
+    case 'division':
+      return 'district';
+    case 'group':
+      return 'group';
+    default:
+      return 'project';
+  }
+};
+
+export const getCoordinationViewReportPdfRows = (
   rows: IPlanningRow[],
   year: number,
-): IConstructionProgramCsvRow[] => {
-  const csvRows: IConstructionProgramCsvRow[] = [];
+): ICoordinationViewReportPdfRow[] => {
+  const pdfRows: ICoordinationViewReportPdfRow[] = [];
 
   const walk = (planningRows: IPlanningRow[]) => {
     planningRows.forEach((row) => {
-      // Handle hierarchy row (master class, class etc.)
-      csvRows.push({
-        [t('target')]: row.name,
-        ...getCoordinationViewReportRowValues(row.cells, year),
+      pdfRows.push({
+        rowType: mapPlanningRowTypeToCoordinationHierarchyType(row.type),
+        values: {
+          [t('target')]: row.name,
+          ...getCoordinationViewReportRowValues(row.cells, year),
+        },
       });
 
-      // Handle project rows within the hierarchy
       row.projectRows.forEach((project) => {
-        csvRows.push({
-          [t('target')]: project.name,
-          ...getCoordinationViewReportProjectValues(project, year),
+        pdfRows.push({
+          rowType: 'project',
+          values: {
+            [t('target')]: project.name,
+            ...getCoordinationViewReportProjectValues(project, year),
+          },
         });
       });
 
@@ -2171,7 +2206,14 @@ const generateCoordinationViewReportCsvRows = (
 
   walk(rows);
 
-  return csvRows;
+  return pdfRows;
+};
+
+const generateCoordinationViewReportCsvRows = (
+  rows: IPlanningRow[],
+  year: number,
+): IConstructionProgramCsvRow[] => {
+  return getCoordinationViewReportPdfRows(rows, year).map((row) => row.values);
 };
 
 /**
