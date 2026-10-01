@@ -2081,17 +2081,17 @@ export const flattenConstructionProgramForecastTableRows = (
   processConstructionForecastReportRows(tableRows).flat(Infinity);
 
 const getCoordinationViewReportColumnKeys = (year: number) => [
-  `kuluva TA ${year}`,
+  `${t('report.shared.ongoingTA')} ${year}`,
   `TAE ${year + 1}`,
   `TSE ${year + 2}`,
   `TSE ${year + 3}`,
-  `alustava ${year + 4}`,
-  `alustava ${year + 5}`,
-  `alustava ${year + 6}`,
-  `alustava ${year + 7}`,
-  `alustava ${year + 8}`,
-  `alustava ${year + 9}`,
-  `alustava ${year + 10}`,
+  `${t('report.shared.preliminary')} ${year + 4}`,
+  `${t('report.shared.preliminary')} ${year + 5}`,
+  `${t('report.shared.preliminary')} ${year + 6}`,
+  `${t('report.shared.preliminary')} ${year + 7}`,
+  `${t('report.shared.preliminary')} ${year + 8}`,
+  `${t('report.shared.preliminary')} ${year + 9}`,
+  `${t('report.shared.preliminary')} ${year + 10}`,
 ];
 
 const normalizeCoordinationViewReportValue = (value?: string | null): string => {
