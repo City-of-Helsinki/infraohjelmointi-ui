@@ -6,7 +6,7 @@
     "@react-pdf/renderer": "^3.1.16",
     "@reduxjs/toolkit": "^2.0.0",
     "@types/autosize": "^4.0.1",
-    "@types/file-saver": "^2.0.5",
+    "@types/file-saver": "^2.0.7",
     "@types/jest": "^27.5.2",
     "@types/jwt-decode": "^3.1.0",
     "@types/lodash": "^4.14.191",
