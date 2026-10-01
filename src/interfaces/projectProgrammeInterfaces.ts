@@ -21,8 +21,7 @@ export interface IProjectProgrammeTransitionResponse {
   currentStatus: ProjectProgrammeStatus;
 }
 
-export interface IProjectProgrammeSectionTransitionResponse
-  extends IProjectProgrammeTransitionResponse {
+export interface IProjectProgrammeSectionTransitionResponse extends IProjectProgrammeTransitionResponse {
   section: string;
 }
 

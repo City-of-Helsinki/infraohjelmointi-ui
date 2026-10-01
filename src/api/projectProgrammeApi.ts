@@ -58,9 +58,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
         method: 'POST',
         data: { to },
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: 'ProjectProgrammes', id: arg.id },
-      ],
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
     postProjectProgrammeSection: build.mutation<
       Record<string, unknown>,
