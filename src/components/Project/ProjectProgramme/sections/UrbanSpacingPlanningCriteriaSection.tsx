@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import ProjectProgrammeTextAreaFieldsSection from './ProjectProgrammeTextAreaFieldsSection';
+import ProjectProgrammeTextAreaFieldsSection from '../ProjectProgrammeTextAreaFieldsSection';
 
 export const URBAN_SPACING_PLANNING_CRITERIA_FIELDS = [
   { field: 'targetUrbanAppearance' },

@@ -4,6 +4,7 @@ import { ButtonPresetTheme, ButtonVariant } from 'hds-react';
 import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
 
 const mockActionButtons = jest.fn();
+const mockStatusTransitionButtons = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -15,12 +16,21 @@ jest.mock('./ProjectProgrammeActionButtons', () => ({
   },
 }));
 
+jest.mock('./ProjectProgrammeStatusTransitionButtons', () => ({
+  __esModule: true,
+  default: (props: unknown) => {
+    mockStatusTransitionButtons(props);
+    return <div data-testid="project-programme-status-transition-buttons" />;
+  },
+}));
+
 describe('ProjectProgrammeDraftStateNotification', () => {
   const onOpenSection = jest.fn();
 
   beforeEach(() => {
     onOpenSection.mockReset();
     mockActionButtons.mockReset();
+    mockStatusTransitionButtons.mockReset();
   });
 
   it('renders draft state links and opens selected section', async () => {
@@ -47,7 +57,7 @@ describe('ProjectProgrammeDraftStateNotification', () => {
     expect(onOpenSection).toHaveBeenCalledWith('designCriteria');
   });
 
-  it('passes expected button overrides to action buttons', () => {
+  it('passes status and action button overrides to their respective components', () => {
     render(
       <ProjectProgrammeDraftStateNotification
         sectionsInCompletedState={[]}
@@ -58,9 +68,10 @@ describe('ProjectProgrammeDraftStateNotification', () => {
       />,
     );
 
+    const statusButtonProps = mockStatusTransitionButtons.mock.calls[0][0];
     const actionButtonProps = mockActionButtons.mock.calls[0][0];
 
-    expect(actionButtonProps).toEqual(
+    expect(statusButtonProps).toEqual(
       expect.objectContaining({
         isProjectProgrammeComplete: true,
         effectiveProjectProgrammeId: 'programme-123',
@@ -70,6 +81,12 @@ describe('ProjectProgrammeDraftStateNotification', () => {
             theme: ButtonPresetTheme.Black,
             style: { backgroundColor: 'var(--color-white)' },
           },
+        },
+      }),
+    );
+    expect(actionButtonProps).toEqual(
+      expect.objectContaining({
+        buttonOverrides: {
           copyLink: {
             theme: ButtonPresetTheme.Black,
             style: { backgroundColor: 'var(--color-white)' },

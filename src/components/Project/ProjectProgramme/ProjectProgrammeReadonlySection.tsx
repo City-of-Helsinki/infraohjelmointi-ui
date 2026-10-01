@@ -1,11 +1,11 @@
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
-import { BASIC_INFO_BRIEF_FIELDS, BASIC_INFO_FULL_FIELDS } from './BasicInfoSection';
-import { DESIGN_CRITERIA_FIELDS } from './DesignCriteriaSection';
-import { URBAN_SPACING_PLANNING_CRITERIA_FIELDS } from './UrbanSpacingPlanningCriteriaSection';
-import { INTERACTION_AND_RELATED_PROJECTS_FIELDS } from './InteractionAndRelatedProjectsSection';
-import { MAINTENANCE_NEEDS_FIELDS } from './MaintenanceNeedsSection';
-import { TRAFFIC_PLANNING_CRITERIA_FIELDS } from './TrafficPlanningCriteriaSection';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
+import { BASIC_INFO_BRIEF_FIELDS, BASIC_INFO_FULL_FIELDS } from './sections/BasicInfoSection';
+import { DESIGN_CRITERIA_FIELDS } from './sections/DesignCriteriaSection';
+import { URBAN_SPACING_PLANNING_CRITERIA_FIELDS } from './sections/UrbanSpacingPlanningCriteriaSection';
+import { INTERACTION_AND_RELATED_PROJECTS_FIELDS } from './sections/InteractionAndRelatedProjectsSection';
+import { MAINTENANCE_NEEDS_FIELDS } from './sections/MaintenanceNeedsSection';
+import { TRAFFIC_PLANNING_CRITERIA_FIELDS } from './sections/TrafficPlanningCriteriaSection';
 import ReadonlyFieldList from '@/components/shared/ReadonlyFieldList';
 import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
 

@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
   IProjectProgrammeSectionConfig,
   ProjectProgrammeSectionId,
-} from './projectProgrammeSections';
+} from './sections/projectProgrammeSections';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
+import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
 
 type Section = Pick<IProjectProgrammeSectionConfig, 'id' | 'label'>;
 
@@ -81,7 +82,7 @@ function ProjectProgrammeDraftStateNotification({
       />
 
       <div className="flex flex-wrap gap-4">
-        <ProjectProgrammeActionButtons
+        <ProjectProgrammeStatusTransitionButtons
           isProjectProgrammeComplete={isProjectProgrammeComplete}
           effectiveProjectProgrammeId={effectiveProjectProgrammeId}
           buttonOverrides={{
@@ -90,6 +91,10 @@ function ProjectProgrammeDraftStateNotification({
               theme: ButtonPresetTheme.Black,
               style: { backgroundColor: 'var(--color-white)' },
             },
+          }}
+        />
+        <ProjectProgrammeActionButtons
+          buttonOverrides={{
             copyLink: {
               theme: ButtonPresetTheme.Black,
               style: { backgroundColor: 'var(--color-white)' },

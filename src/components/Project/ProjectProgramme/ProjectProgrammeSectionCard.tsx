@@ -7,7 +7,7 @@ import {
   SupportedLanguage,
 } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 import ProjectProgrammeReadonlySection from './ProjectProgrammeReadonlySection';
 import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
@@ -21,6 +21,7 @@ interface ProjectProgrammeSectionCardProps {
   actionText: string;
   sectionId: ProjectProgrammeSectionId;
   projectProgramme?: IProjectProgramme;
+  programmeIsComplete: boolean;
 }
 
 function ProjectProgrammeSectionCard({
@@ -31,6 +32,7 @@ function ProjectProgrammeSectionCard({
   cardText,
   sectionId,
   projectProgramme,
+  programmeIsComplete,
 }: Readonly<ProjectProgrammeSectionCardProps>) {
   const { t, i18n } = useTranslation();
   const formMethods = useProjectProgrammeForm(projectProgramme);
@@ -41,13 +43,15 @@ function ProjectProgrammeSectionCard({
         <div className="project-programme-notification-content">
           <p>{cardText}</p>
           <div>
-            <Button
-              variant={sectionIsStarted ? ButtonVariant.Secondary : ButtonVariant.Primary}
-              type="button"
-              onClick={() => handleOpenSection(sectionId)}
-            >
-              {sectionIsStarted ? t('projectProgrammeForm.modifyInformation') : actionText}
-            </Button>
+            {!programmeIsComplete && (
+              <Button
+                variant={sectionIsStarted ? ButtonVariant.Secondary : ButtonVariant.Primary}
+                type="button"
+                onClick={() => handleOpenSection(sectionId)}
+              >
+                {sectionIsStarted ? t('projectProgrammeForm.modifyInformation') : actionText}
+              </Button>
+            )}
           </div>
           {Boolean(projectProgramme?.[sectionId]) && (
             <Accordion

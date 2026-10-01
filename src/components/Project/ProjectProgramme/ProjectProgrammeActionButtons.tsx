@@ -1,47 +1,14 @@
 import { Button, ButtonVariant, IconDownload, IconLink } from 'hds-react';
-import { ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTransitionProjectProgrammeStatusMutation } from '@/api/projectProgrammeApi';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-
-type ActionButtonVariant = Exclude<ButtonVariant, ButtonVariant.Supplementary>;
-
-type ActionButtonVisualProps = Pick<ComponentProps<typeof Button>, 'theme' | 'style'> & {
-  variant?: ActionButtonVariant;
-};
-
-export interface ProjectProgrammeActionButtonsOverrides {
-  markReady?: ActionButtonVisualProps;
-  copyLink?: ActionButtonVisualProps;
-  makePdf?: ActionButtonVisualProps;
-}
-
-interface ProjectProgrammeActionButtonsProps {
-  isProjectProgrammeComplete: boolean;
-  effectiveProjectProgrammeId: string;
-  buttonOverrides?: ProjectProgrammeActionButtonsOverrides;
-}
+import { ProjectProgrammeActionButtonsProps } from '@/interfaces/projectProgrammeInterfaces';
 
 function ProjectProgrammeActionButtons({
-  isProjectProgrammeComplete,
-  effectiveProjectProgrammeId,
   buttonOverrides,
 }: Readonly<ProjectProgrammeActionButtonsProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-
-  const [transitionStatus] = useTransitionProjectProgrammeStatusMutation();
-
-  function notifyMissingProject() {
-    dispatch(
-      notifyError({
-        title: 'saveError',
-        message: 'projectNotFound',
-        type: 'toast',
-      }),
-    );
-  }
 
   function handleCopyLinkClick() {
     navigator.clipboard
@@ -78,44 +45,8 @@ function ProjectProgrammeActionButtons({
     );
   }
 
-  async function handleMarkProgrammeReady() {
-    if (!effectiveProjectProgrammeId) {
-      notifyMissingProject();
-      return;
-    }
-
-    try {
-      await transitionStatus({ id: effectiveProjectProgrammeId, to: 'COMPLETE' }).unwrap();
-      dispatch(
-        notifySuccess({
-          title: 'saveSuccess',
-          message: 'projectProgrammeMarkReadySuccess',
-          type: 'toast',
-        }),
-      );
-    } catch {
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeMarkReadyError',
-          type: 'toast',
-        }),
-      );
-    }
-  }
-
   return (
-    <>
-      <Button
-        type="button"
-        onClick={handleMarkProgrammeReady}
-        disabled={isProjectProgrammeComplete}
-        variant={buttonOverrides?.markReady?.variant}
-        theme={buttonOverrides?.markReady?.theme}
-        style={buttonOverrides?.markReady?.style}
-      >
-        {t('projectProgrammeForm.markReady')}
-      </Button>
+    <span style={{ display: 'flex', gap: '1.5rem' }}>
       <Button
         variant={buttonOverrides?.copyLink?.variant ?? ButtonVariant.Secondary}
         theme={buttonOverrides?.copyLink?.theme}
@@ -136,7 +67,7 @@ function ProjectProgrammeActionButtons({
       >
         {t('projectProgrammeForm.makePdf')}
       </Button>
-    </>
+    </span>
   );
 }
 
