@@ -11,7 +11,7 @@ import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectFinancialSection from './ProjectFinancialSection';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
 import ProjectLocationSection from './ProjectLocationSection';
-import ProjectProgramSection from './ProjectProgramSection';
+import AdditionalInformationSection from './AdditionalInformationSection';
 import ProjectFormBanner from './ProjectFormBanner';
 import { useNavigate } from 'react-router';
 import './styles.css';
@@ -545,7 +545,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
+      <AdditionalInformationSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
       {/* BANNER */}
       {!isOnlyViewer && (
         <ProjectFormBanner

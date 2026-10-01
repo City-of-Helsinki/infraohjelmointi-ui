@@ -68,7 +68,7 @@ describe('ProjectBasics', () => {
       'nav.financial',
       'nav.responsiblePersons',
       'nav.location',
-      'nav.projectProgram',
+      'nav.additionalInformation',
     ];
 
     expect(await findByTestId('side-panel')).toBeInTheDocument();

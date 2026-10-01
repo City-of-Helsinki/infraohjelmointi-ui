@@ -181,6 +181,7 @@ const defaultFormValues = {
   budgetOverrunReason: { value: '', label: '' },
   otherBudgetOverrunReason: '',
   otherPersons: [],
+  additionalInformation: '',
 } as IProjectForm;
 
 const TestComponent = ({ phase = '' }: { phase?: string }) => {
