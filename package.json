@@ -86,7 +86,7 @@
     "@typescript/native": "npm:typescript@7.0.2",
     "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.71.0",
-    "css-loader": "^6.7.1",
+    "css-loader": "^7.1.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
