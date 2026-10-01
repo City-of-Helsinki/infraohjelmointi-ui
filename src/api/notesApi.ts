@@ -1,13 +1,100 @@
 import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import axios from 'axios';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+
+function getResolvedImageUrl(imageUrl: string): string {
+  if (!API_BASE_URL) {
+    return imageUrl;
+  }
+
+  try {
+    return new URL(imageUrl, API_BASE_URL).toString();
+  } catch {
+    return imageUrl;
+  }
+}
+
+async function getDownloadedImageUrl(image: INoteImage): Promise<string | undefined> {
+  if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+    return undefined;
+  }
+
+  try {
+    const imageResponse = await axios.get<Blob>(getResolvedImageUrl(image.url), {
+      responseType: 'blob',
+    });
+    return URL.createObjectURL(imageResponse.data);
+  } catch {
+    // Keep original url if image download fails.
+    return undefined;
+  }
+}
+
+async function hydrateNoteImages(note: INote): Promise<INote> {
+  if (!note.images || note.images.length === 0) {
+    return note;
+  }
+
+  const hydratedImages = await Promise.all(
+    note.images.map(async (image) => ({
+      ...image,
+      downloadUrl: await getDownloadedImageUrl(image),
+    })),
+  );
+
+  return {
+    ...note,
+    images: hydratedImages,
+  };
+}
+
+function revokeDownloadedImageUrls(notes: INote[] | undefined) {
+  if (!notes || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') {
+    return;
+  }
+
+  notes.forEach((note) => {
+    note.images?.forEach((image) => {
+      if (image.downloadUrl) {
+        URL.revokeObjectURL(image.downloadUrl);
+      }
+    });
+  });
+}
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
     getNotesByProject: build.query<INote[], string>({
-      query: (projectId: string) => ({
-        url: `/projects/${projectId}/notes/`,
-      }),
+      async queryFn(projectId, _api, _extraOptions, baseQuery) {
+        const notesResult = await baseQuery({
+          url: `/projects/${projectId}/notes/`,
+        });
+
+        if (notesResult.error) {
+          return { error: notesResult.error };
+        }
+
+        const notes = (notesResult.data as INote[]) ?? [];
+        const hydratedNotes = await Promise.all(notes.map(hydrateNoteImages));
+
+        return { data: hydratedNotes };
+      },
+      async onCacheEntryAdded(_arg, { cacheDataLoaded, cacheEntryRemoved, getCacheEntry }) {
+        try {
+          await cacheDataLoaded;
+        } catch {
+          return;
+        }
+
+        const notes = getCacheEntry().data;
+
+        await cacheEntryRemoved;
+
+        revokeDownloadedImageUrls(notes);
+      },
       providesTags: ['Notes'],
     }),
     postNote: build.mutation<INote, INoteRequest>({

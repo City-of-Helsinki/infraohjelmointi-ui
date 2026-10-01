@@ -84,7 +84,7 @@ export default function NoteAttachmentList({
               onClick={() => handleOpenImage(index)}
               aria-label={t('noteAttachments.viewAttachment', { fileName: attachment.fileName })}
             >
-              <img src={attachment.url} alt="" className={styles.listItemImage} />
+              <img src={attachment.downloadUrl} alt="" className={styles.listItemImage} />
             </button>
             <div className={styles.listItemInfo}>
               <p className="my-0 font-medium">{t('noteAttachments.attachmentAdded')}</p>

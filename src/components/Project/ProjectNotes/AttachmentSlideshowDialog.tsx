@@ -67,7 +67,7 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
       <Dialog.Content style={{ padding: '14px 24px 24px', position: 'relative' }}>
         <div className="flex flex-col items-center">
           <img
-            src={currentAttachment.url}
+            src={currentAttachment.downloadUrl}
             alt={currentAttachment.fileName}
             className="max-h-[70vh] w-full rounded-sm object-contain"
           />

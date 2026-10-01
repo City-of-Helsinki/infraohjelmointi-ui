@@ -13,6 +13,7 @@ type INoteImageContentType = 'image/jpeg' | 'image/png';
 export interface INoteImage {
   id: string;
   url: string;
+  downloadUrl?: string;
   fileName: string;
   contentType: INoteImageContentType;
   size: number;
