@@ -195,7 +195,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           );
 
           if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            const rows = getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             document = getPdfDocument(
               type,
               rows.coordinatorRows,
@@ -228,7 +228,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
 
           if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            const rows = getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             document = getPdfDocument(
               type,
               rows.coordinatorRows,

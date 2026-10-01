@@ -53,7 +53,7 @@ export const getForcedToFrameDataForReports = async (
  * @param resForcedToFrame Forced to Frame view data
  * @returns Object
  */
-export const getCoordinatorAndForcedToFrameRows = async (
+export const getCoordinatorAndForcedToFrameRows = (
   resCoordinator: IGetForcedToFrameData,
   resForcedToFrame: IGetForcedToFrameData,
 ) => {

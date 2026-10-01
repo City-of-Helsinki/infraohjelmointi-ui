@@ -120,7 +120,7 @@ export const useCsvData = ({
           );
 
           if (resCoordinator && resCoordinator.projects.length > 0) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            const rows = getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             data = await getReportData(
               t,
               type,

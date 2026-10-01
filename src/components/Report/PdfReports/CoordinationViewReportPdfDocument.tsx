@@ -186,19 +186,16 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
               const firstColumnValue = String(row[headers[0]] ?? '');
               const rowStyle = getRowStyle(firstColumnValue, index);
               const rowKey = `${row[headers[0]] ?? 'row'}-${index}`;
+              const firstColumnCellStyle = shouldUseClassNameCell(firstColumnValue)
+                ? styles.firstColumnClass
+                : styles.firstColumn;
 
               return (
                 <View wrap={false} key={rowKey} style={rowStyle}>
                   {headers.map((header, headerIndex) => (
                     <Text
                       key={`${rowKey}-${header}`}
-                      style={
-                        headerIndex === 0
-                          ? shouldUseClassNameCell(firstColumnValue)
-                            ? styles.firstColumnClass
-                            : styles.firstColumn
-                          : getColumnStyle(false)
-                      }
+                      style={headerIndex === 0 ? firstColumnCellStyle : getColumnStyle(false)}
                     >
                       {row[header] ?? ''}
                     </Text>
