@@ -256,15 +256,7 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
   });
 
-  it('returns a completed programme to draft before reopening its section', async () => {
-    const completedFormData: IProjectProgrammeForm = {
-      ...baseFormData,
-      designCriteria: {
-        ...baseFormData.designCriteria,
-        status: 'COMPLETE',
-      },
-    };
-
+  it('keeps sections locked while the programme is complete', async () => {
     await act(async () =>
       renderWithProviders(
         <Route
@@ -273,7 +265,7 @@ describe('ProjectProgrammeForm save logic', () => {
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
               activeSection="designCriteria"
-              effectiveProjectProgramme={completedFormData}
+              effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete
               onClose={jest.fn()}
@@ -285,22 +277,15 @@ describe('ProjectProgrammeForm save logic', () => {
       ),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
-
-    await waitFor(() => {
-      expect(mockTransitionProjectProgrammeStatus).toHaveBeenCalledWith({
-        id: 'programme-1',
-        to: 'DRAFT',
-      });
-      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
-        id: 'programme-1',
-        section: 'design-criteria',
-        to: 'DRAFT',
-      });
-    });
-    expect(mockTransitionProjectProgrammeStatus.mock.invocationCallOrder[0]).toBeLessThan(
-      mockTransitionProjectProgrammeSectionStatus.mock.invocationCallOrder[0],
-    );
+    expect(screen.getByDisplayValue('Guiding zoning regulations')).toBeDisabled();
+    expect(screen.getByText('projectProgrammeForm.draftStatus')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'projectProgrammeForm.returnToDraft' })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.markSectionReady' }),
+    ).toBeNull();
+    expect(screen.queryByRole('button', { name: 'projectProgrammeForm.saveDraft' })).toBeNull();
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+    expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
   });
 
   it('shows brief-only fields and does not require inspector in brief programme mode', async () => {

@@ -7,7 +7,6 @@ import {
   usePatchProjectProgrammeSectionMutation,
   usePostProjectProgrammeSectionMutation,
   useTransitionProjectProgrammeSectionStatusMutation,
-  useTransitionProjectProgrammeStatusMutation,
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
@@ -86,7 +85,6 @@ function ProjectProgrammeForm({
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
   const [transitionSectionStatus] = useTransitionProjectProgrammeSectionStatusMutation();
-  const [transitionProgrammeStatus] = useTransitionProjectProgrammeStatusMutation();
   const activeSectionStatus = effectiveProjectProgramme?.[activeSection]?.status ?? 'DRAFT';
   const isActiveSectionComplete = activeSectionStatus === 'COMPLETE';
   const isFormReadOnly = isProjectProgrammeComplete || isActiveSectionComplete;
@@ -131,6 +129,8 @@ function ProjectProgrammeForm({
     data: IProjectProgrammeForm,
     activeSection: keyof IProjectProgrammeForm,
   ) {
+    if (isProjectProgrammeComplete) return;
+
     try {
       const sectionWasSaved = await persistSection(data, activeSection);
       if (!sectionWasSaved) {
@@ -158,6 +158,8 @@ function ProjectProgrammeForm({
   }
 
   async function markSectionReady(data: IProjectProgrammeForm) {
+    if (isProjectProgrammeComplete) return;
+
     try {
       await persistSection(data, activeSection, true);
       await transitionSectionStatus({
@@ -185,10 +187,9 @@ function ProjectProgrammeForm({
   }
 
   async function returnSectionToDraft() {
+    if (isProjectProgrammeComplete) return;
+
     try {
-      if (isProjectProgrammeComplete) {
-        await transitionProgrammeStatus({ id: projectProgrammeId, to: 'DRAFT' }).unwrap();
-      }
       await transitionSectionStatus({
         id: projectProgrammeId,
         section: mapSectionIdToApiRoute(activeSection),
@@ -279,7 +280,7 @@ function ProjectProgrammeForm({
                     {t('projectProgrammeForm.saveDraft')}
                   </Button>
                 </>
-              ) : (
+              ) : !isProjectProgrammeComplete ? (
                 <Button
                   variant={ButtonVariant.Primary}
                   type="button"
@@ -287,7 +288,7 @@ function ProjectProgrammeForm({
                 >
                   {t('projectProgrammeForm.returnToDraft')}
                 </Button>
-              )}
+              ) : null}
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"
