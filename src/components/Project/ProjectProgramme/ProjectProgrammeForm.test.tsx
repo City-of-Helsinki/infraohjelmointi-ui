@@ -213,7 +213,7 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('keeps a completed section read-only and returns it to draft', async () => {
+  it('keeps a completed section read-only without a return-to-draft action', async () => {
     const completedFormData: IProjectProgrammeForm = {
       ...baseFormData,
       maintenanceNeeds: {
@@ -244,15 +244,10 @@ describe('ProjectProgrammeForm save logic', () => {
 
     expect(screen.getByDisplayValue('Regular maintenance required')).toBeDisabled();
     expect(screen.getByText('projectProgrammeForm.completeStatus')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
-
-    await waitFor(() => {
-      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
-        id: 'programme-1',
-        section: 'maintenance-needs',
-        to: 'DRAFT',
-      });
-    });
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.returnSectionToDraft' }),
+    ).toBeNull();
+    expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
     expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
   });
 

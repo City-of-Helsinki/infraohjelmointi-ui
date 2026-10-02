@@ -6,7 +6,6 @@ import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import {
   usePatchProjectProgrammeSectionMutation,
   usePostProjectProgrammeSectionMutation,
-  useTransitionProjectProgrammeSectionStatusMutation,
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useAppDispatch } from '@/hooks/common';
@@ -25,6 +24,7 @@ import TrafficPlanningCriteriaSection from './sections/TrafficPlanningCriteriaSe
 import UrbanSpacingPlanningCriteriaSection from './sections/UrbanSpacingPlanningCriteriaSection';
 import MaintenanceNeedsSection from './sections/MaintenanceNeedsSection';
 import InteractionAndRelatedProjectsSection from './sections/InteractionAndRelatedProjectsSection';
+import useMarkProjectProgrammeSectionReady from './useMarkProjectProgrammeSectionReady';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
@@ -84,7 +84,11 @@ function ProjectProgrammeForm({
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
-  const [transitionSectionStatus] = useTransitionProjectProgrammeSectionStatusMutation();
+  const markSectionReady = useMarkProjectProgrammeSectionReady(
+    projectProgrammeId,
+    activeSection,
+    isProjectProgrammeComplete,
+  );
   const activeSectionStatus = effectiveProjectProgramme?.[activeSection]?.status ?? 'DRAFT';
   const isActiveSectionComplete = activeSectionStatus === 'COMPLETE';
   const isFormReadOnly = isProjectProgrammeComplete || isActiveSectionComplete;
@@ -157,61 +161,8 @@ function ProjectProgrammeForm({
     }
   }
 
-  async function markSectionReady(data: IProjectProgrammeForm) {
-    if (isProjectProgrammeComplete) return;
-
-    try {
-      await persistSection(data, activeSection, true);
-      await transitionSectionStatus({
-        id: projectProgrammeId,
-        section: mapSectionIdToApiRoute(activeSection),
-        to: 'COMPLETE',
-      }).unwrap();
-      dispatch(
-        notifySuccess({
-          title: 'saveSuccess',
-          message: 'projectProgrammeSectionMarkReadySuccess',
-          type: 'toast',
-        }),
-      );
-      onClose();
-    } catch {
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeSectionMarkReadyError',
-          type: 'toast',
-        }),
-      );
-    }
-  }
-
-  async function returnSectionToDraft() {
-    if (isProjectProgrammeComplete) return;
-
-    try {
-      await transitionSectionStatus({
-        id: projectProgrammeId,
-        section: mapSectionIdToApiRoute(activeSection),
-        to: 'DRAFT',
-      }).unwrap();
-      dispatch(
-        notifySuccess({
-          title: 'saveSuccess',
-          message: 'projectProgrammeSectionReturnToDraftSuccess',
-          type: 'toast',
-        }),
-      );
-      onClose();
-    } catch {
-      dispatch(
-        notifyError({
-          title: 'saveError',
-          message: 'projectProgrammeSectionReturnToDraftError',
-          type: 'toast',
-        }),
-      );
-    }
+  function handleMarkSectionReady(data: IProjectProgrammeForm) {
+    return markSectionReady(() => persistSection(data, activeSection, true), onClose);
   }
 
   function handleShowChangeHistory() {
@@ -262,12 +213,12 @@ function ProjectProgrammeForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              {!isFormReadOnly ? (
+              {!isFormReadOnly && (
                 <>
                   <Button
                     variant={ButtonVariant.Primary}
                     type="button"
-                    onClick={handleSubmit(markSectionReady)}
+                    onClick={handleSubmit(handleMarkSectionReady)}
                   >
                     {t('projectProgrammeForm.markSectionReady')}
                   </Button>
@@ -280,15 +231,7 @@ function ProjectProgrammeForm({
                     {t('projectProgrammeForm.saveDraft')}
                   </Button>
                 </>
-              ) : !isProjectProgrammeComplete ? (
-                <Button
-                  variant={ButtonVariant.Primary}
-                  type="button"
-                  onClick={returnSectionToDraft}
-                >
-                  {t('projectProgrammeForm.returnToDraft')}
-                </Button>
-              ) : null}
+              )}
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"
