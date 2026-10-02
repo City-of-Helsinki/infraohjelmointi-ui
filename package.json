@@ -53,6 +53,9 @@
     "prepare": "node -e \"if (require('fs').existsSync('.git')) { require('fs').chmodSync('.githooks/pre-commit', 0o755); require('child_process').execFileSync('git', ['config', '--local', 'core.hooksPath', '.githooks']); }\"",
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },
+  "resolutions": {
+    "css-loader": "^7.1.5"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
