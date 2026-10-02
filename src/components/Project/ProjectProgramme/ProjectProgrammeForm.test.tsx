@@ -11,6 +11,8 @@ import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 const mockDispatch = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
+const mockTransitionProjectProgrammeSectionStatus = jest.fn();
+const mockTransitionProjectProgrammeStatus = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -25,6 +27,14 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
   usePatchProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPatchProjectProgrammeSection(...args) }),
+  ],
+  useTransitionProjectProgrammeSectionStatusMutation: () => [
+    (...args: unknown[]) => ({
+      unwrap: () => mockTransitionProjectProgrammeSectionStatus(...args),
+    }),
+  ],
+  useTransitionProjectProgrammeStatusMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockTransitionProjectProgrammeStatus(...args) }),
   ],
 }));
 
@@ -83,8 +93,194 @@ describe('ProjectProgrammeForm save logic', () => {
     mockDispatch.mockReset();
     mockPostProjectProgrammeSection.mockReset();
     mockPatchProjectProgrammeSection.mockReset();
+    mockTransitionProjectProgrammeSectionStatus.mockReset();
+    mockTransitionProjectProgrammeStatus.mockReset();
     mockPostProjectProgrammeSection.mockResolvedValue({});
     mockPatchProjectProgrammeSection.mockResolvedValue({});
+    mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
+    mockTransitionProjectProgrammeStatus.mockResolvedValue({});
+  });
+
+  it('saves changed section fields before marking the section ready', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Initial project'), {
+      target: { value: 'Updated project name' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockPatchProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'basic-info',
+        data: { projectName: 'Updated project name' },
+      });
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'basic-info',
+        to: 'COMPLETE',
+      });
+    });
+    expect(mockPatchProjectProgrammeSection.mock.invocationCallOrder[0]).toBeLessThan(
+      mockTransitionProjectProgrammeSectionStatus.mock.invocationCallOrder[0],
+    );
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('marks an unchanged existing section ready without patching it', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'design-criteria',
+        to: 'COMPLETE',
+      });
+    });
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+  });
+
+  it('does not mark a section ready when required fields are missing', async () => {
+    const onClose = jest.fn();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => {
+      expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
+      expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
+      expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('keeps a completed section read-only without a return-to-draft action', async () => {
+    const completedFormData: IProjectProgrammeForm = {
+      ...baseFormData,
+      maintenanceNeeds: {
+        ...baseFormData.maintenanceNeeds,
+        status: 'COMPLETE',
+      },
+    };
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="maintenanceNeeds"
+              effectiveProjectProgramme={completedFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Regular maintenance required')).toBeDisabled();
+    expect(screen.getByText('projectProgrammeForm.completeStatus')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.returnSectionToDraft' }),
+    ).toBeNull();
+    expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+  });
+
+  it('keeps sections locked while the programme is complete', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="designCriteria"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete
+              onClose={jest.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Guiding zoning regulations')).toBeDisabled();
+    expect(screen.getByText('projectProgrammeForm.draftStatus')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'projectProgrammeForm.returnToDraft' })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.markSectionReady' }),
+    ).toBeNull();
+    expect(screen.queryByRole('button', { name: 'projectProgrammeForm.saveDraft' })).toBeNull();
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+    expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
   });
 
   it('shows brief-only fields and does not require inspector in brief programme mode', async () => {
@@ -98,6 +294,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -132,6 +329,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -207,6 +405,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -254,6 +453,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -301,6 +501,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -361,6 +562,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="trafficPlanningCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -415,6 +617,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="urbanSpacingPlanningCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -469,6 +672,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -507,6 +711,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -522,7 +727,7 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
   });
 
-  it('trims whitespace-only values in dirty fields before submit', async () => {
+  it('saves a draft with required fields missing and trims whitespace-only dirty values', async () => {
     const onClose = jest.fn();
 
     await act(async () =>
@@ -535,6 +740,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="designCriteria"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -583,6 +789,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="basicInfo"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -622,6 +829,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -669,6 +877,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -716,6 +925,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -761,6 +971,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={{ basicInfo: baseFormData.basicInfo }}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={onClose}
             />
           }
@@ -811,6 +1022,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="trafficPlanningCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -837,6 +1049,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="urbanSpacingPlanningCriteria"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -863,6 +1076,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="maintenanceNeeds"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }
@@ -887,6 +1101,7 @@ describe('ProjectProgrammeForm save logic', () => {
               activeSection="interactionAndRelatedProjects"
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
+              isProjectProgrammeComplete={false}
               onClose={jest.fn()}
             />
           }

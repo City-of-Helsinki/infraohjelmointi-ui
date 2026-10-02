@@ -1,6 +1,7 @@
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
+  IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
@@ -43,6 +44,17 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
     >({
       query: ({ id, to }: { id: string; to: ProjectProgrammeStatus }) => ({
         url: `/project-programmes/${id}/transitions/`,
+        method: 'POST',
+        data: { to },
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
+    transitionProjectProgrammeSectionStatus: build.mutation<
+      IProjectProgrammeSectionTransitionResponse,
+      { id: string; section: string; to: ProjectProgrammeStatus }
+    >({
+      query: ({ id, section, to }) => ({
+        url: `/project-programmes/${id}/sections/${section}/transitions/`,
         method: 'POST',
         data: { to },
       }),
@@ -104,6 +116,7 @@ export const {
   usePostProjectProgrammeMutation,
   usePostSwitchProjectProgrammeTypeMutation,
   useTransitionProjectProgrammeStatusMutation,
+  useTransitionProjectProgrammeSectionStatusMutation,
   usePostProjectProgrammeSectionMutation,
   usePatchProjectProgrammeSectionMutation,
 } = projectProgrammeApi;

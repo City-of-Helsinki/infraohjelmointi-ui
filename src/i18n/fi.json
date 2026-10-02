@@ -586,8 +586,11 @@
     "changeHistory": "Muutoshistoria",
     "cancel": "Peruuta ja palaa päänäkymään",
     "draftStatus": "Luonnos",
+    "completeStatus": "Valmis",
+    "sectionCompleteStatus": "Merkitty valmiiksi",
     "markReady": "Merkitse hankeohjelma valmiiksi",
     "returnToDraft": "Palauta hankeohjelma luonnokseksi",
+    "returnSectionToDraft": "Palauta luonnokseksi",
     "makePdf": "Koosta pdf-tiedosto",
     "switchToBriefProgramme": "Muuta suppeaksi hankeohjelmaksi",
     "projectProgrammeLoadError": "Hankeohjelmaa ei voitu ladata. Yritä uudelleen.",
@@ -689,7 +692,8 @@
     "completedStateSections": "Valmiiksi merkityt osiot:",
     "draftStateSections": "Luonnostilassa olevat osiot:",
     "programmeCompletedNotificationTitle": "Hankeohjelma merkitty valmiiksi",
-    "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten."
+    "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten.",
+    "markSectionReady": "Merkitse valmiiksi"
   },
   "notification": {
     "title": {
@@ -754,6 +758,10 @@
       "projectProgrammeMarkReadyError": "Hankeohjelman merkitseminen valmiiksi ei onnistunut.",
       "projectProgrammeReturnToDraftSuccess": "Hankeohjelma palautettu luonnokseksi.",
       "projectProgrammeReturnToDraftError": "Hankeohjelman palauttaminen luonnokseksi ei onnistunut.",
+      "projectProgrammeSectionMarkReadySuccess": "Hankeohjelman osio merkitty valmiiksi.",
+      "projectProgrammeSectionMarkReadyError": "Hankeohjelman osion merkitseminen valmiiksi ei onnistunut.",
+      "projectProgrammeSectionReturnToDraftSuccess": "Hankeohjelman osio palautettu luonnokseksi.",
+      "projectProgrammeSectionReturnToDraftError": "Hankeohjelman osion palauttaminen luonnokseksi ei onnistunut.",
       "projectProgrammePdfGenerationNotImplemented": "PDF-koostaminen lisätään myöhemmin.",
       "projectProgrammeChangeHistoryNotImplemented": "Muutoshistoria lisätään myöhemmin.",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
