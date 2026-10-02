@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 
 interface IDocumentHeaderProps {
   title: string;
-  reportType: ReportType;
+  reportType?: ReportType;
   subtitleOne?: string;
   subtitleTwo?: string;
   date?: string;

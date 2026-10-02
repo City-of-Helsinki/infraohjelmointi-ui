@@ -944,10 +944,17 @@
       "ta": "TA",
       "ts": "TS",
       "kiloEuro": "1000€",
-      "millionEuro": "milj. €"
+      "millionEuro": "milj. €",
+      "ongoingTA": "kuluva TA",
+      "preliminary": "alustava"
     },
     "warrantyPeriodPhaseNotIncluded": "HUOM! Takuuaikaiset hankkeet eivät tulostu raportille.",
     "yearLabel": "Vuosi",
+    "coordinationViewReport": {
+      "title": "Helsingin kaupunki",
+      "rowTitle": "Koordinointinäkymä",
+      "documentName": "koordinointinäkymä"
+    },
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
       "documentName": "kategorisointiraportti - koordinointinäkymä",

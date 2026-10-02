@@ -4,12 +4,14 @@ import {
   checkProjectHasBudgets,
   convertToGroupValues,
   frameBudgetHandler,
+  getCoordinationViewReportPdfRows,
   getIsGroupOnSchedule,
   getIsProjectOnSchedule,
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
 import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterfaces';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 
 jest.mock('i18next', () => ({
   t: (key: string) => key,
@@ -646,6 +648,99 @@ describe('reportHelpers', () => {
           ),
         ).toBeFalsy();
       });
+    });
+  });
+
+  describe('coordination view PDF rows', () => {
+    const buildCells = (baseValue: number): IPlanningCell[] =>
+      Array.from({ length: 11 }, (_, index) => ({
+        key: `cell-${baseValue}-${index}`,
+        year: 2026 + index,
+        plannedBudget: `${baseValue + index}`,
+        isCurrentOrPastYear: false,
+        isFrameBudgetOverlap: false,
+      }));
+
+    const buildPlanningRow = (
+      rowType: PlanningRowType,
+      name: string,
+      overrides: Partial<IPlanningRow> = {},
+    ): IPlanningRow => ({
+      type: rowType,
+      name,
+      path: name,
+      children: [],
+      projectRows: [],
+      id: `${rowType}-${name}`,
+      key: `${rowType}-${name}`,
+      defaultExpanded: true,
+      urlSearchParam: null,
+      cells: buildCells(10),
+      ...overrides,
+    });
+
+    it('preserves explicit hierarchy row types for numeric code rows and custom groups', () => {
+      const project = createProject({
+        name: 'Kohde A',
+        finances: {
+          budgetProposalCurrentYearPlus0: '1',
+          budgetProposalCurrentYearPlus1: '2',
+          budgetProposalCurrentYearPlus2: '3',
+          preliminaryCurrentYearPlus3: '4',
+          preliminaryCurrentYearPlus4: '5',
+          preliminaryCurrentYearPlus5: '6',
+          preliminaryCurrentYearPlus6: '7',
+          preliminaryCurrentYearPlus7: '8',
+          preliminaryCurrentYearPlus8: '9',
+          preliminaryCurrentYearPlus9: '10',
+          preliminaryCurrentYearPlus10: '11',
+        },
+      });
+
+      const customGroupRow = buildPlanningRow('group', 'Kunnossapidon kohdepaketti', {
+        cells: buildCells(30),
+      });
+
+      const subClassRow = buildPlanningRow('subClass', '801 Esirakentaminen', {
+        children: [customGroupRow],
+        projectRows: [project],
+        cells: buildCells(20),
+      });
+
+      const classRow = buildPlanningRow('class', '8 01 Katualueet', {
+        children: [subClassRow],
+      });
+
+      const masterClassRow = buildPlanningRow('masterClass', '8 Kaupunkiymparisto', {
+        children: [classRow],
+      });
+
+      const result = getCoordinationViewReportPdfRows([masterClassRow], 2026);
+      const targetKey = 'target';
+
+      expect(result.map((row) => row.rowType)).toEqual([
+        'masterClass',
+        'class',
+        'subClass',
+        'project',
+        'group',
+      ]);
+      expect(result.map((row) => row.values[targetKey])).toEqual([
+        '8 Kaupunkiymparisto',
+        '8 01 Katualueet',
+        '801 Esirakentaminen',
+        'Kohde A',
+        'Kunnossapidon kohdepaketti',
+      ]);
+    });
+
+    it('maps district-like planning row types to district hierarchy styling metadata', () => {
+      const districtPreviewRow = buildPlanningRow('districtPreview', 'Etelainen suurpiiri');
+
+      const result = getCoordinationViewReportPdfRows([districtPreviewRow], 2026);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].rowType).toBe('district');
     });
   });
 });

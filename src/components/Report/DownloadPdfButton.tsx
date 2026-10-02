@@ -17,6 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { getCoordinationViewReportPdfRows } from '@/utils/reportHelpers';
 import {
   getCoordinatorAndForcedToFrameRows,
   getForcedToFrameDataForReports,
@@ -24,6 +25,7 @@ import {
 } from './common';
 import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import CoordinationViewReportPdfDocument from './PdfReports/CoordinationViewReportPdfDocument';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -106,6 +108,7 @@ const getPdfDocument = (
     ),
     budgetBookSummary: <ReportContainer data={{ rows }} reportType={Reports.BudgetBookSummary} />,
     financialStatement: <EmptyDocument />,
+    coordinationViewReport: <EmptyDocument />,
   };
 
   return pdfDocument[type];
@@ -187,7 +190,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           );
 
           if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            const rows = getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             document = getPdfDocument(
               type,
               rows.coordinatorRows,
@@ -220,7 +223,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
 
           if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            const rows = getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             document = getPdfDocument(
               type,
               rows.coordinatorRows,
@@ -309,6 +312,29 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
+        case Reports.CoordinationViewReport: {
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
+
+          if (viewHasProjects(res)) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+
+            const reportRows = getCoordinationViewReportPdfRows(coordinatorRows, year);
+
+            document = (
+              <CoordinationViewReportPdfDocument
+                rows={reportRows}
+                title={t('report.coordinationViewReport.rowTitle')}
+              />
+            );
+          }
+          break;
+        }
       }
 
       if (document !== undefined) {
@@ -347,6 +373,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
     projectSapCosts,
     type,
     year,
+    t,
   ]);
 
   return (

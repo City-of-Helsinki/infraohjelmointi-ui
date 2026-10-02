@@ -38,6 +38,7 @@ import {
   calculateOperationalEnvironmentAnalysisCategorySums,
 } from '@/components/Report/common';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { parseCurrency } from './currencyUtils';
 
 interface IYearCheck {
   planningStart: number;
@@ -2079,6 +2080,142 @@ export const flattenConstructionProgramForecastTableRows = (
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionForecastReportRows(tableRows).flat(Infinity);
 
+const getCoordinationViewReportColumnKeys = (year: number) => [
+  `${t('report.shared.ongoingTA')} ${year}`,
+  `TAE ${year + 1}`,
+  `TSE ${year + 2}`,
+  `TSE ${year + 3}`,
+  `${t('report.shared.preliminary')} ${year + 4}`,
+  `${t('report.shared.preliminary')} ${year + 5}`,
+  `${t('report.shared.preliminary')} ${year + 6}`,
+  `${t('report.shared.preliminary')} ${year + 7}`,
+  `${t('report.shared.preliminary')} ${year + 8}`,
+  `${t('report.shared.preliminary')} ${year + 9}`,
+  `${t('report.shared.preliminary')} ${year + 10}`,
+];
+
+const normalizeCoordinationViewReportValue = (value?: string | null): string => {
+  if (value == null || value === '') {
+    return '';
+  }
+
+  const parsedValue = parseCurrency(value);
+
+  if (parsedValue === null) {
+    return String(value).replace(/\s/g, '');
+  }
+
+  if (Number.isInteger(parsedValue)) {
+    return parsedValue.toString();
+  }
+
+  return Math.round(parsedValue).toString();
+};
+
+const getCoordinationViewReportRowValues = (cells: IPlanningCell[], year: number) => {
+  const columns: IConstructionProgramCsvRow = {};
+  const keys = getCoordinationViewReportColumnKeys(year);
+  keys.forEach((key, index) => {
+    columns[key] = normalizeCoordinationViewReportValue(cells[index]?.plannedBudget);
+  });
+  return columns;
+};
+
+const getCoordinationViewReportProjectValues = (project: IProject, year: number) => {
+  const keys = getCoordinationViewReportColumnKeys(year);
+  const financeValues = [
+    project.finances.budgetProposalCurrentYearPlus0,
+    project.finances.budgetProposalCurrentYearPlus1,
+    project.finances.budgetProposalCurrentYearPlus2,
+    project.finances.preliminaryCurrentYearPlus3,
+    project.finances.preliminaryCurrentYearPlus4,
+    project.finances.preliminaryCurrentYearPlus5,
+    project.finances.preliminaryCurrentYearPlus6,
+    project.finances.preliminaryCurrentYearPlus7,
+    project.finances.preliminaryCurrentYearPlus8,
+    project.finances.preliminaryCurrentYearPlus9,
+    project.finances.preliminaryCurrentYearPlus10,
+  ];
+
+  return keys.reduce((acc, key, index) => {
+    acc[key] = normalizeCoordinationViewReportValue(financeValues[index]);
+    return acc;
+  }, {} as IConstructionProgramCsvRow);
+};
+
+export type CoordinationViewReportHierarchyType =
+  'masterClass' | 'class' | 'subClass' | 'district' | 'group' | 'project';
+
+export interface ICoordinationViewReportPdfRow {
+  rowType: CoordinationViewReportHierarchyType;
+  values: IConstructionProgramCsvRow;
+}
+
+const mapPlanningRowTypeToCoordinationHierarchyType = (
+  rowType: PlanningRowType,
+): CoordinationViewReportHierarchyType => {
+  switch (rowType) {
+    case 'masterClass':
+      return 'masterClass';
+    case 'class':
+      return 'class';
+    case 'subClass':
+      return 'subClass';
+    case 'subClassDistrict':
+    case 'district':
+    case 'districtPreview':
+    case 'subLevelDistrict':
+    case 'division':
+      return 'district';
+    case 'group':
+      return 'group';
+    default:
+      return 'project';
+  }
+};
+
+export const getCoordinationViewReportPdfRows = (
+  rows: IPlanningRow[],
+  year: number,
+): ICoordinationViewReportPdfRow[] => {
+  const pdfRows: ICoordinationViewReportPdfRow[] = [];
+
+  const walk = (planningRows: IPlanningRow[]) => {
+    planningRows.forEach((row) => {
+      pdfRows.push({
+        rowType: mapPlanningRowTypeToCoordinationHierarchyType(row.type),
+        values: {
+          [t('target')]: row.name,
+          ...getCoordinationViewReportRowValues(row.cells, year),
+        },
+      });
+
+      row.projectRows.forEach((project) => {
+        pdfRows.push({
+          rowType: 'project',
+          values: {
+            [t('target')]: project.name,
+            ...getCoordinationViewReportProjectValues(project, year),
+          },
+        });
+      });
+
+      walk(row.children);
+    });
+  };
+
+  walk(rows);
+
+  return pdfRows;
+};
+
+const generateCoordinationViewReportCsvRows = (
+  rows: IPlanningRow[],
+  year: number,
+): IConstructionProgramCsvRow[] => {
+  return getCoordinationViewReportPdfRows(rows, year).map((row) => row.values);
+};
+
 /**
  * Create report table rows without flattening
  */
@@ -2436,6 +2573,8 @@ export const getReportData = async (
           ...analysisTableRows,
         ] as IOperationalEnvironmentAnalysisCsvRow[];
       }
+      case Reports.CoordinationViewReport:
+        return generateCoordinationViewReportCsvRows(rows, year);
       default:
         return [];
     }
