@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { ProjectProgrammeActionButtonsProps } from '@/interfaces/projectProgrammeInterfaces';
+import useProjectProgrammePdf from './pdf/useProjectProgrammePdf';
 
 function ProjectProgrammeActionButtons({
   buttonOverrides,
 }: Readonly<ProjectProgrammeActionButtonsProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { generatePdf, isGenerating, canGeneratePdf } = useProjectProgrammePdf();
 
   function handleCopyLinkClick() {
     navigator.clipboard
@@ -35,16 +37,6 @@ function ProjectProgrammeActionButtons({
       });
   }
 
-  function handleGeneratePdfClick() {
-    dispatch(
-      notifySuccess({
-        title: 'update',
-        message: 'projectProgrammePdfGenerationNotImplemented',
-        type: 'toast',
-      }),
-    );
-  }
-
   return (
     <span style={{ display: 'flex', gap: '1.5rem' }}>
       <Button
@@ -63,7 +55,8 @@ function ProjectProgrammeActionButtons({
         style={buttonOverrides?.makePdf?.style}
         iconStart={<IconDownload />}
         type="button"
-        onClick={handleGeneratePdfClick}
+        onClick={generatePdf}
+        disabled={!canGeneratePdf || isGenerating}
       >
         {t('projectProgrammeForm.makePdf')}
       </Button>
