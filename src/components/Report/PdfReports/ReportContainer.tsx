@@ -1,5 +1,5 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import { FC, memo } from 'react';
 import {
   IBasicReportData,
@@ -47,8 +47,6 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({
   currentYearSapValues,
   year = new Date().getFullYear(),
 }) => {
-  const { t } = useTranslation();
-
   const date = new Date();
   const currentYear = date.getFullYear();
   const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${currentYear}`;

@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 const styles = StyleSheet.create({
   tableHeader: {
@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
 });
 
 const BudgetBookSummaryTableHeader = () => {
-  const { t } = useTranslation();
   // This is used for looping the inital budgets for 5-10 years from now on
   const currentPlusYears = [5, 6, 7, 8, 9, 10];
   return (
