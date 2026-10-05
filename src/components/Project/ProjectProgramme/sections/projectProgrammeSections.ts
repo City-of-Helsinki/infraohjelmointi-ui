@@ -113,7 +113,7 @@ interface StartedSections {
 export const getProjectProgrammeSections = (
   t: TFunction,
   briefProgramme: boolean,
-  startedSections: StartedSections,
+  startedSections?: StartedSections,
 ): IProjectProgrammeSectionConfig[] => [
   {
     id: 'basicInfo',
@@ -123,7 +123,7 @@ export const getProjectProgrammeSections = (
     }`,
     actionText: t('projectProgrammeForm.fillBasicInfo'),
     showInBrief: true,
-    sectionIsStarted: startedSections.hasBasicInfo,
+    sectionIsStarted: startedSections?.hasBasicInfo ?? false,
   },
   {
     id: 'designCriteria',
@@ -131,7 +131,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.designCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillDesignCriteria'),
     showInBrief: false,
-    sectionIsStarted: startedSections.hasDesignCriteria,
+    sectionIsStarted: startedSections?.hasDesignCriteria ?? false,
   },
   {
     id: 'trafficPlanningCriteria',
@@ -139,7 +139,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.trafficPlanningCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillTrafficPlanningCriteria'),
     showInBrief: false,
-    sectionIsStarted: startedSections.hasTrafficPlanningCriteria,
+    sectionIsStarted: startedSections?.hasTrafficPlanningCriteria ?? false,
   },
   {
     id: 'urbanSpacingPlanningCriteria',
@@ -147,7 +147,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.urbanSpacingPlanningCriteriaCardText'),
     actionText: t('projectProgrammeForm.fillUrbanSpacingPlanningCriteria'),
     showInBrief: false,
-    sectionIsStarted: startedSections.hasUrbanSpacingPlanningCriteria,
+    sectionIsStarted: startedSections?.hasUrbanSpacingPlanningCriteria ?? false,
   },
   {
     id: 'maintenanceNeeds',
@@ -155,7 +155,7 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.maintenanceNeedsCardText'),
     actionText: t('projectProgrammeForm.fillMaintenanceNeeds'),
     showInBrief: false,
-    sectionIsStarted: startedSections.hasMaintenanceNeeds,
+    sectionIsStarted: startedSections?.hasMaintenanceNeeds ?? false,
   },
   {
     id: 'interactionAndRelatedProjects',
@@ -163,6 +163,6 @@ export const getProjectProgrammeSections = (
     cardText: t('projectProgrammeForm.interactionAndRelatedProjectsCardText'),
     actionText: t('projectProgrammeForm.fillInteractionAndRelatedProjects'),
     showInBrief: false,
-    sectionIsStarted: startedSections.hasInteractionAndRelatedProjects,
+    sectionIsStarted: startedSections?.hasInteractionAndRelatedProjects ?? false,
   },
 ];

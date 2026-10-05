@@ -14,15 +14,6 @@ import { createProjectProgrammePdfBlob } from './createProjectProgrammePdf';
 
 const LOADING_PROJECT_PROGRAMME_PDF = 'loading-project-programme-pdf';
 
-const NO_STARTED_SECTIONS = {
-  hasBasicInfo: false,
-  hasDesignCriteria: false,
-  hasTrafficPlanningCriteria: false,
-  hasUrbanSpacingPlanningCriteria: false,
-  hasMaintenanceNeeds: false,
-  hasInteractionAndRelatedProjects: false,
-};
-
 export default function useProjectProgrammePdf() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -40,7 +31,7 @@ export default function useProjectProgrammePdf() {
 
     try {
       const isBrief = projectProgramme.briefProjectProgramme ?? true;
-      const sections = getProjectProgrammeSections(t, isBrief, NO_STARTED_SECTIONS)
+      const sections = getProjectProgrammeSections(t, isBrief)
         .filter((section) => !isBrief || section.showInBrief)
         .map(({ id, label }) => ({ id, label }));
       const projectName = projectProgramme.basicInfo?.projectName?.trim() || project?.name || '';

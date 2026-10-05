@@ -140,3 +140,15 @@ export interface ProjectProgrammeStatusTransitionButtonsProps {
 export interface ProjectProgrammeActionButtonsProps {
   buttonOverrides?: ProjectProgrammeActionButtonsOverrides;
 }
+
+export interface IProjectProgrammePdfSection {
+  id: ProjectProgrammeSectionId;
+  label: string;
+}
+
+export interface IProjectProgrammePdfDocumentProps {
+  projectProgramme: IProjectProgramme;
+  sections: IProjectProgrammePdfSection[];
+  projectName: string;
+  createdDate: string;
+}
