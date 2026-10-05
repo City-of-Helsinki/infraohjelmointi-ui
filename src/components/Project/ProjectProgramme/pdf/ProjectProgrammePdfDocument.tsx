@@ -4,12 +4,7 @@ import DocumentHeader from '@/components/Report/PdfReports/reportHeaders/Documen
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 import { ProjectProgrammeSectionId } from '../sections/projectProgrammeSections';
 import { getFieldsForSection } from '../sections/projectProgrammeSectionFields';
-import {
-  formatPdfValue,
-  getPdfLinks,
-  IProjectProgrammePdfDetail,
-  isSafeHttpUrl,
-} from './projectProgrammePdfUtils';
+import { formatPdfValue, getPdfLinks, isSafeHttpUrl } from './projectProgrammePdfUtils';
 
 const BLUE = '#0000bf';
 const GREY = '#666666';
@@ -116,7 +111,6 @@ export interface IProjectProgrammePdfDocumentProps {
   sections: IProjectProgrammePdfSection[];
   projectName: string;
   createdDate: string;
-  projectDetails?: IProjectProgrammePdfDetail[];
 }
 
 function PdfField({
@@ -147,7 +141,6 @@ function ProjectProgrammePdfDocument({
   sections,
   projectName,
   createdDate,
-  projectDetails = [],
 }: Readonly<IProjectProgrammePdfDocumentProps>) {
   const { t } = useTranslation();
   const isBrief = projectProgramme.briefProjectProgramme ?? true;
@@ -213,17 +206,6 @@ function ProjectProgrammePdfDocument({
             {t('projectProgrammeForm.pdfCreated', { date: createdDate })}
           </Text>
         </View>
-
-        {projectDetails.length > 0 && (
-          <View style={styles.section}>
-            <PdfSectionTitle title={t('projectProgrammeForm.pdfProjectDetails')} />
-            <View style={styles.gridRow}>
-              {projectDetails.map((detail) => (
-                <PdfField key={detail.label} label={detail.label} value={detail.value} grid />
-              ))}
-            </View>
-          </View>
-        )}
 
         {sections.map(renderSection)}
 

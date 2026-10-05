@@ -1,5 +1,3 @@
-import { TFunction } from 'i18next';
-import { IProject } from '@/interfaces/projectInterfaces';
 import { IProjectProgrammeLinkFormItem } from '@/interfaces/projectProgrammeInterfaces';
 
 export const EMPTY_PDF_VALUE = '-';
@@ -8,13 +6,6 @@ export interface IProjectProgrammePdfDetail {
   label: string;
   value: string;
 }
-
-// Placeholder for adding other project fields like project number, phase etc to pdf in the future.
-// They will be added to the "Hankkeen tiedot" block of the PDF.
-export const PROJECT_PDF_FIELDS: ReadonlyArray<{
-  labelKey: string;
-  getValue: (_project: IProject) => unknown;
-}> = [];
 
 export function formatPdfValue(value: unknown): string {
   if (value === null || value === undefined) {
@@ -30,19 +21,6 @@ export function formatPdfValue(value: unknown): string {
     return formatPdfValue((value as { name?: unknown }).name);
   }
   return EMPTY_PDF_VALUE;
-}
-
-export function getProjectPdfDetails(
-  project: IProject | undefined,
-  t: TFunction,
-): IProjectProgrammePdfDetail[] {
-  if (!project) {
-    return [];
-  }
-  return PROJECT_PDF_FIELDS.map(({ labelKey, getValue }) => ({
-    label: t(labelKey),
-    value: formatPdfValue(getValue(project)),
-  }));
 }
 
 export function getPdfLinks(links?: IProjectProgrammeLinkFormItem[] | null): string[] {

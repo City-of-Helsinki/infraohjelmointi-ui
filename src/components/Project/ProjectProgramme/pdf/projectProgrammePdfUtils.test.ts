@@ -2,14 +2,11 @@ import {
   EMPTY_PDF_VALUE,
   formatPdfValue,
   getPdfLinks,
-  getProjectPdfDetails,
   getProjectProgrammePdfFileName,
   isSafeHttpUrl,
 } from './projectProgrammePdfUtils';
 import { getFieldsForSection } from '../sections/projectProgrammeSectionFields';
 import { BASIC_INFO_BRIEF_FIELDS, BASIC_INFO_FULL_FIELDS } from '../sections/BasicInfoSection';
-import { IProject } from '@/interfaces/projectInterfaces';
-import { TFunction } from 'i18next';
 
 describe('projectProgrammePdfUtils', () => {
   it('formats empty values as a dash', () => {
@@ -46,12 +43,6 @@ describe('projectProgrammePdfUtils', () => {
     expect(getProjectProgrammePdfFileName('Hankeohjelma', '', '2026-10-05')).toBe(
       'Hankeohjelma_2026-10-05.pdf',
     );
-  });
-
-  it('returns no project details by default', () => {
-    const t = ((key: string) => key) as unknown as TFunction;
-    expect(getProjectPdfDetails({ id: '1' } as IProject, t)).toEqual([]);
-    expect(getProjectPdfDetails(undefined, t)).toEqual([]);
   });
 });
 

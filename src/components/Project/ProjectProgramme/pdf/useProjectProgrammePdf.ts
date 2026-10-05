@@ -9,7 +9,7 @@ import { useGetProjectProgrammeByProjectQuery } from '@/api/projectProgrammeApi'
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { getProjectProgrammeSections } from '../sections/projectProgrammeSections';
-import { getProjectPdfDetails, getProjectProgrammePdfFileName } from './projectProgrammePdfUtils';
+import { getProjectProgrammePdfFileName } from './projectProgrammePdfUtils';
 import { createProjectProgrammePdfBlob } from './createProjectProgrammePdf';
 
 const LOADING_PROJECT_PROGRAMME_PDF = 'loading-project-programme-pdf';
@@ -50,7 +50,6 @@ export default function useProjectProgrammePdf() {
         sections,
         projectName,
         createdDate: now.format('D.M.YYYY'),
-        projectDetails: getProjectPdfDetails(project, t),
       });
 
       saveAs(
