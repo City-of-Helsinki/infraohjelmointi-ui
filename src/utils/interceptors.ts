@@ -29,6 +29,7 @@ const urlsToExclueFromLoading = [
   '/project-groups',
   '/project-hashtags',
   '/projects/',
+  '/images/',
 ];
 
 /**
