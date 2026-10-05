@@ -5,7 +5,7 @@ import {
   ICoordinationViewReportPdfRow,
 } from '@/utils/reportHelpers';
 import DocumentHeader from './reportHeaders/DocumentHeader';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import moment from 'moment';
 
 const styles = StyleSheet.create({
@@ -95,7 +95,6 @@ const CoordinationViewReportPdfDocument: FC<ICoordinationViewReportPdfDocumentPr
   rows,
   title,
 }) => {
-  const { t } = useTranslation();
   const headers = useMemo(() => Object.keys(rows[0]?.values ?? {}), [rows]);
   const otherColumnWidth = headers.length > 1 ? `${66 / (headers.length - 1)}%` : '66%';
   const currentDate = moment(new Date()).format('D.MM.YYYY');

@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 const cellStyles = {
   width: '56px',
@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
 });
 
 const ConstructionProgramForecastTableHeader = () => {
-  const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
