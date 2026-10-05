@@ -29,6 +29,7 @@ const urlsToExclueFromLoading = [
   '/project-groups',
   '/project-hashtags',
   '/projects/',
+  '/images/',
 ];
 
 /**
@@ -132,7 +133,7 @@ const handleError = (error: AxiosError): Promise<IError> => {
 
   const responseUrl = error?.request?.responseURL || '';
 
-  let excludedUrls = ['/project-hashtags', '/projects/'];
+  let excludedUrls = ['/project-hashtags', '/projects/', '/images'];
 
   if (
     (responseUrl.includes('/talpa-project-opening/by-project') ||
