@@ -1,4 +1,4 @@
-import { Button, ButtonVariant, IconPen, StatusLabel } from 'hds-react';
+import { Button, ButtonVariant, IconCheckCircle, IconPen, StatusLabel } from 'hds-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
@@ -24,6 +24,7 @@ import TrafficPlanningCriteriaSection from './sections/TrafficPlanningCriteriaSe
 import UrbanSpacingPlanningCriteriaSection from './sections/UrbanSpacingPlanningCriteriaSection';
 import MaintenanceNeedsSection from './sections/MaintenanceNeedsSection';
 import InteractionAndRelatedProjectsSection from './sections/InteractionAndRelatedProjectsSection';
+import useMarkProjectProgrammeSectionReady from './useMarkProjectProgrammeSectionReady';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
@@ -69,6 +70,7 @@ function ProjectProgrammeForm({
   activeSection,
   effectiveProjectProgramme,
   briefProgramme,
+  isProjectProgrammeComplete,
   onClose,
   project,
 }: Readonly<IProjectProgrammeFormProps>) {
@@ -77,16 +79,25 @@ function ProjectProgrammeForm({
   const formMethods = useProjectProgrammeForm(effectiveProjectProgramme, project);
   const {
     handleSubmit,
-    formState: { isDirty, dirtyFields },
     getValues,
+    formState: { isDirty, dirtyFields },
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
+  const markSectionReady = useMarkProjectProgrammeSectionReady(
+    projectProgrammeId,
+    activeSection,
+    isProjectProgrammeComplete,
+  );
+  const activeSectionStatus = effectiveProjectProgramme?.[activeSection]?.status ?? 'DRAFT';
+  const isActiveSectionComplete = activeSectionStatus === 'COMPLETE';
+  const isFormReadOnly = isProjectProgrammeComplete || isActiveSectionComplete;
 
-  async function submitDraft(
+  async function persistSection(
     data: IProjectProgrammeForm,
     activeSection: keyof IProjectProgrammeForm,
-  ) {
+    createIfMissing = false,
+  ): Promise<boolean> {
     const requestData: Record<string, unknown> = pickChangedFormFields(
       data,
       activeSection,
@@ -98,30 +109,39 @@ function ProjectProgrammeForm({
       requestData.links = linksPayload;
     }
 
-    if (activeSection === 'basicInfo' && !effectiveProjectProgramme?.basicInfo) {
-      // If the basicInfo section is created,
-      // ensure projectName and district are included in the requestData.
-      requestData.projectName = data.basicInfo?.projectName || '';
-      requestData.district = data.basicInfo?.district || '';
+    const sectionExists = Boolean(effectiveProjectProgramme?.[activeSection]);
+    if (!Object.keys(requestData).length && (sectionExists || !createIfMissing)) {
+      return false;
     }
 
-    if (!Object.keys(requestData).length) {
-      onClose();
-      return;
+    const request = {
+      id: projectProgrammeId,
+      section: mapSectionIdToApiRoute(activeSection),
+      data: requestData,
+    };
+
+    if (sectionExists) {
+      await patchProjectProgrammeSection(request).unwrap();
+    } else {
+      await postProjectProgrammeSection(request).unwrap();
     }
+
+    return true;
+  }
+
+  async function submitDraft(
+    data: IProjectProgrammeForm,
+    activeSection: keyof IProjectProgrammeForm,
+  ) {
+    if (isProjectProgrammeComplete) return;
 
     try {
-      const request = {
-        id: projectProgrammeId,
-        section: mapSectionIdToApiRoute(activeSection),
-        data: requestData,
-      };
-
-      if (effectiveProjectProgramme?.[activeSection]) {
-        await patchProjectProgrammeSection(request).unwrap();
-      } else {
-        await postProjectProgrammeSection(request).unwrap();
+      const sectionWasSaved = await persistSection(data, activeSection);
+      if (!sectionWasSaved) {
+        onClose();
+        return;
       }
+
       dispatch(
         notifySuccess({
           title: 'saveSuccess',
@@ -139,6 +159,10 @@ function ProjectProgrammeForm({
         }),
       );
     }
+  }
+
+  function handleMarkSectionReady(data: IProjectProgrammeForm) {
+    return markSectionReady(() => persistSection(data, activeSection, true), onClose);
   }
 
   function handleShowChangeHistory() {
@@ -159,35 +183,55 @@ function ProjectProgrammeForm({
         noValidate
       >
         <div className="mb-4">
-          <StatusLabel type="info" iconStart={<IconPen />}>
-            {t('projectProgrammeForm.draftStatus')}
+          <StatusLabel
+            type={isActiveSectionComplete ? 'success' : 'info'}
+            iconStart={isActiveSectionComplete ? <IconCheckCircle /> : <IconPen />}
+          >
+            {t(
+              isActiveSectionComplete
+                ? 'projectProgrammeForm.completeStatus'
+                : 'projectProgrammeForm.draftStatus',
+            )}
           </StatusLabel>
         </div>
 
-        {activeSection === 'basicInfo' && (
-          <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
-        )}
-        {activeSection === 'designCriteria' && <DesignCriteriaSection />}
-        {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaSection />}
-        {activeSection === 'urbanSpacingPlanningCriteria' && (
-          <UrbanSpacingPlanningCriteriaSection />
-        )}
-        {activeSection === 'maintenanceNeeds' && <MaintenanceNeedsSection />}
-        {activeSection === 'interactionAndRelatedProjects' && (
-          <InteractionAndRelatedProjectsSection />
-        )}
+        <fieldset disabled={isFormReadOnly} className="m-0 min-w-0 border-0 p-0">
+          {activeSection === 'basicInfo' && (
+            <ProjectProgrammeBasicInfoForm briefProgramme={briefProgramme} />
+          )}
+          {activeSection === 'designCriteria' && <DesignCriteriaSection />}
+          {activeSection === 'trafficPlanningCriteria' && <TrafficPlanningCriteriaSection />}
+          {activeSection === 'urbanSpacingPlanningCriteria' && (
+            <UrbanSpacingPlanningCriteriaSection />
+          )}
+          {activeSection === 'maintenanceNeeds' && <MaintenanceNeedsSection />}
+          {activeSection === 'interactionAndRelatedProjects' && (
+            <InteractionAndRelatedProjectsSection />
+          )}
+        </fieldset>
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="project-programme-actions">
-              <Button
-                variant={ButtonVariant.Secondary}
-                type="button"
-                onClick={() => submitDraft(getValues(), activeSection)}
-                disabled={!isDirty}
-              >
-                {t('projectProgrammeForm.saveDraft')}
-              </Button>
+              {!isFormReadOnly && (
+                <>
+                  <Button
+                    variant={ButtonVariant.Primary}
+                    type="button"
+                    onClick={handleSubmit(handleMarkSectionReady)}
+                  >
+                    {t('projectProgrammeForm.markSectionReady')}
+                  </Button>
+                  <Button
+                    variant={ButtonVariant.Secondary}
+                    type="button"
+                    disabled={!isDirty}
+                    onClick={() => submitDraft(getValues(), activeSection)}
+                  >
+                    {t('projectProgrammeForm.saveDraft')}
+                  </Button>
+                </>
+              )}
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"
