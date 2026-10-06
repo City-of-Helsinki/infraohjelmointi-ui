@@ -88,6 +88,7 @@ export interface IProjectForm {
   district: IOption;
   division: IOption;
   subDivision: IOption;
+  additionalInformation: string;
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
   onSchedule?: boolean | null;

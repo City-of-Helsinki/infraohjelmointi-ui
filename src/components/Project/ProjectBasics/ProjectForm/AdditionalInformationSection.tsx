@@ -4,7 +4,7 @@ import { FC, memo } from 'react';
 import { Control } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 
-interface IProjectProgramSectionProps {
+interface IAdditionalInformationSectionProps {
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -12,20 +12,21 @@ interface IProjectProgramSectionProps {
   };
   isUserOnlyViewer: boolean;
 }
-const ProjectProgramSection: FC<IProjectProgramSectionProps> = ({
+
+const AdditionalInformationSection: FC<IAdditionalInformationSectionProps> = ({
   getFieldProps,
   isUserOnlyViewer,
 }) => {
   return (
-    <div className="w-full" id="basics-location-section">
-      <FormSectionTitle {...getFieldProps('projectProgramTitle')} />
+    <div className="w-full" id="additionalInformation">
+      <FormSectionTitle {...getFieldProps('additionalInformationTitle')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          <TextAreaField {...getFieldProps('projectProgram')} readOnly={isUserOnlyViewer} />
+          <TextAreaField {...getFieldProps('additionalInformation')} readOnly={isUserOnlyViewer} />
         </div>
       </div>
     </div>
   );
 };
 
-export default memo(ProjectProgramSection);
+export default memo(AdditionalInformationSection);
