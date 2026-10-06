@@ -7,7 +7,8 @@ export type ProjectProgrammeSectionId =
   | 'trafficPlanningCriteria'
   | 'urbanSpacingPlanningCriteria'
   | 'maintenanceNeeds'
-  | 'interactionAndRelatedProjects';
+  | 'interactionAndRelatedProjects'
+  | 'otherAttachments';
 
 export const LOCATION_MAP_ELEMENT_ID = 'project-programme-location-map';
 export const LOCATION_MAP_REQUIRED_SECTION_ID = 'locationMap' as const;
@@ -100,6 +101,7 @@ const SECTION_ID_TO_API_ROUTE: Record<ProjectProgrammeSectionId, string> = {
   urbanSpacingPlanningCriteria: 'urban-spacing-planning-criteria',
   maintenanceNeeds: 'maintenance-needs',
   interactionAndRelatedProjects: 'interaction-and-related-projects',
+  otherAttachments: 'other-attachments',
 };
 
 export function mapSectionIdToApiRoute(sectionId: ProjectProgrammeSectionId): string {
@@ -113,6 +115,7 @@ interface StartedSections {
   hasUrbanSpacingPlanningCriteria: boolean;
   hasMaintenanceNeeds: boolean;
   hasInteractionAndRelatedProjects: boolean;
+  hasOtherAttachments: boolean;
 }
 
 export const getProjectProgrammeSections = (
@@ -169,5 +172,13 @@ export const getProjectProgrammeSections = (
     actionText: t('projectProgrammeForm.fillInteractionAndRelatedProjects'),
     showInBrief: false,
     sectionIsStarted: startedSections?.hasInteractionAndRelatedProjects ?? false,
+  },
+  {
+    id: 'otherAttachments',
+    label: t('projectProgrammeForm.otherAttachmentsCardTitle'),
+    cardText: '',
+    actionText: t('projectProgrammeForm.fillOtherAttachments'),
+    showInBrief: false,
+    sectionIsStarted: startedSections?.hasOtherAttachments ?? false,
   },
 ];

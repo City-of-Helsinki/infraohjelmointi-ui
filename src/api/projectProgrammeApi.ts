@@ -3,6 +3,7 @@ import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
   IProjectProgrammeLocationMap,
+  IProjectProgrammeAttachment,
   IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
@@ -17,6 +18,20 @@ const getLocationMapUrl = (id: string) => `/project-programmes/${id}/location-ma
 // programme's locationMap comes with.
 export async function getProjectProgrammeLocationMapBlob(url: string): Promise<Blob> {
   const response = await axios.get<Blob>(`${API_BASE_URL}${url}`, { responseType: 'blob' });
+  return response.data;
+}
+
+const getOtherAttachmentsUrl = (id: string) =>
+  `/project-programmes/${id}/sections/other-attachments/attachments/`;
+
+export async function getProjectProgrammeAttachmentBlob(
+  projectProgrammeId: string,
+  attachmentId: string,
+): Promise<Blob> {
+  const response = await axios.get<Blob>(
+    `${API_BASE_URL}${getOtherAttachmentsUrl(projectProgrammeId)}${attachmentId}/download/`,
+    { responseType: 'blob' },
+  );
   return response.data;
 }
 
@@ -132,9 +147,30 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
+    postProjectProgrammeAttachments: build.mutation<
+      IProjectProgrammeAttachment[],
+      { id: string; formData: FormData }
+    >({
+      query: ({ id, formData }) => ({
+        url: getOtherAttachmentsUrl(id),
+        method: 'POST',
+        data: formData,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
     deleteProjectProgrammeLocationMap: build.mutation<undefined, { id: string }>({
       query: ({ id }) => ({
         url: getLocationMapUrl(id),
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
+    deleteProjectProgrammeAttachment: build.mutation<
+      undefined,
+      { id: string; attachmentId: string }
+    >({
+      query: ({ id, attachmentId }) => ({
+        url: `${getOtherAttachmentsUrl(id)}${attachmentId}/`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
@@ -154,4 +190,6 @@ export const {
   usePatchProjectProgrammeSectionMutation,
   useSaveProjectProgrammeLocationMapMutation,
   useDeleteProjectProgrammeLocationMapMutation,
+  usePostProjectProgrammeAttachmentsMutation,
+  useDeleteProjectProgrammeAttachmentMutation,
 } = projectProgrammeApi;

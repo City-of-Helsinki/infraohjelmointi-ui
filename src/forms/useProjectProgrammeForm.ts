@@ -7,6 +7,7 @@ import type {
   IProjectProgrammeDesignCriteria,
   IProjectProgrammeMaintenanceNeeds,
   IProjectProgrammeInteractionAndRelatedProjects,
+  IProjectProgrammeOtherAttachments,
   IProjectProgrammeUrbanSpacingPlanningCriteria,
   IProjectProgrammeTrafficPlanningCriteria,
 } from '@/interfaces/projectProgrammeInterfaces';
@@ -162,6 +163,17 @@ function getInteractionAndRelatedProjectsValues(
   };
 }
 
+function getOtherAttachmentsValues(
+  otherAttachments?: IProjectProgrammeOtherAttachments,
+): IProjectProgrammeOtherAttachments {
+  return {
+    attachments: otherAttachments?.attachments ?? [],
+    newFiles: [],
+    removedAttachmentIds: [],
+    links: getLinksValue(otherAttachments?.links),
+  };
+}
+
 // Every section has to be listed here, reset() replaces the whole form value object.
 function getFormValues(
   formData?: IProjectProgrammeForm,
@@ -178,6 +190,7 @@ function getFormValues(
     interactionAndRelatedProjects: getInteractionAndRelatedProjectsValues(
       formData?.interactionAndRelatedProjects,
     ),
+    otherAttachments: getOtherAttachmentsValues(formData?.otherAttachments),
   };
 }
 

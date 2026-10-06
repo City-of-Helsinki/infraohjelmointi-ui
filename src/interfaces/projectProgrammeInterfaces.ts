@@ -19,6 +19,7 @@ export interface IProjectProgramme {
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+  otherAttachments?: IProjectProgrammeOtherAttachments;
 }
 
 // The map has no status of its own: it locks together with the programme
@@ -103,6 +104,22 @@ export interface IProjectProgrammeInteractionAndRelatedProjects extends IProject
   interactionNotes?: string | null;
 }
 
+export interface IProjectProgrammeAttachment {
+  id: string;
+  originalName: string;
+  contentType?: string;
+  size?: number;
+  uploadedDate?: string;
+  downloadUrl?: string;
+}
+
+export interface IProjectProgrammeOtherAttachments extends IProjectProgrammeSectionShared {
+  attachments?: IProjectProgrammeAttachment[];
+  // Form-only: changes applied when the section is saved
+  newFiles?: File[];
+  removedAttachmentIds?: string[];
+}
+
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
@@ -117,6 +134,7 @@ export interface IProjectProgrammeForm {
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+  otherAttachments?: IProjectProgrammeOtherAttachments;
 }
 
 export interface IProjectProgrammeFormProps {

@@ -72,6 +72,8 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
   getProjectProgrammeLocationMapBlob: (...args: unknown[]) =>
     mockGetProjectProgrammeLocationMapBlob(...args),
+  usePostProjectProgrammeAttachmentsMutation: () => [() => ({ unwrap: jest.fn() })],
+  useDeleteProjectProgrammeAttachmentMutation: () => [() => ({ unwrap: jest.fn() })],
 }));
 
 describe('ProjectProgramme', () => {
