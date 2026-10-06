@@ -63,7 +63,7 @@ export default function useProjectProgrammePdf() {
       dispatch(clearLoading(LOADING_PROJECT_PROGRAMME_PDF));
       setIsGenerating(false);
     }
-  }, [dispatch, project, projectProgramme, t]);
+  }, [dispatch, project, projectProgramme]);
 
   return { generatePdf, isGenerating, canGeneratePdf: Boolean(projectProgramme) };
 }
