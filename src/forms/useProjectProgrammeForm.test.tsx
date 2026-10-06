@@ -75,6 +75,12 @@ describe('useProjectProgrammeForm', () => {
         interactionNotes: '',
         links: [{ value: '' }],
       },
+      otherAttachments: {
+        attachments: [],
+        newFiles: [],
+        removedAttachmentIds: [],
+        links: [{ value: '' }],
+      },
     });
   });
 
