@@ -118,16 +118,6 @@ const initialState: IListState = {
 export const sortOptions = <T extends IListItem>(persons: Array<T>): Array<T> =>
   [...persons].sort((a, b) => (a.value < b.value ? -1 : a.value > b.value ? 1 : 0));
 
-const getResponsiblePersons = async () => {
-  try {
-    const persons = await getPersons();
-    return persons;
-  } catch (e) {
-    console.log('Error getting responsible persons: ', e);
-    return [];
-  }
-};
-
 const toResponsiblePersonsListItems = (persons: Array<IPerson>): Array<IListItem> =>
   sortOptions(
     persons.map(({ firstName, lastName, id }) => ({
@@ -176,39 +166,90 @@ export const getProjectDistricts = (
 };
 
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
-  try {
-    const districts = await getDistricts();
-    const persons = await getResponsiblePersons();
+  const failedRequests: Array<{ name: string; error: unknown }> = [];
+  let requestCount = 0;
 
-    return {
-      types: await getProjectTypes(),
-      typeQualifiers: await getProjectTypeQualifiers(),
-      phases: await getProjectPhases(),
-      projectPhaseDetails: await getProjectPhaseDetails(),
-      constructionProcurementMethods: await getConstructionProcurementMethods(),
-      staraProcurementReasons: await getStaraProcurementReasons(),
-      categories: await getProjectCategories(),
-      projectQualityLevels: await getProjectQualityLevels(),
-      planningPhases: await getPlanningPhases(),
-      constructionPhases: await getConstructionPhases(),
-      responsibleZones: await getResponsibleZones(),
+  // Run a request and fall back to an empty list on failure so one failing list doesn't block the rest.
+  const safely = async <T extends unknown[]>(
+    name: string,
+    request: () => Promise<T>,
+  ): Promise<T> => {
+    requestCount++;
+    try {
+      return await request();
+    } catch (error) {
+      // The axios interceptor rejects canceled requests (e.g. user not loaded yet) with undefined.
+      if (error !== undefined) {
+        console.error(`Error getting ${name}: `, error);
+      }
+      failedRequests.push({ name, error });
+      return [] as unknown as T;
+    }
+  };
+
+  try {
+    const requests = {
+      districts: safely('districts', getDistricts),
+      persons: safely('responsible persons', getPersons),
+      types: safely('project types', getProjectTypes),
+      typeQualifiers: safely('project type qualifiers', getProjectTypeQualifiers),
+      phases: safely('project phases', getProjectPhases),
+      projectPhaseDetails: safely('project phase details', getProjectPhaseDetails),
+      constructionProcurementMethods: safely(
+        'construction procurement methods',
+        getConstructionProcurementMethods,
+      ),
+      staraProcurementReasons: safely('stara procurement reasons', getStaraProcurementReasons),
+      categories: safely('project categories', getProjectCategories),
+      projectQualityLevels: safely('project quality levels', getProjectQualityLevels),
+      planningPhases: safely('planning phases', getPlanningPhases),
+      constructionPhases: safely('construction phases', getConstructionPhases),
+      responsibleZones: safely('responsible zones', getResponsibleZones),
+      budgetOverrunReasons: safely('budget overrun reasons', getBudgetOverrunReasons),
+      financingParties: safely('financing parties', getFinancingParties),
+      programmers: safely('programmers', getProgrammers),
+      programmersRaw: safely('raw programmers', getRawProgrammers),
+      priorities: safely('priorities', getPriorities),
+    };
+
+    const districts = await requests.districts;
+    const persons = await requests.persons;
+
+    const lists = {
+      types: await requests.types,
+      typeQualifiers: await requests.typeQualifiers,
+      phases: await requests.phases,
+      projectPhaseDetails: await requests.projectPhaseDetails,
+      constructionProcurementMethods: await requests.constructionProcurementMethods,
+      staraProcurementReasons: await requests.staraProcurementReasons,
+      categories: await requests.categories,
+      projectQualityLevels: await requests.projectQualityLevels,
+      planningPhases: await requests.planningPhases,
+      constructionPhases: await requests.constructionPhases,
+      responsibleZones: await requests.responsibleZones,
       responsiblePersons: toResponsiblePersonsListItems(persons),
       responsiblePersonsRaw: persons,
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, 'district'),
       projectDivisions: getProjectDistricts(districts, 'division'),
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
-      budgetOverrunReasons: await getBudgetOverrunReasons(),
-      financingParties: await getFinancingParties(),
-      programmers: await getProgrammers(),
-      programmersRaw: await getRawProgrammers(),
-      priorities: await getPriorities(),
+      budgetOverrunReasons: await requests.budgetOverrunReasons,
+      financingParties: await requests.financingParties,
+      programmers: await requests.programmers,
+      programmersRaw: await requests.programmersRaw,
+      priorities: await requests.priorities,
       talpaProjectRanges: [],
       talpaProjectTypes: [],
       talpaServiceClasses: [],
       talpaAssetClasses: [],
       projectClasses: [],
     };
+
+    if (failedRequests.length === requestCount) {
+      return thunkAPI.rejectWithValue(toSerializableError(failedRequests[0].error));
+    }
+
+    return lists;
   } catch (err) {
     return thunkAPI.rejectWithValue(toSerializableError(err));
   }
