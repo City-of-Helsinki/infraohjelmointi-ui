@@ -15,6 +15,9 @@ import {
   getProjectProgrammeSections,
   hasExtendedBasicInfoContent,
   isSectionStarted,
+  LOCATION_MAP_ELEMENT_ID,
+  LOCATION_MAP_SECTION_ID,
+  ProjectProgrammeOverviewSectionId,
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
@@ -25,6 +28,7 @@ import SwitchToExtendedProgrammeNotification from './SwitchToExtendedProgrammeNo
 import ProgrammeCompletedNotification from './ProgrammeCompletedNotification';
 import { getMissingRequiredSections } from './sections/projectProgrammeSectionFields';
 import MissingRequiredFieldsNotification from './MissingRequiredFieldsNotification';
+import LocationSection from './sections/LocationSection';
 
 const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
   return projectProgramme.briefProjectProgramme ?? true;
@@ -103,20 +107,34 @@ function ProjectProgramme() {
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
     PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
 
+  const locationMapSection = useMemo(
+    () => ({
+      id: LOCATION_MAP_SECTION_ID,
+      label: t('projectProgrammeForm.locationSectionTitle'),
+    }),
+    [t],
+  );
+
   const sectionsInDraftState = useMemo(
-    () =>
-      PROJECT_PROGRAMME_SECTIONS.filter(
+    () => [
+      ...PROJECT_PROGRAMME_SECTIONS.filter(
         (section) => effectiveProjectProgramme?.[section.id]?.status === 'DRAFT',
       ),
-    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+      ...(effectiveProjectProgramme?.locationMap?.status === 'DRAFT' ? [locationMapSection] : []),
+    ],
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme, locationMapSection],
   );
 
   const sectionsInCompletedState = useMemo(
-    () =>
-      PROJECT_PROGRAMME_SECTIONS.filter(
+    () => [
+      ...PROJECT_PROGRAMME_SECTIONS.filter(
         (section) => effectiveProjectProgramme?.[section.id]?.status === 'COMPLETE',
       ),
-    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+      ...(effectiveProjectProgramme?.locationMap?.status === 'COMPLETE'
+        ? [locationMapSection]
+        : []),
+    ],
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme, locationMapSection],
   );
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
@@ -216,6 +234,17 @@ function ProjectProgramme() {
     });
   }
 
+  function handleOpenDraftStateSection(sectionId: ProjectProgrammeOverviewSectionId) {
+    if (sectionId === LOCATION_MAP_SECTION_ID) {
+      document
+        .getElementById(LOCATION_MAP_ELEMENT_ID)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    handleOpenSection(sectionId);
+  }
+
   if (isLoadingProjectProgrammeByProject) {
     return null;
   }
@@ -276,13 +305,17 @@ function ProjectProgramme() {
               <ProjectProgrammeDraftStateNotification
                 sectionsInCompletedState={sectionsInCompletedState}
                 sectionsInDraftState={sectionsInDraftState}
-                onOpenSection={handleOpenSection}
+                onOpenSection={handleOpenDraftStateSection}
                 isProjectProgrammeComplete={isProjectProgrammeComplete}
                 effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
                 effectiveProjectProgramme={effectiveProjectProgramme}
                 onMissingRequiredFields={handleMissingRequiredFields}
               />
             )}
+            <LocationSection
+              projectProgramme={effectiveProjectProgramme}
+              programmeIsComplete={isProjectProgrammeComplete}
+            />
             {PROJECT_PROGRAMME_SECTIONS.filter(
               (section) => !briefProgramme || section.showInBrief,
             ).map((section) => {
