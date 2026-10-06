@@ -242,7 +242,8 @@ describe('App', () => {
   it('catches a failed lists fetch', async () => {
     const { store } = await render();
 
-    mockedAxios.get.mockRejectedValueOnce(mockError);
+    // getListsThunk only rejects when every list request fails.
+    mockedAxios.get.mockRejectedValue(mockError);
 
     await waitFor(() => store.dispatch(getListsThunk()));
 
