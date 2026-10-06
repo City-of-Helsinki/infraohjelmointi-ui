@@ -2,17 +2,19 @@ import { ButtonPresetTheme, ButtonVariant, Link, Notification } from 'hds-react'
 import { useTranslation } from 'react-i18next';
 import {
   IProjectProgrammeSectionConfig,
-  ProjectProgrammeSectionId,
+  ProjectProgrammeOverviewSectionId,
 } from './sections/projectProgrammeSections';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
 
-type Section = Pick<IProjectProgrammeSectionConfig, 'id' | 'label'>;
+type Section = Pick<IProjectProgrammeSectionConfig, 'label'> & {
+  id: ProjectProgrammeOverviewSectionId;
+};
 
 interface ProjectProgrammeDraftStateNotificationProps {
   sectionsInCompletedState: Section[];
   sectionsInDraftState: Section[];
-  onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
+  onOpenSection: (sectionId: ProjectProgrammeOverviewSectionId) => void;
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
 }
@@ -22,7 +24,7 @@ interface ProjectProgrammeSectionListProps {
   labelKey:
     'projectProgrammeForm.completedStateSections' | 'projectProgrammeForm.draftStateSections';
   containerClassName: string;
-  onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
+  onOpenSection: (sectionId: ProjectProgrammeOverviewSectionId) => void;
 }
 
 function ProjectProgrammeSectionList({

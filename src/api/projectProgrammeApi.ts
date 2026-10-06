@@ -1,10 +1,15 @@
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
+  IProjectProgrammeLocationMap,
   IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
+
+// TODO: verify the route and multipart field name against the backend once the endpoint exists
+export const PROJECT_PROGRAMME_LOCATION_MAP_ROUTE = 'location-map';
+export const PROJECT_PROGRAMME_LOCATION_MAP_FILE_FIELD = 'file';
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -106,6 +111,17 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
+    saveProjectProgrammeLocationMap: build.mutation<
+      IProjectProgrammeLocationMap,
+      { id: string; formData: FormData; isNew: boolean }
+    >({
+      query: ({ id, formData, isNew }) => ({
+        url: `/project-programmes/${id}/sections/${PROJECT_PROGRAMME_LOCATION_MAP_ROUTE}/`,
+        method: isNew ? 'POST' : 'PATCH',
+        data: formData,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -119,4 +135,5 @@ export const {
   useTransitionProjectProgrammeSectionStatusMutation,
   usePostProjectProgrammeSectionMutation,
   usePatchProjectProgrammeSectionMutation,
+  useSaveProjectProgrammeLocationMapMutation,
 } = projectProgrammeApi;

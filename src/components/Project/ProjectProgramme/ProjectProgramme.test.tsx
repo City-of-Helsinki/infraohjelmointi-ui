@@ -12,6 +12,7 @@ const mockTransitionProjectProgrammeSectionStatus = jest.fn();
 const mockPostProjectProgramme = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
+const mockSaveProjectProgrammeLocationMap = jest.fn();
 const mockGetProject = jest.fn();
 const mockGetProjectProgrammeByProject = jest.fn();
 const mockRefetchProjectProgramme = jest.fn();
@@ -49,6 +50,10 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
   usePatchProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPatchProjectProgrammeSection(...args) }),
+  ],
+  useSaveProjectProgrammeLocationMapMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockSaveProjectProgrammeLocationMap(...args) }),
+    { isLoading: false },
   ],
 }));
 
@@ -537,5 +542,67 @@ describe('ProjectProgramme', () => {
     });
 
     expect(mockRefetchProjectProgramme).not.toHaveBeenCalled();
+  });
+
+  it('uploads the location map as form data when a file is attached', async () => {
+    mockSaveProjectProgrammeLocationMap.mockResolvedValue({});
+    const { user } = await render();
+
+    const file = new File(['map'], 'map.png', { type: 'image/png' });
+    const input = screen.getByLabelText(/projectProgrammeForm.locationSectionTitle/, {
+      selector: 'input',
+    });
+
+    await user.upload(input, file);
+
+    expect(mockSaveProjectProgrammeLocationMap).toHaveBeenCalledWith({
+      id: 'programme-1',
+      formData: expect.any(FormData),
+      isNew: true,
+    });
+  });
+
+  it('shows the saved location map image', async () => {
+    mockGetProjectProgrammeByProject.mockReturnValue({
+      data: {
+        id: 'programme-1',
+        briefProjectProgramme: true,
+        status: 'DRAFT',
+        locationMap: { url: 'https://example.com/map.png', fileName: 'map.png', status: 'DRAFT' },
+      },
+      isLoading: false,
+      refetch: mockRefetchProjectProgramme,
+    });
+
+    await render();
+
+    expect(screen.getByTestId('project-programme-location-map-image')).toHaveAttribute(
+      'src',
+      'https://example.com/map.png',
+    );
+  });
+
+  it('lists the location map in the draft state notification', async () => {
+    mockGetProjectProgrammeByProject.mockReturnValue({
+      data: {
+        id: 'programme-1',
+        briefProjectProgramme: true,
+        status: 'DRAFT',
+        locationMap: { url: 'https://example.com/map.png', status: 'DRAFT' },
+      },
+      isLoading: false,
+      refetch: mockRefetchProjectProgramme,
+    });
+
+    await render();
+
+    const draftSections = screen
+      .getByText('projectProgrammeForm.draftStateSections')
+      .closest('div') as HTMLElement;
+    expect(
+      within(draftSections).getByRole('link', {
+        name: 'projectProgrammeForm.locationSectionTitle',
+      }),
+    ).toBeInTheDocument();
   });
 });
