@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { saveAs } from 'file-saver';
 import moment from 'moment';
@@ -15,7 +15,6 @@ import { createProjectProgrammePdfBlob } from './createProjectProgrammePdf';
 const LOADING_PROJECT_PROGRAMME_PDF = 'loading-project-programme-pdf';
 
 export default function useProjectProgrammePdf() {
-  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { data: project } = useGetProject();
   const { data: projectProgramme } = useGetProjectProgrammeByProjectQuery(project?.id ?? skipToken);

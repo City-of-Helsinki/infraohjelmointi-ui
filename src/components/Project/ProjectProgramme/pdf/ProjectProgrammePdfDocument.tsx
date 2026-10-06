@@ -1,5 +1,5 @@
 import { Document, Link, Page, Text, View } from '@react-pdf/renderer';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import DocumentHeader from '@/components/Report/PdfReports/reportHeaders/DocumentHeader';
 import { getFieldsForSection } from '../sections/projectProgrammeSectionFields';
 import { formatPdfValue, getPdfLinks, isSafeHttpUrl } from './projectProgrammePdfUtils';
@@ -48,7 +48,6 @@ function ProjectProgrammePdfDocument({
   projectName,
   createdDate,
 }: Readonly<IProjectProgrammePdfDocumentProps>) {
-  const { t } = useTranslation();
   const isBrief = projectProgramme.briefProjectProgramme ?? true;
   const isComplete = projectProgramme.status === 'COMPLETE';
   const title = t(isBrief ? 'projectProgrammeForm.pdfTitleBrief' : 'projectProgrammeForm.pdfTitle');

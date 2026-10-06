@@ -8,6 +8,7 @@ const mockDispatch = jest.fn();
 const mockGetProjectProgrammeByProject = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
+jest.mock('i18next', () => ({ t: (key: string) => key }));
 
 jest.mock('file-saver', () => ({ saveAs: jest.fn() }));
 

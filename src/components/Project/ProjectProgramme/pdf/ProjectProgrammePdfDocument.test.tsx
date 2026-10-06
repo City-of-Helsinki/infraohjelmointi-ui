@@ -1,10 +1,9 @@
-import mockI18next from '@/mocks/mockI18next';
 import { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import ProjectProgrammePdfDocument from './ProjectProgrammePdfDocument';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 
-jest.mock('react-i18next', () => mockI18next());
+jest.mock('i18next', () => ({ t: (key: string) => key }));
 
 jest.mock('@/components/Report/PdfReports/reportHeaders/DocumentHeader', () => ({
   __esModule: true,
