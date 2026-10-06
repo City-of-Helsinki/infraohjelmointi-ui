@@ -50,6 +50,8 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   usePatchProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPatchProjectProgrammeSection(...args) }),
   ],
+  usePostProjectProgrammeAttachmentsMutation: () => [() => ({ unwrap: jest.fn() })],
+  useDeleteProjectProgrammeAttachmentMutation: () => [() => ({ unwrap: jest.fn() })],
 }));
 
 describe('ProjectProgramme', () => {

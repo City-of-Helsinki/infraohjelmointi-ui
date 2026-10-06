@@ -667,6 +667,34 @@
     "interactionAndRelatedProjectsCardTitle": "Vuorovaikutus, yhteistyötahot ja liittyvät hankkeet",
     "interactionAndRelatedProjectsCardText": "Vuorovaikutus, yhteistyötahot ja liittyvät hankkeet kohtaan kirjataan hankkeessa tai hankekokonaisuudessa tarvittava ja jo toteutettu vuorovaikutus ja sidokset muihin tahoihin ja hankkeisiin.",
     "fillInteractionAndRelatedProjects": "Täytä vuorovaikutus- ja yhteistyötiedot",
+    "otherAttachmentsCardTitle": "Muut liitteet",
+    "fillOtherAttachments": "Lisää hankeohjelmaan liittyvät liitteet",
+    "otherAttachmentsSectionTitle": "Liitteet",
+    "otherAttachmentsInfoTitle": "Huomioithan liitteiden lisäyksessä",
+    "otherAttachmentsInfoItems": {
+      "programmePlans": "Hankeohjelman yhteydessä tehdyt suunnitelmat: viitesuunnitelma / tilakaavio, määrä- ja kustannusluettelo",
+      "otherPlans": "Viitesuunnitelma, liikennesuunnitelma, selvitykset, inventoinnit, viheralue- tai aluesuunnitelmat, luonnonhoitosuunnitelmat, muut aikaisemmat suunnitelmat jne.",
+      "environtmentPlans": "Esim. kasvillisuusinventointi, ympäristöhistoriallinen selvitys, luontoselvitykset (liito-orava, lepakko ym.), puustomittaus, puiden kuntokartoitus, esim. tekniset viitesuunnitelmat, yleissuunnitelmat, leikkipaikan turvatarkastus, haastattelut ja lausunnot",
+      "links": "Linkit sähköisiin aineistoihin",
+      "oldPlans": "Vanhat puisto- ja perusparannussuunnitelmat arkistosta, tieto onko pyydetty"
+    },
+    "otherAttachmentsDragAndDrop": "Raahaa liitetiedostot tähän",
+    "addAttachments": "Lisää liitteitä",
+    "otherAttachmentsSuccessTitle": "Liitteet lisätty",
+    "otherAttachmentsPendingSuccess": "Lisättyjä liitteitä: {{count}}. Liitteet tallennetaan, kun tallennat luonnoksen tai merkitset osion valmiiksi.",
+    "otherAttachmentsErrorTitle": "Liitteiden tallennus epäonnistui",
+    "otherAttachmentsSaveError": "Liitteiden tallennus epäonnistui. Tarkista liitteet ja yritä uudelleen.",
+    "showAttachment": "Näytä",
+    "showAttachmentAriaLabel": "Näytä liite {{fileName}}",
+    "deleteAttachment": "Poista",
+    "deleteAttachmentAriaLabel": "Poista liite {{fileName}}",
+    "deleteAttachmentDialog": {
+      "title": "Poistetaanko liite?",
+      "description": "Liite poistetaan, kun tallennat luonnoksen tai merkitset osion valmiiksi.",
+      "delete": "Poista liite"
+    },
+    "attachmentPreviewNotSupported": "Tätä tiedostotyyppiä ei voi esikatsella. Lataa tiedosto avataksesi sen.",
+    "downloadAttachment": "Lataa",
     "collaborationAndExperts": "Yhteistyö ja asiantuntijat",
     "interactionNotes": "Huomioita vuorovaikutuksesta",
     "collaborationAndExpertsTooltip": "Kirjaa hankeohjelmavaiheessa mukana olleet asiantuntijat ja tunnistetut yhteistyötahot sekä maanomistajat ja vuokrauksiin liittyvät tahot. Erittele erikseen tahot, joihin on jo oltu yhteydessä, ja tahot, joihin tulee vielä ottaa yhteyttä.",
@@ -734,7 +762,8 @@
       "sessionExpired": "Istunto vanhentunut",
       "linkCopied": "Linkki kopioitu",
       "statusTransitionSuccess": "Siirretty onnistuneesti",
-      "returnSuccess": "Palautettu onnistuneesti"
+      "returnSuccess": "Palautettu onnistuneesti",
+      "loadError": "Lataus epäonnistui"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -806,7 +835,8 @@
       "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
       "noteImageGetError": "Muistiinpanoon liitetyn kuvan lataaminen epäonnistui.",
       "noteImagePostError": "Muistiinpanoon liitetyn kuvan lisääminen epäonnistui.",
-      "noteImageDeleteError": "Muistiinpanoon liitetyn kuvan poistaminen epäonnistui."
+      "noteImageDeleteError": "Muistiinpanoon liitetyn kuvan poistaminen epäonnistui.",
+      "projectProgrammeAttachmentLoadError": "Liitteen lataaminen epäonnistui."
     }
   },
   "searchOrder": {

@@ -77,6 +77,7 @@ function ProjectProgramme() {
   const hasInteractionAndRelatedProjects = isSectionStarted(
     effectiveProjectProgramme?.interactionAndRelatedProjects,
   );
+  const hasOtherAttachments = isSectionStarted(effectiveProjectProgramme?.otherAttachments);
 
   const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(t, briefProgramme, {
     hasBasicInfo,
@@ -85,6 +86,7 @@ function ProjectProgramme() {
     hasUrbanSpacingPlanningCriteria,
     hasMaintenanceNeeds,
     hasInteractionAndRelatedProjects,
+    hasOtherAttachments,
   });
 
   const hasSavedExtendedSection =
