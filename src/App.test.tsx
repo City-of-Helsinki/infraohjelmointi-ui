@@ -241,16 +241,22 @@ describe('App', () => {
 
   it('catches a failed lists fetch', async () => {
     const { store } = await render();
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    // getListsThunk only rejects when every list request fails.
-    mockedAxios.get.mockRejectedValue(mockError);
+    try {
+      // getListsThunk only rejects when every list request fails.
+      mockedAxios.get.mockRejectedValue(mockError);
 
-    await waitFor(() => store.dispatch(getListsThunk()));
+      await waitFor(() => store.dispatch(getListsThunk()));
 
-    const storeError = store.getState().lists.error as IError;
+      const storeError = store.getState().lists.error as IError;
 
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
+      expect(storeError.message).toBe(mockError.message);
+      expect(storeError.status).toBe(mockError.status);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', mockError);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
   });
 
   it('catches a failed groups fetch', async () => {

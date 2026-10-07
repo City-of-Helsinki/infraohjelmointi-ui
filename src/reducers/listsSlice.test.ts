@@ -1,9 +1,19 @@
+import axios from 'axios';
 import listsReducer, {
   deleteMenuItemsThunk,
+  getListsThunk,
+  IListState,
   patchMenuItemsThunk,
   postMenuItemsThunk,
 } from './listsSlice';
 import { IPerson } from '@/interfaces/personsInterfaces';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { mockError } from '@/mocks/mockError';
+import { mockProjectTypes } from '@/mocks/mockLists';
+
+jest.mock('axios');
+
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const createState = () => listsReducer(undefined, { type: 'init' });
 
@@ -160,5 +170,29 @@ describe('listsSlice admin menu person list synchronization', () => {
 
     expect(nextState.programmersRaw).toHaveLength(1);
     expect(nextState.programmers).toEqual([{ id: '2', value: 'Bob Builder' }]);
+  });
+});
+
+describe('getListsThunk', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('resolves with the remaining lists when a single list request fails', async () => {
+    mockGetResponseProvider();
+    const defaultGet = mockedAxios.get.getMockImplementation();
+    mockedAxios.get.mockImplementation((url, config) =>
+      url.endsWith('/project-priority/') ? Promise.reject(mockError) : defaultGet!(url, config),
+    );
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const action = await getListsThunk()(jest.fn(), () => ({}), undefined);
+
+    expect(action.meta.requestStatus).toBe('fulfilled');
+    const payload = action.payload as Partial<IListState>;
+    expect(payload.priorities).toEqual([]);
+    expect(payload.types).toEqual(mockProjectTypes.data);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', mockError);
   });
 });
