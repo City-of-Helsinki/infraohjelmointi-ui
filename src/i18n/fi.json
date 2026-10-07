@@ -698,7 +698,13 @@
     "draftStateSections": "Luonnostilassa olevat osiot:",
     "programmeCompletedNotificationTitle": "Hankeohjelma merkitty valmiiksi",
     "programmeCompletedNotificationText": "Hyvä! Hankeohjelma on nyt merkitty valmiiksi. Hankeohjelman tietoja ei voi enää muokata. Jos muutoksia tarvitaan, lomake tulee palauttaa takaisin käsittelyyn. Valmiista hankeohjelmasta voit jakaa suoran linkin tai koostaa pdf-tiedoston. Hankeohjelmasta koostettua dokumenttia käytetään suunnittelutoimeksiannon liitteenä jatkosuunnittelua varten.",
-    "markSectionReady": "Merkitse valmiiksi"
+    "markSectionReady": "Merkitse valmiiksi",
+    "locationSectionTitle": "Sijaintikartta",
+    "locationSectionHelperText": "Lisää kuvatiedosto, missä on esitetty kartalla hankkeen tai hankekokonaisuuden rajaus",
+    "locationDragAndDropFieldLabel": "Raahaa sijaintikartta",
+    "locationAttachFileButtonFieldLabel": "tai valitse tiedosto",
+    "locationAttachFileButtonLabel": "Valitse tiedosto",
+    "locationAttachmentInfoText": "Hyväksytyt tiedostomuodot ovat .jpeg ja .png. Suurin sallittu tiedostokoko on 500 kb."
   },
   "notification": {
     "title": {
@@ -768,6 +774,8 @@
       "projectProgrammeSectionReturnToDraftSuccess": "Hankeohjelman osio palautettu luonnokseksi.",
       "projectProgrammeSectionReturnToDraftError": "Hankeohjelman osion palauttaminen luonnokseksi ei onnistunut.",
       "projectProgrammePdfGenerationError": "PDF-tiedoston koostaminen epäonnistui.",
+      "projectProgrammeLocationMapSaveSuccess": "Sijaintikartan tallentaminen onnistui.",
+      "projectProgrammeLocationMapSaveError": "Sijaintikartan tallentaminen ei onnistunut.",
       "projectProgrammeChangeHistoryNotImplemented": "Muutoshistoria lisätään myöhemmin.",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 401": "Pyyntö epäonnistui virhekoodilla 401",

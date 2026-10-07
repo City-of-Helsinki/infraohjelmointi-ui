@@ -9,12 +9,21 @@ export interface IProjectProgramme {
   id: string;
   status?: ProjectProgrammeStatus;
   briefProjectProgramme?: boolean;
+  locationMap?: IProjectProgrammeLocationMap | null;
   basicInfo?: IProjectProgrammeBasicInfo;
   designCriteria?: IProjectProgrammeDesignCriteria;
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+}
+
+export interface IProjectProgrammeLocationMap {
+  id?: string;
+  url?: string | null;
+  downloadUrl?: string | null;
+  fileName?: string | null;
+  status?: ProjectProgrammeStatus;
 }
 
 export interface IProjectProgrammeTransitionResponse {

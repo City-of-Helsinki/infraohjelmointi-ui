@@ -9,6 +9,13 @@ export type ProjectProgrammeSectionId =
   | 'maintenanceNeeds'
   | 'interactionAndRelatedProjects';
 
+// The location map is not an openable form section, so it is kept out of ProjectProgrammeSectionId
+export const LOCATION_MAP_SECTION_ID = 'locationMap' as const;
+export const LOCATION_MAP_ELEMENT_ID = 'project-programme-location-map';
+
+export type ProjectProgrammeOverviewSectionId =
+  ProjectProgrammeSectionId | typeof LOCATION_MAP_SECTION_ID;
+
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;
   label: string;
