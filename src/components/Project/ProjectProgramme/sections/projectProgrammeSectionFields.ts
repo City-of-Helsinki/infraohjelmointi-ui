@@ -17,6 +17,7 @@ const SECTION_FIELDS: Record<Exclude<ProjectProgrammeSectionId, 'basicInfo'>, re
   urbanSpacingPlanningCriteria: mapToFieldNames(URBAN_SPACING_PLANNING_CRITERIA_FIELDS),
   maintenanceNeeds: mapToFieldNames(MAINTENANCE_NEEDS_FIELDS),
   interactionAndRelatedProjects: mapToFieldNames(INTERACTION_AND_RELATED_PROJECTS_FIELDS),
+  otherAttachments: [],
 };
 
 export function getFieldsForSection(

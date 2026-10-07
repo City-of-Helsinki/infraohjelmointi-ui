@@ -1,5 +1,6 @@
 import mockI18next from '@/mocks/mockI18next';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Route } from 'react-router';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectProgrammeForm, {
@@ -13,8 +14,17 @@ const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
 const mockTransitionProjectProgrammeSectionStatus = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
+const mockPostProjectProgrammeAttachments = jest.fn();
+const mockDeleteProjectProgrammeAttachment = jest.fn();
+const mockGetProjectProgrammeAttachmentBlob = jest.fn();
+const mockIsConfirmed = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
+
+jest.mock('@/hooks/useConfirmDialog', () => ({
+  __esModule: true,
+  default: () => ({ isConfirmed: mockIsConfirmed }),
+}));
 
 jest.mock('@/hooks/common', () => ({
   ...jest.requireActual('@/hooks/common'),
@@ -36,6 +46,14 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   useTransitionProjectProgrammeStatusMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockTransitionProjectProgrammeStatus(...args) }),
   ],
+  usePostProjectProgrammeAttachmentsMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockPostProjectProgrammeAttachments(...args) }),
+  ],
+  useDeleteProjectProgrammeAttachmentMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockDeleteProjectProgrammeAttachment(...args) }),
+  ],
+  getProjectProgrammeAttachmentBlob: (...args: unknown[]) =>
+    mockGetProjectProgrammeAttachmentBlob(...args),
 }));
 
 const baseFormData: IProjectProgrammeForm = {
@@ -1114,5 +1132,213 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(screen.getByDisplayValue('Collaboration with experts')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Interaction notes')).toBeInTheDocument();
     expect(screen.getByDisplayValue('https://old-interaction-link.fi')).toBeInTheDocument();
+  });
+});
+
+describe('ProjectProgrammeForm other attachments', () => {
+  const savedAttachment = {
+    id: 'attachment-1',
+    originalName: 'site-plan.pdf',
+    contentType: 'application/pdf',
+    size: 1000,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockPostProjectProgrammeSection.mockResolvedValue({});
+    mockPatchProjectProgrammeSection.mockResolvedValue({});
+    mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
+    mockPostProjectProgrammeAttachments.mockResolvedValue([]);
+    mockDeleteProjectProgrammeAttachment.mockResolvedValue(undefined);
+    mockIsConfirmed.mockResolvedValue(true);
+    global.URL.createObjectURL = jest.fn(() => 'blob:preview');
+    global.URL.revokeObjectURL = jest.fn();
+  });
+
+  async function renderOtherAttachmentsForm(
+    effectiveProjectProgramme: IProjectProgrammeForm,
+    onClose = jest.fn(),
+  ) {
+    const user = userEvent.setup();
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="otherAttachments"
+              effectiveProjectProgramme={effectiveProjectProgramme}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={onClose}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+    return user;
+  }
+
+  async function uploadFile(
+    user: ReturnType<typeof userEvent.setup>,
+    fileName = 'map.png',
+    type = 'image/png',
+  ) {
+    const fileInput = screen.getByLabelText('projectProgrammeForm.otherAttachmentsDragAndDrop');
+    await user.upload(fileInput, new File(['content'], fileName, { type }));
+  }
+
+  it.each([
+    ['plan.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    ['plan.doc', 'application/msword'],
+    ['plan.pdf', 'application/pdf'],
+    ['photo.jpeg', 'image/jpeg'],
+  ])('accepts and uploads %s', async (fileName, type) => {
+    const user = await renderOtherAttachmentsForm({ otherAttachments: { links: [] } });
+
+    await uploadFile(user, fileName, type);
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => expect(mockPostProjectProgrammeAttachments).toHaveBeenCalledTimes(1));
+    const { formData } = mockPostProjectProgrammeAttachments.mock.calls[0][0] as {
+      formData: FormData;
+    };
+    expect((formData.get('file') as File).name).toBe(fileName);
+  });
+
+  it('shows a download link instead of a preview for Word files', async () => {
+    mockGetProjectProgrammeAttachmentBlob.mockResolvedValue(new Blob(['doc']));
+    const user = await renderOtherAttachmentsForm({
+      otherAttachments: {
+        attachments: [
+          {
+            id: 'attachment-2',
+            originalName: 'plan.docx',
+            contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          },
+        ],
+        links: [],
+      },
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'projectProgrammeForm.showAttachmentAriaLabel' }),
+    );
+
+    expect(
+      await screen.findByText('projectProgrammeForm.attachmentPreviewNotSupported'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'projectProgrammeForm.downloadAttachment' }),
+    ).toHaveAttribute('download', 'plan.docx');
+  });
+
+  it('renders the section content', async () => {
+    await renderOtherAttachmentsForm({});
+
+    expect(screen.getByTestId('project-programme-other-attachments-form')).toBeInTheDocument();
+    expect(screen.getByText('projectProgrammeForm.requiredSectionHelperText')).toBeInTheDocument();
+    expect(screen.getByText('projectProgrammeForm.otherAttachmentsInfoTitle')).toBeInTheDocument();
+    expect(screen.getByText('projectProgrammeForm.links')).toBeInTheDocument();
+  });
+
+  it('creates the section and uploads selected files on save draft', async () => {
+    const onClose = jest.fn();
+    const user = await renderOtherAttachmentsForm({}, onClose);
+
+    await uploadFile(user);
+    expect(screen.getByTestId('project-programme-other-attachments-success')).toBeInTheDocument();
+    expect(mockPostProjectProgrammeAttachments).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => expect(mockPostProjectProgrammeAttachments).toHaveBeenCalledTimes(1));
+    expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+      id: 'programme-1',
+      section: 'other-attachments',
+      data: {},
+    });
+    const { id, formData } = mockPostProjectProgrammeAttachments.mock.calls[0][0] as {
+      id: string;
+      formData: FormData;
+    };
+    expect(id).toBe('programme-1');
+    expect((formData.get('file') as File).name).toBe('map.png');
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it('deletes a removed attachment on save draft without patching the section', async () => {
+    const user = await renderOtherAttachmentsForm({
+      otherAttachments: { attachments: [savedAttachment], links: [] },
+    });
+
+    expect(screen.getByText('site-plan.pdf')).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' }),
+    );
+    await waitFor(() => expect(screen.queryByText('site-plan.pdf')).not.toBeInTheDocument());
+    expect(mockDeleteProjectProgrammeAttachment).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() =>
+      expect(mockDeleteProjectProgrammeAttachment).toHaveBeenCalledWith({
+        id: 'programme-1',
+        attachmentId: 'attachment-1',
+      }),
+    );
+    expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
+  });
+
+  it('shows an error banner and keeps the form open when upload fails', async () => {
+    mockPostProjectProgrammeAttachments.mockRejectedValue({
+      status: 413,
+      data: { detail: 'Tiedosto on liian suuri.' },
+    });
+    const onClose = jest.fn();
+    const user = await renderOtherAttachmentsForm({ otherAttachments: { links: [] } }, onClose);
+
+    await uploadFile(user);
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    expect(
+      await screen.findByTestId('project-programme-other-attachments-error'),
+    ).toHaveTextContent('Tiedosto on liian suuri.');
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('uploads files before marking the section ready', async () => {
+    const user = await renderOtherAttachmentsForm({ otherAttachments: { links: [] } });
+
+    await uploadFile(user);
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
+
+    await waitFor(() => expect(mockTransitionProjectProgrammeSectionStatus).toHaveBeenCalled());
+    expect(mockPostProjectProgrammeAttachments.mock.invocationCallOrder[0]).toBeLessThan(
+      mockTransitionProjectProgrammeSectionStatus.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('opens a saved attachment in a preview dialog', async () => {
+    mockGetProjectProgrammeAttachmentBlob.mockResolvedValue(
+      new Blob(['pdf'], { type: 'application/pdf' }),
+    );
+    const user = await renderOtherAttachmentsForm({
+      otherAttachments: { attachments: [savedAttachment], links: [] },
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'projectProgrammeForm.showAttachmentAriaLabel' }),
+    );
+
+    expect(mockGetProjectProgrammeAttachmentBlob).toHaveBeenCalledWith(
+      'programme-1',
+      'attachment-1',
+    );
+    expect(await screen.findByTitle('site-plan.pdf')).toHaveAttribute('src', 'blob:preview');
   });
 });

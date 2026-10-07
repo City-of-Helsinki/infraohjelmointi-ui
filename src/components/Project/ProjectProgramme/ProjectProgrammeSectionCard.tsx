@@ -113,7 +113,7 @@ function ProjectProgrammeSectionCard({
         }
       >
         <div className="project-programme-notification-content">
-          <p>{cardText}</p>
+          {cardText && <p>{cardText}</p>}
           <div className="flex flex-wrap gap-4">
             {!programmeIsComplete && !sectionIsComplete && (
               <>

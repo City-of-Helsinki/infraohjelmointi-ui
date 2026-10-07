@@ -1,10 +1,12 @@
 import { Button, ButtonVariant, IconCheckCircle, IconPen, StatusLabel } from 'hds-react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
 import useProjectProgrammeForm from '@/forms/useProjectProgrammeForm';
 import {
+  useDeleteProjectProgrammeAttachmentMutation,
   usePatchProjectProgrammeSectionMutation,
+  usePostProjectProgrammeAttachmentsMutation,
   usePostProjectProgrammeSectionMutation,
 } from '@/api/projectProgrammeApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
@@ -17,6 +19,7 @@ import {
 import {
   IProjectProgrammeForm,
   IProjectProgrammeFormProps,
+  IProjectProgrammeOtherAttachments,
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import DesignCriteriaSection from './sections/DesignCriteriaSection';
@@ -24,9 +27,25 @@ import TrafficPlanningCriteriaSection from './sections/TrafficPlanningCriteriaSe
 import UrbanSpacingPlanningCriteriaSection from './sections/UrbanSpacingPlanningCriteriaSection';
 import MaintenanceNeedsSection from './sections/MaintenanceNeedsSection';
 import InteractionAndRelatedProjectsSection from './sections/InteractionAndRelatedProjectsSection';
+import OtherAttachmentsSection from './sections/OtherAttachmentsSection';
 import useMarkProjectProgrammeSectionReady from './useMarkProjectProgrammeSectionReady';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
+
+// Fields that are not sent in the section payload
+const NON_PAYLOAD_FIELDS = new Set(['links', 'attachments', 'newFiles', 'removedAttachmentIds']);
+
+function getErrorDetail(error: unknown): string | undefined {
+  if (typeof error !== 'object' || error === null || !('data' in error)) {
+    return undefined;
+  }
+  const { data } = error as { data?: unknown };
+  if (typeof data === 'object' && data !== null && 'detail' in data) {
+    const { detail } = data as { detail?: unknown };
+    return typeof detail === 'string' ? detail : undefined;
+  }
+  return undefined;
+}
 
 function normalizeTextValue(value: unknown): unknown {
   return typeof value === 'string' ? value.trim() : value;
@@ -40,7 +59,7 @@ export function pickChangedFormFields(
   const payload: Record<string, unknown> = {};
   const dirtyFieldNames = new Set(
     Object.entries(dirtyFields ?? {})
-      .filter(([field, isDirty]) => field !== 'links' && isDirty === true)
+      .filter(([field, isDirty]) => !NON_PAYLOAD_FIELDS.has(field) && isDirty === true)
       .map(([field]) => field),
   );
 
@@ -84,6 +103,9 @@ function ProjectProgrammeForm({
   } = formMethods;
   const [postProjectProgrammeSection] = usePostProjectProgrammeSectionMutation();
   const [patchProjectProgrammeSection] = usePatchProjectProgrammeSectionMutation();
+  const [postProjectProgrammeAttachments] = usePostProjectProgrammeAttachmentsMutation();
+  const [deleteProjectProgrammeAttachment] = useDeleteProjectProgrammeAttachmentMutation();
+  const [attachmentSaveError, setAttachmentSaveError] = useState<string | null>(null);
   const markSectionReady = useMarkProjectProgrammeSectionReady(
     projectProgrammeId,
     activeSection,
@@ -92,6 +114,29 @@ function ProjectProgrammeForm({
   const activeSectionStatus = effectiveProjectProgramme?.[activeSection]?.status ?? 'DRAFT';
   const isActiveSectionComplete = activeSectionStatus === 'COMPLETE';
   const isFormReadOnly = isProjectProgrammeComplete || isActiveSectionComplete;
+
+  async function saveAttachmentChanges(newFiles: File[], removedAttachmentIds: string[]) {
+    setAttachmentSaveError(null);
+
+    try {
+      await Promise.all(
+        removedAttachmentIds.map((attachmentId) =>
+          deleteProjectProgrammeAttachment({ id: projectProgrammeId, attachmentId }).unwrap(),
+        ),
+      );
+
+      if (newFiles.length > 0) {
+        const formData = new FormData();
+        newFiles.forEach((file) => formData.append('file', file));
+        await postProjectProgrammeAttachments({ id: projectProgrammeId, formData }).unwrap();
+      }
+    } catch (error) {
+      setAttachmentSaveError(
+        getErrorDetail(error) ?? t('projectProgrammeForm.otherAttachmentsSaveError'),
+      );
+      throw error;
+    }
+  }
 
   async function persistSection(
     data: IProjectProgrammeForm,
@@ -109,8 +154,14 @@ function ProjectProgrammeForm({
       requestData.links = linksPayload;
     }
 
+    const attachmentChanges: IProjectProgrammeOtherAttachments =
+      activeSection === 'otherAttachments' ? (data.otherAttachments ?? {}) : {};
+    const { newFiles = [], removedAttachmentIds = [] } = attachmentChanges;
+    const hasAttachmentChanges = newFiles.length > 0 || removedAttachmentIds.length > 0;
+    const hasSectionChanges = Object.keys(requestData).length > 0;
+
     const sectionExists = Boolean(effectiveProjectProgramme?.[activeSection]);
-    if (!Object.keys(requestData).length && (sectionExists || !createIfMissing)) {
+    if (!hasSectionChanges && !hasAttachmentChanges && (sectionExists || !createIfMissing)) {
       return false;
     }
 
@@ -120,10 +171,14 @@ function ProjectProgrammeForm({
       data: requestData,
     };
 
-    if (sectionExists) {
+    if (sectionExists && hasSectionChanges) {
       await patchProjectProgrammeSection(request).unwrap();
-    } else {
+    } else if (!sectionExists) {
       await postProjectProgrammeSection(request).unwrap();
+    }
+
+    if (hasAttachmentChanges) {
+      await saveAttachmentChanges(newFiles, removedAttachmentIds);
     }
 
     return true;
@@ -207,6 +262,12 @@ function ProjectProgrammeForm({
           {activeSection === 'maintenanceNeeds' && <MaintenanceNeedsSection />}
           {activeSection === 'interactionAndRelatedProjects' && (
             <InteractionAndRelatedProjectsSection />
+          )}
+          {activeSection === 'otherAttachments' && (
+            <OtherAttachmentsSection
+              projectProgrammeId={projectProgrammeId}
+              saveError={attachmentSaveError}
+            />
           )}
         </fieldset>
 
