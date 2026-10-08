@@ -74,6 +74,9 @@ describe('useConstructionHandoverForm', () => {
         value: 'person-programming-1',
       },
       totalCost: '',
+      linkDesignDrawings: '',
+      linkCostAllocation: '',
+      linkContractBoundaries: '',
     });
   });
 

@@ -280,11 +280,11 @@ describe('ProjectNotes', () => {
 
       const { findByText, findAllByText } = await renderWithNotesLoaded();
 
-      expect(await findByText('noteAttachments.imageAttachments')).toBeInTheDocument();
+      expect(await findByText('attachments.imageAttachments')).toBeInTheDocument();
       mockNoteImages.forEach(async (attachment) => {
         expect(await findByText(attachment.fileName)).toBeInTheDocument();
       });
-      expect((await findAllByText('noteAttachments.view')).length).toBe(2);
+      expect((await findAllByText('attachments.view')).length).toBe(2);
     });
 
     it('can POST a note image', async () => {
@@ -302,7 +302,7 @@ describe('ProjectNotes', () => {
 
       const { user, findByLabelText, getByRole } = await renderWithNotesLoaded();
 
-      const fileInput = (await findByLabelText('noteAttachments.dragAndDrop')) as HTMLInputElement;
+      const fileInput = (await findByLabelText('attachments.dragAndDrop')) as HTMLInputElement;
       const file = new File(['dummy content'], newAttachment.fileName, {
         type: newAttachment.contentType,
       });
@@ -341,7 +341,7 @@ describe('ProjectNotes', () => {
       expect(mockIsConfirmed).toHaveBeenCalledWith(
         expect.objectContaining({
           dialogType: 'delete',
-          confirmButtonText: 'noteAttachments.deleteDialog.delete',
+          confirmButtonText: 'attachments.deleteDialog.delete',
         }),
       );
       await waitFor(() => expect(mockDeleteNoteImageTrigger).toHaveBeenCalledTimes(1));

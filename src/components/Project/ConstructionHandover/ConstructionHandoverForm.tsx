@@ -16,13 +16,16 @@ import {
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
+  useDeleteHandoverAttachmentMutation,
   usePatchConstructionHandoverMutation,
+  usePostHandoverAttachmentMutation,
   useTransitionConstructionHandoverStatusMutation,
 } from '@/api/constructionHandoverApi';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   ConstructionHandoverStatus,
   IConstructionHandover,
+  IConstructionHandoverAttachment,
   IConstructionHandoverRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
 import FinancingSection from './FinancingSection/FinancingSection';
@@ -30,6 +33,8 @@ import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
 import { isConstructionHandoverLocked } from './constructionHandoverUtils';
 import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
+import AttachmentsAndLinksSection from './AttachmentsAndLinksSection';
+import usePostAttachments from '@/hooks/usePostAttachments';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -52,9 +57,9 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
     totalCost: parsedTotalCost,
-    linkDesignDrawings: null,
-    linkCostAllocation: null,
-    linkContractBoundaries: null,
+    linkDesignDrawings: formData.linkDesignDrawings,
+    linkCostAllocation: formData.linkCostAllocation,
+    linkContractBoundaries: formData.linkContractBoundaries,
   };
 }
 
@@ -77,6 +82,12 @@ function ConstructionHandoverForm({
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
 
+  const [postAttachment, { isLoading: isPostingAttachment }] = usePostHandoverAttachmentMutation();
+  const [deleteHandoverAttachment] = useDeleteHandoverAttachmentMutation();
+  const { postAttachments } = usePostAttachments((handoverId, formData) =>
+    postAttachment({ handoverId, formData }),
+  );
+
   const {
     isProjectManager,
     isPlanner,
@@ -84,13 +95,14 @@ function ConstructionHandoverForm({
     isResponsiblePersonForProject,
   } = useConstructionHandoverPermissions(project);
 
+  const isHandoverLocked = isConstructionHandoverLocked(constructionHandover);
   const showSubmitToProgrammerButton =
     constructionHandover.status === ConstructionHandoverStatus.DRAFT &&
     isProjectManager &&
     isResponsiblePersonForProject;
   const showSubmitToConstructionButton =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
-  const showSaveDraftButton = !isConstructionHandoverLocked(constructionHandover);
+  const showSaveDraftButton = !isHandoverLocked;
   const showReturnToDraftButton = [
     ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
@@ -100,6 +112,13 @@ function ConstructionHandoverForm({
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;
   const showSubmitTooltip = showSubmitToProgrammerButton || showSubmitToConstructionButton;
+
+  function handleDeleteAttachment(attachment: IConstructionHandoverAttachment) {
+    deleteHandoverAttachment({
+      handoverId: constructionHandover.id,
+      attachmentId: attachment.id,
+    });
+  }
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -131,6 +150,9 @@ function ConstructionHandoverForm({
       try {
         const requestData = mapFormToRequest(data);
         await patchConstructionHandover({ id: data.id, data: requestData }).unwrap();
+        if (data.attachments && data.attachments.length > 0) {
+          await postAttachments(data.id, data.attachments);
+        }
       } catch (error) {
         return error;
       }
@@ -191,6 +213,12 @@ function ConstructionHandoverForm({
         <ScheduleSection />
         <FinancingSection constructionHandover={constructionHandover} />
         <ContactsSection />
+        <AttachmentsAndLinksSection
+          isPostingAttachment={isPostingAttachment}
+          attachments={constructionHandover.attachments ?? []}
+          onDeleteAttachment={handleDeleteAttachment}
+          isHandoverLocked={isHandoverLocked}
+        />
 
         <div
           className="project-form-banner"

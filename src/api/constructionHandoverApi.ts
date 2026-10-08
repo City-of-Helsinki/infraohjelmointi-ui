@@ -3,6 +3,7 @@ import {
   ConstructionHandoverStatus,
   FinancingRowRequest,
   IConstructionHandover,
+  IConstructionHandoverAttachment,
   IConstructionHandoverFinancing,
   IConstructionHandoverHistoryRequest,
   IConstructionHandoverHistoryResponse,
@@ -11,13 +12,47 @@ import {
 } from '@/interfaces/constructionHandoverInterfaces';
 import { notifySuccess } from '@/reducers/notificationSlice';
 import { t } from 'i18next';
+import { hydrateObjectUrls, revokeObjectUrlsOnCacheRemoval } from '@/utils/fileUtils';
+
+async function hydrateHandoverAttachments(
+  handover: IConstructionHandover,
+): Promise<IConstructionHandover> {
+  if (!handover.attachments || handover.attachments.length === 0) {
+    return handover;
+  }
+
+  return {
+    ...handover,
+    attachments: await hydrateObjectUrls(
+      handover.attachments,
+      (attachment) => attachment.downloadUrl,
+      (attachment, objectUrl) => ({ ...attachment, objectUrl }),
+    ),
+  };
+}
 
 export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
     getConstructionHandoversByProject: build.query<IConstructionHandover[], string>({
-      query: (projectId: string) => ({
-        url: `/projects/${projectId}/construction-handovers/`,
-      }),
+      async queryFn(projectId, _api, _extraOptions, baseQuery) {
+        const handoversResult = await baseQuery({
+          url: `/projects/${projectId}/construction-handovers/`,
+        });
+
+        if (handoversResult.error) {
+          return { error: handoversResult.error };
+        }
+
+        const handovers = (handoversResult.data as IConstructionHandover[]) ?? [];
+        const hydratedHandovers = await Promise.all(handovers.map(hydrateHandoverAttachments));
+
+        return { data: hydratedHandovers };
+      },
+      onCacheEntryAdded: revokeObjectUrlsOnCacheRemoval<IConstructionHandover[]>((handovers) =>
+        handovers.flatMap(
+          (handover) => handover.attachments?.map((attachment) => attachment.objectUrl) ?? [],
+        ),
+      ),
       providesTags: ['ConstructionHandovers'],
     }),
     getConstructionHandoverHistory: build.query<
@@ -132,6 +167,24 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: ['ConstructionHandovers'],
     }),
+    postHandoverAttachment: build.mutation<
+      IConstructionHandoverAttachment[],
+      { handoverId: string; formData: FormData }
+    >({
+      query: ({ handoverId, formData }) => ({
+        url: `/construction-handovers/${handoverId}/attachments/`,
+        method: 'POST',
+        data: formData,
+      }),
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
+    deleteHandoverAttachment: build.mutation<void, { handoverId: string; attachmentId: string }>({
+      query: ({ handoverId, attachmentId }) => ({
+        url: `/construction-handovers/${handoverId}/attachments/${attachmentId}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
   }),
 });
 
@@ -145,4 +198,6 @@ export const {
   useDeleteConstructionHandoverMutation,
   useTransitionConstructionHandoverStatusMutation,
   useDeleteConstructionHandoverFinancingMutation,
+  usePostHandoverAttachmentMutation,
+  useDeleteHandoverAttachmentMutation,
 } = constructionHandoverApi;

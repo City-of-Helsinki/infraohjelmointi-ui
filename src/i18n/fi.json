@@ -39,7 +39,9 @@
     "projectContacts": "Hankkeen osoite- ja yhteystiedot",
     "projectClasses": "Hankkeen luokittelu",
     "nameAndDescription": "Hankkeen nimi ja kuvaus",
-    "constructionHandoverContacts": "Yhteyshenkilöt"
+    "constructionHandoverContacts": "Yhteyshenkilöt",
+    "constructionHandoverFinancing": "Hankkeen rahoitus",
+    "attachmentsAndLinks": "Liitteet ja linkit"
   },
   "option": {
     "underConstruction": "Rakenteilla",
@@ -502,6 +504,10 @@
     "moveToConstructionPreparationButton": "Siirrä rakentamisen valmisteluun",
     "nameProjectManagerNotification": "Nimeä urakan projektipäällikkö ennen valmisteluun siirtoa",
     "returnToDraft": "Palauta luonnokseksi",
+    "attachmentsAndLinks": "Liitteet & linkit",
+    "linkDesignDrawings": "Suunnitelupiirustukset",
+    "linkCostAllocation": "Tilaajien välinen kustannusjako",
+    "linkContractBoundaries": "Urakkarajapiirustukset ja kustannusarvio",
     "status": {
       "draft": "Luonnos",
       "submittedToProgrammer": "Siirretty ohjelmoijalle",
@@ -966,11 +972,13 @@
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
-  "noteAttachments": {
+  "attachments": {
+    "attachments": "Liitetiedostot",
     "dragAndDrop": "Raahaa liitetiedosto",
     "imageAttachments": "Kuvaliitteet",
     "attachmentAdded": "Liitetiedosto lisätty",
     "view": "Näytä",
+    "delete": "Poista",
     "viewAttachment": "Näytä liite {{fileName}}",
     "deleteDialog": {
       "title": "Poistetaanko liite?",

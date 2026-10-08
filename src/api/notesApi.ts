@@ -1,68 +1,21 @@
 import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
-
-function getResolvedImageUrl(imageUrl: string): string {
-  if (!API_BASE_URL) {
-    return imageUrl;
-  }
-
-  try {
-    return new URL(imageUrl, API_BASE_URL).toString();
-  } catch {
-    return imageUrl;
-  }
-}
-
-async function getDownloadedImageUrl(image: INoteImage): Promise<string | undefined> {
-  if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
-    return undefined;
-  }
-
-  try {
-    const imageResponse = await axios.get<Blob>(getResolvedImageUrl(image.url), {
-      responseType: 'blob',
-    });
-    return URL.createObjectURL(imageResponse.data);
-  } catch {
-    // Keep original url if image download fails.
-    return undefined;
-  }
-}
+import { hydrateObjectUrls, revokeObjectUrlsOnCacheRemoval } from '@/utils/fileUtils';
 
 async function hydrateNoteImages(note: INote): Promise<INote> {
   if (!note.images || note.images.length === 0) {
     return note;
   }
 
-  const hydratedImages = await Promise.all(
-    note.images.map(async (image) => ({
-      ...image,
-      downloadUrl: await getDownloadedImageUrl(image),
-    })),
-  );
-
   return {
     ...note,
-    images: hydratedImages,
+    images: await hydrateObjectUrls(
+      note.images,
+      (image) => image.url,
+      (image, downloadUrl) => ({ ...image, downloadUrl }),
+    ),
   };
-}
-
-function revokeDownloadedImageUrls(notes: INote[] | undefined) {
-  if (!notes || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') {
-    return;
-  }
-
-  notes.forEach((note) => {
-    note.images?.forEach((image) => {
-      if (image.downloadUrl) {
-        URL.revokeObjectURL(image.downloadUrl);
-      }
-    });
-  });
 }
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
@@ -82,19 +35,9 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
 
         return { data: hydratedNotes };
       },
-      async onCacheEntryAdded(_arg, { cacheDataLoaded, cacheEntryRemoved, getCacheEntry }) {
-        try {
-          await cacheDataLoaded;
-        } catch {
-          return;
-        }
-
-        const notes = getCacheEntry().data;
-
-        await cacheEntryRemoved;
-
-        revokeDownloadedImageUrls(notes);
-      },
+      onCacheEntryAdded: revokeObjectUrlsOnCacheRemoval<INote[]>((notes) =>
+        notes.flatMap((note) => note.images?.map((image) => image.downloadUrl) ?? []),
+      ),
       providesTags: ['Notes'],
     }),
     postNote: build.mutation<INote, INoteRequest>({
