@@ -148,11 +148,11 @@ describe('CoordinatorView', () => {
   });
 
   describe('PlanningToolbar', () => {
-    it('has all buttons as disabled', async () => {
+    it('has new items button as disabled and expand groups button as enabled', async () => {
       const { findByTestId } = await render();
 
-      expect(await findByTestId('expand-groups-button')).toBeDisabled();
       expect(await findByTestId('new-item-button')).toBeDisabled();
+      expect(await findByTestId('expand-groups-button')).toBeEnabled();
     });
   });
 

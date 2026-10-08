@@ -201,7 +201,6 @@ const PlanningToolbar = () => {
               variant={ButtonVariant.Supplementary}
               className="expand-groups-button toolbar-button"
               iconStart={groupsExpandIcon}
-              disabled={mode === 'coordination'}
               data-testid="expand-groups-button"
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
