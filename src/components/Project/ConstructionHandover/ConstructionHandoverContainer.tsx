@@ -38,7 +38,9 @@ export default function ConstructionHandoverContainer() {
   const navItems = [
     { route: '#nameAndDescription', label: t('nav.nameAndDescription') },
     { route: '#projectSchedule', label: t('nav.projectSchedule') },
+    { route: '#constructionHandoverFinancing', label: t('nav.constructionHandoverFinancing') },
     { route: '#constructionHandoverContacts', label: t('nav.constructionHandoverContacts') },
+    { route: '#attachmentsAndLinks', label: t('nav.attachmentsAndLinks') },
   ];
 
   const handleStartHandover = () => {

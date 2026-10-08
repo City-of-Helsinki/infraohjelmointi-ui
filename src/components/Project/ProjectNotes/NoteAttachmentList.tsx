@@ -1,24 +1,17 @@
 import { stringToDateTime } from '@/utils/dates';
 import { Button, ButtonVariant, IconEye, IconTrash } from 'hds-react';
 import { useCallback, useMemo, useState } from 'react';
-import AttachmentSlideshowDialog from './AttachmentSlideshowDialog';
+import AttachmentSlideshowDialog from '../../shared/AttachmentSlideshowDialog';
 import { useTranslation } from 'react-i18next';
 import { INoteImage } from '@/interfaces/noteInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
+import { formatSizeToKilobytes } from '@/utils/fileUtils';
 import styles from './NoteAttachmentList.module.css';
 
 interface INoteAttachmentListProps {
   attachments: INoteImage[];
   onDeleteAttachment?: (imageId: string) => void;
 }
-
-const formatSizeToKilobytes = (size?: number) => {
-  if (size === undefined || size === null || Number.isNaN(size)) {
-    return '-';
-  }
-
-  return `${Math.round(size / 1024)} kB`;
-};
 
 export default function NoteAttachmentList({
   attachments,
@@ -57,9 +50,9 @@ export default function NoteAttachmentList({
     async (imageId: string): Promise<void> => {
       const confirm = await isConfirmed({
         dialogType: 'delete',
-        confirmButtonText: t('noteAttachments.deleteDialog.delete'),
-        title: t('noteAttachments.deleteDialog.title'),
-        description: t('noteAttachments.deleteDialog.description'),
+        confirmButtonText: t('attachments.deleteDialog.delete'),
+        title: t('attachments.deleteDialog.title'),
+        description: t('attachments.deleteDialog.description'),
       });
 
       if (confirm !== false && onDeleteAttachment) {
@@ -75,19 +68,19 @@ export default function NoteAttachmentList({
 
   return (
     <div>
-      <p className="font-medium">{t('noteAttachments.imageAttachments')}</p>
+      <p className="font-medium">{t('attachments.imageAttachments')}</p>
       {attachments.map((attachment, index) => (
         <div key={attachment.id || `${attachment.fileName}-${index}`} className={styles.listItem}>
           <div className="flex gap-4">
             <button
               type="button"
               onClick={() => handleOpenImage(index)}
-              aria-label={t('noteAttachments.viewAttachment', { fileName: attachment.fileName })}
+              aria-label={t('attachments.viewAttachment', { fileName: attachment.fileName })}
             >
               <img src={attachment.downloadUrl} alt="" className={styles.listItemImage} />
             </button>
             <div className={styles.listItemInfo}>
-              <p className="my-0 font-medium">{t('noteAttachments.attachmentAdded')}</p>
+              <p className="my-0 font-medium">{t('attachments.attachmentAdded')}</p>
               <p className="my-0">
                 {attachment.createdDate ? stringToDateTime(attachment.createdDate) : '-'}
               </p>
@@ -112,7 +105,7 @@ export default function NoteAttachmentList({
               iconStart={<IconEye />}
               onClick={() => handleOpenImage(index)}
             >
-              {t('noteAttachments.view')}
+              {t('attachments.view')}
             </Button>
           </div>
         </div>
@@ -121,7 +114,10 @@ export default function NoteAttachmentList({
       {currentAttachment && (
         <AttachmentSlideshowDialog
           isOpen={isSlideshowOpen}
-          attachments={attachments}
+          attachments={attachments.map((attachment) => ({
+            downloadUrl: attachment.downloadUrl,
+            fileName: attachment.fileName,
+          }))}
           selectedIndex={selectedAttachmentIndex}
           onClose={closeSlideshow}
           onNext={handleNextImage}

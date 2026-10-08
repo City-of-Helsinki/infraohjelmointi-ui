@@ -177,6 +177,10 @@ export interface IConstructionHandoverForm {
   personPlanning: IOption; // Suunnittelu- ja tekniset asiat
   personFinancing: IOption; // Rahoitus- ja aikataulu
   totalCost: string; // Kokonaiskustannus
+  linkDesignDrawings: string; // Suunnittelupiirustukset
+  linkCostAllocation: string; // Tilaajien välinen kustannusjako
+  linkContractBoundaries: string; // Urakkarajapiirustukset ja kustannusarvio
+  attachments?: File[] | null; // Liitetiedostot
 }
 
 export interface IConstructionHandoverFinalizingForm {

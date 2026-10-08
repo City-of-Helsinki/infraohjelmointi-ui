@@ -11,6 +11,9 @@ import { UserRole } from '@/interfaces/userInterfaces';
 
 const mockPatchConstructionHandover = jest.fn();
 const mockTransitionConstructionHandoverStatus = jest.fn();
+const mockPostHandoverAttachment = jest.fn();
+const mockDeleteHandoverAttachment = jest.fn();
+const mockIsConfirmed = jest.fn();
 
 jest.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
@@ -18,6 +21,15 @@ jest.mock('@/api/constructionHandoverApi', () => ({
   usePostConstructionHandoverFinancingMutation: () => [jest.fn()],
   usePatchConstructionHandoverFinancingMutation: () => [jest.fn()],
   useDeleteConstructionHandoverFinancingMutation: () => [jest.fn()],
+  usePostHandoverAttachmentMutation: () => [mockPostHandoverAttachment, { isLoading: false }],
+  useDeleteHandoverAttachmentMutation: () => [mockDeleteHandoverAttachment],
+}));
+
+jest.mock('@/hooks/useConfirmDialog', () => ({
+  __esModule: true,
+  default: () => ({
+    isConfirmed: mockIsConfirmed,
+  }),
 }));
 
 jest.mock('react-i18next', () => mockI18next());
@@ -49,7 +61,12 @@ function setupConstructionHandoverForm(
   projectOverrides = {},
   preloadedState = {},
 ) {
-  const constructionHandover = createConstructionHandover(constructionHandoverOverrides);
+  const constructionHandover = createConstructionHandover({
+    linkDesignDrawings: 'https://example.com/design-drawings',
+    linkCostAllocation: 'https://example.com/cost-allocation',
+    linkContractBoundaries: 'https://example.com/contract-boundaries',
+    ...constructionHandoverOverrides,
+  });
   const project = createProject(projectOverrides);
 
   return renderWithProviders(
@@ -161,9 +178,9 @@ describe('ConstructionHandoverForm submit', () => {
           personPlanning: 'person-1',
           personFinancing: 'person-2',
           totalCost: null,
-          linkDesignDrawings: null,
-          linkCostAllocation: null,
-          linkContractBoundaries: null,
+          linkDesignDrawings: 'https://example.com/design-drawings',
+          linkCostAllocation: 'https://example.com/cost-allocation',
+          linkContractBoundaries: 'https://example.com/contract-boundaries',
         },
       });
     });
@@ -558,5 +575,131 @@ describe('ConstructionHandoverForm status transitions', () => {
         to: ConstructionHandoverStatus.DRAFT,
       });
     });
+  });
+});
+
+describe('ConstructionHandoverForm attachments and links', () => {
+  const attachment = {
+    id: 'attachment-1',
+    handover: 'handover-1',
+    downloadUrl: '/construction-handovers/handover-1/attachments/attachment-1/download/',
+    objectUrl: 'blob:first',
+    originalName: 'first-image.jpg',
+    contentType: 'image/jpeg' as const,
+    size: 2048,
+    uploadedDate: '2026-01-01T12:00:00Z',
+    order: 0,
+  };
+
+  beforeEach(() => {
+    mockPatchConstructionHandover.mockReset();
+    mockPatchConstructionHandover.mockReturnValue({ unwrap: () => Promise.resolve() });
+    mockPostHandoverAttachment.mockReset();
+    mockPostHandoverAttachment.mockResolvedValue({ data: [] });
+    mockDeleteHandoverAttachment.mockReset();
+    mockIsConfirmed.mockReset();
+  });
+
+  async function clickSaveDraft() {
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'constructionHandoverForm.saveDraft' }));
+    });
+  }
+
+  it('uploads all selected files in a single request after saving', async () => {
+    await act(async () => setupConstructionHandoverForm());
+
+    const files = [
+      new File(['first'], 'new-first.jpg', { type: 'image/jpeg' }),
+      new File(['second'], 'new-second.png', { type: 'image/png' }),
+    ];
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('attachments.dragAndDrop'), {
+        target: { files },
+      });
+    });
+
+    await clickSaveDraft();
+
+    await waitFor(() => expect(mockPostHandoverAttachment).toHaveBeenCalledTimes(1));
+    const { handoverId, formData } = mockPostHandoverAttachment.mock.calls[0][0] as {
+      handoverId: string;
+      formData: FormData;
+    };
+    expect(handoverId).toBe('handover-1');
+    expect((formData.getAll('file') as File[]).map((file) => file.name)).toEqual([
+      'new-first.jpg',
+      'new-second.png',
+    ]);
+  });
+
+  it('does not upload attachments when no files are selected', async () => {
+    await act(async () => setupConstructionHandoverForm());
+
+    await clickSaveDraft();
+
+    await waitFor(() => expect(mockPatchConstructionHandover).toHaveBeenCalled());
+    expect(mockPostHandoverAttachment).not.toHaveBeenCalled();
+  });
+
+  it('does not upload attachments when saving the handover fails', async () => {
+    mockPatchConstructionHandover.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('Patch failed')),
+    });
+    await act(async () => setupConstructionHandoverForm());
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('attachments.dragAndDrop'), {
+        target: { files: [new File(['first'], 'new-first.jpg', { type: 'image/jpeg' })] },
+      });
+    });
+
+    await clickSaveDraft();
+
+    await waitFor(() => expect(mockPatchConstructionHandover).toHaveBeenCalled());
+    expect(mockPostHandoverAttachment).not.toHaveBeenCalled();
+  });
+
+  it.each(['linkDesignDrawings', 'linkCostAllocation', 'linkContractBoundaries'])(
+    'does not submit when required link %s is empty',
+    async (linkField) => {
+      await act(async () => setupConstructionHandoverForm({ [linkField]: null }));
+
+      await clickSaveDraft();
+
+      expect(await screen.findByText('validation.required')).toBeInTheDocument();
+      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+    },
+  );
+
+  it('renders every attachment of the handover', async () => {
+    await act(async () =>
+      setupConstructionHandoverForm({
+        attachments: [
+          attachment,
+          { ...attachment, id: 'attachment-2', originalName: 'second-image.png' },
+        ],
+      }),
+    );
+
+    expect(screen.getByText(/first-image\.jpg/)).toBeInTheDocument();
+    expect(screen.getByText(/second-image\.png/)).toBeInTheDocument();
+  });
+
+  it('deletes an attachment after confirmation', async () => {
+    mockIsConfirmed.mockResolvedValue(true);
+    await act(async () => setupConstructionHandoverForm({ attachments: [attachment] }));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'attachments.delete' }));
+    });
+
+    await waitFor(() =>
+      expect(mockDeleteHandoverAttachment).toHaveBeenCalledWith({
+        handoverId: 'handover-1',
+        attachmentId: 'attachment-1',
+      }),
+    );
   });
 });
