@@ -67,8 +67,8 @@ function getBasicInfoValues(
   project?: IProjectNameAndDistrict,
 ): IProjectProgrammeBasicInfo {
   return {
-    projectName: getTextValue(basicInfo?.projectName ?? project?.name),
-    district: getDistrictValue(basicInfo?.district ?? project?.projectDistrict),
+    projectName: getTextValue(basicInfo?.projectName || project?.name),
+    district: getDistrictValue(basicInfo?.district) || getTextValue(project?.projectDistrict),
     projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
     personsInvolved: getTextValue(basicInfo?.personsInvolved),
     estimatedCosts: getTextValue(basicInfo?.estimatedCosts),

@@ -48,12 +48,13 @@ describe('projectProgrammePdfUtils', () => {
 
 describe('getFieldsForSection', () => {
   it('uses brief or full basic info fields depending on programme type', () => {
-    expect(getFieldsForSection('basicInfo', { briefProjectProgramme: true })).toBe(
-      BASIC_INFO_BRIEF_FIELDS,
+    const briefFieldNames = BASIC_INFO_BRIEF_FIELDS.map(({ field }) => field);
+    expect(getFieldsForSection('basicInfo', { briefProjectProgramme: true })).toEqual(
+      briefFieldNames,
     );
-    expect(getFieldsForSection('basicInfo', undefined)).toBe(BASIC_INFO_BRIEF_FIELDS);
-    expect(getFieldsForSection('basicInfo', { briefProjectProgramme: false })).toBe(
-      BASIC_INFO_FULL_FIELDS,
+    expect(getFieldsForSection('basicInfo', undefined)).toEqual(briefFieldNames);
+    expect(getFieldsForSection('basicInfo', { briefProjectProgramme: false })).toEqual(
+      BASIC_INFO_FULL_FIELDS.map(({ field }) => field),
     );
   });
 
