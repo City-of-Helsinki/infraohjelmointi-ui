@@ -1301,6 +1301,7 @@
       "budget": {
         "NAME_CONSTRUCTION_PROJECT_MANAGER": "KYMP-rahoitus"
       },
+      "totalCost": "Kokonaiskustannus",
       "constructionProcurementMethod": "Rakentamisen hankintatapa",
       "infoNotAvailable": "Ei tiedossa",
       "paginationAriaLabel": "Tehtävien sivutus"
