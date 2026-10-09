@@ -109,6 +109,16 @@ function ProjectProgrammeForm({
       requestData.links = linksPayload;
     }
 
+    if (activeSection === 'basicInfo') {
+      const savedBasicInfo = effectiveProjectProgramme?.basicInfo;
+      if (!savedBasicInfo?.projectName && data.basicInfo?.projectName) {
+        requestData.projectName ??= data.basicInfo.projectName;
+      }
+      if (!savedBasicInfo?.district && data.basicInfo?.district) {
+        requestData.district ??= data.basicInfo.district;
+      }
+    }
+
     const sectionExists = Boolean(effectiveProjectProgramme?.[activeSection]);
     if (!Object.keys(requestData).length && (sectionExists || !createIfMissing)) {
       return false;

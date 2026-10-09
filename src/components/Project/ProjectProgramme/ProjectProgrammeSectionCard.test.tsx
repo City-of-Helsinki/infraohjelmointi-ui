@@ -160,10 +160,41 @@ describe('ProjectProgrammeSectionCard readonly sections', () => {
     expect(baseProps.handleOpenSection).toHaveBeenCalledWith('basicInfo');
   });
 
+  it('hides mark ready on the card when required fields are missing', async () => {
+    await renderSectionCard({
+      sectionIsStarted: true,
+      projectProgramme: {
+        id: 'programme-1',
+        status: 'DRAFT',
+        briefProjectProgramme: false,
+        basicInfo: { status: 'DRAFT', summary: 'Only summary' },
+      },
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'projectProgrammeForm.markSectionReady' }),
+    ).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }),
+    ).toBeInTheDocument();
+  });
+
   it('marks a draft section ready from the card', async () => {
     await renderSectionCard({
       sectionIsStarted: true,
-      projectProgramme: { id: 'programme-1', status: 'DRAFT', basicInfo: { status: 'DRAFT' } },
+      projectProgramme: {
+        id: 'programme-1',
+        status: 'DRAFT',
+        briefProjectProgramme: true,
+        basicInfo: {
+          status: 'DRAFT',
+          projectName: 'Project',
+          district: { name: 'Keskinen' },
+          projectProgrammeCompiler: 'Compiler',
+          estimatedCosts: '100 000 EUR',
+          summary: 'Summary',
+        },
+      },
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markSectionReady' }));
