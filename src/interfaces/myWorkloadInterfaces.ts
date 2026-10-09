@@ -34,6 +34,7 @@ export interface MyWorkloadTableRow {
 export interface MyWorkloadTaskItem {
   id: string;
   budget: string;
+  totalCost: string;
   projectName: string;
   planningPeriod: string;
   constructionPeriod: string;

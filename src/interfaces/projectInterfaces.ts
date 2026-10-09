@@ -502,5 +502,6 @@ export interface IProjectTask extends Pick<
   constructionProcurementMethod: IListItem | null;
   costForecast?: number | null;
   budget?: number | null;
+  totalCost?: number | null;
   taskType: ProjectTaskType;
 }
