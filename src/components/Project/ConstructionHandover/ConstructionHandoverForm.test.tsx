@@ -313,6 +313,82 @@ describe('ConstructionHandoverForm financing rows', () => {
   });
 });
 
+describe('ConstructionHandoverForm save draft button', () => {
+  const responsibleProjectOverrides = {
+    personPlanning: {
+      id: 'person-1',
+      firstName: 'Planner',
+      lastName: 'User',
+      email: 'planner@example.com',
+      title: '',
+      phone: '123456789',
+    },
+  };
+
+  it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
+    'shows save draft button for %s status when user is not the responsible person',
+    async (status) => {
+      await act(async () =>
+        setupConstructionHandoverForm(
+          { status },
+          responsibleProjectOverrides,
+          withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+            email: 'otheruser@example.com',
+          }),
+        ),
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it('shows save draft button for responsible person when status is draft', async () => {
+    await act(async () =>
+      setupConstructionHandoverForm(
+        { status: ConstructionHandoverStatus.DRAFT },
+        responsibleProjectOverrides,
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
+      ),
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+    ).toBeInTheDocument();
+  });
+
+  it('hides save draft button for responsible person when status is submitted to programmer', async () => {
+    await act(async () =>
+      setupConstructionHandoverForm(
+        { status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER },
+        responsibleProjectOverrides,
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
+      ),
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+    ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+    ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+  ])('hides save draft button for locked %s status', async (status) => {
+    await act(async () => setupConstructionHandoverForm({ status }));
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe('ConstructionHandoverForm status transitions', () => {
   beforeEach(() => {
     mockTransitionConstructionHandoverStatus.mockClear();
@@ -333,7 +409,6 @@ describe('ConstructionHandoverForm status transitions', () => {
     expect(
       screen.getByRole('textbox', { name: /constructionHandoverForm\.constructionStart/i }),
     ).toBeDisabled();
-    expect(screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' })).toBeNull();
   });
 
   it('submits handover to programmer when submit to programmer button is clicked', async () => {

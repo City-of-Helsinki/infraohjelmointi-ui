@@ -90,7 +90,13 @@ function ConstructionHandoverForm({
     isResponsiblePersonForProject;
   const showSubmitToConstructionButton =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
-  const showSaveDraftButton = !isConstructionHandoverLocked(constructionHandover);
+  const showSaveDraftButton =
+    !isConstructionHandoverLocked(constructionHandover) &&
+    !(
+      constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER &&
+      isProjectManager &&
+      isResponsiblePersonForProject
+    );
   const showReturnToDraftButton = [
     ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
     ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,

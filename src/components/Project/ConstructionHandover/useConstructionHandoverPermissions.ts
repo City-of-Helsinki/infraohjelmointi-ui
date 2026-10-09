@@ -2,7 +2,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import {
-  isUserProjectManager,
+  isUserOnlyProjectManager,
   isUserPlanner,
   isUserConstructionManagementLead,
 } from '@/utils/userRoleHelpers';
@@ -14,7 +14,7 @@ export default function useConstructionHandoverPermissions(project: IProject | u
   const user = useAppSelector(selectUser);
   const userEmail = user?.email.trim().toLowerCase();
 
-  const isProjectManager = isUserProjectManager(user);
+  const isProjectManager = isUserOnlyProjectManager(user);
   const isPlanner = isUserPlanner(user);
   const isConstructionManagementLead = isUserConstructionManagementLead(user);
 
