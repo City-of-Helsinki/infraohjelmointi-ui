@@ -22,6 +22,7 @@ const baseTask: MyWorkloadTaskItem = {
   planningPeriod: '1.1.2026 - 6.12.2028',
   constructionPeriod: '11.4.2029 - 31.12.2036',
   budget: '1234',
+  totalCost: '5000',
   constructionProcurementMethod: 'Kilpailutus',
   taskDescription: 'Nimeä rakennuttamisen projektipäällikkö',
   taskType: ProjectTaskType.NAME_CONSTRUCTION_PROJECT_MANAGER,
@@ -42,9 +43,16 @@ describe('MyWorkloadTaskCard', () => {
     expect(
       screen.getByText('myWorkloadView.tasks.constructionPeriod: 11.4.2029 - 31.12.2036'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('myWorkloadView.tasks.budget.NAME_CONSTRUCTION_PROJECT_MANAGER: 1 234,00€'),
-    ).toBeInTheDocument();
+    const budgetValue = screen.getByText('1 234,00€');
+    expect(budgetValue).toHaveClass('noWrap');
+    expect(budgetValue.closest('p')).toHaveTextContent(
+      'myWorkloadView.tasks.budget.NAME_CONSTRUCTION_PROJECT_MANAGER: 1 234,00€',
+    );
+    const totalCostValue = screen.getByText('5 000,00€');
+    expect(totalCostValue).toHaveClass('noWrap');
+    expect(totalCostValue.closest('p')).toHaveTextContent(
+      'myWorkloadView.tasks.totalCost: 5 000,00€',
+    );
     expect(
       screen.getByText('myWorkloadView.tasks.constructionProcurementMethod: Kilpailutus'),
     ).toBeInTheDocument();
