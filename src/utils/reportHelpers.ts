@@ -429,6 +429,11 @@ const getBudgetOverrunReason = (
   return '';
 };
 
+const hasNonzeroStrategyBudget = (value: string | null | undefined): boolean => {
+  const budget = parseCurrency(value);
+  return budget !== null && budget !== 0;
+};
+
 const convertToStrategyAndForecastReportProjects = (
   type: ReportType,
   projects: IProject[],
@@ -439,7 +444,7 @@ const convertToStrategyAndForecastReportProjects = (
     if (type === Reports.Strategy) {
       return projects.filter(
         (p) =>
-          p.finances.budgetProposalCurrentYearPlus0 != '0.00' &&
+          hasNonzeroStrategyBudget(p.finances.budgetProposalCurrentYearPlus0) &&
           p.planningStartYear &&
           p.constructionEndYear &&
           isProjectInPlanningOrConstruction(
@@ -456,7 +461,10 @@ const convertToStrategyAndForecastReportProjects = (
     }
 
     return projects.filter((p) => {
-      const hasBudget = p.finances.budgetProposalCurrentYearPlus0 !== '0.00';
+      const hasBudget =
+        type === Reports.StrategyForcedToFrame
+          ? hasNonzeroStrategyBudget(p.finances.budgetProposalCurrentYearPlus0)
+          : p.finances.budgetProposalCurrentYearPlus0 !== '0.00';
       const planningStart = p.frameEstPlanningStart
         ? getYear(p.frameEstPlanningStart)
         : p.planningStartYear;
@@ -2272,7 +2280,6 @@ export const operationalEnvironmentAnalysisTableRows = (
   tableRows.forEach((row) => {
     if (row.type === 'class') {
       data = getOperationalEnvironmentAnalysisSummaryData(row.children);
-      let classData: any = {};
 
       if (!data.length) {
         summarySubClasses.length = 0;
@@ -2280,7 +2287,7 @@ export const operationalEnvironmentAnalysisTableRows = (
       }
 
       if (!summaryClasses.some((summaryClass) => summaryClass.id === row.id)) {
-        classData = {
+        const classData: IOperationalEnvironmentAnalysisSummaryRow = {
           id: row.id,
           name: row.name,
           type: row.type,
