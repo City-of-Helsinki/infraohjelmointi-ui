@@ -13,7 +13,7 @@ interface IFileInputProps {
 
 export default function FileInput({
   id,
-  maxSize = 512288,
+  maxSize = 512000,
   accept = '.jpg,.png',
   multiple = true,
   disabled,

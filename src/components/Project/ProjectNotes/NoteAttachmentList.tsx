@@ -1,7 +1,7 @@
 import { stringToDateTime } from '@/utils/dates';
 import { Button, ButtonVariant, IconEye, IconTrash } from 'hds-react';
 import { useCallback, useMemo, useState } from 'react';
-import AttachmentSlideshowDialog from '../../shared/AttachmentSlideshowDialog';
+import AttachmentSlideshowDialog from '@/components/shared/AttachmentSlideshowDialog';
 import { useTranslation } from 'react-i18next';
 import { INoteImage } from '@/interfaces/noteInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';

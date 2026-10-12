@@ -82,7 +82,7 @@ export default function AttachmentsAndLinksSection({
         <FileInput
           id="attachments-and-links-file-input"
           handleChange={(files) => {
-            setValue('attachments', files);
+            setValue('attachments', files, { shouldDirty: true });
           }}
           disabled={isHandoverLocked}
         />

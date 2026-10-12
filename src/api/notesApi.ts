@@ -1,7 +1,7 @@
 import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import { hydrateObjectUrls, revokeObjectUrlsOnCacheRemoval } from '@/utils/fileUtils';
+import { hydrateObjectUrls, objectUrlCacheLifecycle } from '@/utils/fileUtils';
 
 async function hydrateNoteImages(note: INote): Promise<INote> {
   if (!note.images || note.images.length === 0) {
@@ -35,7 +35,7 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
 
         return { data: hydratedNotes };
       },
-      onCacheEntryAdded: revokeObjectUrlsOnCacheRemoval<INote[]>((notes) =>
+      ...objectUrlCacheLifecycle<INote[]>((notes) =>
         notes.flatMap((note) => note.images?.map((image) => image.downloadUrl) ?? []),
       ),
       providesTags: ['Notes'],

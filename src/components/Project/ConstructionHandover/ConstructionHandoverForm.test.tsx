@@ -643,6 +643,54 @@ describe('ConstructionHandoverForm attachments and links', () => {
     expect(mockPostHandoverAttachment).not.toHaveBeenCalled();
   });
 
+  it('uploads selected files before transitioning status when only files have changed', async () => {
+    mockTransitionConstructionHandoverStatus.mockClear();
+    await act(async () =>
+      setupConstructionHandoverForm(
+        { status: ConstructionHandoverStatus.DRAFT },
+        {
+          personPlanning: {
+            id: 'person-1',
+            firstName: 'Planner',
+            lastName: 'User',
+            email: 'planner@example.com',
+            title: '',
+            phone: '123456789',
+          },
+        },
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
+      ),
+    );
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('attachments.dragAndDrop'), {
+        target: { files: [new File(['first'], 'new-first.jpg', { type: 'image/jpeg' })] },
+      });
+    });
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: 'constructionHandoverForm.submitToProgrammer' }),
+      );
+    });
+
+    await waitFor(() =>
+      expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+        id: 'handover-1',
+        to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      }),
+    );
+    expect(mockPatchConstructionHandover).toHaveBeenCalledTimes(1);
+    expect(mockPostHandoverAttachment).toHaveBeenCalledTimes(1);
+    const { formData } = mockPostHandoverAttachment.mock.calls[0][0] as { formData: FormData };
+    expect((formData.getAll('file') as File[]).map((file) => file.name)).toEqual(['new-first.jpg']);
+    expect(mockPostHandoverAttachment.mock.invocationCallOrder[0]).toBeLessThan(
+      mockTransitionConstructionHandoverStatus.mock.invocationCallOrder[0],
+    );
+  });
+
   it('does not upload attachments when saving the handover fails', async () => {
     mockPatchConstructionHandover.mockReturnValue({
       unwrap: () => Promise.reject(new Error('Patch failed')),

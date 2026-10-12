@@ -2,8 +2,8 @@ import axios from 'axios';
 import {
   getDownloadUrl,
   hydrateObjectUrls,
+  objectUrlCacheLifecycle,
   revokeObjectUrls,
-  revokeObjectUrlsOnCacheRemoval,
 } from './fileUtils';
 
 jest.mock('axios');
@@ -83,28 +83,51 @@ describe('fileUtils object urls', () => {
     });
   });
 
-  describe('revokeObjectUrlsOnCacheRemoval', () => {
-    function createLifecycle<T>(data: T | undefined, cacheDataLoaded = Promise.resolve()) {
+  describe('objectUrlCacheLifecycle', () => {
+    type Data = { urls: string[] };
+
+    function createCache(initial: Data | undefined, cacheDataLoaded = Promise.resolve()) {
+      const cache: { data?: Data } = { data: initial };
       let removeCacheEntry: () => void = () => undefined;
       const cacheEntryRemoved = new Promise<void>((resolve) => {
         removeCacheEntry = resolve;
       });
 
       return {
+        cache,
         lifecycle: {
           cacheDataLoaded,
           cacheEntryRemoved,
-          getCacheEntry: () => ({ data }),
+          getCacheEntry: () => cache,
         },
         removeCacheEntry,
       };
     }
 
-    it('revokes collected urls only after the cache entry is removed', async () => {
-      const handler = revokeObjectUrlsOnCacheRemoval<{ urls: string[] }>((data) => data.urls);
-      const { lifecycle, removeCacheEntry } = createLifecycle({ urls: ['blob:first'] });
+    async function refetch(
+      onQueryStarted: (
+        arg: string,
+        api: { getCacheEntry: () => { data?: Data }; queryFulfilled: Promise<unknown> },
+      ) => Promise<void>,
+      cache: { data?: Data },
+      arg: string,
+      next: Data,
+    ) {
+      let fulfil: () => void = () => undefined;
+      const queryFulfilled = new Promise<void>((resolve) => {
+        fulfil = resolve;
+      });
+      const done = onQueryStarted(arg, { getCacheEntry: () => cache, queryFulfilled });
+      cache.data = next;
+      fulfil();
+      await done;
+    }
 
-      const done = handler(undefined, lifecycle);
+    it('revokes collected urls only after the cache entry is removed', async () => {
+      const { onCacheEntryAdded } = objectUrlCacheLifecycle<Data>((data) => data.urls);
+      const { lifecycle, removeCacheEntry } = createCache({ urls: ['blob:first'] });
+
+      const done = onCacheEntryAdded('project', lifecycle);
       await Promise.resolve();
       expect(revokeObjectURL).not.toHaveBeenCalled();
 
@@ -114,12 +137,49 @@ describe('fileUtils object urls', () => {
       expect(revokeObjectURL).toHaveBeenCalledWith('blob:first');
     });
 
+    it('revokes replaced urls on refetch and the latest urls on removal', async () => {
+      const { onQueryStarted, onCacheEntryAdded } = objectUrlCacheLifecycle<Data>(
+        (data) => data.urls,
+      );
+      const { cache, lifecycle, removeCacheEntry } = createCache({
+        urls: ['blob:kept', 'blob:old'],
+      });
+
+      const done = onCacheEntryAdded('project', lifecycle);
+      await Promise.resolve();
+
+      await refetch(onQueryStarted, cache, 'project', { urls: ['blob:kept', 'blob:new'] });
+
+      expect(revokeObjectURL).toHaveBeenCalledTimes(1);
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:old');
+
+      revokeObjectURL.mockClear();
+      removeCacheEntry();
+      await done;
+
+      expect(revokeObjectURL).toHaveBeenCalledTimes(2);
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:kept');
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:new');
+    });
+
+    it('keeps previous urls when the refetch fails', async () => {
+      const { onQueryStarted } = objectUrlCacheLifecycle<Data>((data) => data.urls);
+      const queryFulfilled = Promise.reject(new Error('Failed'));
+
+      await onQueryStarted('project', {
+        getCacheEntry: () => ({ data: { urls: ['blob:first'] } }),
+        queryFulfilled,
+      });
+
+      expect(revokeObjectURL).not.toHaveBeenCalled();
+    });
+
     it('does nothing when cache data fails to load', async () => {
       const collectUrls = jest.fn();
-      const handler = revokeObjectUrlsOnCacheRemoval(collectUrls);
-      const { lifecycle } = createLifecycle(undefined, Promise.reject(new Error('Failed')));
+      const { onCacheEntryAdded } = objectUrlCacheLifecycle<Data>(collectUrls);
+      const { lifecycle } = createCache(undefined, Promise.reject(new Error('Failed')));
 
-      await handler(undefined, lifecycle);
+      await onCacheEntryAdded('project', lifecycle);
 
       expect(collectUrls).not.toHaveBeenCalled();
       expect(revokeObjectURL).not.toHaveBeenCalled();

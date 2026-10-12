@@ -12,7 +12,7 @@ import {
 } from '@/interfaces/constructionHandoverInterfaces';
 import { notifySuccess } from '@/reducers/notificationSlice';
 import { t } from 'i18next';
-import { hydrateObjectUrls, revokeObjectUrlsOnCacheRemoval } from '@/utils/fileUtils';
+import { hydrateObjectUrls, objectUrlCacheLifecycle } from '@/utils/fileUtils';
 
 async function hydrateHandoverAttachments(
   handover: IConstructionHandover,
@@ -48,7 +48,7 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
 
         return { data: hydratedHandovers };
       },
-      onCacheEntryAdded: revokeObjectUrlsOnCacheRemoval<IConstructionHandover[]>((handovers) =>
+      ...objectUrlCacheLifecycle<IConstructionHandover[]>((handovers) =>
         handovers.flatMap(
           (handover) => handover.attachments?.map((attachment) => attachment.objectUrl) ?? [],
         ),

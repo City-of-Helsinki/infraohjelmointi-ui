@@ -83,15 +83,43 @@ export function revokeObjectUrls(urls: (string | undefined)[]) {
 }
 
 /**
- * Creates an RTK Query `onCacheEntryAdded` handler that revokes the cached data's
- * object URLs once the cache entry is removed.
+ * Creates RTK Query `onQueryStarted` and `onCacheEntryAdded` handlers that revoke the
+ * cached data's object URLs when a refetch replaces the data and when the cache entry is removed.
  * @param collectUrls Returns the object URLs contained in the cached data.
  */
-export function revokeObjectUrlsOnCacheRemoval<T>(
-  collectUrls: (data: T) => (string | undefined)[],
-) {
-  return async (
-    _arg: unknown,
+export function objectUrlCacheLifecycle<T>(collectUrls: (data: T) => (string | undefined)[]) {
+  // Latest cached data per query arg; lifecycle APIs don't expose the cache key.
+  const latestData = new Map<string, T>();
+  const getKey = (arg: unknown) => JSON.stringify(arg ?? null);
+
+  const onQueryStarted = async (
+    arg: unknown,
+    {
+      getCacheEntry,
+      queryFulfilled,
+    }: { getCacheEntry: () => { data?: T }; queryFulfilled: Promise<unknown> },
+  ) => {
+    const previous = getCacheEntry().data;
+
+    try {
+      await queryFulfilled;
+    } catch {
+      return;
+    }
+
+    const current = getCacheEntry().data;
+    if (current) {
+      latestData.set(getKey(arg), current);
+    }
+
+    if (previous && previous !== current) {
+      const currentUrls = new Set(current ? collectUrls(current) : []);
+      revokeObjectUrls(collectUrls(previous).filter((url) => !currentUrls.has(url)));
+    }
+  };
+
+  const onCacheEntryAdded = async (
+    arg: unknown,
     {
       cacheDataLoaded,
       cacheEntryRemoved,
@@ -102,18 +130,25 @@ export function revokeObjectUrlsOnCacheRemoval<T>(
       getCacheEntry: () => { data?: T };
     },
   ) => {
+    const key = getKey(arg);
+
     try {
       await cacheDataLoaded;
     } catch {
       return;
     }
 
-    const data = getCacheEntry().data;
+    const initialData = getCacheEntry().data;
 
     await cacheEntryRemoved;
+
+    const data = latestData.get(key) ?? initialData;
+    latestData.delete(key);
 
     if (data) {
       revokeObjectUrls(collectUrls(data));
     }
   };
+
+  return { onQueryStarted, onCacheEntryAdded };
 }
