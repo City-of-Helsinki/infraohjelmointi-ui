@@ -1,3 +1,4 @@
+@reference "../../../../../index.css";
 .tooltip-container {
   position: absolute;
   inset: auto auto 2rem 0px;

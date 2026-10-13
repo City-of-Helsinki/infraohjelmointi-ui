@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .loader-container {
   @apply fixed z-[110] -mt-20 h-full w-full overflow-hidden;
 }

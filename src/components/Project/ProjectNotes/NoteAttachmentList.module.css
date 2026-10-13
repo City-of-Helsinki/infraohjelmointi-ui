@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 .listItem {
   @apply flex flex-wrap justify-between gap-2 border-b border-[--color-black-30] py-6 last:border-b-0;
 }

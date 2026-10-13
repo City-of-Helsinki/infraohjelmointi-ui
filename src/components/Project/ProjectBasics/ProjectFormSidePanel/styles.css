@@ -1,3 +1,4 @@
+@reference "../../../../index.css";
 .project-form-side-panel-container {
   @apply sticky top-0 mx-6 max-w-[20.5rem] translate-y-[4rem] justify-center;
 }
@@ -6,7 +7,7 @@
 }
 
 .project-form-side-panel .pw-folder-container {
-  @apply mb-4 mt-16 flex justify-center;
+  @apply mt-16 mb-4 flex justify-center;
 }
 
 .project-form-side-panel .pw-folder-link-container {

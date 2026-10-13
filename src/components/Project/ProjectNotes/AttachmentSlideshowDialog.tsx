@@ -69,7 +69,7 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
           <img
             src={currentAttachment.downloadUrl}
             alt={currentAttachment.fileName}
-            className="max-h-[70vh] w-full rounded-sm object-contain"
+            className="max-h-[70vh] w-full rounded-xs object-contain"
           />
           <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
             <button
@@ -95,7 +95,7 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
             </button>
           </div>
         </div>
-        <div className="absolute right-8 top-6">
+        <div className="absolute top-6 right-8">
           <Button
             onClick={onClose}
             variant={ButtonVariant.Secondary}

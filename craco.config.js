@@ -7,6 +7,21 @@ module.exports = {
     },
     configure: (webpackConfig) => {
       const rules = webpackConfig.module.rules.flatMap((rule) => rule.oneOf ?? [rule]);
+      const postcssLoaders = rules
+        .flatMap((rule) => rule.use ?? [])
+        .filter(
+          (loader) =>
+            typeof loader !== 'string' &&
+            loader.loader?.includes('postcss-loader') &&
+            Array.isArray(loader.options?.postcssOptions?.plugins),
+        );
+
+      postcssLoaders.forEach((loader) => {
+        loader.options.postcssOptions.plugins = loader.options.postcssOptions.plugins.map((plugin) =>
+          plugin === 'tailwindcss' ? require('@tailwindcss/postcss') : plugin,
+        );
+      });
+
       const cssModuleLoaders = rules
         .flatMap((rule) => rule.use ?? [])
         .filter(

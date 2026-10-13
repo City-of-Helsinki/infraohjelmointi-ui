@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 /* set a fixed height to keep the pagination in place */
 .admin-hashtags-table-container {
   @apply mt-8 h-[540px];
@@ -51,10 +52,10 @@
 
 /* border to header */
 #add-hashtag-dialog > div:nth-child(1) {
-  @apply border-b-[1px] border-black-60;
+  @apply border-black-60 border-b-[1px];
 }
 
 /* padding and border to content */
 #add-hashtag-dialog > div:nth-child(2) {
-  @apply border-b-[1px] border-black-60 pb-24 pt-8;
+  @apply border-black-60 border-b-[1px] pt-8 pb-24;
 }
