@@ -18,12 +18,14 @@ export interface IProjectProgramme {
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
 }
 
+// The map has no status of its own: it locks together with the programme
 export interface IProjectProgrammeLocationMap {
-  id?: string;
-  url?: string | null;
-  downloadUrl?: string | null;
-  fileName?: string | null;
-  status?: ProjectProgrammeStatus;
+  id: string;
+  url: string | null;
+  originalName: string;
+  contentType?: string;
+  size?: number;
+  uploadedDate?: string;
 }
 
 export interface IProjectProgrammeTransitionResponse {

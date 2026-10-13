@@ -16,6 +16,9 @@ const mockPostProjectProgramme = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
 const mockSaveProjectProgrammeLocationMap = jest.fn();
+const mockDeleteProjectProgrammeLocationMap = jest.fn();
+const mockGetProjectProgrammeLocationMapBlob = jest.fn();
+const mockIsConfirmed = jest.fn();
 const mockGetProject = jest.fn();
 const mockGetProjectProgrammeByProject = jest.fn();
 const mockRefetchProjectProgramme = jest.fn();
@@ -25,6 +28,11 @@ jest.mock('react-i18next', () => mockI18next());
 jest.mock('@/hooks/common', () => ({
   useAppDispatch: () => jest.fn(),
   useAppSelector: jest.fn(),
+}));
+
+jest.mock('@/hooks/useConfirmDialog', () => ({
+  __esModule: true,
+  default: () => ({ isConfirmed: (...args: unknown[]) => mockIsConfirmed(...args) }),
 }));
 
 jest.mock('@/hooks/useGetProject', () => ({
@@ -58,6 +66,12 @@ jest.mock('@/api/projectProgrammeApi', () => ({
     (...args: unknown[]) => ({ unwrap: () => mockSaveProjectProgrammeLocationMap(...args) }),
     { isLoading: false },
   ],
+  useDeleteProjectProgrammeLocationMapMutation: () => [
+    (...args: unknown[]) => ({ unwrap: () => mockDeleteProjectProgrammeLocationMap(...args) }),
+    { isLoading: false },
+  ],
+  getProjectProgrammeLocationMapBlob: (...args: unknown[]) =>
+    mockGetProjectProgrammeLocationMapBlob(...args),
 }));
 
 describe('ProjectProgramme', () => {
@@ -686,6 +700,25 @@ describe('ProjectProgramme', () => {
     expect(mockRefetchProjectProgramme).not.toHaveBeenCalled();
   });
 
+  const savedLocationMap = {
+    id: 'map-1',
+    url: '/project-programmes/programme-1/location-map/',
+    originalName: 'map.png',
+  };
+
+  function mockProgrammeWithLocationMap(status: ProjectProgrammeStatus = 'DRAFT') {
+    mockGetProjectProgrammeByProject.mockReturnValue({
+      data: {
+        id: 'programme-1',
+        briefProjectProgramme: true,
+        status,
+        locationMap: savedLocationMap,
+      },
+      isLoading: false,
+      refetch: mockRefetchProjectProgramme,
+    });
+  }
+
   it('uploads the location map as form data when a file is attached', async () => {
     mockSaveProjectProgrammeLocationMap.mockResolvedValue({});
     const { user } = await render();
@@ -700,51 +733,68 @@ describe('ProjectProgramme', () => {
     expect(mockSaveProjectProgrammeLocationMap).toHaveBeenCalledWith({
       id: 'programme-1',
       formData: expect.any(FormData),
-      isNew: true,
     });
+    const { formData } = mockSaveProjectProgrammeLocationMap.mock.calls[0][0] as {
+      formData: FormData;
+    };
+    expect((formData.get('file') as File).name).toBe('map.png');
   });
 
-  it('shows the saved location map image', async () => {
-    mockGetProjectProgrammeByProject.mockReturnValue({
-      data: {
-        id: 'programme-1',
-        briefProjectProgramme: true,
-        status: 'DRAFT',
-        locationMap: { url: 'https://example.com/map.png', fileName: 'map.png', status: 'DRAFT' },
-      },
-      isLoading: false,
-      refetch: mockRefetchProjectProgramme,
-    });
+  it('shows the saved location map fetched with authentication', async () => {
+    const originalCreateObjectUrl = URL.createObjectURL;
+    const originalRevokeObjectUrl = URL.revokeObjectURL;
+    URL.createObjectURL = jest.fn(() => 'blob:location-map');
+    URL.revokeObjectURL = jest.fn();
+    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
+    mockProgrammeWithLocationMap();
+
+    try {
+      await render();
+
+      expect(await screen.findByTestId('project-programme-location-map-image')).toHaveAttribute(
+        'src',
+        'blob:location-map',
+      );
+      expect(mockGetProjectProgrammeLocationMapBlob).toHaveBeenCalledWith(savedLocationMap.url);
+      // A saved map is replaced by deleting it first, as in the design
+      expect(screen.queryByTestId('project-programme-location-map-input')).not.toBeInTheDocument();
+    } finally {
+      URL.createObjectURL = originalCreateObjectUrl;
+      URL.revokeObjectURL = originalRevokeObjectUrl;
+    }
+  });
+
+  it('deletes the location map after confirmation', async () => {
+    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
+    mockIsConfirmed.mockResolvedValue(true);
+    mockDeleteProjectProgrammeLocationMap.mockResolvedValue(undefined);
+    mockProgrammeWithLocationMap();
+    const { user } = await render();
+
+    await user.click(screen.getByTestId('project-programme-location-map-delete'));
+
+    expect(mockIsConfirmed).toHaveBeenCalled();
+    expect(mockDeleteProjectProgrammeLocationMap).toHaveBeenCalledWith({ id: 'programme-1' });
+  });
+
+  it('does not delete the location map when the dialog is cancelled', async () => {
+    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
+    mockIsConfirmed.mockResolvedValue(false);
+    mockProgrammeWithLocationMap();
+    const { user } = await render();
+
+    await user.click(screen.getByTestId('project-programme-location-map-delete'));
+
+    expect(mockDeleteProjectProgrammeLocationMap).not.toHaveBeenCalled();
+  });
+
+  it('does not allow changing the location map of a completed programme', async () => {
+    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
+    mockProgrammeWithLocationMap('COMPLETE');
 
     await render();
 
-    expect(screen.getByTestId('project-programme-location-map-image')).toHaveAttribute(
-      'src',
-      'https://example.com/map.png',
-    );
-  });
-
-  it('lists the location map in the draft state notification', async () => {
-    mockGetProjectProgrammeByProject.mockReturnValue({
-      data: {
-        id: 'programme-1',
-        briefProjectProgramme: true,
-        status: 'DRAFT',
-        locationMap: { url: 'https://example.com/map.png', status: 'DRAFT' },
-      },
-      isLoading: false,
-      refetch: mockRefetchProjectProgramme,
-    });
-
-    await render();
-
-    const draftSections = screen
-      .getByText('projectProgrammeForm.draftStateSections')
-      .closest('div') as HTMLElement;
-    expect(
-      within(draftSections).getByRole('link', {
-        name: 'projectProgrammeForm.locationSectionTitle',
-      }),
-    ).toBeInTheDocument();
+    expect(screen.queryByTestId('project-programme-location-map-delete')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('project-programme-location-map-input')).not.toBeInTheDocument();
   });
 });
