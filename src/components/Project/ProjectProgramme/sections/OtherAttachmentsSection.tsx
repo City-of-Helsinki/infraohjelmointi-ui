@@ -8,7 +8,8 @@ import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfa
 import ProjectProgrammeLinksField from '../ProjectProgrammeLinksField';
 import ProjectProgrammeAttachmentList from '../ProjectProgrammeAttachmentList';
 
-export const OTHER_ATTACHMENTS_ACCEPT = '.jpg,.jpeg,.png,.pdf,.doc,.docx';
+// The API rejects legacy .doc (it can carry macros)
+export const OTHER_ATTACHMENTS_ACCEPT = '.jpg,.jpeg,.png,.pdf,.docx';
 export const OTHER_ATTACHMENTS_MAX_SIZE = 500 * 1024;
 
 const INFO_ITEM_KEYS = [
