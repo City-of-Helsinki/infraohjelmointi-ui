@@ -3,21 +3,158 @@ import {
   checkGroupHasBudgets,
   checkProjectHasBudgets,
   convertToGroupValues,
+  convertToReportRows,
   frameBudgetHandler,
   getCoordinationViewReportPdfRows,
   getIsGroupOnSchedule,
   getIsProjectOnSchedule,
+  getReportData,
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
 import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterfaces';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
+import { t } from 'i18next';
 
 jest.mock('i18next', () => ({
   t: (key: string) => key,
 }));
 
 describe('reportHelpers', () => {
+  describe.each([Reports.Strategy, Reports.StrategyForcedToFrame])('%s project budgets', (type) => {
+    const year = new Date().getFullYear() + 1;
+    const buildRow = (
+      budget: string | null | undefined,
+      rowType: PlanningRowType = 'class',
+    ): IPlanningRow => ({
+      id: 'class-id',
+      key: 'class-id',
+      name: 'Report class',
+      path: '8 01 Report class',
+      type: rowType,
+      children: [],
+      defaultExpanded: false,
+      urlSearchParam: null,
+      cells: [
+        {
+          key: 'budget-cell',
+          year,
+          plannedBudget: '500.00',
+          displayFrameBudget: '500.00',
+          isCurrentOrPastYear: false,
+          isFrameBudgetOverlap: false,
+        },
+      ],
+      projectRows: [
+        createProject({
+          planningStartYear: year - 2,
+          constructionEndYear: year + 2,
+          finances: {
+            year,
+            budgetProposalCurrentYearPlus0: budget,
+            budgetProposalCurrentYearPlus1: '100.00',
+            budgetProposalCurrentYearPlus2: '200.00',
+          },
+        }),
+      ],
+    });
+    const convert = (row: IPlanningRow, selectedYear = year) =>
+      convertToReportRows(
+        [row],
+        type,
+        undefined,
+        t,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        selectedYear,
+      );
+
+    it.each([null, undefined, '', '   ', '0.00', '0', '0.0', '0,00', 'invalid'])(
+      'excludes a report-year budget of %p even with spending in later years',
+      (budget) => {
+        expect(convert(buildRow(budget))).toMatchObject([{ projects: [], costForecast: '500.00' }]);
+      },
+    );
+
+    it.each(['100.00', '-100.00'])('includes a nonzero report-year budget of %p', (budget) => {
+      expect(convert(buildRow(budget))).toMatchObject([{ projects: [{ id: 'project-id' }] }]);
+    });
+
+    it('excludes consecutive gap years without excluding funded years before and after them', () => {
+      const budgets = ['100.00', null, null, '200.00'];
+      budgets.forEach((budget, index) => {
+        const row = buildRow(budget);
+        row.projectRows[0].finances.year = year - 1 + index;
+        expect(convert(row, row.projectRows[0].finances.year)).toMatchObject([
+          {
+            projects: budget === null ? [] : [{ id: 'project-id' }],
+          },
+        ]);
+      });
+    });
+
+    it('removes a group when its last project has a gap-year budget', () => {
+      expect(convert(buildRow(null, 'group'))).toEqual([]);
+    });
+
+    it.each([null, '100.00'])(
+      'exports only funded projects to CSV for a budget of %p',
+      async (budget) => {
+        const selectedYear = type === Reports.StrategyForcedToFrame ? year - 1 : year;
+        let isolatedGetReportData = getReportData;
+        jest.isolateModules(() => {
+          isolatedGetReportData = require('./reportHelpers').getReportData;
+        });
+        const csvRows = await isolatedGetReportData(
+          t,
+          type,
+          [buildRow(budget)],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          selectedYear,
+        );
+        const projectName = { '\nreport.strategy.projectNameTitle': 'Default Project' };
+        if (budget === null) {
+          expect(csvRows).not.toContainEqual(expect.objectContaining(projectName));
+        } else {
+          expect(csvRows).toContainEqual(expect.objectContaining(projectName));
+        }
+        expect(csvRows).toContainEqual(expect.objectContaining({ [`\nTS ${year}`]: '500.00' }));
+      },
+    );
+
+    it.each([null, '', '0', '0.00', '100.00'])(
+      'preserves forecast filtering for a budget of %p',
+      (budget) => {
+        const row = buildRow(budget);
+        const forecastRows = convertToReportRows(
+          [row],
+          Reports.ForecastReport,
+          undefined,
+          t,
+          undefined,
+          undefined,
+          undefined,
+          [row],
+        );
+        expect(forecastRows).toMatchObject([
+          {
+            projects: budget === '0.00' ? [] : [{ id: 'project-id' }],
+          },
+        ]);
+      },
+    );
+  });
+
   describe('frameBudgetHandler', () => {
     it('should calculate frame budget from current year for forecast report', () => {
       const currentYear = new Date().getFullYear();
