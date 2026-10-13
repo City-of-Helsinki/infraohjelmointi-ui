@@ -48,10 +48,10 @@ function ProjectProgrammeAttachmentList({
   const closePreview = useCallback(() => setPreview(null), []);
 
   async function handleShowAttachment(attachment: IProjectProgrammeAttachment) {
-    if (!projectProgrammeId) return;
+    if (!projectProgrammeId || !attachment.downloadUrl) return;
 
     try {
-      const blob = await getProjectProgrammeAttachmentBlob(projectProgrammeId, attachment.id);
+      const blob = await getProjectProgrammeAttachmentBlob(attachment.downloadUrl);
       setPreview({
         fileName: attachment.originalName,
         contentType: attachment.contentType || blob.type,

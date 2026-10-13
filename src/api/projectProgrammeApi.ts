@@ -24,14 +24,11 @@ export async function getProjectProgrammeLocationMapBlob(url: string): Promise<B
 const getOtherAttachmentsUrl = (id: string) =>
   `/project-programmes/${id}/sections/other-attachments/attachments/`;
 
-export async function getProjectProgrammeAttachmentBlob(
-  projectProgrammeId: string,
-  attachmentId: string,
-): Promise<Blob> {
-  const response = await axios.get<Blob>(
-    `${API_BASE_URL}${getOtherAttachmentsUrl(projectProgrammeId)}${attachmentId}/download/`,
-    { responseType: 'blob' },
-  );
+// downloadUrl is the API-relative path each attachment comes with
+export async function getProjectProgrammeAttachmentBlob(downloadUrl: string): Promise<Blob> {
+  const response = await axios.get<Blob>(`${API_BASE_URL}${downloadUrl}`, {
+    responseType: 'blob',
+  });
   return response.data;
 }
 
@@ -170,7 +167,7 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       { id: string; attachmentId: string }
     >({
       query: ({ id, attachmentId }) => ({
-        url: `${getOtherAttachmentsUrl(id)}${attachmentId}/`,
+        url: `/project-programmes/${id}/attachments/${attachmentId}/`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],

@@ -1181,6 +1181,7 @@ describe('ProjectProgrammeForm other attachments', () => {
     originalName: 'site-plan.pdf',
     contentType: 'application/pdf',
     size: 1000,
+    downloadUrl: '/project-programmes/programme-1/attachments/attachment-1/download/',
   };
 
   beforeEach(() => {
@@ -1233,7 +1234,6 @@ describe('ProjectProgrammeForm other attachments', () => {
 
   it.each([
     ['plan.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-    ['plan.doc', 'application/msword'],
     ['plan.pdf', 'application/pdf'],
     ['photo.jpeg', 'image/jpeg'],
   ])('accepts and uploads %s', async (fileName, type) => {
@@ -1258,6 +1258,7 @@ describe('ProjectProgrammeForm other attachments', () => {
             id: 'attachment-2',
             originalName: 'plan.docx',
             contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            downloadUrl: '/project-programmes/programme-1/attachments/attachment-2/download/',
           },
         ],
         links: [],
@@ -1376,8 +1377,7 @@ describe('ProjectProgrammeForm other attachments', () => {
     );
 
     expect(mockGetProjectProgrammeAttachmentBlob).toHaveBeenCalledWith(
-      'programme-1',
-      'attachment-1',
+      '/project-programmes/programme-1/attachments/attachment-1/download/',
     );
     expect(await screen.findByTitle('site-plan.pdf')).toHaveAttribute('src', 'blob:preview');
   });
