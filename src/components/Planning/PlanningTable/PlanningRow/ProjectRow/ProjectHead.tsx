@@ -15,6 +15,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
 import { usePatchProjectMutation } from '@/api/projectApi';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -42,6 +43,8 @@ interface IProjectHeadProps {
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
+  const { canEditClass } = useRestrictedClassAccess();
+  const isReadOnly = isUserOnlyViewer(user) || !canEditClass(project.projectClass);
   const [patchProject] = usePatchProjectMutation();
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
@@ -98,7 +101,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         {/* Dots & Document */}
         <div className="project-left-icons-container">
           <button
-            className={isUserOnlyViewer(user) ? 'pointer-events-none' : 'cursor-pointer'}
+            className={isReadOnly ? 'pointer-events-none' : 'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
             onClick={handleOpenPhaseMenu}
           >

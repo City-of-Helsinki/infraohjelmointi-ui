@@ -173,6 +173,7 @@
   },
   "validation": {
     "required": "Täytä {{field}}",
+    "restrictedClass": "Valitse luokka, jonka hankkeita sinulla on oikeus muokata",
     "incorrectLocation": "Valittu {{field}} ei voi kuulua valitun alaluokan alle.",
     "isBefore": "Aika on oltava ennen kuin {{value}}",
     "isAfter": "Aika on oltava myöhemmin kuin {{value}}",
