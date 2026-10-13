@@ -1,9 +1,10 @@
+@reference "../../index.css";
 .report-row-container {
-  @apply border-b-[1px] border-gray pb-6 pt-6;
+  @apply border-gray border-b-[1px] pt-6 pb-6;
 }
 
 .report-title {
-  @apply mb-2 text-heading-s;
+  @apply text-heading-s mb-2;
 }
 
 .report-last-updated {

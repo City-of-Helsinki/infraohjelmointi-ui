@@ -1,3 +1,4 @@
+@reference "../../../../index.css";
 .phase-menu-container {
   @apply w-[18rem] max-w-[18rem] border border-black bg-white;
 }
@@ -7,11 +8,11 @@
 }
 
 .phase-menu-header {
-  @apply flex w-full items-center justify-between overflow-hidden border-b border-gray py-1;
+  @apply border-gray flex w-full items-center justify-between overflow-hidden border-b py-1;
 }
 
 .phase-menu-header .title {
-  @apply max-w-[12rem] overflow-hidden overflow-ellipsis whitespace-nowrap pl-4;
+  @apply max-w-[12rem] overflow-hidden pl-4 text-ellipsis whitespace-nowrap;
 }
 
 .phase-menu-header .description {
@@ -23,7 +24,7 @@
 }
 
 .phase-menu-list {
-  @apply m-0 flex flex-col border-b border-gray py-1;
+  @apply border-gray m-0 flex flex-col border-b py-1;
 }
 
 .phase-menu-list .list-item {
@@ -46,7 +47,7 @@
 }
 
 .phase-menu-list .list-item .item-text {
-  @apply overflow-hidden text-ellipsis whitespace-nowrap pr-8 text-sm;
+  @apply overflow-hidden pr-8 text-sm text-ellipsis whitespace-nowrap;
 }
 
 .phase-menu-list .list-item .item-text.selected {

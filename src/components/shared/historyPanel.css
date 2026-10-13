@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .project-history-overlay {
   @apply fixed inset-0 z-[100] flex justify-end;
 }
@@ -29,7 +30,7 @@
 }
 
 .project-history-panel-title {
-  @apply flex items-center gap-2 text-l font-bold;
+  @apply text-l flex items-center gap-2 font-bold;
 }
 
 .project-history-close {
@@ -45,7 +46,7 @@
 }
 
 .project-history-status {
-  @apply flex items-center gap-2 py-4 text-base text-black-60;
+  @apply text-black-60 flex items-center gap-2 py-4 text-base;
 }
 
 .project-history-timeline {
@@ -59,13 +60,13 @@
 /* Timeline connector running through the avatars. */
 .project-history-entry:not(:last-child)::before {
   content: '';
-  @apply absolute left-4 top-9 w-px;
+  @apply absolute top-9 left-4 w-px;
   bottom: 0;
   background: var(--color-black-20);
 }
 
 .project-history-avatar {
-  @apply flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-bold text-white;
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold text-white;
   z-index: 1;
   font-size: 0.75rem;
 }
@@ -87,7 +88,7 @@
 }
 
 .project-history-date {
-  @apply ml-auto whitespace-nowrap text-sm text-black-60;
+  @apply text-black-60 ml-auto text-sm whitespace-nowrap;
 }
 
 .project-history-changes {
@@ -104,7 +105,7 @@
 }
 
 .project-history-field-label {
-  @apply font-medium text-black-90;
+  @apply text-black-90 font-medium;
 }
 
 .project-history-diff {
@@ -117,7 +118,7 @@
 }
 
 .project-history-new-value {
-  @apply font-medium text-black-90;
+  @apply text-black-90 font-medium;
 }
 
 .project-history-arrow {
@@ -140,5 +141,5 @@
 }
 
 .project-history-pill.is-new {
-  @apply font-medium text-black-90;
+  @apply text-black-90 font-medium;
 }

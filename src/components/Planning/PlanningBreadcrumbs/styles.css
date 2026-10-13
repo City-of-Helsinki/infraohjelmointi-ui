@@ -1,5 +1,6 @@
+@reference "../../../index.css";
 .breadcrumbs-list {
-  @apply flex h-16 list-none items-center border-b border-gray p-8;
+  @apply border-gray flex h-16 list-none items-center border-b p-8;
 }
 
 .breadcrumbs-list > li > a {
@@ -19,5 +20,5 @@
 }
 
 .breadcrumbs-list .breadcrumb {
-  @apply max-w-[16rem] overflow-x-hidden overflow-ellipsis whitespace-nowrap;
+  @apply max-w-[16rem] overflow-x-hidden text-ellipsis whitespace-nowrap;
 }

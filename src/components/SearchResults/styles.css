@@ -1,10 +1,11 @@
+@reference "../../index.css";
 /* Search terms */
 .search-terms-container {
   @apply flex w-[80%] flex-col;
 }
 
 .search-terms {
-  @apply mb-6 mr-6 flex h-auto flex-wrap gap-2;
+  @apply mr-6 mb-6 flex h-auto flex-wrap gap-2;
 }
 
 /* Tag container (can't be given classes or styles) */
@@ -81,12 +82,12 @@
 
 /* Search result list */
 .search-result-list-container {
-  @apply min-h-[60vh] py-16 pl-16 pr-24;
+  @apply min-h-[60vh] py-16 pr-24 pl-16;
 }
 
 /* Search result header */
 .search-result-header-container {
-  @apply pb-6 pl-16 pr-24 pt-16;
+  @apply pt-16 pr-24 pb-6 pl-16;
 }
 
 .search-result-header-container .search-result-page-title {
@@ -125,11 +126,11 @@
 .limit-dropdown > div > button {
   /* HDS overwrites this if set with tailwind classes */
   padding: 0 0.4rem;
-  @apply !min-h-full justify-between text-black-60;
+  @apply text-black-60 !min-h-full justify-between;
 }
 
 .limit-dropdown > div > button > svg {
-  @apply absolute right-0 top-0;
+  @apply absolute top-0 right-0;
 }
 
 .limit-dropdown > div > button > span {
