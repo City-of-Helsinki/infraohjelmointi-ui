@@ -93,3 +93,43 @@ export const isUserConstructionManagementLead = (user: IUser | null) => {
 
   return user.ad_groups.some((ag) => ag.name === UserRole.CONSTRUCTION_MANAGEMENT_LEAD);
 };
+
+/**
+ * Restricted programmers (IO-756) may only edit projects in their assigned classes.
+ * Coordinators and admins are never restricted, matching the API.
+ */
+export const isUserRestrictedProgrammer = (user: IUser | null) => {
+  if (!user || isUserCoordinator(user)) {
+    return false;
+  }
+
+  return user.ad_groups.some((ag) => ag.name === UserRole.RESTRICTED_PROGRAMMER);
+};
+
+/**
+ * True if the class path is one of the restricted programmer's assigned classes or below one.
+ */
+export const isClassPathInRestrictedScope = (user: IUser | null, classPath?: string | null) => {
+  if (!classPath) {
+    return false;
+  }
+
+  return (user?.restricted_class_paths ?? []).some(
+    (path) => classPath === path || classPath.startsWith(`${path}/`),
+  );
+};
+
+/**
+ * True if the class path is in scope or is a parent of an assigned class, so it has to be
+ * selectable to reach the assigned class in the class selects.
+ */
+export const isClassPathOnRestrictedScopePath = (user: IUser | null, classPath?: string | null) => {
+  if (!classPath) {
+    return false;
+  }
+
+  return (
+    isClassPathInRestrictedScope(user, classPath) ||
+    (user?.restricted_class_paths ?? []).some((path) => path.startsWith(`${classPath}/`))
+  );
+};

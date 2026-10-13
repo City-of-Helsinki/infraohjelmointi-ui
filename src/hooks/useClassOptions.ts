@@ -9,12 +9,14 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import { selectUser } from '@/reducers/authSlice';
 import {
+  isClassPathOnRestrictedScopePath,
   isUserAdmin,
   isUserCoordinator,
   isUserOnlyProjectAreaPlanner,
   isUserPlanner,
+  isUserRestrictedProgrammer,
 } from '@/utils/userRoleHelpers';
-import { IProjectClassOption } from '@/interfaces/classInterfaces';
+import { IClass, IProjectClassOption } from '@/interfaces/classInterfaces';
 
 /**
  * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
@@ -79,8 +81,19 @@ const useClassOptions = (currentClass: string | undefined) => {
     }
   }, [classes, currentClass, selectedSubClass, subClasses, otherClassifications]);
 
+  // Restricted programmers only see their assigned classes and the classes above them (IO-756)
+  const filterForRestrictedUser = useCallback(
+    (classList: Array<IClass>) =>
+      isUserRestrictedProgrammer(user)
+        ? classList.filter((c) => isClassPathOnRestrictedScopePath(user, c.path))
+        : classList,
+    [user],
+  );
+
   const filteredMasterClasses = useMemo(() => {
-    if (
+    if (isUserRestrictedProgrammer(user)) {
+      return filterForRestrictedUser(masterClasses);
+    } else if (
       isUserOnlyProjectAreaPlanner(user) &&
       (!selectedMasterClass?.name.startsWith('808') ||
         !selectedMasterClass?.name.startsWith('8 08'))
@@ -89,12 +102,12 @@ const useClassOptions = (currentClass: string | undefined) => {
     } else if (isUserPlanner(user) || isUserCoordinator(user) || isUserAdmin(user)) {
       return masterClasses;
     } else return [];
-  }, [user, selectedMasterClass?.name, masterClasses]);
+  }, [user, selectedMasterClass?.name, masterClasses, filterForRestrictedUser]);
 
   return {
     masterClasses: classesToOptions(filteredMasterClasses),
-    classes: classesToOptions(getNextClasses()),
-    subClasses: classesToOptions(getNextSubClasses()),
+    classes: classesToOptions(filterForRestrictedUser(getNextClasses())),
+    subClasses: classesToOptions(filterForRestrictedUser(getNextSubClasses())),
     otherClassifications: classesToOptions(getNextOtherClassifications()),
   };
 };

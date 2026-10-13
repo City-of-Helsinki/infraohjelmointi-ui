@@ -11,6 +11,10 @@ export interface IUser {
   uuid: string;
   id: number;
   ad_groups: Array<IAdGroup>;
+  /**
+   * Class paths a restricted programmer may edit (IO-756), empty for other users
+   */
+  restricted_class_paths?: Array<string>;
 }
 
 export interface IAdGroup {
@@ -30,4 +34,5 @@ export enum UserRole {
   VIEWER_OUTSIDE_ORGANIZATION_ALT = '952da398-75b3-404a-b274-c8f351d7f5a7',
   ADMIN = 'sg_kymp_sso_io_admin',
   CONSTRUCTION_MANAGEMENT_LEAD = 'sg_kymp_sso_io_rakennuttamisen_esihenkilot',
+  RESTRICTED_PROGRAMMER = 'sg_kymp_sso_io_rajoitetut_ohjelmoijat',
 }

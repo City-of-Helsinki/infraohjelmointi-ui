@@ -13,14 +13,16 @@ import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 interface IProjectNameFormProps {
   control: HookFormControlType;
+  /** Read-only even for an editing role, e.g. a restricted programmer outside their classes */
+  isReadOnly?: boolean;
 }
 
-const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
+const ProjectNameForm: FC<IProjectNameFormProps> = ({ control, isReadOnly = false }) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const projectMode = useAppSelector(selectProjectMode);
   const user = useAppSelector(selectUser);
-  const isOnlyViewer = isUserOnlyViewer(user);
+  const isOnlyViewer = isUserOnlyViewer(user) || isReadOnly;
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 

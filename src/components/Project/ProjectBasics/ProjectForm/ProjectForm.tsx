@@ -38,6 +38,7 @@ import {
   getPwErrorMessageForCodes,
 } from '@/utils/projectErrorMessage';
 import usePwLinkConfirmation, { normalizeHkrId } from '@/hooks/usePwLinkConfirmation';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
 import {
   collectErrorElements,
@@ -72,7 +73,11 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const user = useAppSelector(selectUser);
   const projectMode = useAppSelector(selectProjectMode);
 
-  const isOnlyViewer = isUserOnlyViewer(user);
+  const { canEditClass } = useRestrictedClassAccess();
+
+  // Restricted programmers (IO-756) can only view projects outside their own classes
+  const isOnlyViewer =
+    isUserOnlyViewer(user) || (projectMode === 'edit' && !canEditClass(project?.projectClass));
 
   const [newProjectId, setNewProjectId] = useState('');
   const formRef = useRef<HTMLFormElement | null>(null);

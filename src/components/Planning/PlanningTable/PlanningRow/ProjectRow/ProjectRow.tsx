@@ -43,6 +43,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCo
           cell={c}
           projectFinances={projectFinances}
           sapProject={project.sapProject}
+          projectClass={project.projectClass}
         />
       ))}
     </tr>
