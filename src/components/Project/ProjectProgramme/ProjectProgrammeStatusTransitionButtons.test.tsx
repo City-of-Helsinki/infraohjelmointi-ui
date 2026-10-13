@@ -20,6 +20,17 @@ jest.mock('@/api/projectProgrammeApi', () => ({
 }));
 
 describe('ProjectProgrammeStatusTransitionButtons', () => {
+  const filledProgramme = {
+    id: 'programme-1',
+    basicInfo: {
+      projectName: 'Project',
+      district: 'District',
+      projectProgrammeCompiler: 'Compiler',
+      estimatedCosts: '100000',
+      summary: 'Summary',
+      status: 'DRAFT' as const,
+    },
+  };
   beforeEach(() => {
     mockDispatch.mockReset();
     mockTransitionProjectProgrammeStatus.mockReset();
@@ -31,6 +42,7 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
       <ProjectProgrammeStatusTransitionButtons
         isProjectProgrammeComplete={false}
         effectiveProjectProgrammeId="programme-1"
+        effectiveProjectProgramme={filledProgramme}
       />,
     );
 
@@ -89,6 +101,7 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
       <ProjectProgrammeStatusTransitionButtons
         isProjectProgrammeComplete={false}
         effectiveProjectProgrammeId="programme-1"
+        effectiveProjectProgramme={filledProgramme}
       />,
     );
 
@@ -104,5 +117,48 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
         }),
       );
     });
+  });
+
+  it('blocks the API call and reports sections with missing required fields', () => {
+    const onMissingRequiredFields = jest.fn();
+    render(
+      <ProjectProgrammeStatusTransitionButtons
+        isProjectProgrammeComplete={false}
+        effectiveProjectProgrammeId="programme-1"
+        effectiveProjectProgramme={{
+          ...filledProgramme,
+          basicInfo: { ...filledProgramme.basicInfo, summary: '  ', status: 'DRAFT' },
+        }}
+        onMissingRequiredFields={onMissingRequiredFields}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markReady' }));
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+    expect(onMissingRequiredFields).toHaveBeenCalledWith(['basicInfo']);
+  });
+
+  it('does not revalidate completed sections when completing the programme', async () => {
+    const onMissingRequiredFields = jest.fn();
+    render(
+      <ProjectProgrammeStatusTransitionButtons
+        isProjectProgrammeComplete={false}
+        effectiveProjectProgrammeId="programme-1"
+        effectiveProjectProgramme={{
+          ...filledProgramme,
+          basicInfo: { status: 'COMPLETE' },
+        }}
+        onMissingRequiredFields={onMissingRequiredFields}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.markReady' }));
+
+    await waitFor(() =>
+      expect(mockTransitionProjectProgrammeStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        to: 'COMPLETE',
+      }),
+    );
+    expect(onMissingRequiredFields).not.toHaveBeenCalled();
   });
 });

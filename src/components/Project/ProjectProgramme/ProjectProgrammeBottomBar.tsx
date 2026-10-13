@@ -2,12 +2,16 @@ import { Button, ButtonVariant } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
+import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 interface ProjectProgrammeBottomBarProps {
   isBriefProgramme: boolean;
   hasSavedExtendedSection: boolean;
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
+  effectiveProjectProgramme?: IProjectProgramme;
+  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
   handleSwitchType: () => Promise<unknown>;
 }
 
@@ -16,6 +20,8 @@ function ProjectProgrammeBottomBar({
   hasSavedExtendedSection,
   isProjectProgrammeComplete,
   effectiveProjectProgrammeId,
+  effectiveProjectProgramme,
+  onMissingRequiredFields,
   handleSwitchType,
 }: Readonly<ProjectProgrammeBottomBarProps>) {
   const { t } = useTranslation();
@@ -27,6 +33,8 @@ function ProjectProgrammeBottomBar({
           <ProjectProgrammeStatusTransitionButtons
             isProjectProgrammeComplete={isProjectProgrammeComplete}
             effectiveProjectProgrammeId={effectiveProjectProgrammeId}
+            effectiveProjectProgramme={effectiveProjectProgramme}
+            onMissingRequiredFields={onMissingRequiredFields}
           />
           <ProjectProgrammeActionButtons />
           {!isBriefProgramme && !hasSavedExtendedSection && (

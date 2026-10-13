@@ -7,10 +7,13 @@ import {
   ProjectProgrammeStatus,
   ProjectProgrammeStatusTransitionButtonsProps,
 } from '@/interfaces/projectProgrammeInterfaces';
+import { getMissingRequiredSections } from './sections/projectProgrammeSectionFields';
 
 function ProjectProgrammeStatusTransitionButtons({
   isProjectProgrammeComplete,
   effectiveProjectProgrammeId,
+  effectiveProjectProgramme,
+  onMissingRequiredFields,
   buttonOverrides,
 }: Readonly<ProjectProgrammeStatusTransitionButtonsProps>) {
   const { t } = useTranslation();
@@ -32,6 +35,14 @@ function ProjectProgrammeStatusTransitionButtons({
     if (!effectiveProjectProgrammeId) {
       notifyMissingProject();
       return;
+    }
+
+    if (status === 'COMPLETE') {
+      const missingSections = getMissingRequiredSections(effectiveProjectProgramme);
+      if (missingSections.length > 0) {
+        onMissingRequiredFields?.(missingSections);
+        return;
+      }
     }
 
     try {

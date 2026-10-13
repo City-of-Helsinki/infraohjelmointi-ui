@@ -6,6 +6,7 @@ import {
 } from './sections/projectProgrammeSections';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
+import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 
 type Section = Pick<IProjectProgrammeSectionConfig, 'id' | 'label'>;
 
@@ -15,6 +16,8 @@ interface ProjectProgrammeDraftStateNotificationProps {
   onOpenSection: (sectionId: ProjectProgrammeSectionId) => void;
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
+  effectiveProjectProgramme?: IProjectProgramme;
+  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
 }
 
 interface ProjectProgrammeSectionListProps {
@@ -63,6 +66,8 @@ function ProjectProgrammeDraftStateNotification({
   onOpenSection,
   isProjectProgrammeComplete,
   effectiveProjectProgrammeId,
+  effectiveProjectProgramme,
+  onMissingRequiredFields,
 }: Readonly<ProjectProgrammeDraftStateNotificationProps>) {
   const { t } = useTranslation();
 
@@ -85,6 +90,8 @@ function ProjectProgrammeDraftStateNotification({
         <ProjectProgrammeStatusTransitionButtons
           isProjectProgrammeComplete={isProjectProgrammeComplete}
           effectiveProjectProgrammeId={effectiveProjectProgrammeId}
+          effectiveProjectProgramme={effectiveProjectProgramme}
+          onMissingRequiredFields={onMissingRequiredFields}
           buttonOverrides={{
             markReady: {
               variant: ButtonVariant.Secondary,

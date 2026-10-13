@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, Notification } from 'hds-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
@@ -23,6 +23,8 @@ import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
 import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
 import SwitchToExtendedProgrammeNotification from './SwitchToExtendedProgrammeNotification';
 import ProgrammeCompletedNotification from './ProgrammeCompletedNotification';
+import { getMissingRequiredSections } from './sections/projectProgrammeSectionFields';
+import MissingRequiredFieldsNotification from './MissingRequiredFieldsNotification';
 
 const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
   return projectProgramme.briefProjectProgramme ?? true;
@@ -51,8 +53,17 @@ function ProjectProgramme() {
   const [postProjectProgramme] = usePostProjectProgrammeMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
+  const [missingRequiredSections, setMissingRequiredSections] = useState<
+    ProjectProgrammeSectionId[]
+  >([]);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
+  useEffect(() => {
+    setMissingRequiredSections((sections) =>
+      sections.length > 0 ? getMissingRequiredSections(effectiveProjectProgramme) : sections,
+    );
+  }, [effectiveProjectProgramme]);
+
   const projectProgrammeId = effectiveProjectProgramme?.id ?? null;
 
   const briefProgramme = effectiveProjectProgramme
@@ -241,6 +252,13 @@ function ProjectProgramme() {
 
         {showOverview && (
           <div className="project-form mx-auto max-w-xl">
+            {missingRequiredSections.length > 0 && (
+              <MissingRequiredFieldsNotification
+                handleOpenSection={handleOpenSection}
+                PROJECT_PROGRAMME_SECTIONS={PROJECT_PROGRAMME_SECTIONS}
+                missingRequiredSections={missingRequiredSections}
+              />
+            )}
             {showSwitchToExtendedProgrammeNotification && (
               <SwitchToExtendedProgrammeNotification handleSwitchType={handleSwitchType} />
             )}
@@ -251,6 +269,8 @@ function ProjectProgramme() {
                 onOpenSection={handleOpenSection}
                 isProjectProgrammeComplete={isProjectProgrammeComplete}
                 effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+                effectiveProjectProgramme={effectiveProjectProgramme}
+                onMissingRequiredFields={setMissingRequiredSections}
               />
             )}
             {PROJECT_PROGRAMME_SECTIONS.filter(
@@ -275,6 +295,8 @@ function ProjectProgramme() {
               hasSavedExtendedSection={hasSavedExtendedSection}
               isProjectProgrammeComplete={isProjectProgrammeComplete}
               effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+              effectiveProjectProgramme={effectiveProjectProgramme}
+              onMissingRequiredFields={setMissingRequiredSections}
               handleSwitchType={handleSwitchType}
             />
           </div>

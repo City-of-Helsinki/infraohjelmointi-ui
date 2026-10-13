@@ -59,3 +59,19 @@ export function getFieldsForSection(
 ): readonly string[] {
   return getSectionFields(sectionId, projectProgramme).map((field) => field.field);
 }
+
+export function getMissingRequiredSections(
+  projectProgramme?: IProjectProgramme,
+): ProjectProgrammeSectionId[] {
+  const sections: ProjectProgrammeSectionId[] = isBrief(projectProgramme)
+    ? ['basicInfo']
+    : [
+        'basicInfo',
+        ...(Object.keys(SECTION_FIELDS) as Exclude<ProjectProgrammeSectionId, 'basicInfo'>[]),
+      ];
+  return sections.filter(
+    (sectionId) =>
+      projectProgramme?.[sectionId]?.status !== 'COMPLETE' &&
+      !hasAllRequiredFields(sectionId, projectProgramme),
+  );
+}

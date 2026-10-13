@@ -1,5 +1,5 @@
 import { isSectionStarted } from './projectProgrammeSections';
-import { hasAllRequiredFields } from './projectProgrammeSectionFields';
+import { getMissingRequiredSections, hasAllRequiredFields } from './projectProgrammeSectionFields';
 
 describe('hasAllRequiredFields', () => {
   it('requires the mode-specific basic info fields', () => {
@@ -44,6 +44,38 @@ describe('hasAllRequiredFields', () => {
       }),
     ).toBe(false);
     expect(hasAllRequiredFields('maintenanceNeeds', { id: 'programme-1' })).toBe(false);
+  });
+});
+
+describe('getMissingRequiredSections', () => {
+  it.each([true, undefined])(
+    'skips completed brief basic info for programme type %s',
+    (programmeType) => {
+      expect(
+        getMissingRequiredSections({
+          id: 'programme-1',
+          briefProjectProgramme: programmeType,
+          basicInfo: { status: 'COMPLETE', summary: '  ' },
+        }),
+      ).toEqual([]);
+    },
+  );
+
+  it('skips completed sections but still reports missing and incomplete draft sections', () => {
+    expect(
+      getMissingRequiredSections({
+        id: 'programme-1',
+        briefProjectProgramme: false,
+        basicInfo: { status: 'COMPLETE' },
+        designCriteria: { status: 'COMPLETE' },
+        maintenanceNeeds: { status: 'DRAFT', maintenanceNeeds: '  ' },
+      }),
+    ).toEqual([
+      'trafficPlanningCriteria',
+      'urbanSpacingPlanningCriteria',
+      'maintenanceNeeds',
+      'interactionAndRelatedProjects',
+    ]);
   });
 });
 

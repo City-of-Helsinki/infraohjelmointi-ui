@@ -1,10 +1,13 @@
 import mockI18next from '@/mocks/mockI18next';
+import { TFunction } from 'i18next';
 import { Route } from 'react-router';
 import { act, screen, within } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import ProjectProgramme from './ProjectProgramme';
 import { ProjectProgrammeStatus } from '@/interfaces/projectProgrammeInterfaces';
+import { getProjectProgrammeSections } from './sections/projectProgrammeSections';
+import { getFieldsForSection } from './sections/projectProgrammeSectionFields';
 
 const mockSwitchType = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
@@ -139,6 +142,119 @@ describe('ProjectProgramme', () => {
       expect(button).toBeEnabled();
     });
   });
+
+  it.each([0, 1])(
+    'blocks completion from button %s and lists missing sections with links',
+    async (buttonIndex) => {
+      mockProjectProgramme(false);
+      await render();
+      await act(async () => {
+        screen
+          .getAllByRole('button', { name: 'projectProgrammeForm.markReady' })
+          [buttonIndex].click();
+      });
+      expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+      expect(
+        screen.getByText('projectProgrammeForm.missingRequiredFieldsText'),
+      ).toBeInTheDocument();
+      const missingFields = screen.getByText(
+        'projectProgrammeForm.missingRequiredFieldsText',
+      ).parentElement!;
+      expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
+      await act(async () => {
+        within(missingFields)
+          .getByRole('link', { name: 'projectProgrammeForm.designCriteriaCardTitle' })
+          .click();
+      });
+      expect(screen.getByTestId('project-programme-design-criteria-form')).toBeInTheDocument();
+    },
+  );
+
+  it('only lists basic information when brief programme completion is blocked', async () => {
+    await render();
+    await act(async () => {
+      screen.getAllByRole('button', { name: 'projectProgrammeForm.markReady' })[0].click();
+    });
+    const missingFields = screen.getByText(
+      'projectProgrammeForm.missingRequiredFieldsText',
+    ).parentElement!;
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(1);
+    expect(
+      within(missingFields).getByRole('link', { name: 'projectProgrammeForm.basicInfoCardTitle' }),
+    ).toBeInTheDocument();
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+  });
+
+  it('updates the missing section list when saved programme data changes', async () => {
+    mockProjectProgramme(false);
+    await render();
+    await act(async () => {
+      screen.getAllByRole('button', { name: 'projectProgrammeForm.markReady' })[0].click();
+    });
+    mockProjectProgramme(false, undefined, {
+      relationshipToPublicAreaServices: 'Services',
+      siteValuesProtectionAndSignificance: 'Values',
+    });
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.fillDesignCriteria' }).click();
+    });
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.cancel' }).click();
+    });
+    const missingFields = screen.getByText(
+      'projectProgrammeForm.missingRequiredFieldsText',
+    ).parentElement!;
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(5);
+    expect(
+      within(missingFields).queryByRole('link', {
+        name: 'projectProgrammeForm.designCriteriaCardTitle',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each([0, 1])(
+    'allows completion from button %s when filled sections are still drafts',
+    async (buttonIndex) => {
+      const programme = {
+        id: 'programme-1',
+        briefProjectProgramme: false,
+        status: 'DRAFT' as const,
+      };
+      const sections = getProjectProgrammeSections(((key: string) => key) as TFunction, false);
+      mockGetProjectProgrammeByProject.mockReturnValue({
+        data: {
+          ...programme,
+          ...Object.fromEntries(
+            sections.map((section) => [
+              section.id,
+              {
+                status: 'DRAFT',
+                ...Object.fromEntries(
+                  getFieldsForSection(section.id, programme).map((field) => [field, 'Filled']),
+                ),
+              },
+            ]),
+          ),
+        },
+        isLoading: false,
+        refetch: mockRefetchProjectProgramme,
+      });
+      await render();
+      await act(async () => {
+        screen
+          .getAllByRole('button', { name: 'projectProgrammeForm.markReady' })
+          [buttonIndex].click();
+      });
+      expect(mockTransitionProjectProgrammeStatus).toHaveBeenCalledWith({
+        id: 'programme-1',
+        to: 'COMPLETE',
+      });
+      expect(mockTransitionProjectProgrammeSectionStatus).not.toHaveBeenCalled();
+      expect(
+        screen.queryByText('projectProgrammeForm.missingRequiredFieldsText'),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   it('includes draft and completed sections in draft state notification', async () => {
     mockProjectProgramme(
