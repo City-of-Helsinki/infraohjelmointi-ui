@@ -14,6 +14,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import optionIcon from '@/utils/optionIcon';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -30,6 +31,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
   const { t } = useTranslation();
   const [patchProject] = usePatchProjectMutation();
   const { formMethods } = useProjectHeaderForm(project);
+  const { canEditClass } = useRestrictedClassAccess();
 
   const projectGroupName = useMemo(() => {
     return project?.projectGroup
@@ -106,7 +108,10 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
             className="project-header-phase-select-container"
             data-testid="project-header-name-fields"
           >
-            <ProjectNameFields control={control} />
+            <ProjectNameFields
+              control={control}
+              isReadOnly={!!project && !canEditClass(project.projectClass)}
+            />
             {projectHeaderPhaseString && (
               <div className="project-header-phase">
                 <div className="project-header-icon">{icon}</div>

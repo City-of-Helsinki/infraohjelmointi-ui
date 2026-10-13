@@ -40,11 +40,13 @@ import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRole
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
   sapProject: string | undefined;
+  projectClass?: string | null;
 }
 
 interface IProjectCellState {
@@ -54,7 +56,12 @@ interface IProjectCellState {
 
 const UPDATE_PROJECT = 'update-project';
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject }) => {
+const ProjectCell: FC<IProjectCellProps> = ({
+  cell,
+  projectFinances,
+  sapProject,
+  projectClass,
+}) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -66,6 +73,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
+  const { canEditClass } = useRestrictedClassAccess();
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,
@@ -85,6 +93,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
       return true;
     }
 
+    // Restricted programmers can only edit projects in their own classes (IO-756)
+    if (!canEditClass(projectClass)) {
+      return true;
+    }
+
     // Project area planner can only edit projects under masterclass 808
     if (isUserOnlyProjectAreaPlanner(user)) {
       return !(
@@ -94,7 +107,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
 
     // Disable editing project budgets if user is only a viewer
     return isUserOnlyViewer(user);
-  }, [type, user, selectedMasterClass]);
+  }, [type, user, selectedMasterClass, canEditClass, projectClass]);
 
   const updateCell = useCallback(
     async (req: IProjectRequest) => {
