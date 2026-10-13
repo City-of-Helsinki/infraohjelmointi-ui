@@ -15,9 +15,6 @@ import {
   getProjectProgrammeSections,
   hasExtendedBasicInfoContent,
   isSectionStarted,
-  LOCATION_MAP_ELEMENT_ID,
-  LOCATION_MAP_SECTION_ID,
-  ProjectProgrammeOverviewSectionId,
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
@@ -95,34 +92,20 @@ function ProjectProgramme() {
     hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
     PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
 
-  const locationMapSection = useMemo(
-    () => ({
-      id: LOCATION_MAP_SECTION_ID,
-      label: t('projectProgrammeForm.locationSectionTitle'),
-    }),
-    [t],
-  );
-
   const sectionsInDraftState = useMemo(
-    () => [
-      ...PROJECT_PROGRAMME_SECTIONS.filter(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
         (section) => effectiveProjectProgramme?.[section.id]?.status === 'DRAFT',
       ),
-      ...(effectiveProjectProgramme?.locationMap?.status === 'DRAFT' ? [locationMapSection] : []),
-    ],
-    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme, locationMapSection],
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
   );
 
   const sectionsInCompletedState = useMemo(
-    () => [
-      ...PROJECT_PROGRAMME_SECTIONS.filter(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
         (section) => effectiveProjectProgramme?.[section.id]?.status === 'COMPLETE',
       ),
-      ...(effectiveProjectProgramme?.locationMap?.status === 'COMPLETE'
-        ? [locationMapSection]
-        : []),
-    ],
-    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme, locationMapSection],
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
   );
 
   const hasActiveSection = Boolean(activeSection && projectProgrammeId);
@@ -214,17 +197,6 @@ function ProjectProgramme() {
     setActiveSection(null);
   }
 
-  function handleOpenDraftStateSection(sectionId: ProjectProgrammeOverviewSectionId) {
-    if (sectionId === LOCATION_MAP_SECTION_ID) {
-      document
-        .getElementById(LOCATION_MAP_ELEMENT_ID)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-
-    handleOpenSection(sectionId);
-  }
-
   if (isLoadingProjectProgrammeByProject) {
     return null;
   }
@@ -277,7 +249,7 @@ function ProjectProgramme() {
               <ProjectProgrammeDraftStateNotification
                 sectionsInCompletedState={sectionsInCompletedState}
                 sectionsInDraftState={sectionsInDraftState}
-                onOpenSection={handleOpenDraftStateSection}
+                onOpenSection={handleOpenSection}
                 isProjectProgrammeComplete={isProjectProgrammeComplete}
                 effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
               />
