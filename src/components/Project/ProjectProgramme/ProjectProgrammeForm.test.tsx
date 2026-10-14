@@ -7,6 +7,7 @@ import ProjectProgrammeForm, {
   pickChangedLinks,
 } from './ProjectProgrammeForm';
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 const mockDispatch = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
@@ -374,6 +375,45 @@ describe('ProjectProgrammeForm save logic', () => {
       summary: 'Summary text',
     });
     expect(payload).not.toHaveProperty('district');
+  });
+
+  it('persists autofilled project name when another basic info field is saved as draft', async () => {
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              effectiveProjectProgramme={{}}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={jest.fn()}
+              project={{ name: 'Autofilled project' } as IProject}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    expect(screen.getByDisplayValue('Autofilled project')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' })).toBeDisabled();
+
+    fireEvent.change(screen.getByRole('textbox', { name: /projectProgrammeForm\.summary/ }), {
+      target: { value: 'New summary' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => {
+      expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+        id: 'programme-1',
+        section: 'basic-info',
+        data: { projectName: 'Autofilled project', summary: 'New summary' },
+      });
+    });
   });
 
   it('trims and filters empty links when links are dirty', () => {

@@ -22,6 +22,7 @@ import {
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 import useMarkProjectProgrammeSectionReady from './useMarkProjectProgrammeSectionReady';
+import { hasAllRequiredFields } from './sections/projectProgrammeSectionFields';
 
 interface ProjectProgrammeSectionCardProps {
   sectionIsStarted: boolean;
@@ -117,7 +118,7 @@ function ProjectProgrammeSectionCard({
           <div className="flex flex-wrap gap-4">
             {!programmeIsComplete && !sectionIsComplete && (
               <>
-                {sectionIsStarted && (
+                {sectionIsStarted && hasAllRequiredFields(sectionId, projectProgramme) && (
                   <Button
                     variant={ButtonVariant.Primary}
                     type="button"

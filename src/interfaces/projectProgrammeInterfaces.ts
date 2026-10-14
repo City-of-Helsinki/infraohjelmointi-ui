@@ -134,6 +134,8 @@ export interface ProjectProgrammeStatusTransitionButtonsOverrides {
 export interface ProjectProgrammeStatusTransitionButtonsProps {
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
+  effectiveProjectProgramme?: IProjectProgramme;
+  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
   buttonOverrides?: ProjectProgrammeStatusTransitionButtonsOverrides;
 }
 

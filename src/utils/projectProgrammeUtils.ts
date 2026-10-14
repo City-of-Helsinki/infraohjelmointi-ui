@@ -16,3 +16,9 @@ export const requiredTrimmedRule = (labelKey: string, t: TFunction) => ({
   validate: (value: string | null | undefined) =>
     value?.trim() ? true : t('validation.required', { field: t(labelKey) }),
 });
+
+export function getRequiredFieldNames(
+  fields: readonly { field: string; required?: boolean }[],
+): string[] {
+  return fields.filter((field) => field.required ?? true).map((field) => field.field);
+}

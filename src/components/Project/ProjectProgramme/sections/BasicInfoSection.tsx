@@ -6,6 +6,7 @@ import TextAreaField from '@/components/shared/TextAreaField';
 import { validateMaxLength } from '@/utils/validation';
 import {
   getFieldPropsForProjectProgrammeForm,
+  getRequiredFieldNames,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
 import ProjectProgrammeLinksField from '../ProjectProgrammeLinksField';
@@ -15,35 +16,40 @@ interface IBasicInfoSectionProps {
 }
 
 export const BASIC_INFO_BRIEF_FIELDS = [
-  'projectName',
-  'district',
-  'projectProgrammeCompiler',
-  'personsInvolved',
-  'estimatedCosts',
-  'inspector',
-  'summary',
+  { field: 'projectName' },
+  { field: 'district' },
+  { field: 'projectProgrammeCompiler' },
+  { field: 'personsInvolved', required: false },
+  { field: 'estimatedCosts' },
+  { field: 'inspector', required: false },
+  { field: 'summary' },
 ] as const;
 
 export const BASIC_INFO_FULL_FIELDS = [
-  'projectName',
-  'district',
-  'projectProgrammeCompiler',
-  'personsInvolved',
-  'inspector',
-  'summary',
-  'strategyGoals',
-  'costClass',
-  'projectSize',
-  'risks',
-  'studyAndPlanningNeeds',
-  'planningAndImplementationFeasibility',
-  'specialConsiderations',
-  'otherConsiderations',
+  { field: 'projectName' },
+  { field: 'district' },
+  { field: 'projectProgrammeCompiler' },
+  { field: 'personsInvolved' },
+  { field: 'inspector', required: false },
+  { field: 'summary' },
+  { field: 'strategyGoals' },
+  { field: 'costClass' },
+  { field: 'projectSize' },
+  { field: 'risks' },
+  { field: 'studyAndPlanningNeeds' },
+  { field: 'planningAndImplementationFeasibility' },
+  { field: 'specialConsiderations', required: false },
+  { field: 'otherConsiderations', required: false },
 ] as const;
 
 function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) {
   const { t } = useTranslation();
   const tooltip = useProjectProgrammeTooltip();
+  const requiredFields = getRequiredFieldNames(
+    briefProgramme ? BASIC_INFO_BRIEF_FIELDS : BASIC_INFO_FULL_FIELDS,
+  );
+  const requiredRule = (field: string) =>
+    requiredFields.includes(field) ? requiredTrimmedRule(`projectProgrammeForm.${field}`, t) : {};
 
   return (
     <div className="mb-12" data-testid="project-programme-basic-info-form">
@@ -57,7 +63,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
         size="full"
         rules={{
           ...validateMaxLength(200, t),
-          ...requiredTrimmedRule('projectProgrammeForm.projectName', t),
+          ...requiredRule('projectName'),
         }}
       />
       <div className="flex w-full gap-6">
@@ -67,7 +73,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
             size="full"
             rules={{
               ...validateMaxLength(200, t),
-              ...requiredTrimmedRule('projectProgrammeForm.district', t),
+              ...requiredRule('district'),
             }}
           />
         </div>
@@ -77,7 +83,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
             size="full"
             rules={{
               ...validateMaxLength(100, t),
-              ...requiredTrimmedRule('projectProgrammeForm.projectProgrammeCompiler', t),
+              ...requiredRule('projectProgrammeCompiler'),
             }}
           />
         </div>
@@ -87,7 +93,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
         size="full"
         rules={{
           ...validateMaxLength(200, t),
-          ...(!briefProgramme && requiredTrimmedRule('projectProgrammeForm.personsInvolved', t)),
+          ...requiredRule('personsInvolved'),
         }}
       />
       {briefProgramme && (
@@ -96,7 +102,7 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
           size="full"
           rules={{
             ...validateMaxLength(200, t),
-            ...requiredTrimmedRule('projectProgrammeForm.estimatedCosts', t),
+            ...requiredRule('estimatedCosts'),
           }}
         />
       )}
@@ -109,19 +115,19 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
       />
       <TextAreaField
         {...getFieldPropsForProjectProgrammeForm('basicInfo.summary')}
-        rules={{ ...requiredTrimmedRule('projectProgrammeForm.summary', t) }}
+        rules={{ ...requiredRule('summary') }}
         tooltip={tooltip('summary')}
       />
       {!briefProgramme && (
         <>
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.strategyGoals')}
-            rules={{ ...requiredTrimmedRule('projectProgrammeForm.strategyGoals', t) }}
+            rules={{ ...requiredRule('strategyGoals') }}
             tooltip={tooltip('strategyGoals')}
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.costClass')}
-            rules={{ ...requiredTrimmedRule('projectProgrammeForm.costClass', t) }}
+            rules={{ ...requiredRule('costClass') }}
             tooltip={tooltip('costClass')}
           />
           <TextField
@@ -129,29 +135,24 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
             size="full"
             rules={{
               ...validateMaxLength(200, t),
-              ...requiredTrimmedRule('projectProgrammeForm.projectSize', t),
+              ...requiredRule('projectSize'),
             }}
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.risks')}
-            rules={{ ...requiredTrimmedRule('projectProgrammeForm.risks', t) }}
+            rules={{ ...requiredRule('risks') }}
             tooltip={tooltip('risks')}
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm('basicInfo.studyAndPlanningNeeds')}
-            rules={{ ...requiredTrimmedRule('projectProgrammeForm.studyAndPlanningNeeds', t) }}
+            rules={{ ...requiredRule('studyAndPlanningNeeds') }}
             tooltip={tooltip('studyAndPlanningNeeds')}
           />
           <TextAreaField
             {...getFieldPropsForProjectProgrammeForm(
               'basicInfo.planningAndImplementationFeasibility',
             )}
-            rules={{
-              ...requiredTrimmedRule(
-                'projectProgrammeForm.planningAndImplementationFeasibility',
-                t,
-              ),
-            }}
+            rules={{ ...requiredRule('planningAndImplementationFeasibility') }}
             tooltip={tooltip('planningAndImplementationFeasibility')}
           />
           <TextAreaField
