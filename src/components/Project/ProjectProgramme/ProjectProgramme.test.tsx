@@ -1,7 +1,7 @@
 import mockI18next from '@/mocks/mockI18next';
 import { TFunction } from 'i18next';
 import { Route } from 'react-router';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import ProjectProgramme from './ProjectProgramme';
@@ -169,6 +169,32 @@ describe('ProjectProgramme', () => {
       expect(screen.getByTestId('project-programme-design-criteria-form')).toBeInTheDocument();
     },
   );
+
+  it.each([0, 1])('focuses missing fields only on submit from button %s', async (buttonIndex) => {
+    await render();
+    const getNotification = () =>
+      screen.getByText('projectProgrammeForm.missingRequiredFieldsText').closest('[tabindex="-1"]');
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const submitButton = screen.getAllByRole('button', {
+        name: 'projectProgrammeForm.markReady',
+      })[buttonIndex];
+      submitButton.focus();
+      await act(async () => {
+        submitButton.click();
+      });
+      await waitFor(() => expect(getNotification()).toHaveFocus());
+    }
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.modifyInformation' }).click();
+    });
+    mockProjectProgramme(true, { projectName: 'Updated project', district: 'Keskinen' });
+    await act(async () => {
+      screen.getByRole('button', { name: 'projectProgrammeForm.cancel' }).click();
+    });
+    expect(getNotification()).not.toHaveFocus();
+  });
 
   it('only lists basic information when brief programme completion is blocked', async () => {
     await render();

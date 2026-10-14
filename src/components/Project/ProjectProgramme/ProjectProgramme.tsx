@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, Notification } from 'hds-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
@@ -56,6 +56,7 @@ function ProjectProgramme() {
   const [missingRequiredSections, setMissingRequiredSections] = useState<
     ProjectProgrammeSectionId[]
   >([]);
+  const missingFieldsNotificationRef = useRef<HTMLDivElement>(null);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
   useEffect(() => {
@@ -207,6 +208,14 @@ function ProjectProgramme() {
     setActiveSection(null);
   }
 
+  function handleMissingRequiredFields(sections: ProjectProgrammeSectionId[]) {
+    setMissingRequiredSections(sections);
+    globalThis.requestAnimationFrame(() => {
+      missingFieldsNotificationRef.current?.scrollIntoView?.({ block: 'center' });
+      missingFieldsNotificationRef.current?.focus();
+    });
+  }
+
   if (isLoadingProjectProgrammeByProject) {
     return null;
   }
@@ -254,6 +263,7 @@ function ProjectProgramme() {
           <div className="project-form mx-auto max-w-xl">
             {missingRequiredSections.length > 0 && (
               <MissingRequiredFieldsNotification
+                missingFieldsNotificationRef={missingFieldsNotificationRef}
                 handleOpenSection={handleOpenSection}
                 PROJECT_PROGRAMME_SECTIONS={PROJECT_PROGRAMME_SECTIONS}
                 missingRequiredSections={missingRequiredSections}
@@ -270,7 +280,7 @@ function ProjectProgramme() {
                 isProjectProgrammeComplete={isProjectProgrammeComplete}
                 effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
                 effectiveProjectProgramme={effectiveProjectProgramme}
-                onMissingRequiredFields={setMissingRequiredSections}
+                onMissingRequiredFields={handleMissingRequiredFields}
               />
             )}
             {PROJECT_PROGRAMME_SECTIONS.filter(
@@ -296,7 +306,7 @@ function ProjectProgramme() {
               isProjectProgrammeComplete={isProjectProgrammeComplete}
               effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
               effectiveProjectProgramme={effectiveProjectProgramme}
-              onMissingRequiredFields={setMissingRequiredSections}
+              onMissingRequiredFields={handleMissingRequiredFields}
               handleSwitchType={handleSwitchType}
             />
           </div>

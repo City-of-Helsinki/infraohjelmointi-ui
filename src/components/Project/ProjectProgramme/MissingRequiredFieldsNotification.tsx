@@ -1,5 +1,5 @@
 import { Link, Notification } from 'hds-react';
-import { useEffect, useRef } from 'react';
+import { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   IProjectProgrammeSectionConfig,
@@ -7,26 +7,19 @@ import {
 } from './sections/projectProgrammeSections';
 
 interface MissingRequiredFieldsNotificationProps {
+  missingFieldsNotificationRef: RefObject<HTMLDivElement>;
   handleOpenSection(sectionId: ProjectProgrammeSectionId): void;
   PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[];
   missingRequiredSections: ProjectProgrammeSectionId[];
 }
 
 function MissingRequiredFieldsNotification({
+  missingFieldsNotificationRef,
   handleOpenSection,
   PROJECT_PROGRAMME_SECTIONS,
   missingRequiredSections,
 }: Readonly<MissingRequiredFieldsNotificationProps>) {
   const { t } = useTranslation();
-
-  const missingFieldsNotificationRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (missingRequiredSections.length > 0) {
-      missingFieldsNotificationRef.current?.scrollIntoView?.({ block: 'center' });
-      missingFieldsNotificationRef.current?.focus();
-    }
-  }, [missingRequiredSections]);
 
   return (
     <div ref={missingFieldsNotificationRef} tabIndex={-1}>
