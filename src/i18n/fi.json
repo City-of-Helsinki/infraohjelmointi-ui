@@ -337,7 +337,7 @@
     "planningWorkQuantity": "Suoritemäärä",
     "constructionPhase": "Rakentamisen kustannusarvio",
     "constructionWorkQuantity": "Suoritemäärä",
-    "costForecast": "Budjetti",
+    "costForecast": "Kokonaisrahoitusvaraus",
     "realizedCostLabel": "Toteumatiedot",
     "realizedCostCurrentYear": "Toteuma kuluva vuosi",
     "realizedCostCurrentYearTooltipLabel": "Kuluvan vuoden toteuma",
@@ -374,8 +374,8 @@
     "warrantyPhase": "Takuuaika",
     "estWarrantyPhaseStart": "Alkaa",
     "estWarrantyPhaseEnd": "Päättyy",
-    "budgetOverrunReason": "Budjettipoikkeaman selitys",
-    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle",
+    "budgetOverrunReason": "Kokonaisrahoitusvarauksen poikkeaman selitys",
+    "otherBudgetOverrunReason": "Muu syy kokonaisrahoitusvarauksen poikkeamalle",
     "onSchedule": "Onko hanke aikataulussa",
     "address": "Katuosoite",
     "postalCode": "Postinumero",
@@ -528,7 +528,7 @@
         "financer": "Rahoittava taho",
         "budgetItem": "Talousarviokohta",
         "projectNumber": "Projektinumero",
-        "budget": "Budjetti"
+        "budget": "Kokonaisrahoitusvaraus"
       },
       "projectNumberWarning": "Projektinumeroa ei voitu hakea tietokannasta. Kirjaa se käsin tai yritä myöhemmin uudelleen."
     },
@@ -804,13 +804,13 @@
       "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
       "hashtagPostError": "Tunnisteen luonti epäonnistui.",
       "phaseChangeError": "Haluamasi vaihemuutos vaatii lisää tietoja hankekorttiin. Tee vaihemuutos hankekortilla.",
-      "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
-      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
+      "financeChangeError": "Haluamasi muutos kokonaisrahoitusvaraukseen vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
+      "frameBudgetError": "Raamikokonaisrahoitusvaraus ei voi olla negatiivinen.",
       "Network Error": "Verkkovirhe",
       "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
-      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
-      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
-      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
+      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu kokonaisrahoitusvaraus -näkymään.",
+      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu kokonaisrahoitusvaraus -näkymään tapahtui virhe.",
+      "forcedToFrameStatusUpdateError": "Sovitettu kokonaisrahoitusvaraus -näkymän tilan vaihtamisessa tapahtui virhe.",
       "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
       "linkCopyFailed": "Linkin kopiointi epäonnistui",
       "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
@@ -1016,9 +1016,9 @@
       "name": "Nimi"
     },
     "operationalEnvironmentAnalysisForcedToFrame": {
-      "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",
-      "documentName": "kategorisointiraportti - sovitettu budjetti",
-      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu budjetti)"
+      "rowTitle": "Kategorisointiraportti (Sovitettu kokonaisrahoitusvaraus)",
+      "documentName": "kategorisointiraportti - sovitettu kokonaisrahoitusvaraus",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu kokonaisrahoitusvaraus)"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
@@ -1034,8 +1034,8 @@
       "projectManagerMissing": "Odottaa nimeämistä"
     },
     "strategyForcedToFrame": {
-      "rowTitle": "Toimintasuunnitelma (Sovitettu budjetti)",
-      "documentName": "toimintasuunnitelma - sovitettu budjetti",
+      "rowTitle": "Toimintasuunnitelma (Sovitettu kokonaisrahoitusvaraus)",
+      "documentName": "toimintasuunnitelma - sovitettu kokonaisrahoitusvaraus",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
       "projectNameTitle": "Hanke",
@@ -1054,8 +1054,8 @@
       "underMillionSummary": "Muut alle 1 milj. euron investointihankkeet"
     },
     "constructionProgramForcedToFrame": {
-      "rowTitle": "Rakentamisohjelma (Sovitettu budjetti, yli 1 milj hankkeet)",
-      "documentName": "rakentamisohjelma - sovitettu budjetti",
+      "rowTitle": "Rakentamisohjelma (Sovitettu kokonaisrahoitusvaraus, yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma - sovitettu kokonaisrahoitusvaraus",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
       "classSummary": "Hankkeet yhteensä",
@@ -1102,9 +1102,9 @@
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadCsv": "Lataa {{name}} (.csv)",
   "reportsTitle": "Raportit",
-  "forcedToFrame": "Sovitettu budjetti",
+  "forcedToFrame": "Sovitettu kokonaisrahoitusvaraus",
   "implementedAndBound": "Toteutettu ja sidottu",
-  "deviationFromBudget": "Erotus budjettiin",
+  "deviationFromBudget": "Erotus kokonaisrahoitusvaraukseen",
   "budgetChange": "TA-muutos",
   "admin": "Ylläpitäjä",
   "helloUser": "Hei {{firstName}}",
@@ -1149,7 +1149,7 @@
         "responsibleZones": "Vastuuyksikkö",
         "responsiblePersonsRaw": "Vastuuhenkilölistat",
         "programmersRaw": "Ohjelmoija",
-        "budgetOverrunReasons": "Budjettipoikkeaman selitys"
+        "budgetOverrunReasons": "Kokonaisrahoitusvarauksen poikkeaman selitys"
       },
       "tableEmptyText": "Valikossa ei ole vielä vaihtoehtoja. Lisää uusi valinta aloittaaksesi.",
       "sideNavigationToggleButton": "Navigoi valikkoon"
@@ -1165,11 +1165,11 @@
       "button": "Lukitse tilinpäätös tästä"
     },
     "forcedtoframestate": {
-      "name": "Sovitettu budjetti -näkymän hallinta",
-      "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
-      "button": "Hallitse sovitettu budjetti -näkymää",
-      "viewState": "Sovitettu budjetti -näkymän tila",
-      "moveData": "Tietojen siirto sovitettu budjetti -näkymään",
+      "name": "Sovitettu kokonaisrahoitusvaraus -näkymän hallinta",
+      "description": "Sulje tai avaa sovitettu kokonaisrahoitusvaraus. Lataa tiedot koordinointinäkymästä sovitettu kokonaisrahoitusvaraus -näkymään.",
+      "button": "Hallitse sovitettu kokonaisrahoitusvaraus -näkymää",
+      "viewState": "Sovitettu kokonaisrahoitusvaraus -näkymän tila",
+      "moveData": "Tietojen siirto sovitettu kokonaisrahoitusvaraus -näkymään",
       "lastModified": "Tilaa viimeksi muokattu",
       "changeStatus": "Vaihda tilan status",
       "dataLastUpdated": "Tiedot viimeksi siirretty",
@@ -1178,7 +1178,7 @@
       "open": "Auki",
       "locked": "Lukittu",
       "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
-      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
+      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän kokonaisrahoitusvaraus- ja aikataulutiedot Sovitettu kokonaisrahoitusvaraus -näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
     }
   },
   "projectCount": "Projektien määrä",
@@ -1255,7 +1255,7 @@
       "class": "<p>Tarve-esitys</p><p>Talousarvion raamiluku</p><p>Raamiluvun ja tarve-esityksen erotus</p>",
       "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
       "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
-      "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
+      "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus</p>"
     }
   },
   "myWorkloadView": {
@@ -1278,7 +1278,7 @@
       "projectCostForecast": "Hankkeen kustannusarvio",
       "planningCostForecast": "Suunnittelun kustannusarvio",
       "constructionCostForecast": "Rakentamisen kustannusarvio",
-      "totalBudget": "Hankkeen kokonaisbudjetti",
+      "totalBudget": "Hankkeen kokonaisrahoitusvaraus",
       "phase": "Vaihe",
       "functions": "Toimenpiteet",
       "modifyInformation": "Muokkaa tietoja",
