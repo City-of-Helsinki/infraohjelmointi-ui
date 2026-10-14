@@ -808,9 +808,9 @@
       "frameBudgetError": "Raamikokonaisrahoitusvaraus ei voi olla negatiivinen.",
       "Network Error": "Verkkovirhe",
       "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
-      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu kokonaisrahoitusvaraus -näkymään.",
-      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu kokonaisrahoitusvaraus -näkymään tapahtui virhe.",
-      "forcedToFrameStatusUpdateError": "Sovitettu kokonaisrahoitusvaraus -näkymän tilan vaihtamisessa tapahtui virhe.",
+      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettuun näkymään.",
+      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettuun näkymään tapahtui virhe.",
+      "forcedToFrameStatusUpdateError": "Sovitetun näkymän tilan vaihtamisessa tapahtui virhe.",
       "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
       "linkCopyFailed": "Linkin kopiointi epäonnistui",
       "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
@@ -1016,9 +1016,9 @@
       "name": "Nimi"
     },
     "operationalEnvironmentAnalysisForcedToFrame": {
-      "rowTitle": "Kategorisointiraportti (Sovitettu kokonaisrahoitusvaraus)",
-      "documentName": "kategorisointiraportti - sovitettu kokonaisrahoitusvaraus",
-      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu kokonaisrahoitusvaraus)"
+      "rowTitle": "Kategorisointiraportti (Sovitettu)",
+      "documentName": "kategorisointiraportti - sovitettu",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu)"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
@@ -1034,8 +1034,8 @@
       "projectManagerMissing": "Odottaa nimeämistä"
     },
     "strategyForcedToFrame": {
-      "rowTitle": "Toimintasuunnitelma (Sovitettu kokonaisrahoitusvaraus)",
-      "documentName": "toimintasuunnitelma - sovitettu kokonaisrahoitusvaraus",
+      "rowTitle": "Toimintasuunnitelma (Sovitettu)",
+      "documentName": "toimintasuunnitelma - sovitettu",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
       "projectNameTitle": "Hanke",
@@ -1054,8 +1054,8 @@
       "underMillionSummary": "Muut alle 1 milj. euron investointihankkeet"
     },
     "constructionProgramForcedToFrame": {
-      "rowTitle": "Rakentamisohjelma (Sovitettu kokonaisrahoitusvaraus, yli 1 milj hankkeet)",
-      "documentName": "rakentamisohjelma - sovitettu kokonaisrahoitusvaraus",
+      "rowTitle": "Rakentamisohjelma (Sovitettu, yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma - sovitettu",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
       "classSummary": "Hankkeet yhteensä",
@@ -1165,11 +1165,11 @@
       "button": "Lukitse tilinpäätös tästä"
     },
     "forcedtoframestate": {
-      "name": "Sovitettu kokonaisrahoitusvaraus -näkymän hallinta",
-      "description": "Sulje tai avaa sovitettu kokonaisrahoitusvaraus. Lataa tiedot koordinointinäkymästä sovitettu kokonaisrahoitusvaraus -näkymään.",
-      "button": "Hallitse sovitettu kokonaisrahoitusvaraus -näkymää",
-      "viewState": "Sovitettu kokonaisrahoitusvaraus -näkymän tila",
-      "moveData": "Tietojen siirto sovitettu kokonaisrahoitusvaraus -näkymään",
+      "name": "Sovitetun näkymän hallinta",
+      "description": "Sulje tai avaa sovitettu näkymä. Lataa tiedot koordinointinäkymästä sovitettuun näkymään.",
+      "button": "Hallitse sovitettua näkymää",
+      "viewState": "Sovitetun näkymän tila",
+      "moveData": "Tietojen siirto sovitettuun näkymään",
       "lastModified": "Tilaa viimeksi muokattu",
       "changeStatus": "Vaihda tilan status",
       "dataLastUpdated": "Tiedot viimeksi siirretty",
@@ -1178,7 +1178,7 @@
       "open": "Auki",
       "locked": "Lukittu",
       "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
-      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän kokonaisrahoitusvaraus- ja aikataulutiedot Sovitettu kokonaisrahoitusvaraus -näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
+      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän kokonaisrahoitusvaraus- ja aikataulutiedot Sovitettuun näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
     }
   },
   "projectCount": "Projektien määrä",
