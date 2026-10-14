@@ -1,5 +1,6 @@
+@reference "../../index.css";
 .planning-view-container {
-  @apply mx-8 mb-8 whitespace-nowrap leading-5;
+  @apply mx-8 mb-8 leading-5 whitespace-nowrap;
 }
 
 .planning-header-container {

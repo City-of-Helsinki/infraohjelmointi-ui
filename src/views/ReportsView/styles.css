@@ -1,5 +1,6 @@
+@reference "../../index.css";
 .reports-view {
-  @apply my-10 ml-14 mr-20 flex flex-col;
+  @apply my-10 mr-20 ml-14 flex flex-col;
 }
 
 .reports-title {

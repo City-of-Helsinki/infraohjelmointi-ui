@@ -1,6 +1,7 @@
+@reference "../../../index.css";
 .admin-card-container {
   --admin-card-width: calc(50% - 1.5rem);
-  @apply mb-6 mr-6 flex basis-[var(--admin-card-width)] flex-col justify-center;
+  @apply mr-6 mb-6 flex basis-[var(--admin-card-width)] flex-col justify-center;
 }
 
 /* we style the HDS cards to be full height so that the cards on the same row are always the same height */

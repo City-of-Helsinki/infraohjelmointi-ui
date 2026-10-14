@@ -1,12 +1,13 @@
+@reference "../../../../index.css";
 /* TABLE HEAD */
 .planning-head {
   /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */
-  @apply sticky left-0 z-50 h-11 w-[32rem] min-w-[32rem] max-w-[32rem] border-b border-white bg-bus py-1 pr-4 text-white;
+  @apply bg-bus sticky left-0 z-50 h-11 w-[32rem] max-w-[32rem] min-w-[32rem] border-b border-white py-1 pr-4 text-white;
 }
 
 .planning-head-content {
   --head-width: calc(100% - var(--planning-cell-width));
-  @apply flex w-[var(--head-width)] items-center gap-1 overflow-ellipsis;
+  @apply flex w-[var(--head-width)] items-center gap-1 text-ellipsis;
 }
 
 .planning-head.masterClass {
@@ -62,7 +63,7 @@
 }
 
 .planning-head.division {
-  @apply border-b border-black-70 bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
+  @apply border-black-70 text-l text-black-90 border-b bg-[var(--color-division)] pl-10 font-medium;
 }
 
 .planning-head.division .planning-head-content {
@@ -70,7 +71,7 @@
 }
 
 .planning-head.group {
-  @apply border-b border-black-70 bg-[var(--color-group)] font-medium text-black;
+  @apply border-black-70 border-b bg-[var(--color-group)] font-medium text-black;
 }
 
 /* Group row under a subClass */
@@ -102,7 +103,7 @@
 }
 
 .planning-head .planning-title-button .planning-head-title {
-  @apply w-full overflow-hidden text-ellipsis text-left;
+  @apply w-full overflow-hidden text-left text-ellipsis;
 }
 
 .custom-tooltip button {
@@ -120,7 +121,7 @@
 /* TABLE CELL */
 /* setting max width to 0px will cause the table cell to stay in place when we're editing the frame budget in coordination view */
 .planning-cell {
-  @apply min-w-[var(--planning-cell-width)] max-w-0 border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
+  @apply bg-bus max-w-0 min-w-[var(--planning-cell-width)] border-b border-white py-1 pr-4 align-text-top text-white;
 }
 
 .planning-cell.masterClass {
@@ -169,11 +170,11 @@
 }
 
 .planning-cell.division {
-  @apply border-b border-black-70 bg-[var(--color-division)] text-black-90;
+  @apply border-black-70 text-black-90 border-b bg-[var(--color-division)];
 }
 
 .planning-cell.group {
-  @apply border-b border-black-70 bg-[var(--color-group)] text-black;
+  @apply border-black-70 border-b bg-[var(--color-group)] text-black;
 }
 
 .planning-cell .planning-cell-container {
@@ -189,7 +190,7 @@
 }
 
 .planning-cell-deviation {
-  @apply !font-bold text-suomenlinna;
+  @apply text-suomenlinna !font-bold;
 }
 
 .planning-cell-deviation.framed {
@@ -197,7 +198,7 @@
 }
 
 .planning-head-deviation {
-  @apply text-sm font-bold text-suomenlinna;
+  @apply text-suomenlinna text-sm font-bold;
 }
 
 .planning-head-content-dots {
@@ -237,7 +238,7 @@
 }
 
 .frame-budget-input {
-  @apply h-[44px] w-full translate-y-[20px] rounded-sm p-2 text-right text-black-80;
+  @apply text-black-80 h-[44px] w-full translate-y-[20px] rounded-xs bg-white p-2 text-right;
 }
 
 /* Hide arrows from number input in Chrome, Safari, Edge, Opera */
@@ -248,7 +249,7 @@
 }
 
 .budget-change-input {
-  @apply mt-[1.2rem] h-[44px] w-[74px] rounded-sm p-2 text-right text-black-80;
+  @apply text-black-80 mt-[1.2rem] h-[44px] w-[74px] rounded-xs p-2 text-right;
 }
 /* Hide arrows from number input in Chrome, Safari, Edge, Opera */
 .budget-change-input::-webkit-outer-spin-button,

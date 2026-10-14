@@ -1,3 +1,4 @@
+@reference "../../../../index.css";
 .project-form {
   @apply my-16 w-full;
 }
@@ -32,7 +33,7 @@
 }
 
 .project-form .error-summary-col {
-  @apply mb-6 mr-6 flex basis-[49.5rem] flex-col;
+  @apply mr-6 mb-6 flex basis-[49.5rem] flex-col;
 }
 
 .project-form #projectQualityLevel label,
@@ -47,15 +48,15 @@
 
 /* Select fields error message svg icon resize */
 .select-field-wrapper div div > svg {
-  @apply min-w-[25px] max-w-[25px];
+  @apply max-w-[25px] min-w-[25px];
 }
 
 .error-summary-container {
-  @apply w-full border-l-8 border-error bg-error-light px-4 py-4;
+  @apply border-error bg-error-light w-full border-l-8 px-4 py-4;
 }
 
 .error-summary-label {
-  @apply flex items-center gap-2 text-l font-bold;
+  @apply text-l flex items-center gap-2 font-bold;
 }
 
 .error-summary-list {
@@ -63,11 +64,11 @@
 }
 
 .error-summary-link {
-  @apply font-medium text-bus underline;
+  @apply text-bus font-medium underline;
 }
 
 .project-form-banner {
-  @apply fixed bottom-0 right-0 z-50 h-20 w-screen bg-white px-28;
+  @apply fixed right-0 bottom-0 z-50 h-20 w-screen bg-white px-28;
 }
 
 .project-form-banner-container {

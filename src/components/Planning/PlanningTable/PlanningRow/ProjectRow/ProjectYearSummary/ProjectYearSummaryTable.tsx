@@ -52,17 +52,17 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
               <tr>
                 <th></th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">
+                  <span className="text-black-60 ml-2 text-sm font-medium">
                     {t('monthlySummaryTable.currentYearSapCosts')}
                   </span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">
+                  <span className="text-black-60 ml-2 text-sm font-medium">
                     {t('monthlySummaryTable.currentYearSapCommitments')}
                   </span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">
+                  <span className="text-black-60 ml-2 text-sm font-medium">
                     {t('monthlySummaryTable.totalValues')}
                   </span>
                 </th>

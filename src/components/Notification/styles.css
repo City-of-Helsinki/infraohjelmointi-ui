@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .notification-wrapper {
   @apply pt-3;
 }
@@ -7,5 +8,5 @@
 }
 
 .notification-container {
-  @apply sticky left-0 right-0 top-0 z-[999] mx-auto h-0 w-[22rem];
+  @apply sticky top-0 right-0 left-0 z-[999] mx-auto h-0 w-[22rem];
 }

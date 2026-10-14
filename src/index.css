@@ -1,11 +1,9 @@
 /* @import '~hds-core/lib/utils/helpers.css'; */
-@import 'fonts.css';
+@import './fonts.css';
+@import 'tailwindcss';
+@config '../tailwind.config.js';
 
 /* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
   --planning-cell-width: 5.5rem;
@@ -84,7 +82,7 @@ we give the container a 3rem margin left
 }
 
 .toolbar-button {
-  @apply whitespace-nowrap py-2 !text-sm !font-normal leading-normal !text-black;
+  @apply py-2 !text-sm leading-normal !font-normal whitespace-nowrap !text-black;
 }
 
 .toolbar-button[disabled] {
@@ -139,7 +137,7 @@ input {
 }
 
 .input-l.error {
-  @apply border-2 border-error;
+  @apply border-error border-2;
 }
 
 /* 

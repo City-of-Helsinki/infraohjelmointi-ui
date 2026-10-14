@@ -1,17 +1,18 @@
+@reference "../../../../../index.css";
 #hashtags-dialog {
   @apply !w-[65%];
 }
 
 #hashtags-dialog h2 {
-  @apply mb-6 mt-2 text-heading-s font-medium;
+  @apply text-heading-s mt-2 mb-6 font-medium;
 }
 
 #hashtags-dialog .content-container {
-  @apply mb-3 mt-6 flex flex-col;
+  @apply mt-6 mb-3 flex flex-col;
 }
 
 #hashtags-dialog hr {
-  @apply m-0 border-t border-gray;
+  @apply border-gray m-0 border-t;
 }
 
 #hashtags-dialog .dialog-footer {
@@ -47,7 +48,7 @@
 }
 
 .hashtag-created-text button {
-  @apply font-medium leading-[0] text-bus underline;
+  @apply text-bus leading-[0] font-medium underline;
 }
 
 .dialog-section .new-hashtags-form input {
@@ -59,7 +60,7 @@
 }
 
 .hashtags-container .hashtags-wrapper {
-  @apply mb-3 mr-3;
+  @apply mr-3 mb-3;
 }
 
 .hashtags-label {

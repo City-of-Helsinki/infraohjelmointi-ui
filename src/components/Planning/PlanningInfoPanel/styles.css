@@ -1,9 +1,10 @@
+@reference "../../../index.css";
 .planning-info-panel-container {
   @apply z-50 h-36 bg-white;
 }
 
 .planning-info-panel {
-  @apply flex w-[32rem] min-w-[32rem] max-w-[32rem] justify-between pl-2 pr-3;
+  @apply flex w-[32rem] max-w-[32rem] min-w-[32rem] justify-between pr-3 pl-2;
 }
 
 .planning-info-panel .buttons-container {
@@ -15,11 +16,11 @@
 }
 
 .selected-class {
-  @apply block overflow-hidden text-ellipsis pl-4 text-sm font-bold;
+  @apply block overflow-hidden pl-4 text-sm font-bold text-ellipsis;
 }
 
 .mode-indicator {
-  @apply flex h-11 items-center justify-center border-success bg-success px-8 font-medium text-white;
+  @apply border-success bg-success flex h-11 items-center justify-center px-8 font-medium text-white;
 }
 
 .mode-indicator.framed {

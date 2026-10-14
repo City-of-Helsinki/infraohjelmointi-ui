@@ -1,5 +1,6 @@
+@reference "../../index.css";
 .search-button {
-  @apply !p-0 !font-light !text-black-80;
+  @apply !text-black-80 !p-0 !font-light;
 }
 
 .search-button:disabled {
@@ -11,7 +12,7 @@ add HDS navigation border to make the top-bar-container look like the HDS naviga
 to center the navigation, this is needed because the .back-button-container otherwise makes the navigation un-even
 */
 .top-bar-container {
-  @apply ml-12 flex w-full justify-end border-b-[1px] border-gray pr-24;
+  @apply border-gray ml-12 flex w-full justify-end border-b-[1px] pr-24;
 }
 
 .navigation-container {
@@ -28,5 +29,5 @@ to center the navigation, this is needed because the .back-button-container othe
 }
 
 .back-button:hover {
-  @apply h-[75%] w-[75%] cursor-pointer bg-bus-l;
+  @apply bg-bus-l h-[75%] w-[75%] cursor-pointer;
 }

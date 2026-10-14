@@ -1,3 +1,4 @@
+@reference "../../../../../../index.css";
 .monthly-cell.project:nth-child(even) {
   @apply bg-bus-l;
 }
@@ -7,12 +8,12 @@
 }
 
 .monthly-summary-table-container {
-  @apply flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1;
+  @apply border-gray flex h-full w-full justify-center border-b-2 p-2 pt-1;
 }
 
 /* no gray border-bottom when cellType is none (the ProjectYearSummaryTable is hidden when viewing a none cell) */
 .monthly-summary-table-container.none {
-  @apply border-none bg-bus-l;
+  @apply bg-bus-l border-none;
 }
 
 .monthly-graph-cell-container {
@@ -47,11 +48,11 @@ td:has(.monthly-warrantyPhase-bar-container.empty)
 }
 
 .monthly-planning-bar {
-  @apply mb-3 h-3 -translate-y-[3px] bg-black-80;
+  @apply bg-black-80 mb-3 h-3 -translate-y-[3px];
 }
 
 .monthly-construction-bar {
-  @apply h-3 bg-copper;
+  @apply bg-copper h-3;
 }
 
 .monthly-warrantyPhase-bar {

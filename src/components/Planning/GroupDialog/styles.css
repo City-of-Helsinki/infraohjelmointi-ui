@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 #summing-group-dialog .search-input ul {
   max-height: 200px !important;
 }
@@ -29,7 +30,7 @@
 }
 
 .search-selections-container .search-selections {
-  @apply mb-3 mr-3;
+  @apply mr-3 mb-3;
 }
 
 .dialog-section .button-container {

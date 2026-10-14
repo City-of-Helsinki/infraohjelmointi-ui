@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 .admin-functions {
   @apply flex flex-wrap;
 }

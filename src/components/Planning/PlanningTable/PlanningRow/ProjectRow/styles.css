@@ -1,9 +1,10 @@
+@reference "../../../../../index.css";
 :root {
   --amount-of-month: 0%;
 }
 
 .project-row.searched {
-  @apply border-[1px] border-l-[3px] border-black-80;
+  @apply border-black-80 border-[1px] border-l-[3px];
 }
 
 /* 
@@ -32,7 +33,7 @@
 }
 
 .project-head-cell .project-name-button {
-  @apply max-w-[100%] overflow-hidden overflow-ellipsis text-sm;
+  @apply max-w-[100%] overflow-hidden text-sm text-ellipsis;
 }
 
 .project-head-cell .project-right-icons-container {
@@ -40,11 +41,11 @@
 }
 
 .table-input input {
-  @apply absolute -top-6 bottom-0 left-[0.65rem] !h-11 !w-[80%] cursor-pointer !rounded-sm text-center !text-sm font-light;
+  @apply absolute -top-6 bottom-0 left-[0.65rem] !h-11 !w-[80%] cursor-pointer !rounded-xs text-center !text-sm font-light;
 }
 
 .project-cell {
-  @apply relative border-b-[0.05rem] border-bus-m bg-bus-l;
+  @apply border-bus-m bg-bus-l relative border-b-[0.05rem];
 }
 
 .project-cell.planning {
@@ -176,7 +177,7 @@ tr.active .edit-timeline-button {
 }
 
 .project-cell-input:focus {
-  @apply rounded-[3px] border-2 border-coat-of-arms outline-none;
+  @apply border-coat-of-arms rounded-[3px] border-2 outline-hidden;
 }
 /* Hide arrows from number input in Chrome, Safari, Edge, Opera */
 .project-cell-input::-webkit-outer-spin-button,
@@ -207,7 +208,7 @@ tr.active .edit-timeline-button {
 
 /* Gray border bottom on top of black border bottom when viewing a selected year */
 .project-cell.selected-year.current-year .project-cell-input-container {
-  @apply flex h-full items-center border-b-2 border-gray p-0 font-bold;
+  @apply border-gray flex h-full items-center border-b-2 p-0 font-bold;
 }
 
 /* If viewing a selected year with a none type the gray border bottom is removed */
