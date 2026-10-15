@@ -11,7 +11,7 @@ export default function ContactsSection() {
   const programmers = useOptions('programmers');
 
   return (
-    <div className="mb-48">
+    <div className="mb-12">
       <FormSectionTitle
         label="constructionHandoverForm.contacts"
         name="constructionHandoverContacts"

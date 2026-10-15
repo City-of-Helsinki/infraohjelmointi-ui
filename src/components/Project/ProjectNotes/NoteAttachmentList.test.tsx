@@ -18,10 +18,10 @@ describe('NoteAttachmentList', () => {
   it('renders attachment rows', () => {
     const { getByText, getAllByRole } = render(<NoteAttachmentList attachments={attachments} />);
 
-    expect(getByText('noteAttachments.imageAttachments')).toBeInTheDocument();
+    expect(getByText('attachments.imageAttachments')).toBeInTheDocument();
     expect(getByText('first-image.jpg')).toBeInTheDocument();
     expect(getByText('second-image.jpg')).toBeInTheDocument();
-    expect(getAllByRole('button', { name: 'noteAttachments.view' })).toHaveLength(2);
+    expect(getAllByRole('button', { name: 'attachments.view' })).toHaveLength(2);
   });
 
   it('opens slideshow from clicked attachment index and supports navigation', async () => {
@@ -30,7 +30,7 @@ describe('NoteAttachmentList', () => {
       <NoteAttachmentList attachments={attachments} />,
     );
 
-    await user.click(getAllByRole('button', { name: 'noteAttachments.view' })[1]);
+    await user.click(getAllByRole('button', { name: 'attachments.view' })[1]);
 
     expect(getByText('2 / 2')).toBeInTheDocument();
 

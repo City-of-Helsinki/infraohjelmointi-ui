@@ -837,15 +837,15 @@ describe('PlanningView', () => {
   describe('PlanningRow', () => {
     (describe('PlanningForecastSums', () => {
       it('renders all the elements and 0 sums until SAP data is received from the backend ', async () => {
-        const { findByTestId, user, store } = await render();
+        const { findByTestId, getByTestId, user, store } = await render();
         const year = new Date().getFullYear();
         const { id } = store.getState().class.planning.masterClasses[0];
         await user.click(await findByTestId(`expand-monthly-view-button-${year}`));
 
-        await waitFor(async () => {
-          expect(await findByTestId(`planning-forecast-sums-${id}`)).toBeInTheDocument();
-          expect(await findByTestId(`planning-forecast-implemented-${id}`)).toHaveTextContent('0');
-          expect(await findByTestId(`planning-forecast-bound-${id}`)).toHaveTextContent('0');
+        await waitFor(() => {
+          expect(getByTestId(`planning-forecast-sums-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`planning-forecast-implemented-${id}`)).toHaveTextContent('0');
+          expect(getByTestId(`planning-forecast-bound-${id}`)).toHaveTextContent('0');
         });
       });
     }),
@@ -934,11 +934,9 @@ describe('PlanningView', () => {
 
         expect(hoverTooltip).not.toBeVisible();
 
-        await waitFor(async () => {
-          await user.hover(rowTitle.children[0]);
-        });
+        await user.hover(rowTitle.children[0]);
 
-        expect(hoverTooltip).toBeVisible();
+        await waitFor(() => expect(hoverTooltip).toBeVisible());
         expect(hoverTooltip).toHaveTextContent(name);
 
         await user.unhover(rowTitle);
@@ -951,35 +949,30 @@ describe('PlanningView', () => {
       it('renders all the elements and the row budgets to rows that have either est-dates or planningStartYear or constructionEndYear, and no financial data to cells if there is no planning or construction', async () => {
         const renderResult = await render();
 
-        const { findByTestId } = renderResult;
+        const { getByTestId } = renderResult;
         const project = mockPlanningViewProjects.data.results[0];
         const { id, category, name, finances } = project;
 
         await navigateToProjectRows(renderResult);
 
-        await waitFor(async () => {
-          expect(await findByTestId(`row-${id}-parent-test-class-1`)).toBeInTheDocument();
-          expect(await findByTestId(`head-${id}`)).toBeInTheDocument();
-          expect(await findByTestId(`edit-phase-${id}`)).toBeInTheDocument();
-          expect(await findByTestId(`navigate-${id}`)).toHaveTextContent(name);
-          expect(await findByTestId(`category-${id}`)).toHaveTextContent(
-            (category as IListItem).value,
-          );
+        const { availableFrameBudget, costEstimateBudget } = calculateProjectRowSums(project);
 
-          const { availableFrameBudget, costEstimateBudget } = calculateProjectRowSums(project);
-
-          expect(await findByTestId(`available-frame-budget-${id}`)).toHaveTextContent(
+        await waitFor(() => {
+          expect(getByTestId(`row-${id}-parent-test-class-1`)).toBeInTheDocument();
+          expect(getByTestId(`head-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
+          expect(getByTestId(`category-${id}`)).toHaveTextContent((category as IListItem).value);
+          expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(
             availableFrameBudget,
           );
-          expect(await findByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(
-            costEstimateBudget,
-          );
+          expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
 
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;
-            expect(await findByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
             if (i === 0 || i === 9 || i === 10) {
-              expect(await findByTestId(`cell-input-${year}-${id}`)).toHaveAttribute('readonly');
+              expect(getByTestId(`cell-input-${year}-${id}`)).toHaveAttribute('readonly');
             }
           }
         });
@@ -1019,7 +1012,7 @@ describe('PlanningView', () => {
 
         const renderResult = await render();
 
-        const { user, findByTestId, findByText, queryByTestId, store } = renderResult;
+        const { user, findByTestId, getByText, queryByTestId, store } = renderResult;
 
         await navigateToProjectRows(renderResult);
 
@@ -1059,9 +1052,7 @@ describe('PlanningView', () => {
         expect(await findByTestId('project-phase-menu')).toBeInTheDocument();
 
         // All options are visible
-        phasesAsOptions.forEach(async (p) =>
-          expect(await findByText(`option.${p.label}`)).toBeInTheDocument(),
-        );
+        phasesAsOptions.forEach((p) => expect(getByText(`option.${p.label}`)).toBeInTheDocument());
 
         // Click first option
         await user.click(await findByTestId(`select-${targetOptionValue}`));
@@ -1323,6 +1314,7 @@ describe('PlanningView', () => {
           const {
             user,
             findByTestId,
+            getByTestId,
             store: { dispatch },
           } = renderResult;
 
@@ -1355,16 +1347,18 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockDeleteCellPatchResponse.data);
 
-          await waitFor(async () => {
+          await waitFor(() => {
             // Cell is hidden
-            const cellInput = await findByTestId(`cell-input-${yearToHide}-${id}`);
-            expect(cellInput.hasAttribute('readonly')).toBeTruthy();
+            expect(getByTestId(`cell-input-${yearToHide}-${id}`)).toHaveAttribute('readonly');
             expect(
-              (await findByTestId(`project-cell-${yearToHide}-${id}`)).classList.contains('none'),
+              getByTestId(`project-cell-${yearToHide}-${id}`).classList.contains('none'),
             ).toBeTruthy();
             // Next cell is still construction in the document
-            const nextCell = await findByTestId(`project-cell-${yearToHide + 1}-${id}`);
-            expect(nextCell.classList.contains('construction')).toBeTruthy();
+            expect(
+              getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains(
+                'construction',
+              ),
+            ).toBeTruthy();
           });
 
           removeProjectUpdateEventListener(dispatch);
@@ -1409,6 +1403,7 @@ describe('PlanningView', () => {
           const {
             user,
             findByTestId,
+            getByTestId,
             store: { dispatch },
           } = renderResult;
 
@@ -1431,8 +1426,8 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockRemoveConstructionEndPatchResponse.data);
 
-          await waitFor(async () => {
-            const endCellInput = await findByTestId(`cell-input-${endOfTimeline}-${id}`);
+          await waitFor(() => {
+            const endCellInput = getByTestId(`cell-input-${endOfTimeline}-${id}`);
             expect(endCellInput).toHaveAttribute('readonly');
             expect(endCellInput).toHaveValue(null);
           });
@@ -1478,14 +1473,12 @@ describe('PlanningView', () => {
           await sendProjectUpdateEvent(mockRemovePlanningStartPatchResponse.data);
 
           // Check that correct data was patched and planning start has moved
-          await waitFor(async () => {
-            const startCellInput = await findByTestId(`cell-input-${startOfTimeline}-${id}`);
+          await waitFor(() => {
+            const startCellInput = getByTestId(`cell-input-${startOfTimeline}-${id}`);
             expect(startCellInput).toHaveAttribute('readonly');
             expect(startCellInput).toHaveValue(null);
             expect(
-              (await findByTestId(`project-cell-${startOfTimeline}-${id}`)).classList.contains(
-                'none',
-              ),
+              getByTestId(`project-cell-${startOfTimeline}-${id}`).classList.contains('none'),
             ).toBeTruthy();
           });
 
@@ -1912,63 +1905,66 @@ describe('PlanningView', () => {
         });
 
         it('can edit groups using context menu', async () => {
-          const { store, user, findByTestId, findByRole, findAllByTestId, queryByTestId } =
-            await render();
+          const {
+            store,
+            user,
+            findByTestId,
+            findByRole,
+            getAllByTestId,
+            getByTestId,
+            queryByTestId,
+          } = await render();
           addProjectUpdateEventListener(store.dispatch);
           const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
           const projects = mockPlanningViewProjects.data.results;
 
-          const expectRowProperties = async (
-            finances: IClassFinances,
-            id: string,
-            isGroup?: boolean,
-          ) => {
+          const expectRowProperties = (finances: IClassFinances, id: string, isGroup?: boolean) => {
             const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
               finances,
               isGroup ? 'group' : 'class',
             );
 
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument();
-            expect((await findByTestId(`planned-budgets-${id}`)).textContent).toBe(plannedBudgets);
-            expect((await findByTestId(`cost-estimate-budget-${id}`)).textContent).toBe(
-              costEstimateBudget,
-            );
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
+            expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
             if (!isGroup) {
-              expect((await findByTestId(`deviation-${id}`)).textContent).toBe(deviation);
+              expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
             }
           };
 
           // Check that all masterClass-rows is visible
-          masterClasses.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
-          );
+          masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
 
           // Click the first masterclass row
           const { id: masterClassId } = masterClasses[0];
-          await user.click(await findByTestId(`expand-${masterClassId}`));
+          await user.click(getByTestId(`expand-${masterClassId}`));
 
           const classesForMasterClass = classes.filter((c) => c.parent === masterClassId);
 
           // Check that all class-rows are visible
-          classesForMasterClass.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
+          await waitFor(() =>
+            classesForMasterClass.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            ),
           );
 
           // Click the first class row
           const { id: classId } = classesForMasterClass[0];
-          await user.click(await findByTestId(`expand-${classId}`));
+          await user.click(getByTestId(`expand-${classId}`));
 
           const subClassesForClass = subClasses.filter((c) => c.parent === classId);
 
           // Check that all subClass-rows are visible
-          subClassesForClass.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
+          await waitFor(() =>
+            subClassesForClass.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            ),
           );
 
           // Click the first subClass row
           const { id: subClassId } = subClassesForClass[0];
-          await user.click(await findByTestId(`expand-${subClassId}`));
+          await user.click(getByTestId(`expand-${subClassId}`));
 
           // Check that groups that belong directly to the selected subClass are visible
           const groupsForSubClass = mockGroups.data.filter(
@@ -1976,9 +1972,9 @@ describe('PlanningView', () => {
           );
 
           await waitFor(() => {
-            groupsForSubClass.forEach(async ({ id, finances }) => {
+            groupsForSubClass.forEach(({ id, finances }) => {
               expectRowProperties(finances, id, true);
-              expect((await findByTestId(`row-${id}`)).classList.contains('group')).toBeTruthy();
+              expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
             });
           });
 
@@ -2000,8 +1996,8 @@ describe('PlanningView', () => {
           const projectToGroup = projectsForSubClassWithoutGroup[0];
 
           await waitFor(() => {
-            projectsForSubClassWithoutGroup.forEach(async ({ id }) =>
-              expect(await findByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
+            projectsForSubClassWithoutGroup.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
             );
           });
 
@@ -2048,20 +2044,15 @@ describe('PlanningView', () => {
           };
 
           mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
-          await waitFor(async () => {
-            await user.type(
-              await groupEditDialog.findByText('groupForm.searchForProjects'),
-              'not-in',
-            );
-          });
+          await user.type(
+            await groupEditDialog.findByText('groupForm.searchForProjects'),
+            'not-in',
+          );
 
-          await waitFor(async () => {
-            expect(await groupEditDialog.findByText('not-in-group-project')).toBeInTheDocument();
-            // Adding project to the group
-            await user.click(await groupEditDialog.findByText('not-in-group-project'));
-            // Length is 2 since there is already a project under this group
-            expect((await findAllByTestId('project-selections')).length).toBe(2);
-          });
+          // Adding project to the group
+          await user.click(await groupEditDialog.findByText('not-in-group-project'));
+          // Length is 2 since there is already a project under this group
+          await waitFor(() => expect(getAllByTestId('project-selections')).toHaveLength(2));
           const getRequest = mockedAxios.get.mock;
 
           const year = new Date().getFullYear();
@@ -2104,62 +2095,58 @@ describe('PlanningView', () => {
         });
 
         it('can remove groups using context menu', async () => {
-          const { store, user, findByTestId, findByRole } = await render();
+          const { store, user, findByTestId, getByTestId, findByRole } = await render();
           addProjectUpdateEventListener(store.dispatch);
           const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
           const projects = mockPlanningViewProjects.data.results;
 
-          const expectRowProperties = async (
-            finances: IClassFinances,
-            id: string,
-            isGroup?: boolean,
-          ) => {
+          const expectRowProperties = (finances: IClassFinances, id: string, isGroup?: boolean) => {
             const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
               finances,
               isGroup ? 'group' : 'class',
             );
 
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument();
-            expect((await findByTestId(`planned-budgets-${id}`)).textContent).toBe(plannedBudgets);
-            expect((await findByTestId(`cost-estimate-budget-${id}`)).textContent).toBe(
-              costEstimateBudget,
-            );
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
+            expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
             if (!isGroup) {
-              expect((await findByTestId(`deviation-${id}`)).textContent).toBe(deviation);
+              expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
             }
           };
 
           // Check that all masterClass-rows is visible
-          masterClasses.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
-          );
+          masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
 
           // Click the first masterclass row
           const { id: masterClassId } = masterClasses[0];
-          await user.click(await findByTestId(`expand-${masterClassId}`));
+          await user.click(getByTestId(`expand-${masterClassId}`));
 
           const classesForMasterClass = classes.filter((c) => c.parent === masterClassId);
 
           // Check that all class-rows are visible
-          classesForMasterClass.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
+          await waitFor(() =>
+            classesForMasterClass.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            ),
           );
 
           // Click the first class row
           const { id: classId } = classesForMasterClass[0];
-          await user.click(await findByTestId(`expand-${classId}`));
+          await user.click(getByTestId(`expand-${classId}`));
 
           const subClassesForClass = subClasses.filter((c) => c.parent === classId);
 
           // Check that all subClass-rows are visible
-          subClassesForClass.forEach(async ({ id }) =>
-            expect(await findByTestId(`row-${id}`)).toBeInTheDocument(),
+          await waitFor(() =>
+            subClassesForClass.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            ),
           );
 
           // Click the first subClass row
           const { id: subClassId } = subClassesForClass[0];
-          await user.click(await findByTestId(`expand-${subClassId}`));
+          await user.click(getByTestId(`expand-${subClassId}`));
 
           // Check that groups that belong directly to the selected subClass are visible
           const groupsForSubClass = mockGroups.data.filter(
@@ -2167,9 +2154,9 @@ describe('PlanningView', () => {
           );
 
           await waitFor(() => {
-            groupsForSubClass.forEach(async ({ id, finances }) => {
+            groupsForSubClass.forEach(({ id, finances }) => {
               expectRowProperties(finances, id, true);
-              expect((await findByTestId(`row-${id}`)).classList.contains('group')).toBeTruthy();
+              expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
             });
           });
           const groupId = groupsForSubClass[0].id;
@@ -2183,8 +2170,8 @@ describe('PlanningView', () => {
 
           const projectInGroup = projectsForSubClassWithGroup[0];
           await waitFor(() => {
-            projectsForSubClassWithGroup.forEach(async ({ id }) =>
-              expect(await findByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
+            projectsForSubClassWithGroup.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
             );
           });
 
@@ -2265,7 +2252,7 @@ describe('PlanningView', () => {
           const {
             user,
             findByTestId,
-
+            getByTestId,
             store: { dispatch },
           } = renderResult;
 
@@ -2273,21 +2260,23 @@ describe('PlanningView', () => {
 
           const { id, name } = project;
 
-          await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
+          // Actions must not be wrapped in waitFor: retries would re-click the expand toggles
+          await navigateToProjectRows(renderResult);
+          await openContextMenuForCell(planEndCellYear, id, renderResult);
 
-          await waitFor(async () => {
-            expect(await findByTestId('project-cell-menu')).toBeInTheDocument();
-            expect(await findByTestId('close-project-cell-menu')).toBeInTheDocument();
-            expect(await findByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
-            expect(await findByTestId('cell-title')).toHaveTextContent(name);
+          await waitFor(() => {
+            expect(getByTestId('project-cell-menu')).toBeInTheDocument();
+            expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
+            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+            expect(getByTestId('cell-title')).toHaveTextContent(name);
             // overlap cells
-            const overlapCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
-            expect(overlapCell.classList.contains('overlap')).toBeTruthy();
-            const constructionCell = await findByTestId('cell-type-construction');
-            expect(constructionCell.classList.contains('selected')).toBeTruthy();
-            const planningCell = await findByTestId('cell-type-planning');
-            expect(planningCell.classList.contains('selected')).toBeTruthy();
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('overlap'),
+            ).toBeTruthy();
+            expect(
+              getByTestId('cell-type-construction').classList.contains('selected'),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
           });
 
           // Overlap cells can be changed to either plan or con
@@ -2306,30 +2295,30 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse.data);
 
-          await waitFor(async () => {
+          await waitFor(() => {
             // overlap changed to plan
-            expect(await findByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
-            let projectCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
-            expect(projectCell.classList.contains('planning')).toBeTruthy();
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
+            ).toBeTruthy();
             // moved construction + 1 year forward
             expect(
-              await findByTestId(`project-cell-${planEndCellYear + 1}-${id}`),
-            ).toBeInTheDocument();
-            projectCell = await findByTestId(`project-cell-${planEndCellYear + 1}-${id}`);
-            expect(projectCell.classList.contains('construction')).toBeTruthy();
+              getByTestId(`project-cell-${planEndCellYear + 1}-${id}`).classList.contains(
+                'construction',
+              ),
+            ).toBeTruthy();
           });
 
           // opening menu for a cell before the planEnd cell
-          await waitFor(() => openContextMenuForCell(planEndCellYear - 1, id, renderResult));
+          await openContextMenuForCell(planEndCellYear - 1, id, renderResult);
 
-          await waitFor(async () => {
-            expect(await findByTestId('cell-year')).toHaveTextContent(
-              (planEndCellYear - 1).toString(),
-            );
-            let projectCell = await findByTestId(`project-cell-${planEndCellYear - 1}-${id}`);
-            expect(projectCell.classList.contains('planning')).toBeTruthy();
-            projectCell = await findByTestId('cell-type-planning');
-            expect(projectCell.classList.contains('selected')).toBeTruthy();
+          await waitFor(() => {
+            expect(getByTestId('cell-year')).toHaveTextContent((planEndCellYear - 1).toString());
+            expect(
+              getByTestId(`project-cell-${planEndCellYear - 1}-${id}`).classList.contains(
+                'planning',
+              ),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
           });
 
           // Cannot update cells in the middle of timeline
@@ -2352,15 +2341,15 @@ describe('PlanningView', () => {
           };
           mockedAxios.patch.mockResolvedValueOnce(mockUpdateCellTypePatchResponse_2);
 
-          await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
+          await openContextMenuForCell(planEndCellYear, id, renderResult);
 
-          await waitFor(async () => {
-            expect(await findByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+          await waitFor(() => {
+            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
             // plan end cell
-            let projectCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
-            expect(projectCell.classList.contains('planning')).toBeTruthy();
-            projectCell = await findByTestId('cell-type-planning');
-            expect(projectCell.classList.contains('selected')).toBeTruthy();
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
           });
           // plan cell cannot be changed to plan
           // only con button enabled
@@ -2379,22 +2368,22 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse_2.data);
 
-          await waitFor(async () => {
+          await waitFor(() => {
             // planEnd moved 1 year back
             // plan cell changed to conStart cell
             expect(
-              await findByTestId(`project-cell-${conStartYearCell}-${id}`),
-            ).toBeInTheDocument();
-            let projectCell = await findByTestId(`project-cell-${conStartYearCell}-${id}`);
-            expect(projectCell.classList.contains('construction')).toBeTruthy();
-
+              getByTestId(`project-cell-${conStartYearCell}-${id}`).classList.contains(
+                'construction',
+              ),
+            ).toBeTruthy();
             expect(
-              await findByTestId(`project-cell-${conStartYearCell - 1}-${id}`),
-            ).toBeInTheDocument();
-            projectCell = await findByTestId(`project-cell-${conStartYearCell - 1}-${id}`);
-            expect(projectCell.classList.contains('planning')).toBeTruthy();
-            removeProjectUpdateEventListener(dispatch);
+              getByTestId(`project-cell-${conStartYearCell - 1}-${id}`).classList.contains(
+                'planning',
+              ),
+            ).toBeTruthy();
           });
+
+          removeProjectUpdateEventListener(dispatch);
         });
       });
     });

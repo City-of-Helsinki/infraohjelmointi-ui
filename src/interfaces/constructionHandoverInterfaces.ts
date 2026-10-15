@@ -30,6 +30,20 @@ export interface IConstructionHandover {
   linkContractBoundaries: string | null;
   constructionProjectManager: IPerson | null;
   constructionHandoverFinancing: IConstructionHandoverFinancing[];
+  attachments: IConstructionHandoverAttachment[] | null;
+}
+
+type IConstructionHandoverAttachmentContentType = 'image/jpeg' | 'image/png';
+
+export interface IConstructionHandoverAttachment {
+  id: string;
+  handover: string;
+  downloadUrl: string;
+  objectUrl?: string; // Local blob URL created from downloadUrl
+  originalName: string;
+  contentType: IConstructionHandoverAttachmentContentType;
+  size: number;
+  uploadedDate: string;
 }
 
 export interface IConstructionHandoverRequest extends Omit<
@@ -43,6 +57,7 @@ export interface IConstructionHandoverRequest extends Omit<
   | 'personFinancing'
   | 'constructionHandoverFinancing'
   | 'constructionProjectManager'
+  | 'attachments'
 > {
   constructionProcurementMethod: string;
   staraProcurementReason: string | null;

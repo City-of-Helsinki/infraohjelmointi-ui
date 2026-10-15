@@ -36,6 +36,9 @@ function useConstructionHandoverFormValues(
       constructionHandover.totalCost == null
         ? ''
         : formatBudgetEuro(String(constructionHandover.totalCost)),
+    linkDesignDrawings: constructionHandover.linkDesignDrawings || '',
+    linkCostAllocation: constructionHandover.linkCostAllocation || '',
+    linkContractBoundaries: constructionHandover.linkContractBoundaries || '',
   };
 }
 

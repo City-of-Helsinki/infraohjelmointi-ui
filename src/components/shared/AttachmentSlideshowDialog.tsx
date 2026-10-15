@@ -1,4 +1,3 @@
-import { INoteImage } from '@/interfaces/noteInterfaces';
 import { Button, ButtonVariant, Dialog } from 'hds-react';
 import { IconAngleLeft, IconAngleRight, IconCross } from 'hds-react/icons';
 import { FC, memo, useEffect } from 'react';
@@ -6,11 +5,14 @@ import { useTranslation } from 'react-i18next';
 
 interface IAttachmentSlideshowDialogProps {
   isOpen: boolean;
-  attachments: INoteImage[];
+  attachments: {
+    fileName: string;
+    downloadUrl?: string;
+  }[];
   selectedIndex: number;
   onClose: () => void;
-  onPrevious: () => void;
-  onNext: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
 }
 
 const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
@@ -31,11 +33,11 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
-        onPrevious();
+        onPrevious?.();
       }
 
       if (event.key === 'ArrowRight') {
-        onNext();
+        onNext?.();
       }
     };
 
@@ -71,29 +73,31 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
             alt={currentAttachment.fileName}
             className="max-h-[70vh] w-full rounded-sm object-contain"
           />
-          <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
-            <button
-              type="button"
-              onClick={onPrevious}
-              disabled={attachments.length < 2}
-              className="focus:outline-[var(--color-coat-of-arms)]"
-              aria-label={t('attachmentSlideshowDialog.previousImage')}
-            >
-              <IconAngleLeft />
-            </button>
-            <p className="text-sm">
-              {selectedIndex + 1} / {attachments.length}
-            </p>
-            <button
-              type="button"
-              onClick={onNext}
-              disabled={attachments.length < 2}
-              className="focus:outline-[var(--color-coat-of-arms)]"
-              aria-label={t('attachmentSlideshowDialog.nextImage')}
-            >
-              <IconAngleRight />
-            </button>
-          </div>
+          {attachments.length > 1 && (
+            <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
+              <button
+                type="button"
+                onClick={onPrevious}
+                disabled={attachments.length < 2}
+                className="focus:outline-[var(--color-coat-of-arms)]"
+                aria-label={t('attachmentSlideshowDialog.previousImage')}
+              >
+                <IconAngleLeft />
+              </button>
+              <p className="text-sm">
+                {selectedIndex + 1} / {attachments.length}
+              </p>
+              <button
+                type="button"
+                onClick={onNext}
+                disabled={attachments.length < 2}
+                className="focus:outline-[var(--color-coat-of-arms)]"
+                aria-label={t('attachmentSlideshowDialog.nextImage')}
+              >
+                <IconAngleRight />
+              </button>
+            </div>
+          )}
         </div>
         <div className="absolute right-8 top-6">
           <Button
