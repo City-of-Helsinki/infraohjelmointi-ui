@@ -12,6 +12,7 @@ import type {
 import { FormMode } from '@/interfaces/formInterfaces';
 import { notifyError } from '@/reducers/notificationSlice';
 import ProjectProgrammeAttachmentPreviewDialog, {
+  getPreviewKind,
   IAttachmentPreview,
 } from './ProjectProgrammeAttachmentPreviewDialog';
 
@@ -32,9 +33,20 @@ function ProjectProgrammeAttachmentList({
   const removedAttachmentIds =
     useWatch({ control, name: 'otherAttachments.removedAttachmentIds' }) ?? [];
   const [preview, setPreview] = useState<IAttachmentPreview | null>(null);
+  const [selectedAttachmentId, setSelectedAttachmentId] = useState<string | null>(null);
 
   const visibleAttachments = attachments.filter(
     (attachment) => !removedAttachmentIds.includes(attachment.id),
+  );
+  const selectedAttachment = visibleAttachments.find(
+    (attachment) => attachment.id === selectedAttachmentId,
+  );
+  const imageAttachments = visibleAttachments.filter(
+    (attachment) =>
+      attachment.downloadUrl &&
+      (getPreviewKind(attachment.contentType ?? '', attachment.originalName) === 'image' ||
+        (attachment.id === preview?.id &&
+          getPreviewKind(preview.contentType, preview.fileName) === 'image')),
   );
 
   useEffect(() => {
@@ -45,28 +57,68 @@ function ProjectProgrammeAttachmentList({
     };
   }, [preview]);
 
-  const closePreview = useCallback(() => setPreview(null), []);
-
-  async function handleShowAttachment(attachment: IProjectProgrammeAttachment) {
-    if (!projectProgrammeId || !attachment.downloadUrl) return;
-
-    try {
-      const blob = await getProjectProgrammeAttachmentBlob(attachment.downloadUrl);
-      setPreview({
-        fileName: attachment.originalName,
-        contentType: attachment.contentType || blob.type,
-        url: URL.createObjectURL(blob),
-      });
-    } catch {
-      dispatch(
-        notifyError({
-          title: 'loadError',
-          message: 'projectProgrammeAttachmentLoadError',
-          type: 'toast',
-        }),
-      );
+  useEffect(() => {
+    if (!projectProgrammeId || !selectedAttachment?.downloadUrl) {
+      setPreview(null);
+      return;
     }
-  }
+
+    let active = true;
+    const attachment = selectedAttachment;
+    const downloadUrl = selectedAttachment.downloadUrl;
+
+    async function loadPreview() {
+      try {
+        const blob = await getProjectProgrammeAttachmentBlob(downloadUrl);
+        if (active) {
+          setPreview({
+            id: attachment.id,
+            fileName: attachment.originalName,
+            contentType: attachment.contentType || blob.type,
+            url: URL.createObjectURL(blob),
+          });
+        }
+      } catch {
+        if (active) {
+          setSelectedAttachmentId(null);
+          dispatch(
+            notifyError({
+              title: 'loadError',
+              message: 'projectProgrammeAttachmentLoadError',
+              type: 'toast',
+            }),
+          );
+        }
+      }
+    }
+
+    void loadPreview();
+
+    return () => {
+      active = false;
+    };
+  }, [projectProgrammeId, selectedAttachment, dispatch]);
+
+  const closePreview = useCallback(() => setSelectedAttachmentId(null), []);
+
+  const showAdjacentImage = useCallback(
+    (offset: number) => {
+      if (imageAttachments.length < 2) {
+        return;
+      }
+      setSelectedAttachmentId((currentId) => {
+        const currentIndex = imageAttachments.findIndex(
+          (attachment) => attachment.id === currentId,
+        );
+        return imageAttachments[
+          (currentIndex + offset + imageAttachments.length) % imageAttachments.length
+        ].id;
+      });
+    },
+    [imageAttachments],
+  );
+  const showPreviousImage = useCallback(() => showAdjacentImage(-1), [showAdjacentImage]);
+  const showNextImage = useCallback(() => showAdjacentImage(1), [showAdjacentImage]);
 
   async function handleDeleteAttachment(attachment: IProjectProgrammeAttachment) {
     const confirm = await isConfirmed({
@@ -100,7 +152,7 @@ function ProjectProgrammeAttachmentList({
               type="button"
               variant={ButtonVariant.Supplementary}
               iconStart={<IconEye />}
-              onClick={() => handleShowAttachment(attachment)}
+              onClick={() => setSelectedAttachmentId(attachment.id)}
               aria-label={t('projectProgrammeForm.showAttachmentAriaLabel', {
                 fileName: attachment.originalName,
               })}
@@ -123,7 +175,13 @@ function ProjectProgrammeAttachmentList({
           </div>
         </div>
       ))}
-      <ProjectProgrammeAttachmentPreviewDialog preview={preview} onClose={closePreview} />
+      <ProjectProgrammeAttachmentPreviewDialog
+        preview={selectedAttachment ? preview : null}
+        onClose={closePreview}
+        imageAttachments={imageAttachments}
+        onPrevious={showPreviousImage}
+        onNext={showNextImage}
+      />
     </div>
   );
 }

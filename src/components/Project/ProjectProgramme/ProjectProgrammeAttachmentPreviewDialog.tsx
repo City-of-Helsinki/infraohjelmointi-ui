@@ -1,9 +1,10 @@
-import { Button, ButtonVariant, Dialog } from 'hds-react';
-import { IconCross } from 'hds-react/icons';
+import AttachmentPreviewDialog from '@/components/shared/AttachmentPreviewDialog';
+import { IProjectProgrammeAttachment } from '@/interfaces/projectProgrammeInterfaces';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface IAttachmentPreview {
+  id: string;
   fileName: string;
   contentType: string;
   url: string;
@@ -12,6 +13,9 @@ export interface IAttachmentPreview {
 interface IProjectProgrammeAttachmentPreviewDialogProps {
   preview: IAttachmentPreview | null;
   onClose: () => void;
+  imageAttachments: IProjectProgrammeAttachment[];
+  onPrevious: () => void;
+  onNext: () => void;
 }
 
 type PreviewKind = 'image' | 'pdf' | 'unsupported';
@@ -30,6 +34,9 @@ export function getPreviewKind(contentType: string, fileName: string): PreviewKi
 function ProjectProgrammeAttachmentPreviewDialog({
   preview,
   onClose,
+  imageAttachments,
+  onPrevious,
+  onNext,
 }: Readonly<IProjectProgrammeAttachmentPreviewDialogProps>) {
   const { t } = useTranslation();
 
@@ -40,32 +47,35 @@ function ProjectProgrammeAttachmentPreviewDialog({
   const previewKind = getPreviewKind(preview.contentType, preview.fileName);
 
   return (
-    <Dialog
+    <AttachmentPreviewDialog
       id="project-programme-attachment-preview-dialog"
-      aria-labelledby="project-programme-attachment-preview-dialog-title"
       isOpen
-      theme={{ '--accent-line-color': 'var(--color-white)' }}
-      style={{ maxWidth: '1200px', width: '80vw' }}
-      close={onClose}
-      closeButtonLabelText={t('attachmentSlideshowDialog.close')}
+      onClose={onClose}
+      ariaLabel={preview.fileName}
+      contentTestId="attachment-preview-content"
+      image={
+        previewKind === 'image'
+          ? { downloadUrl: preview.url, fileName: preview.fileName }
+          : undefined
+      }
+      navigation={
+        previewKind === 'image'
+          ? {
+              selectedIndex: imageAttachments.findIndex(
+                (attachment) => attachment.id === preview.id,
+              ),
+              count: imageAttachments.length,
+              onPrevious,
+              onNext,
+            }
+          : undefined
+      }
     >
-      <Dialog.Header
-        id="project-programme-attachment-preview-dialog-title"
-        title={preview.fileName}
-      />
-      <Dialog.Content>
-        <div className="flex flex-col items-center" data-testid="attachment-preview-content">
-          {previewKind === 'image' && (
-            <img
-              src={preview.url}
-              alt={preview.fileName}
-              className="max-h-[70vh] w-full rounded-sm object-contain"
-            />
-          )}
-          {previewKind === 'pdf' && (
+      {previewKind !== 'image' && (
+        <div className="w-full pt-20">
+          {previewKind === 'pdf' ? (
             <iframe src={preview.url} title={preview.fileName} className="h-[70vh] w-full" />
-          )}
-          {previewKind === 'unsupported' && (
+          ) : (
             <>
               <p>{t('projectProgrammeForm.attachmentPreviewNotSupported')}</p>
               <a href={preview.url} download={preview.fileName} className="text-link">
@@ -74,13 +84,8 @@ function ProjectProgrammeAttachmentPreviewDialog({
             </>
           )}
         </div>
-      </Dialog.Content>
-      <Dialog.ActionButtons>
-        <Button onClick={onClose} variant={ButtonVariant.Secondary} iconStart={<IconCross />}>
-          {t('attachmentSlideshowDialog.close')}
-        </Button>
-      </Dialog.ActionButtons>
-    </Dialog>
+      )}
+    </AttachmentPreviewDialog>
   );
 }
 
