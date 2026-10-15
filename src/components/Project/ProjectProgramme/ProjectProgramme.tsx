@@ -15,6 +15,7 @@ import {
   getProjectProgrammeSections,
   hasExtendedBasicInfoContent,
   isSectionStarted,
+  ProjectProgrammeRequiredSectionId,
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 import StartProjectProgramme from './StartProjectProgramme';
@@ -55,7 +56,7 @@ function ProjectProgramme() {
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
   const [missingRequiredSections, setMissingRequiredSections] = useState<
-    ProjectProgrammeSectionId[]
+    ProjectProgrammeRequiredSectionId[]
   >([]);
   const missingFieldsNotificationRef = useRef<HTMLDivElement>(null);
 
@@ -209,7 +210,7 @@ function ProjectProgramme() {
     setActiveSection(null);
   }
 
-  function handleMissingRequiredFields(sections: ProjectProgrammeSectionId[]) {
+  function handleMissingRequiredFields(sections: ProjectProgrammeRequiredSectionId[]) {
     setMissingRequiredSections(sections);
     globalThis.requestAnimationFrame(() => {
       missingFieldsNotificationRef.current?.scrollIntoView?.({ block: 'center' });

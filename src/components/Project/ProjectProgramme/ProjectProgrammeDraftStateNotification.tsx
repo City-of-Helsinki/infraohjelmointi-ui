@@ -2,6 +2,7 @@ import { ButtonPresetTheme, ButtonVariant, Link, Notification } from 'hds-react'
 import { useTranslation } from 'react-i18next';
 import {
   IProjectProgrammeSectionConfig,
+  ProjectProgrammeRequiredSectionId,
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
@@ -17,7 +18,7 @@ interface ProjectProgrammeDraftStateNotificationProps {
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
   effectiveProjectProgramme?: IProjectProgramme;
-  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
+  onMissingRequiredFields?: (sections: ProjectProgrammeRequiredSectionId[]) => void;
 }
 
 interface ProjectProgrammeSectionListProps {

@@ -22,6 +22,7 @@ jest.mock('@/api/projectProgrammeApi', () => ({
 describe('ProjectProgrammeStatusTransitionButtons', () => {
   const filledProgramme = {
     id: 'programme-1',
+    locationMap: { id: 'map-1', url: '/map.png', originalName: 'map.png' },
     basicInfo: {
       projectName: 'Project',
       district: 'District',

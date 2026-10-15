@@ -179,7 +179,12 @@ describe('ProjectProgramme', () => {
       const missingFields = screen.getByText(
         'projectProgrammeForm.missingRequiredFieldsText',
       ).parentElement!;
-      expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
+      expect(within(missingFields).getAllByRole('link')).toHaveLength(7);
+      expect(
+        within(missingFields).getByRole('link', {
+          name: 'projectProgrammeForm.locationSectionTitle',
+        }),
+      ).toBeInTheDocument();
       await act(async () => {
         within(missingFields)
           .getByRole('link', { name: 'projectProgrammeForm.designCriteriaCardTitle' })
@@ -215,7 +220,7 @@ describe('ProjectProgramme', () => {
     expect(getNotification()).not.toHaveFocus();
   });
 
-  it('only lists basic information when brief programme completion is blocked', async () => {
+  it('lists basic information and the location map when brief programme completion is blocked', async () => {
     await render();
     await act(async () => {
       screen.getAllByRole('button', { name: 'projectProgrammeForm.markReady' })[0].click();
@@ -223,9 +228,14 @@ describe('ProjectProgramme', () => {
     const missingFields = screen.getByText(
       'projectProgrammeForm.missingRequiredFieldsText',
     ).parentElement!;
-    expect(within(missingFields).getAllByRole('link')).toHaveLength(1);
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(2);
     expect(
       within(missingFields).getByRole('link', { name: 'projectProgrammeForm.basicInfoCardTitle' }),
+    ).toBeInTheDocument();
+    expect(
+      within(missingFields).getByRole('link', {
+        name: 'projectProgrammeForm.locationSectionTitle',
+      }),
     ).toBeInTheDocument();
     expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
   });
@@ -249,7 +259,7 @@ describe('ProjectProgramme', () => {
     const missingFields = screen.getByText(
       'projectProgrammeForm.missingRequiredFieldsText',
     ).parentElement!;
-    expect(within(missingFields).getAllByRole('link')).toHaveLength(5);
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
     expect(
       within(missingFields).queryByRole('link', {
         name: 'projectProgrammeForm.designCriteriaCardTitle',
@@ -269,6 +279,7 @@ describe('ProjectProgramme', () => {
       mockGetProjectProgrammeByProject.mockReturnValue({
         data: {
           ...programme,
+          locationMap: { id: 'map-1', url: '/map.png', originalName: 'map.png' },
           ...Object.fromEntries(
             sections.map((section) => [
               section.id,

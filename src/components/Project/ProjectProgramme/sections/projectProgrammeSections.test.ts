@@ -49,7 +49,7 @@ describe('hasAllRequiredFields', () => {
 
 describe('getMissingRequiredSections', () => {
   it.each([true, undefined])(
-    'skips completed brief basic info for programme type %s',
+    'skips completed brief basic info but requires a location map for programme type %s',
     (programmeType) => {
       expect(
         getMissingRequiredSections({
@@ -57,11 +57,11 @@ describe('getMissingRequiredSections', () => {
           briefProjectProgramme: programmeType,
           basicInfo: { status: 'COMPLETE', summary: '  ' },
         }),
-      ).toEqual([]);
+      ).toEqual(['locationMap']);
     },
   );
 
-  it('skips completed sections but still reports missing and incomplete draft sections', () => {
+  it('skips completed sections but reports missing sections and location map', () => {
     expect(
       getMissingRequiredSections({
         id: 'programme-1',
@@ -75,8 +75,22 @@ describe('getMissingRequiredSections', () => {
       'urbanSpacingPlanningCriteria',
       'maintenanceNeeds',
       'interactionAndRelatedProjects',
+      'locationMap',
     ]);
   });
+
+  it.each([true, false])(
+    'accepts a location map for programme type %s',
+    (briefProjectProgramme) => {
+      expect(
+        getMissingRequiredSections({
+          id: 'programme-1',
+          briefProjectProgramme,
+          locationMap: { id: 'map-1', url: '/map.png', originalName: 'map.png' },
+        }),
+      ).not.toContain('locationMap');
+    },
+  );
 });
 
 describe('isSectionStarted', () => {

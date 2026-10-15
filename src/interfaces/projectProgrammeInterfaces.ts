@@ -1,4 +1,7 @@
-import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
+import {
+  ProjectProgrammeRequiredSectionId,
+  ProjectProgrammeSectionId,
+} from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
 import { IProject } from './projectInterfaces';
 import { Button, ButtonVariant } from 'hds-react';
 import { ComponentProps } from 'react';
@@ -146,7 +149,7 @@ export interface ProjectProgrammeStatusTransitionButtonsProps {
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
   effectiveProjectProgramme?: IProjectProgramme;
-  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
+  onMissingRequiredFields?: (sections: ProjectProgrammeRequiredSectionId[]) => void;
   buttonOverrides?: ProjectProgrammeStatusTransitionButtonsOverrides;
 }
 

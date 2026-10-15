@@ -10,6 +10,9 @@ export type ProjectProgrammeSectionId =
   | 'interactionAndRelatedProjects';
 
 export const LOCATION_MAP_ELEMENT_ID = 'project-programme-location-map';
+export const LOCATION_MAP_REQUIRED_SECTION_ID = 'locationMap' as const;
+export type ProjectProgrammeRequiredSectionId =
+  ProjectProgrammeSectionId | typeof LOCATION_MAP_REQUIRED_SECTION_ID;
 
 export interface IProjectProgrammeSectionConfig {
   id: ProjectProgrammeSectionId;

@@ -174,6 +174,7 @@ function LocationSection({
               dragAndDropInputLabel={t('projectProgrammeForm.locationAttachFileButtonFieldLabel')}
               buttonLabel={t('projectProgrammeForm.locationAttachFileButtonLabel')}
               helperText={t('projectProgrammeForm.locationAttachmentInfoText')}
+              required
               language={language as Language}
               maxSize={LOCATION_MAP_MAX_SIZE}
               accept={LOCATION_MAP_ACCEPT}
