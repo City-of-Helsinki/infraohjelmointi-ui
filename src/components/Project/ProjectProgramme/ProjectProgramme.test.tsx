@@ -162,7 +162,7 @@ describe('ProjectProgramme', () => {
       const missingFields = screen.getByText(
         'projectProgrammeForm.missingRequiredFieldsText',
       ).parentElement!;
-      expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
+      expect(within(missingFields).getAllByRole('link')).toHaveLength(7);
       await act(async () => {
         within(missingFields)
           .getByRole('link', { name: 'projectProgrammeForm.designCriteriaCardTitle' })
@@ -232,7 +232,7 @@ describe('ProjectProgramme', () => {
     const missingFields = screen.getByText(
       'projectProgrammeForm.missingRequiredFieldsText',
     ).parentElement!;
-    expect(within(missingFields).getAllByRole('link')).toHaveLength(5);
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
     expect(
       within(missingFields).queryByRole('link', {
         name: 'projectProgrammeForm.designCriteriaCardTitle',

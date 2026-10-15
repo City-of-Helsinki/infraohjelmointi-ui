@@ -19,6 +19,7 @@ const SECTION_FIELDS: Record<
   urbanSpacingPlanningCriteria: URBAN_SPACING_PLANNING_CRITERIA_FIELDS,
   maintenanceNeeds: MAINTENANCE_NEEDS_FIELDS,
   interactionAndRelatedProjects: INTERACTION_AND_RELATED_PROJECTS_FIELDS,
+  otherAttachments: [],
 };
 
 function isBrief(projectProgramme?: Pick<IProjectProgramme, 'briefProjectProgramme'>) {
