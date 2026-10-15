@@ -1,4 +1,7 @@
-import { ProjectProgrammeSectionId } from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
+import {
+  ProjectProgrammeRequiredSectionId,
+  ProjectProgrammeSectionId,
+} from '@/components/Project/ProjectProgramme/sections/projectProgrammeSections';
 import { IProject } from './projectInterfaces';
 import { Button, ButtonVariant } from 'hds-react';
 import { ComponentProps } from 'react';
@@ -9,12 +12,23 @@ export interface IProjectProgramme {
   id: string;
   status?: ProjectProgrammeStatus;
   briefProjectProgramme?: boolean;
+  locationMap?: IProjectProgrammeLocationMap | null;
   basicInfo?: IProjectProgrammeBasicInfo;
   designCriteria?: IProjectProgrammeDesignCriteria;
   trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria;
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+}
+
+// The map has no status of its own: it locks together with the programme
+export interface IProjectProgrammeLocationMap {
+  id: string;
+  url: string | null;
+  originalName: string;
+  contentType?: string;
+  size?: number;
+  uploadedDate?: string;
 }
 
 export interface IProjectProgrammeTransitionResponse {
@@ -135,7 +149,7 @@ export interface ProjectProgrammeStatusTransitionButtonsProps {
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
   effectiveProjectProgramme?: IProjectProgramme;
-  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
+  onMissingRequiredFields?: (sections: ProjectProgrammeRequiredSectionId[]) => void;
   buttonOverrides?: ProjectProgrammeStatusTransitionButtonsOverrides;
 }
 

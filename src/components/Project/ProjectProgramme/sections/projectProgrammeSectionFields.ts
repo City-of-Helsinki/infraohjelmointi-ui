@@ -1,6 +1,10 @@
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 import { getRequiredFieldNames } from '@/utils/projectProgrammeUtils';
-import { ProjectProgrammeSectionId } from './projectProgrammeSections';
+import {
+  LOCATION_MAP_REQUIRED_SECTION_ID,
+  ProjectProgrammeRequiredSectionId,
+  ProjectProgrammeSectionId,
+} from './projectProgrammeSections';
 import { BASIC_INFO_BRIEF_FIELDS, BASIC_INFO_FULL_FIELDS } from './BasicInfoSection';
 import { DESIGN_CRITERIA_FIELDS } from './DesignCriteriaSection';
 import { URBAN_SPACING_PLANNING_CRITERIA_FIELDS } from './UrbanSpacingPlanningCriteriaSection';
@@ -62,16 +66,18 @@ export function getFieldsForSection(
 
 export function getMissingRequiredSections(
   projectProgramme?: IProjectProgramme,
-): ProjectProgrammeSectionId[] {
+): ProjectProgrammeRequiredSectionId[] {
   const sections: ProjectProgrammeSectionId[] = isBrief(projectProgramme)
     ? ['basicInfo']
     : [
         'basicInfo',
         ...(Object.keys(SECTION_FIELDS) as Exclude<ProjectProgrammeSectionId, 'basicInfo'>[]),
       ];
-  return sections.filter(
+  const missingSections: ProjectProgrammeRequiredSectionId[] = sections.filter(
     (sectionId) =>
       projectProgramme?.[sectionId]?.status !== 'COMPLETE' &&
       !hasAllRequiredFields(sectionId, projectProgramme),
   );
+  if (!projectProgramme?.locationMap) missingSections.push(LOCATION_MAP_REQUIRED_SECTION_ID);
+  return missingSections;
 }

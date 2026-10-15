@@ -3,6 +3,9 @@ import { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   IProjectProgrammeSectionConfig,
+  LOCATION_MAP_ELEMENT_ID,
+  LOCATION_MAP_REQUIRED_SECTION_ID,
+  ProjectProgrammeRequiredSectionId,
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 
@@ -10,7 +13,7 @@ interface MissingRequiredFieldsNotificationProps {
   missingFieldsNotificationRef: RefObject<HTMLDivElement>;
   handleOpenSection(sectionId: ProjectProgrammeSectionId): void;
   PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[];
-  missingRequiredSections: ProjectProgrammeSectionId[];
+  missingRequiredSections: ProjectProgrammeRequiredSectionId[];
 }
 
 function MissingRequiredFieldsNotification({
@@ -30,6 +33,13 @@ function MissingRequiredFieldsNotification({
       >
         <p>{t('projectProgrammeForm.missingRequiredFieldsText')}</p>
         <ul>
+          {missingRequiredSections.includes(LOCATION_MAP_REQUIRED_SECTION_ID) && (
+            <li key={LOCATION_MAP_REQUIRED_SECTION_ID} className="mb-2">
+              <Link href={`#${LOCATION_MAP_ELEMENT_ID}`}>
+                {t('projectProgrammeForm.locationSectionTitle')}
+              </Link>
+            </li>
+          )}
           {PROJECT_PROGRAMME_SECTIONS.filter((section) =>
             missingRequiredSections.includes(section.id),
           ).map((section) => (

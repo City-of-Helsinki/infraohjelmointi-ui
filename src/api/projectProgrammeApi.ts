@@ -1,10 +1,24 @@
+import axios from 'axios';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
+  IProjectProgrammeLocationMap,
   IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+
+const getLocationMapUrl = (id: string) => `/project-programmes/${id}/location-map/`;
+
+// The image is served by the API, so it has to be fetched with the auth header
+// rather than used as an <img> src directly. url is the API-relative path the
+// programme's locationMap comes with.
+export async function getProjectProgrammeLocationMapBlob(url: string): Promise<Blob> {
+  const response = await axios.get<Blob>(`${API_BASE_URL}${url}`, { responseType: 'blob' });
+  return response.data;
+}
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -106,6 +120,25 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
+    // POST both sets and replaces the map
+    saveProjectProgrammeLocationMap: build.mutation<
+      IProjectProgrammeLocationMap,
+      { id: string; formData: FormData }
+    >({
+      query: ({ id, formData }) => ({
+        url: getLocationMapUrl(id),
+        method: 'POST',
+        data: formData,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
+    deleteProjectProgrammeLocationMap: build.mutation<undefined, { id: string }>({
+      query: ({ id }) => ({
+        url: getLocationMapUrl(id),
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -119,4 +152,6 @@ export const {
   useTransitionProjectProgrammeSectionStatusMutation,
   usePostProjectProgrammeSectionMutation,
   usePatchProjectProgrammeSectionMutation,
+  useSaveProjectProgrammeLocationMapMutation,
+  useDeleteProjectProgrammeLocationMapMutation,
 } = projectProgrammeApi;
