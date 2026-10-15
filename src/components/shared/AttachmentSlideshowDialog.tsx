@@ -1,7 +1,5 @@
-import { Button, ButtonVariant, Dialog } from 'hds-react';
-import { IconAngleLeft, IconAngleRight, IconCross } from 'hds-react/icons';
-import { FC, memo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import AttachmentPreviewDialog from '@/components/shared/AttachmentPreviewDialog';
+import { FC, memo } from 'react';
 
 interface IAttachmentSlideshowDialogProps {
   isOpen: boolean;
@@ -23,31 +21,6 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
   onPrevious,
   onNext,
 }) => {
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    // Add keyboard event listeners for navigation
-    if (!isOpen) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        onPrevious?.();
-      }
-
-      if (event.key === 'ArrowRight') {
-        onNext?.();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose, onPrevious, onNext]);
-
   const currentAttachment = attachments[selectedIndex];
 
   if (!currentAttachment) {
@@ -55,68 +28,22 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
   }
 
   return (
-    <Dialog
+    <AttachmentPreviewDialog
       id="attachment-slideshow-dialog"
-      aria-labelledby="attachment-slideshow-dialog-title"
       isOpen={isOpen}
-      theme={{
-        '--accent-line-color': 'var(--color-white)',
-      }}
-      style={{ maxWidth: '1200px', width: '80vw' }}
-      close={onClose}
-      closeButtonLabelText={t('attachmentSlideshowDialog.close')}
-    >
-      <Dialog.Content style={{ padding: '14px 24px 24px', position: 'relative' }}>
-        <div className="flex flex-col items-center">
-          <img
-            src={currentAttachment.downloadUrl}
-            alt={currentAttachment.fileName}
-            className="max-h-[70vh] w-full rounded-sm object-contain"
-          />
-          {attachments.length > 1 && (
-            <div className="absolute bottom-8 flex items-center gap-4 bg-white px-4 py-1">
-              <button
-                type="button"
-                onClick={onPrevious}
-                disabled={attachments.length < 2}
-                className="focus:outline-[var(--color-coat-of-arms)]"
-                aria-label={t('attachmentSlideshowDialog.previousImage')}
-              >
-                <IconAngleLeft />
-              </button>
-              <p className="text-sm">
-                {selectedIndex + 1} / {attachments.length}
-              </p>
-              <button
-                type="button"
-                onClick={onNext}
-                disabled={attachments.length < 2}
-                className="focus:outline-[var(--color-coat-of-arms)]"
-                aria-label={t('attachmentSlideshowDialog.nextImage')}
-              >
-                <IconAngleRight />
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="absolute right-8 top-6">
-          <Button
-            onClick={onClose}
-            variant={ButtonVariant.Secondary}
-            iconStart={<IconCross />}
-            theme={{
-              '--background-color': 'var(--color-white)',
-              '--background-color-hover': 'var(--color-white)',
-              '--background-color-focus': 'var(--color-white)',
-              '--border-color': 'var(--color-white)',
-              '--color': 'var(--color-black)',
-            }}
-          >
-            {t('attachmentSlideshowDialog.close')}
-          </Button>
-        </div>
-      </Dialog.Content>
-    </Dialog>
+      onClose={onClose}
+      image={currentAttachment}
+      navigation={
+        attachments.length > 1
+          ? {
+              selectedIndex,
+              count: attachments.length,
+              onPrevious,
+              onNext,
+            }
+          : undefined
+      }
+    />
   );
 };
 

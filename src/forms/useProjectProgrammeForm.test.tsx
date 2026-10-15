@@ -6,6 +6,7 @@ import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 import { setupStore } from '@/store';
 
 const store = setupStore();
+const emptyAttachments = { attachments: [], newFiles: [], removedAttachmentIds: [] };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <Provider store={store}>{children}</Provider>
@@ -17,6 +18,7 @@ describe('useProjectProgrammeForm', () => {
 
     expect(result.current.getValues()).toEqual({
       basicInfo: {
+        ...emptyAttachments,
         projectName: '',
         district: '',
         projectProgrammeCompiler: '',
@@ -35,12 +37,14 @@ describe('useProjectProgrammeForm', () => {
         links: [{ value: '' }],
       },
       designCriteria: {
+        ...emptyAttachments,
         guidingZoningRegulations: '',
         siteValuesProtectionAndSignificance: '',
         relationshipToPublicAreaServices: '',
         links: [{ value: '' }],
       },
       trafficPlanningCriteria: {
+        ...emptyAttachments,
         targetTrafficChanges: '',
         pedestrianTraffic: '',
         bicycleTraffic: '',
@@ -53,6 +57,7 @@ describe('useProjectProgrammeForm', () => {
         links: [{ value: '' }],
       },
       urbanSpacingPlanningCriteria: {
+        ...emptyAttachments,
         targetUrbanAppearance: '',
         surfaceMaterials: '',
         structures: '',
@@ -67,12 +72,20 @@ describe('useProjectProgrammeForm', () => {
         links: [{ value: '' }],
       },
       maintenanceNeeds: {
+        ...emptyAttachments,
         maintenanceNeeds: '',
         links: [{ value: '' }],
       },
       interactionAndRelatedProjects: {
+        ...emptyAttachments,
         collaborationAndExperts: '',
         interactionNotes: '',
+        links: [{ value: '' }],
+      },
+      otherAttachments: {
+        attachments: [],
+        newFiles: [],
+        removedAttachmentIds: [],
         links: [{ value: '' }],
       },
     });
@@ -91,6 +104,7 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('designCriteria')).toEqual({
+      ...emptyAttachments,
       guidingZoningRegulations: 'Zoning',
       siteValuesProtectionAndSignificance: 'Site values',
       relationshipToPublicAreaServices: 'Public area services',
@@ -109,6 +123,7 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('maintenanceNeeds')).toEqual({
+      ...emptyAttachments,
       maintenanceNeeds: 'Regular maintenance required',
       links: [{ value: 'https://maintenance.fi' }],
     });
@@ -129,6 +144,7 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('trafficPlanningCriteria')).toEqual({
+      ...emptyAttachments,
       targetTrafficChanges: 'Target traffic changes info',
       pedestrianTraffic: 'Pedestrian info',
       bicycleTraffic: 'Bicycle info',
@@ -155,6 +171,7 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('urbanSpacingPlanningCriteria')).toEqual({
+      ...emptyAttachments,
       targetUrbanAppearance: 'Urban appearance',
       surfaceMaterials: '',
       structures: '',
@@ -182,6 +199,7 @@ describe('useProjectProgrammeForm', () => {
     const { result } = renderHook(() => useProjectProgrammeForm(formData), { wrapper });
 
     expect(result.current.getValues('interactionAndRelatedProjects')).toEqual({
+      ...emptyAttachments,
       collaborationAndExperts: 'Collaboration info',
       interactionNotes: 'Interaction notes',
       links: [{ value: 'https://interaction.fi' }],

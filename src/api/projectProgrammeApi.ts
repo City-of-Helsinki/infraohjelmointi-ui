@@ -1,10 +1,25 @@
+import axios from 'axios';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
+  IProjectProgrammeAttachment,
   IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+
+const getAttachmentsUrl = (id: string, section: string) =>
+  `/project-programmes/${id}/sections/${section}/attachments/`;
+
+// downloadUrl is the API-relative path each attachment comes with
+export async function getProjectProgrammeAttachmentBlob(downloadUrl: string): Promise<Blob> {
+  const response = await axios.get<Blob>(`${API_BASE_URL}${downloadUrl}`, {
+    responseType: 'blob',
+  });
+  return response.data;
+}
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -106,6 +121,27 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
+    postProjectProgrammeAttachments: build.mutation<
+      IProjectProgrammeAttachment[],
+      { id: string; section?: string; formData: FormData }
+    >({
+      query: ({ id, section = 'other-attachments', formData }) => ({
+        url: getAttachmentsUrl(id, section),
+        method: 'POST',
+        data: formData,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
+    deleteProjectProgrammeAttachment: build.mutation<
+      undefined,
+      { id: string; attachmentId: string }
+    >({
+      query: ({ id, attachmentId }) => ({
+        url: `/project-programmes/${id}/attachments/${attachmentId}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -119,4 +155,6 @@ export const {
   useTransitionProjectProgrammeSectionStatusMutation,
   usePostProjectProgrammeSectionMutation,
   usePatchProjectProgrammeSectionMutation,
+  usePostProjectProgrammeAttachmentsMutation,
+  useDeleteProjectProgrammeAttachmentMutation,
 } = projectProgrammeApi;

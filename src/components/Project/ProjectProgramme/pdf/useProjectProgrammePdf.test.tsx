@@ -79,7 +79,7 @@ describe('ProjectProgrammeActionButtons pdf generation', () => {
     });
 
     const props = createBlobMock.mock.calls[0][0];
-    expect(props.sections).toHaveLength(6);
+    expect(props.sections).toHaveLength(7);
     expect(props.projectName).toBe('Project name');
   });
 
