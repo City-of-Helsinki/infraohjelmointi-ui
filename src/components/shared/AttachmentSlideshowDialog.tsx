@@ -1,14 +1,16 @@
-import { INoteImage } from '@/interfaces/noteInterfaces';
 import AttachmentPreviewDialog from '@/components/shared/AttachmentPreviewDialog';
 import { FC, memo } from 'react';
 
 interface IAttachmentSlideshowDialogProps {
   isOpen: boolean;
-  attachments: INoteImage[];
+  attachments: {
+    fileName: string;
+    downloadUrl?: string;
+  }[];
   selectedIndex: number;
   onClose: () => void;
-  onPrevious: () => void;
-  onNext: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
 }
 
 const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
@@ -19,18 +21,28 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
   onPrevious,
   onNext,
 }) => {
+  const currentAttachment = attachments[selectedIndex];
+
+  if (!currentAttachment) {
+    return null;
+  }
+
   return (
     <AttachmentPreviewDialog
       id="attachment-slideshow-dialog"
       isOpen={isOpen}
       onClose={onClose}
-      image={attachments[selectedIndex]}
-      navigation={{
-        selectedIndex,
-        count: attachments.length,
-        onPrevious,
-        onNext,
-      }}
+      image={currentAttachment}
+      navigation={
+        attachments.length > 1
+          ? {
+              selectedIndex,
+              count: attachments.length,
+              onPrevious,
+              onNext,
+            }
+          : undefined
+      }
     />
   );
 };

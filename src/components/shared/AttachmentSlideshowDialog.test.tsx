@@ -9,23 +9,69 @@ jest.mock('react-i18next', () => mockI18next());
 const attachments = mockNoteImages;
 
 describe('AttachmentSlideshowDialog', () => {
-  it('shows a single image with a counter and disabled navigation buttons', () => {
-    const { getByRole, getByText, getByLabelText } = render(
+  it('shows a single image without navigation or a counter', () => {
+    const onPrevious = jest.fn();
+    const onNext = jest.fn();
+    const { getByRole, queryByText, queryByLabelText } = render(
       <AttachmentSlideshowDialog
         isOpen
-        attachments={[{ ...attachments[0], downloadUrl: 'https://example.com/preview.jpg' }]}
+        attachments={[{ fileName: 'preview.jpg', downloadUrl: 'https://example.com/preview.jpg' }]}
         selectedIndex={0}
         onClose={jest.fn()}
-        onPrevious={jest.fn()}
-        onNext={jest.fn()}
+        onPrevious={onPrevious}
+        onNext={onNext}
       />,
     );
 
     expect(getByRole('img')).toHaveAttribute('src', 'https://example.com/preview.jpg');
-    expect(getByRole('img')).toHaveAttribute('alt', attachments[0].fileName);
-    expect(getByText('1 / 1')).toBeInTheDocument();
-    expect(getByLabelText('attachmentSlideshowDialog.previousImage')).toBeDisabled();
-    expect(getByLabelText('attachmentSlideshowDialog.nextImage')).toBeDisabled();
+    expect(getByRole('img')).toHaveAttribute('alt', 'preview.jpg');
+    expect(queryByText('1 / 1')).not.toBeInTheDocument();
+    expect(queryByLabelText('attachmentSlideshowDialog.previousImage')).not.toBeInTheDocument();
+    expect(queryByLabelText('attachmentSlideshowDialog.nextImage')).not.toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(onPrevious).not.toHaveBeenCalled();
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('supports attachments and navigation with no callbacks', () => {
+    const { getByRole, getByLabelText } = render(
+      <AttachmentSlideshowDialog
+        isOpen
+        attachments={[{ fileName: 'first.jpg' }, { fileName: 'second.jpg' }]}
+        selectedIndex={0}
+        onClose={jest.fn()}
+      />,
+    );
+
+    expect(getByRole('img')).toHaveAttribute('alt', 'first.jpg');
+    fireEvent.click(getByLabelText('attachmentSlideshowDialog.previousImage'));
+    fireEvent.click(getByLabelText('attachmentSlideshowDialog.nextImage'));
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+  });
+
+  it.each(['previous', 'next'])('supports only the %s navigation callback', (direction) => {
+    const onNavigate = jest.fn();
+    const { getByLabelText } = render(
+      <AttachmentSlideshowDialog
+        isOpen
+        attachments={[{ fileName: 'first.jpg' }, { fileName: 'second.jpg' }]}
+        selectedIndex={0}
+        onClose={jest.fn()}
+        onPrevious={direction === 'previous' ? onNavigate : undefined}
+        onNext={direction === 'next' ? onNavigate : undefined}
+      />,
+    );
+
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(getByLabelText('attachmentSlideshowDialog.previousImage'));
+    fireEvent.click(getByLabelText('attachmentSlideshowDialog.nextImage'));
+    expect(onNavigate).toHaveBeenCalledTimes(2);
   });
 
   it('removes keyboard navigation listeners when closed or unmounted', () => {

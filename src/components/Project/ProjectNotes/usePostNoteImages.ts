@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { usePostNoteImageMutation } from '@/api/notesApi';
+import usePostAttachments from '../../../hooks/usePostAttachments';
 
 /**
  * Custom hook for posting note images.
@@ -7,22 +8,11 @@ import { usePostNoteImageMutation } from '@/api/notesApi';
  */
 function usePostNoteImages() {
   const [postNoteImage, { isLoading: isPostingNoteImage }] = usePostNoteImageMutation();
-
-  const postImages = useCallback(
-    async (noteId: string, files: File[] | null) => {
-      if (files && files.length > 0) {
-        const formData = new FormData();
-        for (const file of files) {
-          formData.append('file', file);
-        }
-        await postNoteImage({
-          noteId,
-          formData,
-        });
-      }
-    },
+  const upload = useCallback(
+    (noteId: string, formData: FormData) => postNoteImage({ noteId, formData }),
     [postNoteImage],
   );
+  const { postAttachments: postImages } = usePostAttachments(upload);
 
   return { postImages, isPostingNoteImage };
 }

@@ -14,8 +14,8 @@ interface IAttachmentPreviewDialogProps {
   navigation?: {
     selectedIndex: number;
     count: number;
-    onPrevious: () => void;
-    onNext: () => void;
+    onPrevious?: () => void;
+    onNext?: () => void;
   };
   children?: ReactNode;
   ariaLabel?: string;
@@ -37,17 +37,17 @@ function AttachmentPreviewDialog({
   const onNext = navigation?.onNext;
 
   useEffect(() => {
-    if (!isOpen || !onPrevious || !onNext) {
+    if (!isOpen || (!onPrevious && !onNext)) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
-        onPrevious();
+        onPrevious?.();
       }
 
       if (event.key === 'ArrowRight') {
-        onNext();
+        onNext?.();
       }
     };
 

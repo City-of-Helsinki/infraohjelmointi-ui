@@ -140,6 +140,7 @@ export function createConstructionHandover(
     linkDesignDrawings: null,
     linkCostAllocation: null,
     linkContractBoundaries: null,
+    attachments: null,
     constructionProjectManager: null,
     constructionHandoverFinancing: [],
     project: 'project-1',
