@@ -13,6 +13,7 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import { Option } from 'hds-react';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface IProjectFinancialSectionProps {
   project: IProject | null;
@@ -46,6 +47,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const { t } = useTranslation();
 
   const { masterClasses, classes, subClasses } = classOptions;
+  const { isRestricted, canEditClass } = useRestrictedClassAccess();
 
   const isSaving = useAppSelector(selectIsProjectSaving);
   const sapCosts = useAppSelector(getProjectSapCosts);
@@ -179,9 +181,18 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           }
           return true;
         },
+        // Restricted programmers (IO-756) must save the project in one of their own classes
+        isClassInRestrictedScope: (masterClass?: IOption) => {
+          if (!isRestricted) {
+            return true;
+          }
+          const selectedClass =
+            getValues('subClass')?.value || getValues('class')?.value || masterClass?.value;
+          return canEditClass(selectedClass) || t('validation.restrictedClass');
+        },
       },
     }),
-    [getValues, phasesRequiringClass, t],
+    [getValues, phasesRequiringClass, t, isRestricted, canEditClass],
   );
 
   const validateClass = useMemo(
