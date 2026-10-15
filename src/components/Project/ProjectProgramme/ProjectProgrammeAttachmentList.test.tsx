@@ -9,6 +9,7 @@ import type {
 import { FormMode } from '@/interfaces/formInterfaces';
 import { notifyError } from '@/reducers/notificationSlice';
 import ProjectProgrammeAttachmentList from './ProjectProgrammeAttachmentList';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 const mockDispatch = jest.fn();
 const mockGetBlob = jest.fn();
@@ -51,17 +52,23 @@ function AttachmentForm({
   attachments = [firstImage, pdf, secondImage, word],
   removedAttachmentIds = [],
   mode = 'edit',
+  section = 'otherAttachments',
 }: {
   attachments?: IProjectProgrammeAttachment[];
   removedAttachmentIds?: string[];
   mode?: FormMode;
+  section?: ProjectProgrammeSectionId;
 }) {
   const form = useForm<IProjectProgrammeForm>({
-    defaultValues: { otherAttachments: { attachments, removedAttachmentIds } },
+    defaultValues: { [section]: { attachments, removedAttachmentIds } },
   });
   return (
     <FormProvider {...form}>
-      <ProjectProgrammeAttachmentList projectProgrammeId="programme-1" mode={mode} />
+      <ProjectProgrammeAttachmentList
+        projectProgrammeId="programme-1"
+        section={section}
+        mode={mode}
+      />
     </FormProvider>
   );
 }
@@ -112,48 +119,51 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     URL.revokeObjectURL = jest.fn();
   });
 
-  it('opens the clicked image, loads lazily, and navigates only images with wraparound', async () => {
-    const user = userEvent.setup();
-    render(<AttachmentForm />);
-    expect(mockGetBlob).not.toHaveBeenCalled();
-    await user.click(showButtons()[2]);
+  it.each<ProjectProgrammeSectionId>(['otherAttachments', 'designCriteria'])(
+    'opens %s images lazily and navigates only images with wraparound',
+    async (section) => {
+      const user = userEvent.setup();
+      render(<AttachmentForm section={section} />);
+      expect(mockGetBlob).not.toHaveBeenCalled();
+      await user.click(showButtons()[2]);
 
-    expect(await screen.findByRole('img', { name: 'second.PNG' })).toHaveAttribute(
-      'src',
-      'blob:preview-1',
-    );
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
-    expect(mockGetBlob).toHaveBeenCalledTimes(1);
-    expect(mockGetBlob).toHaveBeenLastCalledWith(secondImage.downloadUrl);
+      expect(await screen.findByRole('img', { name: 'second.PNG' })).toHaveAttribute(
+        'src',
+        'blob:preview-1',
+      );
+      expect(screen.getByText('2 / 2')).toBeInTheDocument();
+      expect(mockGetBlob).toHaveBeenCalledTimes(1);
+      expect(mockGetBlob).toHaveBeenLastCalledWith(secondImage.downloadUrl);
 
-    await user.click(screen.getByLabelText('attachmentSlideshowDialog.nextImage'));
-    expect(await screen.findByRole('img', { name: 'first.jpg' })).toHaveAttribute(
-      'src',
-      'blob:preview-2',
-    );
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
-    expect(mockGetBlob).toHaveBeenLastCalledWith(firstImage.downloadUrl);
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
+      await user.click(screen.getByLabelText('attachmentSlideshowDialog.nextImage'));
+      expect(await screen.findByRole('img', { name: 'first.jpg' })).toHaveAttribute(
+        'src',
+        'blob:preview-2',
+      );
+      expect(screen.getByText('1 / 2')).toBeInTheDocument();
+      expect(mockGetBlob).toHaveBeenLastCalledWith(firstImage.downloadUrl);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
 
-    await user.click(screen.getByLabelText('attachmentSlideshowDialog.previousImage'));
-    expect(await screen.findByRole('img', { name: 'second.PNG' })).toBeInTheDocument();
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
+      await user.click(screen.getByLabelText('attachmentSlideshowDialog.previousImage'));
+      expect(await screen.findByRole('img', { name: 'second.PNG' })).toBeInTheDocument();
+      expect(screen.getByText('2 / 2')).toBeInTheDocument();
 
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(await screen.findByRole('img', { name: 'first.jpg' })).toBeInTheDocument();
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(await screen.findByRole('img', { name: 'second.PNG' })).toBeInTheDocument();
+      fireEvent.keyDown(window, { key: 'ArrowRight' });
+      expect(await screen.findByRole('img', { name: 'first.jpg' })).toBeInTheDocument();
+      fireEvent.keyDown(window, { key: 'ArrowLeft' });
+      expect(await screen.findByRole('img', { name: 'second.PNG' })).toBeInTheDocument();
 
-    await closePreview(user);
-    const requestCount = mockGetBlob.mock.calls.length;
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(mockGetBlob).toHaveBeenCalledTimes(requestCount);
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-5');
+      await closePreview(user);
+      const requestCount = mockGetBlob.mock.calls.length;
+      fireEvent.keyDown(window, { key: 'ArrowRight' });
+      expect(mockGetBlob).toHaveBeenCalledTimes(requestCount);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-5');
 
-    await user.click(showButtons()[0]);
-    expect(await screen.findByRole('img', { name: 'first.jpg' })).toBeInTheDocument();
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
-  });
+      await user.click(showButtons()[0]);
+      expect(await screen.findByRole('img', { name: 'first.jpg' })).toBeInTheDocument();
+      expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    },
+  );
 
   it('uses Notes styling and top-right close control without a header or footer actions', async () => {
     const user = userEvent.setup();

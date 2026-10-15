@@ -47,7 +47,7 @@ describe('NoteAttachmentList', () => {
       <NoteAttachmentList attachments={attachments} />,
     );
 
-    await user.click(getAllByRole('button', { name: 'noteAttachments.view' })[1]);
+    await user.click(getAllByRole('button', { name: 'attachments.view' })[1]);
     expect(getByRole('img', { name: attachments[1].fileName })).toBeInTheDocument();
 
     await user.click(getByLabelText('attachmentSlideshowDialog.nextImage'));
@@ -63,7 +63,7 @@ describe('NoteAttachmentList', () => {
     await waitFor(() => expect(queryByRole('dialog')).not.toBeInTheDocument());
     fireEvent.keyDown(window, { key: 'ArrowRight' });
 
-    await user.click(getAllByRole('button', { name: 'noteAttachments.viewAttachment' })[1]);
+    await user.click(getAllByRole('button', { name: 'attachments.viewAttachment' })[1]);
     expect(getByText('2 / 2')).toBeInTheDocument();
     expect(getByRole('img', { name: attachments[1].fileName })).toBeInTheDocument();
   });

@@ -43,6 +43,9 @@ export interface IProjectProgrammeSectionTransitionResponse extends IProjectProg
 interface IProjectProgrammeSectionShared {
   links?: IProjectProgrammeLinkFormItem[] | null;
   status?: ProjectProgrammeStatus;
+  attachments?: IProjectProgrammeAttachment[];
+  newFiles?: File[];
+  removedAttachmentIds?: string[];
 }
 
 export interface IProjectProgrammeBasicInfo extends IProjectProgrammeSectionShared {
@@ -113,12 +116,7 @@ export interface IProjectProgrammeAttachment {
   downloadUrl?: string;
 }
 
-export interface IProjectProgrammeOtherAttachments extends IProjectProgrammeSectionShared {
-  attachments?: IProjectProgrammeAttachment[];
-  // Form-only: changes applied when the section is saved
-  newFiles?: File[];
-  removedAttachmentIds?: string[];
-}
+export type IProjectProgrammeOtherAttachments = IProjectProgrammeSectionShared;
 
 export interface IProjectProgrammeLinkFormItem {
   id?: string;

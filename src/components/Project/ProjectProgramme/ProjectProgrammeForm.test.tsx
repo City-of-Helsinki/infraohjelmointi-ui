@@ -9,6 +9,10 @@ import ProjectProgrammeForm, {
 } from './ProjectProgrammeForm';
 import { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import {
+  mapSectionIdToApiRoute,
+  ProjectProgrammeSectionId,
+} from './sections/projectProgrammeSections';
 
 const mockDispatch = jest.fn();
 const mockPostProjectProgrammeSection = jest.fn();
@@ -1199,6 +1203,7 @@ describe('ProjectProgrammeForm other attachments', () => {
   async function renderOtherAttachmentsForm(
     effectiveProjectProgramme: IProjectProgrammeForm,
     onClose = jest.fn(),
+    activeSection: ProjectProgrammeSectionId = 'otherAttachments',
   ) {
     const user = userEvent.setup();
     await act(async () =>
@@ -1208,7 +1213,7 @@ describe('ProjectProgrammeForm other attachments', () => {
           element={
             <ProjectProgrammeForm
               projectProgrammeId="programme-1"
-              activeSection="otherAttachments"
+              activeSection={activeSection}
               effectiveProjectProgramme={effectiveProjectProgramme}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
@@ -1231,6 +1236,85 @@ describe('ProjectProgrammeForm other attachments', () => {
     const fileInput = screen.getByLabelText('projectProgrammeForm.otherAttachmentsDragAndDrop');
     await user.upload(fileInput, new File(['content'], fileName, { type }));
   }
+
+  it.each<ProjectProgrammeSectionId>([
+    'basicInfo',
+    'designCriteria',
+    'trafficPlanningCriteria',
+    'urbanSpacingPlanningCriteria',
+    'maintenanceNeeds',
+    'interactionAndRelatedProjects',
+  ])(
+    'saves files only to %s above its links without attachment section messaging',
+    async (section) => {
+      const user = await renderOtherAttachmentsForm(
+        {
+          [section]: { attachments: [savedAttachment], links: [] },
+          otherAttachments: {
+            attachments: [{ ...savedAttachment, id: 'other', originalName: 'other.pdf' }],
+          },
+        },
+        jest.fn(),
+        section,
+      );
+
+      const fileInput = screen.getByTestId(`project-programme-${section}-file-input`);
+      const linksTitle = screen.getByText('projectProgrammeForm.links');
+      expect(
+        fileInput.compareDocumentPosition(linksTitle) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(screen.getByText('site-plan.pdf')).toBeInTheDocument();
+      expect(screen.queryByText('other.pdf')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('projectProgrammeForm.otherAttachmentsSectionTitle'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('projectProgrammeForm.otherAttachmentsInfoTitle'),
+      ).not.toBeInTheDocument();
+      expect(screen.getAllByText('projectProgrammeForm.requiredSectionHelperText')).toHaveLength(1);
+
+      await uploadFile(user);
+      expect(
+        screen.queryByText('projectProgrammeForm.otherAttachmentsSuccessTitle'),
+      ).not.toBeInTheDocument();
+      await user.click(
+        screen.getByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' }),
+      );
+      expect(mockPostProjectProgrammeAttachments).not.toHaveBeenCalled();
+      expect(mockDeleteProjectProgrammeAttachment).not.toHaveBeenCalled();
+      await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+      await waitFor(() =>
+        expect(mockPostProjectProgrammeAttachments).toHaveBeenCalledWith({
+          id: 'programme-1',
+          section: mapSectionIdToApiRoute(section),
+          formData: expect.any(FormData),
+        }),
+      );
+      expect(mockDeleteProjectProgrammeAttachment).toHaveBeenCalledWith({
+        id: 'programme-1',
+        attachmentId: 'attachment-1',
+      });
+      expect(mockPostProjectProgrammeSection).not.toHaveBeenCalled();
+      expect(mockPatchProjectProgrammeSection).not.toHaveBeenCalled();
+    },
+  );
+
+  it('creates a missing content section before uploading its attachments', async () => {
+    const user = await renderOtherAttachmentsForm({}, jest.fn(), 'designCriteria');
+    await uploadFile(user);
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
+
+    await waitFor(() => expect(mockPostProjectProgrammeAttachments).toHaveBeenCalled());
+    expect(mockPostProjectProgrammeSection).toHaveBeenCalledWith({
+      id: 'programme-1',
+      section: 'design-criteria',
+      data: {},
+    });
+    expect(mockPostProjectProgrammeSection.mock.invocationCallOrder[0]).toBeLessThan(
+      mockPostProjectProgrammeAttachments.mock.invocationCallOrder[0],
+    );
+  });
 
   it.each([
     ['plan.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],

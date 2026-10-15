@@ -21,18 +21,28 @@ const AttachmentSlideshowDialog: FC<IAttachmentSlideshowDialogProps> = ({
   onPrevious,
   onNext,
 }) => {
+  const currentAttachment = attachments[selectedIndex];
+
+  if (!currentAttachment) {
+    return null;
+  }
+
   return (
     <AttachmentPreviewDialog
       id="attachment-slideshow-dialog"
       isOpen={isOpen}
       onClose={onClose}
-      image={attachments[selectedIndex]}
-      navigation={{
-        selectedIndex,
-        count: attachments.length,
-        onPrevious,
-        onNext,
-      }}
+      image={currentAttachment}
+      navigation={
+        attachments.length > 1
+          ? {
+              selectedIndex,
+              count: attachments.length,
+              onPrevious,
+              onNext,
+            }
+          : undefined
+      }
     />
   );
 };
