@@ -9,6 +9,54 @@ jest.mock('react-i18next', () => mockI18next());
 const attachments = mockNoteImages;
 
 describe('AttachmentSlideshowDialog', () => {
+  it('shows a single image with a counter and disabled navigation buttons', () => {
+    const { getByRole, getByText, getByLabelText } = render(
+      <AttachmentSlideshowDialog
+        isOpen
+        attachments={[{ ...attachments[0], downloadUrl: 'https://example.com/preview.jpg' }]}
+        selectedIndex={0}
+        onClose={jest.fn()}
+        onPrevious={jest.fn()}
+        onNext={jest.fn()}
+      />,
+    );
+
+    expect(getByRole('img')).toHaveAttribute('src', 'https://example.com/preview.jpg');
+    expect(getByRole('img')).toHaveAttribute('alt', attachments[0].fileName);
+    expect(getByText('1 / 1')).toBeInTheDocument();
+    expect(getByLabelText('attachmentSlideshowDialog.previousImage')).toBeDisabled();
+    expect(getByLabelText('attachmentSlideshowDialog.nextImage')).toBeDisabled();
+  });
+
+  it('removes keyboard navigation listeners when closed or unmounted', () => {
+    const onPrevious = jest.fn();
+    const onNext = jest.fn();
+    const props = {
+      attachments,
+      selectedIndex: 0,
+      onClose: jest.fn(),
+      onPrevious,
+      onNext,
+    };
+    const { rerender, unmount } = render(<AttachmentSlideshowDialog {...props} isOpen />);
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(onNext).toHaveBeenCalledTimes(1);
+
+    rerender(<AttachmentSlideshowDialog {...props} isOpen={false} />);
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(onPrevious).not.toHaveBeenCalled();
+    expect(onNext).toHaveBeenCalledTimes(1);
+
+    rerender(<AttachmentSlideshowDialog {...props} isOpen />);
+    unmount();
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(onPrevious).not.toHaveBeenCalled();
+    expect(onNext).toHaveBeenCalledTimes(1);
+  });
+
   it('returns null when selected attachment does not exist', () => {
     const { container } = render(
       <AttachmentSlideshowDialog
