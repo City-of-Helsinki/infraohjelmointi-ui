@@ -181,7 +181,7 @@ describe('ProjectProgramme', () => {
       const missingFields = screen.getByText(
         'projectProgrammeForm.missingRequiredFieldsText',
       ).parentElement!;
-      expect(within(missingFields).getAllByRole('link')).toHaveLength(7);
+      expect(within(missingFields).getAllByRole('link')).toHaveLength(8);
       expect(
         within(missingFields).getByRole('link', {
           name: 'projectProgrammeForm.locationSectionTitle',
@@ -261,7 +261,7 @@ describe('ProjectProgramme', () => {
     const missingFields = screen.getByText(
       'projectProgrammeForm.missingRequiredFieldsText',
     ).parentElement!;
-    expect(within(missingFields).getAllByRole('link')).toHaveLength(6);
+    expect(within(missingFields).getAllByRole('link')).toHaveLength(7);
     expect(
       within(missingFields).queryByRole('link', {
         name: 'projectProgrammeForm.designCriteriaCardTitle',

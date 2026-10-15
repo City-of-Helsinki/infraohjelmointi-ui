@@ -76,7 +76,8 @@ describe('getMissingRequiredSections', () => {
       'urbanSpacingPlanningCriteria',
       'maintenanceNeeds',
       'interactionAndRelatedProjects',
-      'locationMap',
+      'otherAttachments',
+  'locationMap',
     ]);
   });
 
@@ -93,6 +94,7 @@ describe('getMissingRequiredSections', () => {
     },
   );
 });
+
 describe('getProjectProgrammeSections', () => {
   const t = ((key: string) => key) as unknown as TFunction;
   const startedSections = {
