@@ -73,7 +73,7 @@ function ProjectProgrammeDraftStateNotification({
   const { t } = useTranslation();
 
   return (
-    <Notification type="info" label={t('projectProgrammeForm.draftStateLabel')} className="mt-6">
+    <Notification type="info" label={t('projectProgrammeForm.draftStateLabel')}>
       <ProjectProgrammeSectionList
         sections={sectionsInCompletedState}
         labelKey="projectProgrammeForm.completedStateSections"
