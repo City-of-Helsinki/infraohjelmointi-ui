@@ -38,6 +38,7 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
   const tasks = listOfTasks.map((project) => ({
     id: project.id,
     budget: project.budget?.toString() ?? project.costForecast?.toString() ?? '',
+    totalCost: project.totalCost?.toString() ?? '',
     projectName: project.name,
     planningPeriod: dateTextFormatter(
       formatMyWorkloadDateForDisplay(project.estPlanningStart),
