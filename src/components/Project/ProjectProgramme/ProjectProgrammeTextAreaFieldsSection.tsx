@@ -9,7 +9,6 @@ import {
   getFieldPropsForProjectProgrammeForm,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
-import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
 import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 interface IProjectProgrammeTextAreaFieldsSectionProps {
@@ -52,7 +51,6 @@ function ProjectProgrammeTextAreaFieldsSection({
           />
         );
       })}
-      <ProjectProgrammeLinksField section={section} />
     </div>
   );
 }

@@ -179,7 +179,7 @@ function getFormValues(
   formData?: IProjectProgrammeForm,
   project?: IProjectNameAndDistrict,
 ): IProjectProgrammeForm {
-  return {
+  const values: IProjectProgrammeForm = {
     basicInfo: getBasicInfoValues(formData?.basicInfo, project),
     designCriteria: getDesignCriteriaValues(formData?.designCriteria),
     trafficPlanningCriteria: getTrafficPlanningCriteriaValues(formData?.trafficPlanningCriteria),
@@ -192,6 +192,16 @@ function getFormValues(
     ),
     otherAttachments: getOtherAttachmentsValues(formData?.otherAttachments),
   };
+
+  for (const section of Object.keys(values) as (keyof IProjectProgrammeForm)[]) {
+    Object.assign(values[section]!, {
+      attachments: formData?.[section]?.attachments ?? [],
+      newFiles: [],
+      removedAttachmentIds: [],
+    });
+  }
+
+  return values;
 }
 
 export default function useProjectProgrammeForm(

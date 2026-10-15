@@ -19,7 +19,6 @@ import {
 import {
   IProjectProgrammeForm,
   IProjectProgrammeFormProps,
-  IProjectProgrammeOtherAttachments,
 } from '@/interfaces/projectProgrammeInterfaces';
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import DesignCriteriaSection from './sections/DesignCriteriaSection';
@@ -29,6 +28,8 @@ import MaintenanceNeedsSection from './sections/MaintenanceNeedsSection';
 import InteractionAndRelatedProjectsSection from './sections/InteractionAndRelatedProjectsSection';
 import OtherAttachmentsSection from './sections/OtherAttachmentsSection';
 import useMarkProjectProgrammeSectionReady from './useMarkProjectProgrammeSectionReady';
+import ProjectProgrammeAttachmentsField from './ProjectProgrammeAttachmentsField';
+import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
 
 type DirtyFields = FieldNamesMarkedBoolean<IProjectProgrammeForm>;
 
@@ -128,7 +129,11 @@ function ProjectProgrammeForm({
       if (newFiles.length > 0) {
         const formData = new FormData();
         newFiles.forEach((file) => formData.append('file', file));
-        await postProjectProgrammeAttachments({ id: projectProgrammeId, formData }).unwrap();
+        await postProjectProgrammeAttachments({
+          id: projectProgrammeId,
+          section: mapSectionIdToApiRoute(activeSection),
+          formData,
+        }).unwrap();
       }
     } catch (error) {
       setAttachmentSaveError(
@@ -164,8 +169,7 @@ function ProjectProgrammeForm({
       }
     }
 
-    const attachmentChanges: IProjectProgrammeOtherAttachments =
-      activeSection === 'otherAttachments' ? (data.otherAttachments ?? {}) : {};
+    const attachmentChanges = data[activeSection] ?? {};
     const { newFiles = [], removedAttachmentIds = [] } = attachmentChanges;
     const hasAttachmentChanges = newFiles.length > 0 || removedAttachmentIds.length > 0;
     const hasSectionChanges = Object.keys(requestData).length > 0;
@@ -278,6 +282,17 @@ function ProjectProgrammeForm({
               projectProgrammeId={projectProgrammeId}
               saveError={attachmentSaveError}
             />
+          )}
+          {activeSection !== 'otherAttachments' && (
+            <>
+              <ProjectProgrammeAttachmentsField
+                key={activeSection}
+                section={activeSection}
+                projectProgrammeId={projectProgrammeId}
+                saveError={attachmentSaveError}
+              />
+              <ProjectProgrammeLinksField section={activeSection} />
+            </>
           )}
         </fieldset>
 

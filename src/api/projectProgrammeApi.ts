@@ -10,8 +10,8 @@ import {
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
-const getOtherAttachmentsUrl = (id: string) =>
-  `/project-programmes/${id}/sections/other-attachments/attachments/`;
+const getAttachmentsUrl = (id: string, section: string) =>
+  `/project-programmes/${id}/sections/${section}/attachments/`;
 
 // downloadUrl is the API-relative path each attachment comes with
 export async function getProjectProgrammeAttachmentBlob(downloadUrl: string): Promise<Blob> {
@@ -123,10 +123,10 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
     }),
     postProjectProgrammeAttachments: build.mutation<
       IProjectProgrammeAttachment[],
-      { id: string; formData: FormData }
+      { id: string; section?: string; formData: FormData }
     >({
-      query: ({ id, formData }) => ({
-        url: getOtherAttachmentsUrl(id),
+      query: ({ id, section = 'other-attachments', formData }) => ({
+        url: getAttachmentsUrl(id, section),
         method: 'POST',
         data: formData,
       }),

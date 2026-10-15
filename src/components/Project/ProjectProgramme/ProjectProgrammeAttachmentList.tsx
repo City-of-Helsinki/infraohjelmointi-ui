@@ -10,6 +10,7 @@ import type {
   IProjectProgrammeForm,
 } from '@/interfaces/projectProgrammeInterfaces';
 import { FormMode } from '@/interfaces/formInterfaces';
+import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 import { notifyError } from '@/reducers/notificationSlice';
 import ProjectProgrammeAttachmentPreviewDialog, {
   getPreviewKind,
@@ -19,19 +20,20 @@ import ProjectProgrammeAttachmentPreviewDialog, {
 interface IProjectProgrammeAttachmentListProps {
   projectProgrammeId?: string;
   mode?: FormMode;
+  section?: ProjectProgrammeSectionId;
 }
 
 function ProjectProgrammeAttachmentList({
   projectProgrammeId,
   mode = 'edit',
+  section = 'otherAttachments',
 }: Readonly<IProjectProgrammeAttachmentListProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { isConfirmed } = useConfirmDialog();
   const { control, setValue } = useFormContext<IProjectProgrammeForm>();
-  const attachments = useWatch({ control, name: 'otherAttachments.attachments' }) ?? [];
-  const removedAttachmentIds =
-    useWatch({ control, name: 'otherAttachments.removedAttachmentIds' }) ?? [];
+  const attachments = useWatch({ control, name: `${section}.attachments` }) ?? [];
+  const removedAttachmentIds = useWatch({ control, name: `${section}.removedAttachmentIds` }) ?? [];
   const [preview, setPreview] = useState<IAttachmentPreview | null>(null);
   const [selectedAttachmentId, setSelectedAttachmentId] = useState<string | null>(null);
 
@@ -129,7 +131,7 @@ function ProjectProgrammeAttachmentList({
     });
 
     if (confirm !== false) {
-      setValue('otherAttachments.removedAttachmentIds', [...removedAttachmentIds, attachment.id], {
+      setValue(`${section}.removedAttachmentIds`, [...removedAttachmentIds, attachment.id], {
         shouldDirty: true,
       });
     }

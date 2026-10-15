@@ -21,9 +21,11 @@ export default function ProjectProgrammeReadonlySection({
         pathPrefix={sectionId}
         translationNamespace="projectProgrammeForm"
       />
-      {sectionId === 'otherAttachments' && (
-        <ProjectProgrammeAttachmentList projectProgrammeId={projectProgramme?.id} mode="view" />
-      )}
+      <ProjectProgrammeAttachmentList
+        projectProgrammeId={projectProgramme?.id}
+        section={sectionId}
+        mode="view"
+      />
       <ProjectProgrammeLinksField section={sectionId} mode="view" />
     </>
   );
