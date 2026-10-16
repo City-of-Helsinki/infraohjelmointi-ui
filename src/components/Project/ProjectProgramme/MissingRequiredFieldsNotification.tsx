@@ -23,11 +23,7 @@ function MissingRequiredFieldsNotification({
 
   return (
     <div ref={missingFieldsNotificationRef} tabIndex={-1}>
-      <Notification
-        type="error"
-        label={t('projectProgrammeForm.missingRequiredFieldsTitle')}
-        className="mt-6"
-      >
+      <Notification type="error" label={t('projectProgrammeForm.missingRequiredFieldsTitle')}>
         <p>{t('projectProgrammeForm.missingRequiredFieldsText')}</p>
         <ul>
           {PROJECT_PROGRAMME_SECTIONS.filter((section) =>

@@ -261,28 +261,30 @@ function ProjectProgramme() {
 
         {showOverview && (
           <div className="project-form mx-auto max-w-xl">
-            {missingRequiredSections.length > 0 && (
-              <MissingRequiredFieldsNotification
-                missingFieldsNotificationRef={missingFieldsNotificationRef}
-                handleOpenSection={handleOpenSection}
-                PROJECT_PROGRAMME_SECTIONS={PROJECT_PROGRAMME_SECTIONS}
-                missingRequiredSections={missingRequiredSections}
-              />
-            )}
-            {showSwitchToExtendedProgrammeNotification && (
-              <SwitchToExtendedProgrammeNotification handleSwitchType={handleSwitchType} />
-            )}
-            {effectiveProjectProgramme?.status === 'DRAFT' && (
-              <ProjectProgrammeDraftStateNotification
-                sectionsInCompletedState={sectionsInCompletedState}
-                sectionsInDraftState={sectionsInDraftState}
-                onOpenSection={handleOpenSection}
-                isProjectProgrammeComplete={isProjectProgrammeComplete}
-                effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
-                effectiveProjectProgramme={effectiveProjectProgramme}
-                onMissingRequiredFields={handleMissingRequiredFields}
-              />
-            )}
+            <div className="project-programme-notifications">
+              {missingRequiredSections.length > 0 && (
+                <MissingRequiredFieldsNotification
+                  missingFieldsNotificationRef={missingFieldsNotificationRef}
+                  handleOpenSection={handleOpenSection}
+                  PROJECT_PROGRAMME_SECTIONS={PROJECT_PROGRAMME_SECTIONS}
+                  missingRequiredSections={missingRequiredSections}
+                />
+              )}
+              {showSwitchToExtendedProgrammeNotification && (
+                <SwitchToExtendedProgrammeNotification handleSwitchType={handleSwitchType} />
+              )}
+              {effectiveProjectProgramme?.status === 'DRAFT' && (
+                <ProjectProgrammeDraftStateNotification
+                  sectionsInCompletedState={sectionsInCompletedState}
+                  sectionsInDraftState={sectionsInDraftState}
+                  onOpenSection={handleOpenSection}
+                  isProjectProgrammeComplete={isProjectProgrammeComplete}
+                  effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+                  effectiveProjectProgramme={effectiveProjectProgramme}
+                  onMissingRequiredFields={handleMissingRequiredFields}
+                />
+              )}
+            </div>
             {PROJECT_PROGRAMME_SECTIONS.filter(
               (section) => !briefProgramme || section.showInBrief,
             ).map((section) => {
