@@ -34,7 +34,7 @@ export default function AttachmentListItem({
 
   return (
     <div
-      className="flex items-center justify-between gap-4 border-b-2 border-dotted border-b-coat-of-arms p-[var(--spacing-xs)]"
+      className="border-b-coat-of-arms flex items-center justify-between gap-4 border-b-2 border-dotted p-[var(--spacing-xs)]"
       style={{ backgroundColor }}
     >
       <div className="flex min-w-0 items-center gap-4">

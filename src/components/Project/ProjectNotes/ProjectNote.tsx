@@ -58,7 +58,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       </div>
       {/* content */}
       <div className="px-6 pb-8">
-        <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{note.content}</p>
+        <p className="[overflow-wrap:anywhere] whitespace-pre-wrap">{note.content}</p>
       </div>
       {/* footer (buttons) */}
       <div className="note-footer">
@@ -82,7 +82,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         </div>
       </div>
       {noteImages && noteImages.length > 0 && (
-        <div className="pb-8 pl-6 pr-2 pt-8">
+        <div className="pt-8 pr-2 pb-8 pl-6">
           <NoteAttachmentList
             attachments={noteImages ?? []}
             onDeleteAttachment={(imageId) => deleteNoteImage({ noteId: note.id, imageId })}

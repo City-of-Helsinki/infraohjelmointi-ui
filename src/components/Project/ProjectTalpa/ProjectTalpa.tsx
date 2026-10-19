@@ -28,7 +28,7 @@ export default function ProjectTalpa() {
 
   return (
     <div className="flex" data-testid="project-talpa">
-      <div className="flex w-[35%] flex-shrink-0 justify-center">
+      <div className="flex w-[35%] shrink-0 justify-center">
         <ProjectFormSidePanel
           navItems={navItems}
           project={project ?? null}

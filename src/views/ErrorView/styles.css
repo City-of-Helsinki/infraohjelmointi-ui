@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .error-view {
   --error-view-width: calc(100% - 3rem);
   @apply flex h-[80%] w-[var(--error-view-width)] justify-center;

@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .dialog-container {
   width: 300px;
   max-height: 450px;
@@ -72,7 +73,7 @@
 }
 
 .dialog-add-note {
-  @apply text-sm font-bold text-bus;
+  @apply text-bus text-sm font-bold;
   font-weight: 500;
   font-size: 15px;
   text-decoration: underline;

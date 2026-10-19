@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 #add-project-programmed-dialog {
   width: 45vw;
   @apply h-screen;
@@ -28,11 +29,11 @@
 }
 
 .project-suggestions-card .search-result-title-container .search-result-title {
-  @apply flex items-center gap-3 text-l font-normal;
+  @apply text-l flex items-center gap-3 font-normal;
 }
 
 .search-result-tag-container {
-  @apply flex items-center gap-3 text-l font-normal;
+  @apply text-l flex items-center gap-3 font-normal;
 }
 
 .project-suggestions-card-wrapper:hover .search-result-title > span {

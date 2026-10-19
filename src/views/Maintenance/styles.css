@@ -1,3 +1,4 @@
+@reference "../../index.css";
 .maintenance-mode-view {
   --access-denied-view-width: calc(100% - 3rem);
   @apply flex h-[80%] w-[var(--access-denied-view-width)] justify-center;

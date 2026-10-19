@@ -1,3 +1,4 @@
+@reference "../../index.css";
 #search-dialog {
   @apply absolute right-0 min-h-screen;
 }
@@ -16,7 +17,7 @@
 
 /* programmed fieldset legend same properties as the labels */
 .search-form .search-form-content #programmed legend {
-  @apply mb-3 block font-medium text-black-90;
+  @apply text-black-90 mb-3 block font-medium;
 }
 
 /* programmed fieldset flex to get the checkboxes next to eachother */
@@ -25,7 +26,7 @@
 }
 
 .free-search {
-  @apply mt-4 border-b border-gray;
+  @apply border-gray mt-4 border-b;
 }
 
 .free-search .search-selections {
