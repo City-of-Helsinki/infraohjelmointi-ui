@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect, SelectProps } from 'hds-react';
@@ -93,6 +93,12 @@ const SelectField: FC<ISelectFieldProps> = ({
   }, []);
 
   const [icon, setIcon] = useState(resolveIcon(iconKey));
+  const [prevIconKey, setPrevIconKey] = useState(iconKey);
+
+  if (prevIconKey !== iconKey) {
+    setPrevIconKey(iconKey);
+    setIcon(resolveIcon(iconKey));
+  }
 
   const updateIconBasedOnSelection = useCallback(
     (selectedValue: string) => {
@@ -103,10 +109,6 @@ const SelectField: FC<ISelectFieldProps> = ({
     },
     [options, resolveIcon],
   );
-
-  useEffect(() => {
-    setIcon(resolveIcon(iconKey));
-  }, [iconKey, resolveIcon]);
 
   return (
     <Controller

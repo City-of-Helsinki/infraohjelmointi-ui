@@ -32,6 +32,7 @@ const MyWorkloadBaseView: FC = () => {
     const abortController = new AbortController();
     let isActive = true;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
     setIsResolvingViewType(true);
 
     const resolveViewType = async () => {

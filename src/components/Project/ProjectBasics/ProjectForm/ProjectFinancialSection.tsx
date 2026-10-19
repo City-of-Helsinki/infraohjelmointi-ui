@@ -52,9 +52,10 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const isSaving = useAppSelector(selectIsProjectSaving);
   const sapCosts = useAppSelector(getProjectSapCosts);
 
+  const currentYearsSapValues = project?.currentYearsSapValues;
   const currentYearSapValues = useMemo(() => {
-    if (project?.currentYearsSapValues) {
-      const filteredSapValues = project.currentYearsSapValues
+    if (currentYearsSapValues) {
+      const filteredSapValues = currentYearsSapValues
         .filter((value) => value.project_id != null)
         .map((value) => ({
           id: value.project_id,
@@ -68,7 +69,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       return filteredSapValues.length > 0 ? filteredSapValues[0] : null;
     }
     return null;
-  }, [project?.currentYearsSapValues]);
+  }, [currentYearsSapValues]);
 
   const getSapProps = useCallback(
     () => ({

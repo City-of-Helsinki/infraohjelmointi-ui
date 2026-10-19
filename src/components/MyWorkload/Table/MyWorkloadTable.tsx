@@ -1,4 +1,4 @@
-import { FC, memo, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, memo, MouseEvent, useCallback, useMemo, useState } from 'react';
 import { Pagination, Table } from 'hds-react';
 import type { TableProps } from 'hds-react';
 import { IconAngleRight } from 'hds-react/icons';
@@ -233,17 +233,22 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
-  const [tableRows, setTableRows] = useState<Array<MyWorkloadTableRow>>([]);
+  const [tableRows, setTableRows] = useState<Array<MyWorkloadTableRow>>(listOfProjects);
+  const [prevListOfProjects, setPrevListOfProjects] = useState(listOfProjects);
   const [sortState, setSortState] = useState<SortState>(null);
   const [editedProject, setEditedProject] = useState<MyWorkloadTableRow | null>(null);
+
+  if (prevListOfProjects !== listOfProjects) {
+    setPrevListOfProjects(listOfProjects);
+    setTableRows(listOfProjects);
+    if (listOfProjects.length !== tableRows.length) {
+      setPage(0);
+    }
+  }
 
   const isEmpty = !isLoading && !hasError && tableRows.length === 0;
   const hasRows = !hasError && tableRows.length > 0;
   const shouldRenderTable = !isLoading && !hasError && hasRows;
-
-  useEffect(() => {
-    setTableRows(listOfProjects);
-  }, [listOfProjects]);
 
   const sortedRows = useMemo(() => {
     if (!sortState || !hasSortableValues(tableRows, sortState.colKey)) {
@@ -293,10 +298,6 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
     const startIndex = page * ITEMS_PER_PAGE;
     return sortedRows.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [sortedRows, page]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [tableRows.length]);
 
   const handlePageChange = useCallback(
     (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>, selectedPage: number) => {
