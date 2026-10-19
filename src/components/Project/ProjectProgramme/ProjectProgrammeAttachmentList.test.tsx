@@ -12,7 +12,7 @@ import ProjectProgrammeAttachmentList from './ProjectProgrammeAttachmentList';
 import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 const mockDispatch = jest.fn();
-const mockGetBlob = jest.fn();
+const mockGetDownloadUrl = jest.fn();
 const mockIsConfirmed = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
@@ -21,8 +21,9 @@ jest.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({ isConfirmed: mockIsConfirmed }),
 }));
-jest.mock('@/api/projectProgrammeApi', () => ({
-  getProjectProgrammeAttachmentBlob: (...args: unknown[]) => mockGetBlob(...args),
+jest.mock('@/utils/fileUtils', () => ({
+  ...jest.requireActual('@/utils/fileUtils'),
+  getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
 const firstImage: IProjectProgrammeAttachment = {
@@ -73,18 +74,18 @@ function AttachmentForm({
   );
 }
 
-function createDeferredBlob() {
-  let resolvePromise: ((blob: Blob) => void) | undefined;
+function createDeferredUrl() {
+  let resolvePromise: ((url: string) => void) | undefined;
   let rejectPromise: ((reason: Error) => void) | undefined;
-  const promise = new Promise<Blob>((resolve, reject) => {
+  const promise = new Promise<string>((resolve, reject) => {
     resolvePromise = resolve;
     rejectPromise = reject;
   });
   return {
     promise,
-    resolve: (blob: Blob) => {
+    resolve: (url: string) => {
       if (!resolvePromise) throw new Error('Deferred promise is not initialized');
-      resolvePromise(blob);
+      resolvePromise(url);
     },
     reject: (error: Error) => {
       if (!rejectPromise) throw new Error('Deferred promise is not initialized');
@@ -94,9 +95,7 @@ function createDeferredBlob() {
 }
 
 function showButtons() {
-  return screen.getAllByRole('button', {
-    name: 'projectProgrammeForm.showAttachmentAriaLabel',
-  });
+  return screen.getAllByRole('button', { name: 'attachments.view' });
 }
 
 async function closePreview(user: ReturnType<typeof userEvent.setup>) {
@@ -111,11 +110,10 @@ async function closePreview(user: ReturnType<typeof userEvent.setup>) {
 describe('ProjectProgrammeAttachmentList preview', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetBlob.mockReset();
-    mockGetBlob.mockResolvedValue(new Blob(['image'], { type: 'image/png' }));
-    mockIsConfirmed.mockResolvedValue(true);
+    mockGetDownloadUrl.mockReset();
     let urlIndex = 0;
-    URL.createObjectURL = jest.fn(() => `blob:preview-${++urlIndex}`);
+    mockGetDownloadUrl.mockImplementation(async () => `blob:preview-${++urlIndex}`);
+    mockIsConfirmed.mockResolvedValue(true);
     URL.revokeObjectURL = jest.fn();
   });
 
@@ -124,7 +122,7 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     async (section) => {
       const user = userEvent.setup();
       render(<AttachmentForm section={section} />);
-      expect(mockGetBlob).not.toHaveBeenCalled();
+      expect(mockGetDownloadUrl).not.toHaveBeenCalled();
       await user.click(showButtons()[2]);
 
       expect(await screen.findByRole('img', { name: 'second.PNG' })).toHaveAttribute(
@@ -132,8 +130,8 @@ describe('ProjectProgrammeAttachmentList preview', () => {
         'blob:preview-1',
       );
       expect(screen.getByText('2 / 2')).toBeInTheDocument();
-      expect(mockGetBlob).toHaveBeenCalledTimes(1);
-      expect(mockGetBlob).toHaveBeenLastCalledWith(secondImage.downloadUrl);
+      expect(mockGetDownloadUrl).toHaveBeenCalledTimes(1);
+      expect(mockGetDownloadUrl).toHaveBeenLastCalledWith(secondImage.downloadUrl);
 
       await user.click(screen.getByLabelText('attachmentSlideshowDialog.nextImage'));
       expect(await screen.findByRole('img', { name: 'first.jpg' })).toHaveAttribute(
@@ -141,7 +139,7 @@ describe('ProjectProgrammeAttachmentList preview', () => {
         'blob:preview-2',
       );
       expect(screen.getByText('1 / 2')).toBeInTheDocument();
-      expect(mockGetBlob).toHaveBeenLastCalledWith(firstImage.downloadUrl);
+      expect(mockGetDownloadUrl).toHaveBeenLastCalledWith(firstImage.downloadUrl);
       expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
 
       await user.click(screen.getByLabelText('attachmentSlideshowDialog.previousImage'));
@@ -154,9 +152,9 @@ describe('ProjectProgrammeAttachmentList preview', () => {
       expect(await screen.findByRole('img', { name: 'second.PNG' })).toBeInTheDocument();
 
       await closePreview(user);
-      const requestCount = mockGetBlob.mock.calls.length;
+      const requestCount = mockGetDownloadUrl.mock.calls.length;
       fireEvent.keyDown(window, { key: 'ArrowRight' });
-      expect(mockGetBlob).toHaveBeenCalledTimes(requestCount);
+      expect(mockGetDownloadUrl).toHaveBeenCalledTimes(requestCount);
       expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-5');
 
       await user.click(showButtons()[0]);
@@ -204,12 +202,11 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     expect(screen.getByLabelText('attachmentSlideshowDialog.previousImage')).toBeDisabled();
     expect(screen.getByLabelText('attachmentSlideshowDialog.nextImage')).toBeDisabled();
     fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(mockGetBlob).toHaveBeenCalledTimes(1);
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(1);
   });
 
   it('retains PDF embedding without image navigation or a footer close button', async () => {
     const user = userEvent.setup();
-    mockGetBlob.mockResolvedValue(new Blob(['pdf'], { type: 'application/pdf' }));
     render(<AttachmentForm />);
     await user.click(showButtons()[1]);
     expect(await screen.findByTitle(pdf.originalName)).toHaveAttribute('src', 'blob:preview-1');
@@ -217,14 +214,13 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     expect(screen.queryByLabelText('attachmentSlideshowDialog.nextImage')).not.toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).getAllByRole('button')).toHaveLength(1);
     fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(mockGetBlob).toHaveBeenCalledTimes(1);
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(1);
     await closePreview(user);
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
   });
 
   it('retains unsupported-file download links', async () => {
     const user = userEvent.setup();
-    mockGetBlob.mockResolvedValue(new Blob(['word']));
     render(<AttachmentForm />);
     await user.click(showButtons()[3]);
     const download = await screen.findByRole('link', {
@@ -241,9 +237,9 @@ describe('ProjectProgrammeAttachmentList preview', () => {
   });
 
   it('does not let an older download replace a newer selection', async () => {
-    const firstDownload = createDeferredBlob();
-    const secondDownload = createDeferredBlob();
-    mockGetBlob
+    const firstDownload = createDeferredUrl();
+    const secondDownload = createDeferredUrl();
+    mockGetDownloadUrl
       .mockReturnValueOnce(firstDownload.promise)
       .mockReturnValueOnce(secondDownload.promise);
     const user = userEvent.setup();
@@ -251,17 +247,17 @@ describe('ProjectProgrammeAttachmentList preview', () => {
 
     await user.click(showButtons()[0]);
     await user.click(showButtons()[2]);
-    await act(async () => secondDownload.resolve(new Blob(['second'], { type: 'image/png' })));
+    await act(async () => secondDownload.resolve('blob:second'));
     expect(await screen.findByRole('img', { name: secondImage.originalName })).toBeInTheDocument();
-    await act(async () => firstDownload.resolve(new Blob(['first'], { type: 'image/jpeg' })));
+    await act(async () => firstDownload.resolve('blob:first'));
     expect(screen.getByRole('img', { name: secondImage.originalName })).toBeInTheDocument();
-    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(2);
   });
 
   it('keeps the displayed image valid while loading and ignores completion after closing', async () => {
-    const nextDownload = createDeferredBlob();
-    mockGetBlob
-      .mockResolvedValueOnce(new Blob(['first']))
+    const nextDownload = createDeferredUrl();
+    mockGetDownloadUrl
+      .mockResolvedValueOnce('blob:preview-1')
       .mockReturnValueOnce(nextDownload.promise);
     const user = userEvent.setup();
     render(<AttachmentForm />);
@@ -277,17 +273,17 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     await closePreview(user);
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
 
-    await act(async () => nextDownload.resolve(new Blob(['second'])));
+    await act(async () => nextDownload.resolve('blob:preview-2'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(2);
   });
 
   it('uses the latest target during rapid carousel navigation', async () => {
-    const nextDownload = createDeferredBlob();
-    mockGetBlob
-      .mockResolvedValueOnce(new Blob(['first']))
+    const nextDownload = createDeferredUrl();
+    mockGetDownloadUrl
+      .mockResolvedValueOnce('blob:preview-1')
       .mockReturnValueOnce(nextDownload.promise)
-      .mockResolvedValueOnce(new Blob(['first again']));
+      .mockResolvedValueOnce('blob:preview-2');
     const user = userEvent.setup();
     render(<AttachmentForm />);
     await user.click(showButtons()[0]);
@@ -301,21 +297,21 @@ describe('ProjectProgrammeAttachmentList preview', () => {
         'blob:preview-2',
       ),
     );
-    expect(mockGetBlob).toHaveBeenLastCalledWith(firstImage.downloadUrl);
+    expect(mockGetDownloadUrl).toHaveBeenLastCalledWith(firstImage.downloadUrl);
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
 
-    await act(async () => nextDownload.resolve(new Blob(['second'])));
+    await act(async () => nextDownload.resolve('blob:preview-stale'));
     expect(screen.getByRole('img', { name: firstImage.originalName })).toHaveAttribute(
       'src',
       'blob:preview-2',
     );
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
-    expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(3);
   });
 
   it('ignores stale failures while reporting active download failures', async () => {
-    const staleDownload = createDeferredBlob();
-    mockGetBlob.mockReturnValueOnce(staleDownload.promise);
+    const staleDownload = createDeferredUrl();
+    mockGetDownloadUrl.mockReturnValueOnce(staleDownload.promise);
     const user = userEvent.setup();
     render(<AttachmentForm />);
     await user.click(showButtons()[0]);
@@ -324,7 +320,7 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     await act(async () => staleDownload.reject(new Error('Stale failure')));
     expect(mockDispatch).not.toHaveBeenCalled();
 
-    mockGetBlob.mockRejectedValueOnce(new Error('Download failed'));
+    mockGetDownloadUrl.mockResolvedValueOnce(undefined);
     await user.click(screen.getByLabelText('attachmentSlideshowDialog.nextImage'));
     await waitFor(() =>
       expect(mockDispatch).toHaveBeenCalledWith(
@@ -340,9 +336,9 @@ describe('ProjectProgrammeAttachmentList preview', () => {
   });
 
   it('revokes the active URL on unmount and does not create URLs for unmounted requests', async () => {
-    const nextDownload = createDeferredBlob();
-    mockGetBlob
-      .mockResolvedValueOnce(new Blob(['first']))
+    const nextDownload = createDeferredUrl();
+    mockGetDownloadUrl
+      .mockResolvedValueOnce('blob:preview-1')
       .mockReturnValueOnce(nextDownload.promise);
     const user = userEvent.setup();
     const { unmount } = render(<AttachmentForm />);
@@ -351,16 +347,15 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     await user.click(screen.getByLabelText('attachmentSlideshowDialog.nextImage'));
     unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview-1');
-    await act(async () => nextDownload.resolve(new Blob(['second'])));
-    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+    await act(async () => nextDownload.resolve('blob:preview-2'));
+    expect(mockGetDownloadUrl).toHaveBeenCalledTimes(2);
   });
 
   it('preserves deletion confirmation and read-only preview behavior', async () => {
     const user = userEvent.setup();
     mockIsConfirmed.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
     const { unmount } = render(<AttachmentForm />);
-    const deleteButtons = () =>
-      screen.getAllByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' });
+    const deleteButtons = () => screen.getAllByRole('button', { name: 'attachments.delete' });
 
     await user.click(deleteButtons()[0]);
     expect(screen.getByText(firstImage.originalName)).toBeInTheDocument();
@@ -371,9 +366,7 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     unmount();
 
     render(<AttachmentForm mode="view" />);
-    expect(
-      screen.queryByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'attachments.delete' })).not.toBeInTheDocument();
     await user.click(showButtons()[0]);
     expect(await screen.findByRole('img', { name: firstImage.originalName })).toBeInTheDocument();
   });

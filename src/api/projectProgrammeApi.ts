@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
@@ -9,28 +8,10 @@ import {
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
-
 const getLocationMapUrl = (id: string) => `/project-programmes/${id}/location-map/`;
-
-// The image is served by the API, so it has to be fetched with the auth header
-// rather than used as an <img> src directly. url is the API-relative path the
-// programme's locationMap comes with.
-export async function getProjectProgrammeLocationMapBlob(url: string): Promise<Blob> {
-  const response = await axios.get<Blob>(`${API_BASE_URL}${url}`, { responseType: 'blob' });
-  return response.data;
-}
 
 const getAttachmentsUrl = (id: string, section: string) =>
   `/project-programmes/${id}/sections/${section}/attachments/`;
-
-// downloadUrl is the API-relative path each attachment comes with
-export async function getProjectProgrammeAttachmentBlob(downloadUrl: string): Promise<Blob> {
-  const response = await axios.get<Blob>(`${API_BASE_URL}${downloadUrl}`, {
-    responseType: 'blob',
-  });
-  return response.data;
-}
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({

@@ -77,7 +77,7 @@ describe('getMissingRequiredSections', () => {
       'maintenanceNeeds',
       'interactionAndRelatedProjects',
       'otherAttachments',
-  'locationMap',
+      'locationMap',
     ]);
   });
 

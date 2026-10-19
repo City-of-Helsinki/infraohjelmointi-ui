@@ -17,7 +17,7 @@ const mockPostProjectProgrammeSection = jest.fn();
 const mockPatchProjectProgrammeSection = jest.fn();
 const mockSaveProjectProgrammeLocationMap = jest.fn();
 const mockDeleteProjectProgrammeLocationMap = jest.fn();
-const mockGetProjectProgrammeLocationMapBlob = jest.fn();
+const mockGetDownloadUrl = jest.fn();
 const mockIsConfirmed = jest.fn();
 const mockGetProject = jest.fn();
 const mockGetProjectProgrammeByProject = jest.fn();
@@ -70,10 +70,13 @@ jest.mock('@/api/projectProgrammeApi', () => ({
     (...args: unknown[]) => ({ unwrap: () => mockDeleteProjectProgrammeLocationMap(...args) }),
     { isLoading: false },
   ],
-  getProjectProgrammeLocationMapBlob: (...args: unknown[]) =>
-    mockGetProjectProgrammeLocationMapBlob(...args),
   usePostProjectProgrammeAttachmentsMutation: () => [() => ({ unwrap: jest.fn() })],
   useDeleteProjectProgrammeAttachmentMutation: () => [() => ({ unwrap: jest.fn() })],
+}));
+
+jest.mock('@/utils/fileUtils', () => ({
+  ...jest.requireActual('@/utils/fileUtils'),
+  getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
 describe('ProjectProgramme', () => {
@@ -102,6 +105,7 @@ describe('ProjectProgramme', () => {
   }
 
   beforeEach(() => {
+    mockGetDownloadUrl.mockResolvedValue('blob:location-map');
     const { useAppSelector } = jest.requireMock('@/hooks/common');
 
     useAppSelector.mockImplementation(
@@ -754,11 +758,8 @@ describe('ProjectProgramme', () => {
   });
 
   it('shows the saved location map fetched with authentication', async () => {
-    const originalCreateObjectUrl = URL.createObjectURL;
     const originalRevokeObjectUrl = URL.revokeObjectURL;
-    URL.createObjectURL = jest.fn(() => 'blob:location-map');
     URL.revokeObjectURL = jest.fn();
-    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
     mockProgrammeWithLocationMap();
 
     try {
@@ -768,17 +769,15 @@ describe('ProjectProgramme', () => {
         'src',
         'blob:location-map',
       );
-      expect(mockGetProjectProgrammeLocationMapBlob).toHaveBeenCalledWith(savedLocationMap.url);
+      expect(mockGetDownloadUrl).toHaveBeenCalledWith(savedLocationMap.url);
       // A saved map is replaced by deleting it first, as in the design
       expect(screen.queryByTestId('project-programme-location-map-input')).not.toBeInTheDocument();
     } finally {
-      URL.createObjectURL = originalCreateObjectUrl;
       URL.revokeObjectURL = originalRevokeObjectUrl;
     }
   });
 
   it('deletes the location map after confirmation', async () => {
-    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
     mockIsConfirmed.mockResolvedValue(true);
     mockDeleteProjectProgrammeLocationMap.mockResolvedValue(undefined);
     mockProgrammeWithLocationMap();
@@ -791,7 +790,6 @@ describe('ProjectProgramme', () => {
   });
 
   it('does not delete the location map when the dialog is cancelled', async () => {
-    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
     mockIsConfirmed.mockResolvedValue(false);
     mockProgrammeWithLocationMap();
     const { user } = await render();
@@ -802,7 +800,6 @@ describe('ProjectProgramme', () => {
   });
 
   it('does not allow changing the location map of a completed programme', async () => {
-    mockGetProjectProgrammeLocationMapBlob.mockResolvedValue(new Blob(['map']));
     mockProgrammeWithLocationMap('COMPLETE');
 
     await render();

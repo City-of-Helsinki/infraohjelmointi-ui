@@ -698,9 +698,7 @@
     "otherAttachmentsErrorTitle": "Liitteiden tallennus epäonnistui",
     "otherAttachmentsSaveError": "Liitteiden tallennus epäonnistui. Tarkista liitteet ja yritä uudelleen.",
     "showAttachment": "Näytä",
-    "showAttachmentAriaLabel": "Näytä liite {{fileName}}",
     "deleteAttachment": "Poista",
-    "deleteAttachmentAriaLabel": "Poista liite {{fileName}}",
     "deleteAttachmentDialog": {
       "title": "Poistetaanko liite?",
       "description": "Liite poistetaan, kun tallennat luonnoksen tai merkitset osion valmiiksi.",

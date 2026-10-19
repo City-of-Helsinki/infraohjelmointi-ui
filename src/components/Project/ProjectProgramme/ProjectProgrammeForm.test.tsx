@@ -21,7 +21,7 @@ const mockTransitionProjectProgrammeSectionStatus = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
 const mockPostProjectProgrammeAttachments = jest.fn();
 const mockDeleteProjectProgrammeAttachment = jest.fn();
-const mockGetProjectProgrammeAttachmentBlob = jest.fn();
+const mockGetDownloadUrl = jest.fn();
 const mockIsConfirmed = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
@@ -57,8 +57,11 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   useDeleteProjectProgrammeAttachmentMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockDeleteProjectProgrammeAttachment(...args) }),
   ],
-  getProjectProgrammeAttachmentBlob: (...args: unknown[]) =>
-    mockGetProjectProgrammeAttachmentBlob(...args),
+}));
+
+jest.mock('@/utils/fileUtils', () => ({
+  ...jest.requireActual('@/utils/fileUtils'),
+  getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
 const baseFormData: IProjectProgrammeForm = {
@@ -1195,8 +1198,8 @@ describe('ProjectProgrammeForm other attachments', () => {
     mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
     mockPostProjectProgrammeAttachments.mockResolvedValue([]);
     mockDeleteProjectProgrammeAttachment.mockResolvedValue(undefined);
+    mockGetDownloadUrl.mockResolvedValue('blob:preview');
     mockIsConfirmed.mockResolvedValue(true);
-    global.URL.createObjectURL = jest.fn(() => 'blob:preview');
     global.URL.revokeObjectURL = jest.fn();
   });
 
@@ -1277,9 +1280,7 @@ describe('ProjectProgrammeForm other attachments', () => {
       expect(
         screen.queryByText('projectProgrammeForm.otherAttachmentsSuccessTitle'),
       ).not.toBeInTheDocument();
-      await user.click(
-        screen.getByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'attachments.delete' }));
       expect(mockPostProjectProgrammeAttachments).not.toHaveBeenCalled();
       expect(mockDeleteProjectProgrammeAttachment).not.toHaveBeenCalled();
       await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
@@ -1334,7 +1335,7 @@ describe('ProjectProgrammeForm other attachments', () => {
   });
 
   it('shows a download link instead of a preview for Word files', async () => {
-    mockGetProjectProgrammeAttachmentBlob.mockResolvedValue(new Blob(['doc']));
+    mockGetDownloadUrl.mockResolvedValue('blob:preview');
     const user = await renderOtherAttachmentsForm({
       otherAttachments: {
         attachments: [
@@ -1349,9 +1350,7 @@ describe('ProjectProgrammeForm other attachments', () => {
       },
     });
 
-    await user.click(
-      screen.getByRole('button', { name: 'projectProgrammeForm.showAttachmentAriaLabel' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'attachments.view' }));
 
     expect(
       await screen.findByText('projectProgrammeForm.attachmentPreviewNotSupported'),
@@ -1401,9 +1400,7 @@ describe('ProjectProgrammeForm other attachments', () => {
     });
 
     expect(screen.getByText('site-plan.pdf')).toBeInTheDocument();
-    await user.click(
-      screen.getByRole('button', { name: 'projectProgrammeForm.deleteAttachmentAriaLabel' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'attachments.delete' }));
     await waitFor(() => expect(screen.queryByText('site-plan.pdf')).not.toBeInTheDocument());
     expect(mockDeleteProjectProgrammeAttachment).not.toHaveBeenCalled();
 
@@ -1449,18 +1446,14 @@ describe('ProjectProgrammeForm other attachments', () => {
   });
 
   it('opens a saved attachment in a preview dialog', async () => {
-    mockGetProjectProgrammeAttachmentBlob.mockResolvedValue(
-      new Blob(['pdf'], { type: 'application/pdf' }),
-    );
+    mockGetDownloadUrl.mockResolvedValue('blob:preview');
     const user = await renderOtherAttachmentsForm({
       otherAttachments: { attachments: [savedAttachment], links: [] },
     });
 
-    await user.click(
-      screen.getByRole('button', { name: 'projectProgrammeForm.showAttachmentAriaLabel' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'attachments.view' }));
 
-    expect(mockGetProjectProgrammeAttachmentBlob).toHaveBeenCalledWith(
+    expect(mockGetDownloadUrl).toHaveBeenCalledWith(
       '/project-programmes/programme-1/attachments/attachment-1/download/',
     );
     expect(await screen.findByTitle('site-plan.pdf')).toHaveAttribute('src', 'blob:preview');
