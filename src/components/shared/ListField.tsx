@@ -1,6 +1,6 @@
 import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react';
-import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
+import { FC, memo, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
@@ -102,11 +102,9 @@ const ListField: FC<IListFieldProps> = ({
     setEditing((currentState) => !currentState);
   }, []);
 
-  useEffect(() => {
-    if (cancelEdit && editing) {
-      setEditing(false);
-    }
-  }, [cancelEdit, editing]);
+  if (cancelEdit && editing) {
+    setEditing(false);
+  }
 
   const formatFieldValue = (fieldValue: string) => {
     return formatNumberToContainSpaces(Number(Number(fieldValue).toFixed(0)));

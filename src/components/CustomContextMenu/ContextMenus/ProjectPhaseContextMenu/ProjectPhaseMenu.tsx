@@ -21,6 +21,13 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   const phases = useOptions('phases');
   const [selectedPhase, setSelectedPhase] = useState<string>(phase ?? '');
 
+  useEffect(() => {
+    if (phase) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
+      setSelectedPhase(phase);
+    }
+  }, [phase]);
+
   const handleSetSelectedPhase = useCallback((nextPhase: string) => {
     setSelectedPhase(nextPhase);
   }, []);
@@ -29,12 +36,6 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
     onSubmitPhase({ phase: selectedPhase });
     onCloseMenu();
   }, [onCloseMenu, onSubmitPhase, selectedPhase]);
-
-  useEffect(() => {
-    if (phase) {
-      setSelectedPhase(phase);
-    }
-  }, [phase]);
 
   return (
     <div className="phase-menu-container" data-testid={'project-phase-menu'}>

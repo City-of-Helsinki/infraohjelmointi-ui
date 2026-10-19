@@ -11,35 +11,115 @@ import { selectGroupsExpanded } from '@/reducers/planningSlice';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
-interface IPlanningRowState {
+export interface IPlanningRowState {
   expanded: boolean;
   searchedProjectId: string;
   searchedGroupId: string;
 }
 
-// Resets via the given callback if value is falsy and has actually changed from current
-const resetIfCleared = (value: string | null, current: string, reset: () => void) => {
-  if (!value && value !== current) {
-    reset();
+export interface IPlanningRowInputs {
+  defaultExpanded: boolean;
+  groupsExpanded: boolean;
+  type: IPlanningRow['type'];
+  search: string;
+  projectRows: IPlanningRow['projectRows'];
+}
+
+const hasInputsChanged = (prev: IPlanningRowInputs, next: IPlanningRowInputs) =>
+  (Object.keys(next) as Array<keyof IPlanningRowInputs>).some((key) => prev[key] !== next[key]);
+
+// Finds the project/group from the 'project' and 'group' searchParams if the current row contains them
+const getSearchResult = (search: string, projectRows: IPlanningRow['projectRows']) => {
+  const params = new URLSearchParams(search);
+  const projectId = params.get('project');
+  const groupId = params.get('group');
+
+  if (!search || (!projectId && !groupId)) {
+    return { searchedProjectId: '', searchedGroupId: '', found: false };
   }
+
+  const project = projectId ? projectRows.find((p) => p.id === projectId) : undefined;
+  const group = groupId ? projectRows.find((g) => g.projectGroup === groupId) : undefined;
+
+  return {
+    searchedProjectId: project?.id ?? '',
+    searchedGroupId: group?.id ?? '',
+    found: !!(project || group),
+  };
 };
 
-const PlanningRow: FC<
-  IPlanningRow & {
-    sapCosts: Record<string, IProjectSapCost>;
+export const getNextPlanningRowState = (
+  current: IPlanningRowState,
+  inputs: IPlanningRowInputs,
+  prev?: IPlanningRowInputs,
+): IPlanningRowState => {
+  let next = current;
+
+  if (!prev || prev.defaultExpanded !== inputs.defaultExpanded) {
+    next = { ...next, expanded: inputs.defaultExpanded || false };
   }
-> = (props) => {
+
+  let found = false;
+  if (!prev || prev.search !== inputs.search || prev.projectRows !== inputs.projectRows) {
+    const result = getSearchResult(inputs.search, inputs.projectRows);
+    next = {
+      ...next,
+      searchedProjectId: result.searchedProjectId,
+      searchedGroupId: result.searchedGroupId,
+    };
+    found = result.found;
+  }
+
+  const searchedIdsChanged =
+    next.searchedProjectId !== current.searchedProjectId ||
+    next.searchedGroupId !== current.searchedGroupId;
+
+  // Only apply global groupsExpanded if not in search mode
+  if (
+    (!prev ||
+      prev.type !== inputs.type ||
+      prev.groupsExpanded !== inputs.groupsExpanded ||
+      searchedIdsChanged) &&
+    inputs.type === 'group' &&
+    (!next.searchedProjectId || !next.searchedGroupId)
+  ) {
+    next = { ...next, expanded: inputs.groupsExpanded };
+  }
+
+  if (found) {
+    next = { ...next, expanded: true };
+  }
+
+  return next;
+};
+
+type PlanningRowProps = IPlanningRow & {
+  sapCosts: Record<string, IProjectSapCost>;
+};
+
+// Must not subscribe to the store itself: setState during render drops useSelector updates in React 18.2 (facebook/react#25565)
+const PlanningRowContent: FC<PlanningRowProps & { groupsExpanded: boolean }> = ({
+  groupsExpanded,
+  ...props
+}) => {
   const { defaultExpanded, projectRows, cells, id, type, sapCosts } = props;
-  const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
-  const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
-    expanded: defaultExpanded,
-    searchedProjectId: '',
-    searchedGroupId: '',
-  });
+  const inputs: IPlanningRowInputs = { defaultExpanded, groupsExpanded, type, search, projectRows };
+  const [prevInputs, setPrevInputs] = useState(inputs);
+  const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>(() =>
+    getNextPlanningRowState(
+      { expanded: false, searchedProjectId: '', searchedGroupId: '' },
+      inputs,
+    ),
+  );
 
-  const { expanded, searchedProjectId, searchedGroupId } = planningRowState;
+  if (hasInputsChanged(prevInputs, inputs)) {
+    setPrevInputs(inputs);
+    setPlanningRowState((current) => getNextPlanningRowState(current, inputs, prevInputs));
+  }
+
+  const { expanded, searchedProjectId } = planningRowState;
 
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
@@ -47,80 +127,6 @@ const PlanningRow: FC<
   const handleExpand = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, expanded: !current.expanded }));
   }, []);
-
-  // Set the rows initial expanded state
-  useEffect(() => {
-    setPlanningRowState((current) => ({ ...current, expanded: defaultExpanded || false }));
-  }, [defaultExpanded]);
-
-  useEffect(() => {
-    if (type === 'group' && !searchedProjectId) {
-      // Only apply global groupsExpanded if not in search mode
-      setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
-    }
-
-    if (type === 'group' && !searchedGroupId) {
-      // Only apply global groupsExpanded if not in search mode
-      setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
-    }
-  }, [type, groupsExpanded, searchedProjectId, searchedGroupId]);
-
-  const resetSearchedProjectId = useCallback(() => {
-    setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
-  }, []);
-
-  const resetSearchedGroupId = useCallback(() => {
-    setPlanningRowState((current) => ({ ...current, searchedGroupId: '' }));
-  }, []);
-
-  // Listens to the 'project' searchParam and sets the searchedProjectId and expanded to true if
-  // the current row contains the project
-  useEffect(() => {
-    if (!search) {
-      resetSearchedProjectId();
-      resetSearchedGroupId();
-      return;
-    }
-
-    const projectId = new URLSearchParams(search).get('project');
-    const groupId = new URLSearchParams(search).get('group');
-
-    resetIfCleared(projectId, searchedProjectId, resetSearchedProjectId);
-    resetIfCleared(groupId, searchedGroupId, resetSearchedGroupId);
-
-    if (!projectId && !groupId) {
-      return;
-    }
-
-    const project = projectRows.find((p) => p.id === projectId);
-    const group = projectRows.find((g) => g.projectGroup === groupId);
-
-    if (!project) {
-      resetSearchedProjectId();
-    }
-
-    if (!group) {
-      resetSearchedGroupId();
-    }
-
-    if (!project && !group) {
-      return;
-    }
-
-    setPlanningRowState((current) => ({
-      ...current,
-      searchedProjectId: project?.id ?? '',
-      searchedGroupId: group?.id ?? '',
-      expanded: true,
-    }));
-  }, [
-    search,
-    projectRows,
-    resetSearchedProjectId,
-    resetSearchedGroupId,
-    searchedProjectId,
-    searchedGroupId,
-  ]);
 
   // Listens to searchedProjectId and scrolls the viewport to the project
   useEffect(() => {
@@ -180,6 +186,11 @@ const PlanningRow: FC<
       )}
     </>
   );
+};
+
+const PlanningRow: FC<PlanningRowProps> = (props) => {
+  const groupsExpanded = useAppSelector(selectGroupsExpanded);
+  return <PlanningRowContent {...props} groupsExpanded={groupsExpanded} />;
 };
 
 export default memo(PlanningRow);

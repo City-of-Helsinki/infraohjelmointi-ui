@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
 import { getApiToken } from '@/services/userServices';
 import { useAppSelector } from '@/hooks/common';
@@ -33,7 +33,7 @@ const PAGES = {
  */
 const AuthGuard: FC = () => {
   const auth = useAuth();
-  const [hasTriedSignin, setHasTriedSignin] = useState(false);
+  const hasTriedSigninRef = useRef(false);
   const user = useAppSelector(selectUser);
   const authError = useAppSelector(selectAuthError);
   const location = useLocation();
@@ -92,16 +92,22 @@ const AuthGuard: FC = () => {
 
   // Check if user exists and sign in
   useEffect(() => {
-    if (!hasAuthParams() && !isAuthenticated && !activeNavigator && !isLoading && !hasTriedSignin) {
+    if (
+      !hasAuthParams() &&
+      !isAuthenticated &&
+      !activeNavigator &&
+      !isLoading &&
+      !hasTriedSigninRef.current
+    ) {
       const { search, pathname } = location;
       const initialPath = search ? `${pathname}${search}` : pathname;
 
       localStorage.setItem(INITIAL_PATH, initialPath);
 
       auth.signinRedirect();
-      setHasTriedSignin(true);
+      hasTriedSigninRef.current = true;
     }
-  }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
+  }, [isAuthenticated, activeNavigator, isLoading, location, auth]);
 
   // Redirect user from forbidden paths
   // If user can log in (isAuthenticated) but does not have access rights (!user),

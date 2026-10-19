@@ -7,7 +7,7 @@ import { INote } from '@/interfaces/noteInterfaces';
 import { act, waitFor, within } from '@testing-library/react';
 import { stringToDateTime } from '@/utils/dates';
 import { Route } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import mockNoteImages from '@/mocks/mockNoteImages';
 
 jest.mock('react-i18next', () => mockI18next());
@@ -21,11 +21,11 @@ const mockDeleteNoteImageTrigger = jest.fn();
 const mockIsConfirmed = jest.fn();
 
 let mockNotesState: INote[] = [];
-const mockNotesSubscribers = new Set<(notes: INote[]) => void>();
+const mockNotesSubscribers = new Set<() => void>();
 
 const setMockNotesState = (notes: INote[]) => {
   mockNotesState = notes;
-  mockNotesSubscribers.forEach((subscriber) => subscriber(mockNotesState));
+  mockNotesSubscribers.forEach((subscriber) => subscriber());
 };
 
 const appendMockNote = (note: INote) => setMockNotesState([...mockNotesState, note]);
@@ -42,19 +42,15 @@ const setMockNoteImages = (noteId: string, images: INote['images']) => {
   );
 };
 
+const subscribeMockNotes = (subscriber: () => void) => {
+  mockNotesSubscribers.add(subscriber);
+  return () => {
+    mockNotesSubscribers.delete(subscriber);
+  };
+};
+
 const useMockedNotesQuery = () => {
-  const [data, setData] = useState<INote[]>(mockNotesState);
-
-  useEffect(() => {
-    setData(mockNotesState);
-
-    const subscriber = (nextNotes: INote[]) => setData([...nextNotes]);
-    mockNotesSubscribers.add(subscriber);
-
-    return () => {
-      mockNotesSubscribers.delete(subscriber);
-    };
-  }, []);
+  const data = useSyncExternalStore(subscribeMockNotes, () => mockNotesState);
 
   return { data };
 };

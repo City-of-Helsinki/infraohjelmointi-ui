@@ -1,5 +1,5 @@
 import { IPlanningCell } from '@/interfaces/planningInterfaces';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 import { useAppSelector } from './common';
 import {
@@ -74,43 +74,28 @@ const useSummaryRows = () => {
     [allClasses.subClasses, selectedClass],
   );
 
-  const [planningSummaryRows, setPlanningSummaryRows] = useState<IPlanningSummaryTableState>({
-    heads: [],
-    cells: [],
-  });
-
-  // Listens to a startYear and creates 11 cells starting with the startYear
-  useEffect(() => {
-    if (startYear) {
-      setPlanningSummaryRows((current) => ({
-        ...current,
-        heads: buildPlanningSummaryHeadCells(startYear),
-      }));
-    }
-  }, [startYear]);
+  // Creates 11 cells starting with the startYear
+  const heads = useMemo(
+    () => (startYear ? buildPlanningSummaryHeadCells(startYear) : []),
+    [startYear],
+  );
 
   /**
-   * Listens to the selectedMasterClass and selectedSubClass and populates the cells with budgets.
+   * Populates the cells with budgets based on the selectedMasterClass and selectedSubClass.
    *
    * - if no there is no selectedMasterClass all masterClass budgets will be summed and populated
    * - if there is a selectedMasterClass then that masterClasses budgets will be populated
    * - if there is a selectedSubClass then its parentClass will be populated
    */
-  useEffect(() => {
-    if (selectedSubClass) {
-      setPlanningSummaryRows((current) => ({
-        ...current,
-        cells: calculatePlanningSummaryCells(classes, 'class'),
-      }));
-    } else {
-      setPlanningSummaryRows((current) => ({
-        ...current,
-        cells: calculatePlanningSummaryCells(masterClasses, 'masterClass'),
-      }));
-    }
-  }, [selectedMasterClass, selectedSubClass, classes, masterClasses]);
+  const cells = useMemo(
+    () =>
+      selectedSubClass
+        ? calculatePlanningSummaryCells(classes, 'class')
+        : calculatePlanningSummaryCells(masterClasses, 'masterClass'),
+    [selectedSubClass, classes, masterClasses],
+  );
 
-  return planningSummaryRows;
+  return useMemo<IPlanningSummaryTableState>(() => ({ heads, cells }), [heads, cells]);
 };
 
 export default useSummaryRows;

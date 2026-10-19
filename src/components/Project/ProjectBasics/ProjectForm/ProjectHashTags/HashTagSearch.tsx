@@ -1,6 +1,6 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { defaultFilter } from 'hds-react';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Select } from 'hds-react';
 
@@ -16,13 +16,14 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({
   hashTagsForSubmit,
 }) => {
   const { t } = useTranslation();
-  const [value, setValue] = useState<string[]>([]);
+  const [value, setValue] = useState<string[]>(() => hashTagsForSubmit.map((tag) => tag.value));
+  const [prevHashTagsForSubmit, setPrevHashTagsForSubmit] = useState(hashTagsForSubmit);
 
-  useEffect(() => {
-    // Update selectedValues on first render and if hashTagsForSubmit change onDelete
-    const selectedValues = hashTagsForSubmit.map((tag) => tag.value);
-    setValue(selectedValues);
-  }, [hashTagsForSubmit]);
+  // Update selected values if hashTagsForSubmit change onDelete
+  if (prevHashTagsForSubmit !== hashTagsForSubmit) {
+    setPrevHashTagsForSubmit(hashTagsForSubmit);
+    setValue(hashTagsForSubmit.map((tag) => tag.value));
+  }
 
   const hashTagsAsOptions = availableHashTags.map((tag) => ({
     value: tag.value,

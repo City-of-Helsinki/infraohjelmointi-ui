@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
+import { FC, memo, useMemo, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import {
   Control,
@@ -64,7 +64,6 @@ const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: 
 };
 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
-  project,
   getFieldProps,
   getValues,
   setValue,
@@ -415,11 +414,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [t, constructionEndYear, isUserOnlyProjectManager, getValues, phasesThatNeedYearBounds],
   );
 
-  const projectPhase = project?.phase;
-  const [iconKey, setIconKey] = useState(() => mapIconKey(watchedPhase?.label ?? ''));
-  useEffect(() => {
-    setIconKey(mapIconKey(watchedPhase?.label ?? ''));
-  }, [watchedPhase?.label, projectPhase]);
+  const iconKey = mapIconKey(watchedPhase?.label ?? '');
 
   return (
     <div className="w-full" id="basics-status-section">
