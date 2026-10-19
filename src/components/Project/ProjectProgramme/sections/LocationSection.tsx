@@ -152,6 +152,7 @@ function LocationSection({
           )}
           {canEdit && locationMap && (
             <Button
+              className="self-start"
               variant={ButtonVariant.Secondary}
               style={{ backgroundColor: 'var(--color-white)' }}
               type="button"
