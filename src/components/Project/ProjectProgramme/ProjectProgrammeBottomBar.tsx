@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
-import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
+import { ProjectProgrammeRequiredSectionId } from './sections/projectProgrammeSections';
 
 interface ProjectProgrammeBottomBarProps {
   isBriefProgramme: boolean;
@@ -11,7 +11,7 @@ interface ProjectProgrammeBottomBarProps {
   isProjectProgrammeComplete: boolean;
   effectiveProjectProgrammeId: string;
   effectiveProjectProgramme?: IProjectProgramme;
-  onMissingRequiredFields?: (sections: ProjectProgrammeSectionId[]) => void;
+  onMissingRequiredFields?: (sections: ProjectProgrammeRequiredSectionId[]) => void;
   handleSwitchType: () => Promise<unknown>;
 }
 

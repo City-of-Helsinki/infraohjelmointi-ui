@@ -100,8 +100,22 @@
   @apply mt-6;
 }
 
+.project-programme-section > section {
+  border-left-width: 0;
+}
+
 .project-programme-section > section > div > [role='heading'] {
   align-items: flex-start;
+}
+
+/* Hide the HDS notification info icon */
+.project-programme-section > section > div > [role='heading'] > :first-child {
+  display: none;
+}
+
+/* HDS FileInput's internal "select file" button is the only aria-hidden button */
+.project-programme-file-input button[aria-hidden='true'] {
+  background-color: var(--color-white);
 }
 
 .project-programme-actions {
