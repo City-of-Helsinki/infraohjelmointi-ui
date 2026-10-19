@@ -38,12 +38,12 @@ export default function LinkField<TFieldValues extends FieldValues>({
         <TextField name={name} label={label} size="full" rules={rules} />
       </div>
       {showLink && (
-        <div className="pointer-events-none absolute bottom-0 left-[calc(var(--spacing-s)+2px)] right-[calc(var(--spacing-s)+2px)] z-[2] flex h-14 items-center">
+        <div className="pointer-events-none absolute right-[calc(var(--spacing-s)+2px)] bottom-0 left-[calc(var(--spacing-s)+2px)] z-[2] flex h-14 items-center">
           <a
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto truncate text-l text-bus underline"
+            className="text-l text-bus pointer-events-auto truncate underline"
           >
             {String(value).trim()}
           </a>
