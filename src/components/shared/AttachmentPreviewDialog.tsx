@@ -117,7 +117,7 @@ function AttachmentPreviewDialog({
             </div>
           )}
         </div>
-        <div className="absolute right-8 top-6">
+        <div className="absolute top-6 right-8">
           <Button
             onClick={onClose}
             variant={ButtonVariant.Secondary}
