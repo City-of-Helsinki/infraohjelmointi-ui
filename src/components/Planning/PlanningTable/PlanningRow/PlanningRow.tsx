@@ -55,12 +55,12 @@ export const getNextPlanningRowState = (
 ): IPlanningRowState => {
   let next = current;
 
-  if (!prev || prev.defaultExpanded !== inputs.defaultExpanded) {
+  if (prev?.defaultExpanded !== inputs.defaultExpanded) {
     next = { ...next, expanded: inputs.defaultExpanded || false };
   }
 
   let found = false;
-  if (!prev || prev.search !== inputs.search || prev.projectRows !== inputs.projectRows) {
+  if (prev?.search !== inputs.search || prev.projectRows !== inputs.projectRows) {
     const result = getSearchResult(inputs.search, inputs.projectRows);
     next = {
       ...next,
@@ -76,8 +76,7 @@ export const getNextPlanningRowState = (
 
   // Only apply global groupsExpanded if not in search mode
   if (
-    (!prev ||
-      prev.type !== inputs.type ||
+    (prev?.type !== inputs.type ||
       prev.groupsExpanded !== inputs.groupsExpanded ||
       searchedIdsChanged) &&
     inputs.type === 'group' &&

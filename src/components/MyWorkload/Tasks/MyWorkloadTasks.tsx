@@ -17,6 +17,10 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
   const { t, i18n } = useTranslation();
   const [page, setPage] = useState(0);
 
+  if (listOfTasks.length === 0 && page !== 0) {
+    setPage(0);
+  }
+
   const dateTextFormatter = (startDate: string | null, endDate: string | null): string => {
     if (!startDate && !endDate) {
       return t('myWorkloadView.tasks.infoNotAvailable');
