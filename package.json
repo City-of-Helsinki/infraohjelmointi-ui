@@ -54,7 +54,8 @@
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },
   "resolutions": {
-    "css-loader": "^7.1.5"
+    "css-loader": "^7.1.5",
+    "@babel/helper-compilation-targets": "^7.29.7"
   },
   "eslintConfig": {
     "extends": [
