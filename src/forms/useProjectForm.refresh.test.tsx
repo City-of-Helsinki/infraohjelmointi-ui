@@ -105,9 +105,6 @@ describe('useProjectForm - Refresh Bug Fix', () => {
       result.current.formMethods.setValue('description', 'User Description');
     });
 
-    // Store the current values
-    const userValues = result.current.formMethods.getValues();
-
     // The form should retain user data even when formValues are empty
     // (simulating the refresh scenario where Redux data might be empty initially)
 
@@ -134,7 +131,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
   });
 
   it('should NOT reset form during submission', async () => {
-    const { result } = renderHook(() => useProjectForm(null), { wrapper });
+    renderHook(() => useProjectForm(null), { wrapper });
 
     // Simulate form submission state
     // Note: This would require mocking the form submission state

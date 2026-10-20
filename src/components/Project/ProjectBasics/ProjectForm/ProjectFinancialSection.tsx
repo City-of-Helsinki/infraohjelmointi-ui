@@ -207,7 +207,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,
     required?: boolean,
-    rules?: { validate: Record<string, (value?: IOption) => true | string> },
+    rules?: { validate: Record<string, (_value?: IOption) => true | string> },
   ) => (
     <SelectField
       {...getFieldProps(name)}

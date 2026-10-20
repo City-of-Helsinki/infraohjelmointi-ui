@@ -1,15 +1,23 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import { useEffect } from 'react';
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form';
 import mockI18next from '@/mocks/mockI18next';
 import LinkField from './LinkField';
 
 jest.mock('react-i18next', () => mockI18next());
 
-let formMethods: UseFormReturn<FieldValues>;
-
-const TestForm = ({ value }: { value: string }) => {
+const TestForm = ({
+  value,
+  onFormReady,
+}: {
+  value: string;
+  onFormReady?: (methods: UseFormReturn<FieldValues>) => void;
+}) => {
   const methods = useForm<FieldValues>({ defaultValues: { link: value } });
-  formMethods = methods;
+
+  useEffect(() => {
+    onFormReady?.(methods);
+  }, [methods, onFormReady]);
 
   return (
     <FormProvider {...methods}>
@@ -49,9 +57,17 @@ describe('LinkField', () => {
   });
 
   it('hides the link when the field has an error', () => {
-    render(<TestForm value="https://example.com" />);
+    let formMethods: UseFormReturn<FieldValues> | undefined;
+    render(
+      <TestForm
+        value="https://example.com"
+        onFormReady={(methods) => {
+          formMethods = methods;
+        }}
+      />,
+    );
 
-    act(() => formMethods.setError('link', { message: 'error' }));
+    act(() => formMethods?.setError('link', { message: 'error' }));
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });

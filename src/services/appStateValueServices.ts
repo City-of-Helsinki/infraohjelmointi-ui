@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { IAppStateValue } from '@/interfaces/adminInterfaces';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getAllAppStateValues = async (): Promise<any> => {
+export const getAllAppStateValues = async (): Promise<IAppStateValue[]> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/app-state-value/`);
     return res.data;
@@ -15,7 +16,7 @@ export const postOrPatchAppStateValue = async (request: {
   name: string;
   value: boolean;
   id?: string;
-}): Promise<any> => {
+}): Promise<IAppStateValue> => {
   try {
     // if value already exists we modify the existing one
     if (request.id) {

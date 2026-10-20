@@ -1,4 +1,5 @@
 import { IError } from '@/interfaces/common';
+import { IAppStateValue } from '@/interfaces/adminInterfaces';
 import { getAllAppStateValues } from '@/services/appStateValueServices';
 import { RootState } from '@/store';
 import { toSerializableError } from '@/utils/reduxErrorUtils';
@@ -34,7 +35,7 @@ const initialState: IAppStateValues = {
   },
 };
 
-const getForcedToFrameState = (appStateValues: Array<any>): IForcedToFrameState => {
+const getForcedToFrameState = (appStateValues: Array<IAppStateValue>): IForcedToFrameState => {
   for (const value of appStateValues) {
     if (value.name === 'forcedToFrameStatus') {
       return {
@@ -47,7 +48,9 @@ const getForcedToFrameState = (appStateValues: Array<any>): IForcedToFrameState 
   return initialState.forcedToFrameState;
 };
 
-const getForcedToFrameDataUpdated = (appStateValues: Array<any>): IForcedToFrameDataUpdated => {
+const getForcedToFrameDataUpdated = (
+  appStateValues: Array<IAppStateValue>,
+): IForcedToFrameDataUpdated => {
   for (const value of appStateValues) {
     if (value.name === 'forcedToFrameDataUpdated') {
       return {

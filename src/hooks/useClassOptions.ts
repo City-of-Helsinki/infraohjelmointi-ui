@@ -14,7 +14,6 @@ import {
   isUserOnlyProjectAreaPlanner,
   isUserPlanner,
 } from '@/utils/userRoleHelpers';
-import { IProjectClassOption } from '@/interfaces/classInterfaces';
 
 /**
  * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
@@ -77,7 +76,7 @@ const useClassOptions = (currentClass: string | undefined) => {
     } else {
       return [];
     }
-  }, [classes, currentClass, selectedSubClass, subClasses, otherClassifications]);
+  }, [selectedSubClass, subClasses, otherClassifications]);
 
   const filteredMasterClasses = useMemo(() => {
     if (

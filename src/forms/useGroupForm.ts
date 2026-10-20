@@ -2,7 +2,7 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 
 import { useForm } from 'react-hook-form';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IGroup } from '@/interfaces/groupInterfaces';
@@ -40,59 +40,67 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
    */
-  const getGroupClassFields = (group: IGroup | null) => {
-    const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
-      id: projectClass?.id ?? '',
-      value: projectClass?.name ?? '',
-    });
+  const getGroupClassFields = useCallback(
+    (group: IGroup | null) => {
+      const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
+        id: projectClass?.id ?? '',
+        value: projectClass?.name ?? '',
+      });
 
-    const selectedSubClass = group
-      ? subClasses.find(({ id }) => id === group.classRelation)
-      : undefined;
+      const selectedSubClass = group
+        ? subClasses.find(({ id }) => id === group.classRelation)
+        : undefined;
 
-    const projectClassId = selectedSubClass?.parent ?? group?.classRelation;
+      const projectClassId = selectedSubClass?.parent ?? group?.classRelation;
 
-    const selectedClass = projectClassId
-      ? classes.find(({ id }) => id === projectClassId)
-      : undefined;
+      const selectedClass = projectClassId
+        ? classes.find(({ id }) => id === projectClassId)
+        : undefined;
 
-    const masterClassId = selectedClass?.parent ?? group?.classRelation;
+      const masterClassId = selectedClass?.parent ?? group?.classRelation;
 
-    const selectedMasterClass = masterClassId
-      ? masterClasses.find(({ id }) => id === masterClassId)
-      : undefined;
+      const selectedMasterClass = masterClassId
+        ? masterClasses.find(({ id }) => id === masterClassId)
+        : undefined;
 
-    return {
-      masterClass: listItemToOption(classAsListItem(selectedMasterClass) ?? []),
-      class: listItemToOption(classAsListItem(selectedClass) ?? []),
-      subClass: listItemToOption(classAsListItem(selectedSubClass) ?? []),
-    };
-  };
+      return {
+        masterClass: listItemToOption(classAsListItem(selectedMasterClass) ?? []),
+        class: listItemToOption(classAsListItem(selectedClass) ?? []),
+        subClass: listItemToOption(classAsListItem(selectedSubClass) ?? []),
+      };
+    },
+    [subClasses, classes, masterClasses],
+  );
 
   /**
    * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
    */
-  const getGroupLocationFields = (group: IGroup | null) => {
-    const selectedSubDivision = group
-      ? subDivisions.find(({ id }) => id === group.location)
-      : undefined;
+  const getGroupLocationFields = useCallback(
+    (group: IGroup | null) => {
+      const selectedSubDivision = group
+        ? subDivisions.find(({ id }) => id === group.location)
+        : undefined;
 
-    const projectLocationId = selectedSubDivision?.parent ?? group?.location;
+      const projectLocationId = selectedSubDivision?.parent ?? group?.location;
 
-    const selectedDivision = projectLocationId
-      ? divisions.find(({ id }) => id === projectLocationId)
-      : undefined;
+      const selectedDivision = projectLocationId
+        ? divisions.find(({ id }) => id === projectLocationId)
+        : undefined;
 
-    const districtId = selectedDivision?.parent ?? group?.location;
+      const districtId = selectedDivision?.parent ?? group?.location;
 
-    const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
+      const selectedDistrict = districtId
+        ? districts.find(({ id }) => id === districtId)
+        : undefined;
 
-    return {
-      district: listItemToOption(selectedDistrict),
-      division: listItemToOption(selectedDivision),
-      subDivision: listItemToOption(selectedSubDivision),
-    };
-  };
+      return {
+        district: listItemToOption(selectedDistrict),
+        division: listItemToOption(selectedDivision),
+        subDivision: listItemToOption(selectedSubDivision),
+      };
+    },
+    [subDivisions, divisions, districts],
+  );
 
   const formValues: IGroupForm = useMemo(
     () => ({
@@ -101,7 +109,7 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
       ...getGroupLocationFields(group),
       projectsForSubmit: projects && projects.length > 0 ? projects : [],
     }),
-    [group, projects],
+    [group, projects, getGroupClassFields, getGroupLocationFields],
   );
 
   return { formValues, group };
@@ -138,68 +146,74 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
     return lowestSelectedLocationLevel;
   };
 
-  const filterProjectsForSubmit = (
-    projects: IOption[] | undefined,
-    groupLocationLevel: string,
-    groupLocationId: string | undefined,
-    groupLocationName: string | undefined,
-    groupDistrictName: string | undefined,
-  ) => {
-    const filteredProjects = projects?.filter((project) => {
-      const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
-      return projectAndGroupLocationMatches(
-        groupLocationLevel,
-        groupLocationId,
-        groupLocationName,
-        projecLocationId,
-        groupDistrictName,
-      );
-    });
-    return filteredProjects;
-  };
+  const projectAndGroupLocationMatches = useCallback(
+    (
+      groupLocationLevel: string,
+      groupLocationId?: string,
+      groupLocationName?: string,
+      projectLocationId?: string,
+      groupDistrictName?: string,
+    ) => {
+      const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
+      const divisionLevelMatchesGroupDistrict =
+        getLocationParent(projectDivisions, projectLocationId) === groupLocationId ||
+        (groupLocationName === 'Eri kaupunginosia' &&
+          getLocationParent(projectDivisions, projectLocationId) ===
+            getLocationParent(projectDivisions, groupLocationId));
+      const subDivisionLevelMatchesGroupDivision =
+        getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
+      const subDivisionLevelMatchesGroupDistrict =
+        getLocationParent(
+          projectDivisions,
+          getLocationParent(projectSubDivisions, projectLocationId),
+        ) === groupLocationId;
 
-  const projectAndGroupLocationMatches = (
-    groupLocationLevel: string,
-    groupLocationId?: string,
-    groupLocationName?: string,
-    projectLocationId?: string,
-    groupDistrictName?: string,
-  ) => {
-    const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
-    const divisionLevelMatchesGroupDistrict =
-      getLocationParent(projectDivisions, projectLocationId) === groupLocationId ||
-      (groupLocationName === 'Eri kaupunginosia' &&
-        getLocationParent(projectDivisions, projectLocationId) ===
-          getLocationParent(projectDivisions, groupLocationId));
-    const subDivisionLevelMatchesGroupDivision =
-      getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
-    const subDivisionLevelMatchesGroupDistrict =
-      getLocationParent(
-        projectDivisions,
-        getLocationParent(projectSubDivisions, projectLocationId),
-      ) === groupLocationId;
+      const multipleDistrictsSelectedMatches =
+        projectLocationId && groupDistrictName === 'Eri suurpiirejä';
+      const districtMatches =
+        projectDirectlyUnderGroupLocation ||
+        divisionLevelMatchesGroupDistrict ||
+        subDivisionLevelMatchesGroupDistrict ||
+        multipleDistrictsSelectedMatches;
 
-    const multipleDistrictsSelectedMatches =
-      projectLocationId && groupDistrictName === 'Eri suurpiirejä';
-    const districtMatches =
-      projectDirectlyUnderGroupLocation ||
-      divisionLevelMatchesGroupDistrict ||
-      subDivisionLevelMatchesGroupDistrict ||
-      multipleDistrictsSelectedMatches;
+      switch (groupLocationLevel) {
+        case 'district':
+          return districtMatches;
+        case 'division':
+          return (
+            projectDirectlyUnderGroupLocation ||
+            subDivisionLevelMatchesGroupDivision ||
+            (groupLocationName === 'Eri kaupunginosia' && districtMatches)
+          );
+        case 'subDivision':
+          return projectDirectlyUnderGroupLocation;
+      }
+    },
+    [projectDivisions, projectSubDivisions],
+  );
 
-    switch (groupLocationLevel) {
-      case 'district':
-        return districtMatches;
-      case 'division':
-        return (
-          projectDirectlyUnderGroupLocation ||
-          subDivisionLevelMatchesGroupDivision ||
-          (groupLocationName === 'Eri kaupunginosia' && districtMatches)
+  const filterProjectsForSubmit = useCallback(
+    (
+      projects: IOption[] | undefined,
+      groupLocationLevel: string,
+      groupLocationId: string | undefined,
+      groupLocationName: string | undefined,
+      groupDistrictName: string | undefined,
+    ) => {
+      const filteredProjects = projects?.filter((project) => {
+        const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
+        return projectAndGroupLocationMatches(
+          groupLocationLevel,
+          groupLocationId,
+          groupLocationName,
+          projecLocationId,
+          groupDistrictName,
         );
-      case 'subDivision':
-        return projectDirectlyUnderGroupLocation;
-    }
-  };
+      });
+      return filteredProjects;
+    },
+    [allProjects, projectAndGroupLocationMatches],
+  );
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -272,7 +286,7 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue]);
+  }, [watch, setValue, filterProjectsForSubmit, projects]);
 
   return {
     formMethods,
