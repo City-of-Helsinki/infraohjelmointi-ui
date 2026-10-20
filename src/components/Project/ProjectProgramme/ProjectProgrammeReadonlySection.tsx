@@ -3,6 +3,7 @@ import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 import { getFieldsForSection } from './sections/projectProgrammeSectionFields';
 import ReadonlyFieldList from '@/components/shared/ReadonlyFieldList';
 import ProjectProgrammeLinksField from './ProjectProgrammeLinksField';
+import ProjectProgrammeAttachmentList from './ProjectProgrammeAttachmentList';
 
 interface ProjectProgrammeReadonlySectionProps {
   sectionId: ProjectProgrammeSectionId;
@@ -19,6 +20,11 @@ export default function ProjectProgrammeReadonlySection({
         fields={getFieldsForSection(sectionId, projectProgramme)}
         pathPrefix={sectionId}
         translationNamespace="projectProgrammeForm"
+      />
+      <ProjectProgrammeAttachmentList
+        projectProgrammeId={projectProgramme?.id}
+        section={sectionId}
+        mode="view"
       />
       <ProjectProgrammeLinksField section={sectionId} mode="view" />
     </>

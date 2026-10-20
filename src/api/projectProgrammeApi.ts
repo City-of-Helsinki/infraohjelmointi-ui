@@ -1,24 +1,17 @@
-import axios from 'axios';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   IProjectProgramme,
   IProjectProgrammeLocationMap,
+  IProjectProgrammeAttachment,
   IProjectProgrammeSectionTransitionResponse,
   IProjectProgrammeTransitionResponse,
   ProjectProgrammeStatus,
 } from '@/interfaces/projectProgrammeInterfaces';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
-
 const getLocationMapUrl = (id: string) => `/project-programmes/${id}/location-map/`;
 
-// The image is served by the API, so it has to be fetched with the auth header
-// rather than used as an <img> src directly. url is the API-relative path the
-// programme's locationMap comes with.
-export async function getProjectProgrammeLocationMapBlob(url: string): Promise<Blob> {
-  const response = await axios.get<Blob>(`${API_BASE_URL}${url}`, { responseType: 'blob' });
-  return response.data;
-}
+const getAttachmentsUrl = (id: string, section: string) =>
+  `/project-programmes/${id}/sections/${section}/attachments/`;
 
 export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -132,9 +125,30 @@ export const projectProgrammeApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
     }),
+    postProjectProgrammeAttachments: build.mutation<
+      IProjectProgrammeAttachment[],
+      { id: string; section?: string; formData: FormData }
+    >({
+      query: ({ id, section = 'other-attachments', formData }) => ({
+        url: getAttachmentsUrl(id, section),
+        method: 'POST',
+        data: formData,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
     deleteProjectProgrammeLocationMap: build.mutation<undefined, { id: string }>({
       query: ({ id }) => ({
         url: getLocationMapUrl(id),
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
+    }),
+    deleteProjectProgrammeAttachment: build.mutation<
+      undefined,
+      { id: string; attachmentId: string }
+    >({
+      query: ({ id, attachmentId }) => ({
+        url: `/project-programmes/${id}/attachments/${attachmentId}/`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'ProjectProgrammes', id: arg.id }],
@@ -154,4 +168,6 @@ export const {
   usePatchProjectProgrammeSectionMutation,
   useSaveProjectProgrammeLocationMapMutation,
   useDeleteProjectProgrammeLocationMapMutation,
+  usePostProjectProgrammeAttachmentsMutation,
+  useDeleteProjectProgrammeAttachmentMutation,
 } = projectProgrammeApi;

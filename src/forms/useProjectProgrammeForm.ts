@@ -7,6 +7,7 @@ import type {
   IProjectProgrammeDesignCriteria,
   IProjectProgrammeMaintenanceNeeds,
   IProjectProgrammeInteractionAndRelatedProjects,
+  IProjectProgrammeOtherAttachments,
   IProjectProgrammeUrbanSpacingPlanningCriteria,
   IProjectProgrammeTrafficPlanningCriteria,
 } from '@/interfaces/projectProgrammeInterfaces';
@@ -162,12 +163,23 @@ function getInteractionAndRelatedProjectsValues(
   };
 }
 
+function getOtherAttachmentsValues(
+  otherAttachments?: IProjectProgrammeOtherAttachments,
+): IProjectProgrammeOtherAttachments {
+  return {
+    attachments: otherAttachments?.attachments ?? [],
+    newFiles: [],
+    removedAttachmentIds: [],
+    links: getLinksValue(otherAttachments?.links),
+  };
+}
+
 // Every section has to be listed here, reset() replaces the whole form value object.
 function getFormValues(
   formData?: IProjectProgrammeForm,
   project?: IProjectNameAndDistrict,
 ): IProjectProgrammeForm {
-  return {
+  const values: IProjectProgrammeForm = {
     basicInfo: getBasicInfoValues(formData?.basicInfo, project),
     designCriteria: getDesignCriteriaValues(formData?.designCriteria),
     trafficPlanningCriteria: getTrafficPlanningCriteriaValues(formData?.trafficPlanningCriteria),
@@ -178,7 +190,18 @@ function getFormValues(
     interactionAndRelatedProjects: getInteractionAndRelatedProjectsValues(
       formData?.interactionAndRelatedProjects,
     ),
+    otherAttachments: getOtherAttachmentsValues(formData?.otherAttachments),
   };
+
+  for (const section of Object.keys(values) as (keyof IProjectProgrammeForm)[]) {
+    Object.assign(values[section]!, {
+      attachments: formData?.[section]?.attachments ?? [],
+      newFiles: [],
+      removedAttachmentIds: [],
+    });
+  }
+
+  return values;
 }
 
 export default function useProjectProgrammeForm(

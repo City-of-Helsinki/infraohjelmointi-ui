@@ -19,6 +19,7 @@ export interface IProjectProgramme {
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+  otherAttachments?: IProjectProgrammeOtherAttachments;
 }
 
 // The map has no status of its own: it locks together with the programme
@@ -42,6 +43,9 @@ export interface IProjectProgrammeSectionTransitionResponse extends IProjectProg
 interface IProjectProgrammeSectionShared {
   links?: IProjectProgrammeLinkFormItem[] | null;
   status?: ProjectProgrammeStatus;
+  attachments?: IProjectProgrammeAttachment[];
+  newFiles?: File[];
+  removedAttachmentIds?: string[];
 }
 
 export interface IProjectProgrammeBasicInfo extends IProjectProgrammeSectionShared {
@@ -103,6 +107,17 @@ export interface IProjectProgrammeInteractionAndRelatedProjects extends IProject
   interactionNotes?: string | null;
 }
 
+export interface IProjectProgrammeAttachment {
+  id: string;
+  originalName: string;
+  contentType?: string;
+  size?: number;
+  uploadedDate?: string;
+  downloadUrl?: string;
+}
+
+export type IProjectProgrammeOtherAttachments = IProjectProgrammeSectionShared;
+
 export interface IProjectProgrammeLinkFormItem {
   id?: string;
   contentType?: number;
@@ -117,6 +132,7 @@ export interface IProjectProgrammeForm {
   urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria;
   maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds;
   interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects;
+  otherAttachments?: IProjectProgrammeOtherAttachments;
 }
 
 export interface IProjectProgrammeFormProps {

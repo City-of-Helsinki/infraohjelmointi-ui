@@ -9,7 +9,6 @@ import {
   getRequiredFieldNames,
   requiredTrimmedRule,
 } from '@/utils/projectProgrammeUtils';
-import ProjectProgrammeLinksField from '../ProjectProgrammeLinksField';
 
 interface IBasicInfoSectionProps {
   briefProgramme: boolean;
@@ -165,8 +164,6 @@ function BasicInfoSection({ briefProgramme }: Readonly<IBasicInfoSectionProps>) 
           />
         </>
       )}
-
-      <ProjectProgrammeLinksField section="basicInfo" />
     </div>
   );
 }

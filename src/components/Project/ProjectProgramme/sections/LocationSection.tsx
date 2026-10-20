@@ -6,11 +6,11 @@ import { useAppDispatch } from '@/hooks/common';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
-  getProjectProgrammeLocationMapBlob,
   useDeleteProjectProgrammeLocationMapMutation,
   useSaveProjectProgrammeLocationMapMutation,
 } from '@/api/projectProgrammeApi';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
+import { getDownloadUrl } from '@/utils/fileUtils';
 import { LOCATION_MAP_ELEMENT_ID } from './projectProgrammeSections';
 
 const LOCATION_MAP_MAX_SIZE = 500 * 1024;
@@ -27,16 +27,15 @@ function useLocationMapObjectUrl(url?: string | null) {
 
   useEffect(() => {
     setObjectUrl(undefined);
-    // Same guard as notesApi: object URLs are missing in some environments (jsdom)
-    if (!url || typeof URL.createObjectURL !== 'function') return undefined;
+    if (!url) return undefined;
 
     let cancelled = false;
     let createdUrl: string | undefined;
-    getProjectProgrammeLocationMapBlob(url)
-      .then((blob) => {
-        if (cancelled) return;
-        createdUrl = URL.createObjectURL(blob);
-        setObjectUrl(createdUrl);
+    getDownloadUrl(url)
+      .then((downloadUrl) => {
+        if (cancelled || !downloadUrl) return;
+        createdUrl = downloadUrl;
+        setObjectUrl(downloadUrl);
       })
       .catch(() => {
         // The section stays usable without the preview; a new upload replaces the map.
