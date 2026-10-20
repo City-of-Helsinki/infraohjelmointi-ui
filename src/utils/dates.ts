@@ -24,9 +24,9 @@ const getHDSDateParts = (date: string): IHDSDateParts => {
   if (!parts) {
     const parsed = momentFromHDSDate(date);
     parts = {
-      year: parseInt(parsed.format('YYYY')),
-      month: parseInt(parsed.format('M')),
-      day: parseInt(parsed.format('D')),
+      year: Number.parseInt(parsed.format('YYYY')),
+      month: Number.parseInt(parsed.format('M')),
+      day: Number.parseInt(parsed.format('D')),
     };
     if (hdsDatePartsCache.size >= MAX_CACHE_SIZE) {
       hdsDatePartsCache.clear();
