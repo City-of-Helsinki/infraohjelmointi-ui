@@ -1,3 +1,4 @@
+import { IAppStateValue } from '@/interfaces/adminInterfaces';
 import { IFreeSearchResults } from '@/interfaces/common';
 import {
   IProject,
@@ -37,7 +38,7 @@ export const patchProjects = async (
   }
 };
 
-export const patchForcedToFrameProjects = async (): Promise<any> => {
+export const patchForcedToFrameProjects = async (): Promise<IAppStateValue> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/forced-to-frame/`);
     return res.data;

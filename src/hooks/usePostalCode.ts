@@ -13,6 +13,7 @@ export function usePostalCode(address: string) {
 
   useEffect(() => {
     if (!address) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
       setPostalCode('');
       setCity('');
       return;

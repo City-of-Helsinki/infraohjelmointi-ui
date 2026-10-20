@@ -1,5 +1,5 @@
 import { Pagination, SupportedLanguage } from 'hds-react';
-import { FC, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 import MyWorkloadTaskCard from './MyWorkloadTaskCard';
 import { useTranslation } from 'react-i18next';
 import classes from '../styles.module.css';
@@ -16,6 +16,10 @@ const pageHref = () => '#';
 const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
   const { t, i18n } = useTranslation();
   const [page, setPage] = useState(0);
+
+  if (listOfTasks.length === 0 && page !== 0) {
+    setPage(0);
+  }
 
   const dateTextFormatter = (startDate: string | null, endDate: string | null): string => {
     if (!startDate && !endDate) {
@@ -56,21 +60,11 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
   }));
 
   const pageCount = useMemo(() => Math.ceil(tasks.length / TASKS_PER_PAGE), [tasks.length]);
+  const currentPage = Math.max(0, Math.min(page, pageCount - 1));
   const paginatedTasks = useMemo(() => {
-    const firstItem = page * TASKS_PER_PAGE;
+    const firstItem = currentPage * TASKS_PER_PAGE;
     return tasks.slice(firstItem, firstItem + TASKS_PER_PAGE);
-  }, [tasks, page]);
-
-  useEffect(() => {
-    if (page >= pageCount && page > 0) {
-      setPage(pageCount - 1);
-      return;
-    }
-
-    if (tasks.length === 0 && page !== 0) {
-      setPage(0);
-    }
-  }, [tasks.length, page, pageCount]);
+  }, [tasks, currentPage]);
 
   const handlePageChange = useCallback(
     (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>, selectedPage: number) => {
@@ -100,7 +94,7 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
             onChange={handlePageChange}
             pageCount={pageCount}
             pageHref={pageHref}
-            pageIndex={page}
+            pageIndex={currentPage}
             paginationAriaLabel={t('myWorkloadView.tasks.paginationAriaLabel')}
             siblingCount={2}
           />

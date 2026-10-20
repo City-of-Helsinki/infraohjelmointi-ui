@@ -23,10 +23,9 @@ interface ILocationSectionProps {
 
 /** Fetches the map with the auth header and exposes it as an object URL for <img>. */
 function useLocationMapObjectUrl(url?: string | null) {
-  const [objectUrl, setObjectUrl] = useState<string>();
+  const [loaded, setLoaded] = useState<{ url: string; objectUrl: string }>();
 
   useEffect(() => {
-    setObjectUrl(undefined);
     if (!url) return undefined;
 
     let cancelled = false;
@@ -35,7 +34,7 @@ function useLocationMapObjectUrl(url?: string | null) {
       .then((downloadUrl) => {
         if (cancelled || !downloadUrl) return;
         createdUrl = downloadUrl;
-        setObjectUrl(downloadUrl);
+        setLoaded({ url, objectUrl: downloadUrl });
       })
       .catch(() => {
         // The section stays usable without the preview; a new upload replaces the map.
@@ -47,7 +46,8 @@ function useLocationMapObjectUrl(url?: string | null) {
     };
   }, [url]);
 
-  return objectUrl;
+  // Ignore a preview that belongs to a previous url
+  return loaded && loaded.url === url ? loaded.objectUrl : undefined;
 }
 
 function LocationSection({

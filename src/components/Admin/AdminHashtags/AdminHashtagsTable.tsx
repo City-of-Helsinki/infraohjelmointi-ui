@@ -35,7 +35,7 @@ const archiveHashtag =
           duration: 1500,
         }),
       );
-    } catch (e) {
+    } catch {
       dispatch(
         notifyError({
           message: 'hashtagPatchError',

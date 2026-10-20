@@ -14,7 +14,7 @@ const ProjectFavouriteField: FC<IProjectHeaderFieldProps> = ({ control }) => {
 
       onChange(!value);
     },
-    [projectMode],
+    [],
   );
 
   return (

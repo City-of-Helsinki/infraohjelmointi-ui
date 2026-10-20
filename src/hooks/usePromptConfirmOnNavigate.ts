@@ -47,6 +47,8 @@ const usePromptConfirmOnNavigate = ({
 
     const push = navigator.push;
 
+    // Patching the router navigator is the intended way to intercept navigation here
+    // eslint-disable-next-line react-hooks/immutability
     navigator.push = (...args: Parameters<typeof push>) => {
       const promptConfirmOnNavigate = async (args: Parameters<typeof push>) => {
         const argsProperties = args[0] as IArgs;
@@ -68,7 +70,7 @@ const usePromptConfirmOnNavigate = ({
     return () => {
       navigator.push = push;
     };
-  }, [navigator, when, isConfirmed]);
+  }, [navigator, when, isConfirmed, description, title]);
 };
 
 export default usePromptConfirmOnNavigate;

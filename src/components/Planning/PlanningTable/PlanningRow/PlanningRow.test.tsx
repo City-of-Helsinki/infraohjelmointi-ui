@@ -278,4 +278,41 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
       expect(screen.getByTestId('row-test-group-1')).toBeInTheDocument();
     });
   });
+
+  it('should collapse and expand again when global groupsExpanded is toggled', async () => {
+    const groupWithProject = {
+      ...mockGroup,
+      projectRows: [{ ...mockProject.data, id: 'test-project-1', projectGroup: 'test-group-1' }],
+    };
+    const store = setupStore();
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/planning?class=test-class']}>
+          <table>
+            <tbody>
+              <PlanningRow {...groupWithProject} sapCosts={{}} />
+            </tbody>
+          </table>
+        </MemoryRouter>
+      </Provider>,
+    );
+    const projectRow = () => screen.queryByTestId('row-test-project-1-parent-test-group-1');
+
+    expect(projectRow()).not.toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(true));
+    });
+    expect(projectRow()).toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(false));
+    });
+    expect(projectRow()).not.toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(true));
+    });
+    expect(projectRow()).toBeInTheDocument();
+  });
 });

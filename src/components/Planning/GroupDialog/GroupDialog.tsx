@@ -67,6 +67,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
         setShowAdvanceFields(true);
       }
     }, [formValues.district.value, formValues.division.value]);

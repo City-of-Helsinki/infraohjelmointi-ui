@@ -215,7 +215,7 @@ describe('Search', () => {
       expect(res.data).toStrictEqual(mockFreeSearchResults.data);
       expect(getByText('#leikkipuisto')).toBeInTheDocument();
       expect(queryByText('#leikkipaikka')).toBeNull();
-    } catch (e) {
+    } catch {
       console.log('Error getting free search results');
     }
 

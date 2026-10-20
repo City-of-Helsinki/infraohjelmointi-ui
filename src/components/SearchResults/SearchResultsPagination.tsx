@@ -40,8 +40,9 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
 
   // Reset pagination every time a new search is done or the order is changed
   useEffect(() => {
-    handlePageChange(1);
-  }, [pageCount, searchOrder, handlePageChange]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
+    setSearchPage(1);
+  }, [pageCount, searchOrder]);
 
   const handleGetSearchResults = useCallback(
     async (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {

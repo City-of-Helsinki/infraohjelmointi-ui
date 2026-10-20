@@ -9,9 +9,9 @@ import {
   ChangeEvent,
   FC,
   useCallback,
+  useEffect,
   useState,
   MouseEvent,
-  useEffect,
   memo,
   useRef,
   useMemo,
@@ -71,6 +71,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
     isReadOnly: true,
     formValue: parseInt(budget ?? '0'),
   });
+
+  // Set the budgets value to a number if it exists
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
+    setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
+  }, [budget]);
 
   const { formValue, isReadOnly } = projectCellState;
 
@@ -233,19 +239,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
     },
     [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellType, canTypeUpdate],
   );
-
-  // Set the budgets value to a number if it exists
-  useEffect(() => {
-    setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
-  }, [budget]);
-
-  // Sets isSelectedYear to true if the current cell is one of the selected years
-  useEffect(() => {
-    setProjectCellState((current) => ({
-      ...current,
-      isSelectedYear: selectedYears.includes(year),
-    }));
-  }, [selectedYears, year]);
 
   return (
     <>

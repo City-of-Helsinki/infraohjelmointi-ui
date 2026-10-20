@@ -10,7 +10,7 @@ import {
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
 import { TFunction } from 'i18next';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from './common';
 
@@ -142,7 +142,7 @@ const useSearchTerms = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const submittedForm = useAppSelector(selectSubmittedSearchForm);
-  const [searchTerms, setSearchTerms] = useState<Array<ISearchTerm>>([]);
+  const searchTerms = useMemo(() => getSearchTerms(submittedForm, t), [submittedForm, t]);
 
   const deleteTerm = useCallback(
     async (term: ISearchTerm) => {
@@ -166,10 +166,6 @@ const useSearchTerms = () => {
   const deleteAllTerms = useCallback(() => {
     dispatch(clearSearchState());
   }, [dispatch]);
-
-  useEffect(() => {
-    setSearchTerms(getSearchTerms(submittedForm, t));
-  }, [submittedForm]);
 
   return { searchTerms, deleteTerm, deleteAllTerms };
 };
