@@ -27,7 +27,7 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
-  const icon = useMemo(() => optionIcon[iconKey as keyof typeof optionIcon], []);
+  const icon = useMemo(() => optionIcon[iconKey as keyof typeof optionIcon], [iconKey]);
   return (
     <Controller
       name={name}

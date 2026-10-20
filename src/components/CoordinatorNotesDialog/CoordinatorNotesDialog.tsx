@@ -71,7 +71,7 @@ export const CoordinatorNotesDialog = () => {
         } else {
           setErrorNotification();
         }
-      } catch (e) {
+      } catch {
         setErrorNotification();
       }
     }

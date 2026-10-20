@@ -82,7 +82,7 @@ const useSearchForm = () => {
       setMultiListOption(key, value);
     });
     reset(storeFormValues);
-  }, [storeFormValues]);
+  }, [storeFormValues, reset, setMultiListOption]);
 
   return {
     formMethods,
