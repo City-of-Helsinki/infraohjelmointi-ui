@@ -1,11 +1,22 @@
 import { IProject } from '@/interfaces/projectInterfaces';
-import { FC, memo, useCallback, useRef } from 'react';
+import { FC, memo, useCallback, useMemo, useRef } from 'react';
 import ProjectCell from './ProjectCell';
 import useProjectRow from '@/hooks/useProjectRow';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import ProjectHead from './ProjectHead';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { useAppSelector } from '@/hooks/common';
+import {
+  selectChangeHistoryEnabled,
+  selectForcedToFrame,
+  selectSelectedYears,
+  selectSelections,
+} from '@/reducers/planningSlice';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { usePatchProjectMutation } from '@/api/projectApi';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface IProjectRowProps {
   project: IProject;
@@ -17,12 +28,38 @@ interface IProjectRowProps {
 const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCosts }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums, projectFinances } = useProjectRow(project, sapCosts[project.id]);
+  const selectedYears = useAppSelector(selectSelectedYears);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const changeHistoryEnabled = useAppSelector(selectChangeHistoryEnabled);
+  const user = useAppSelector(selectUser);
+  const selectedMasterClass = useAppSelector(
+    (state) => selectSelections(state).selectedMasterClass,
+  );
+  const { canEditClass } = useRestrictedClassAccess();
+  const [patchProject] = usePatchProjectMutation();
 
-  // Remove the active css-class from the current row if the user clicks outside of it
+  const isEditingDisabledForUser = useMemo(() => {
+    if (!canEditClass(project.projectClass)) {
+      return true;
+    }
+
+    // Project area planner can only edit projects under masterclass 808
+    if (isUserOnlyProjectAreaPlanner(user)) {
+      return !(
+        selectedMasterClass?.name.startsWith('808') || selectedMasterClass?.name.startsWith('8 08')
+      );
+    }
+
+    // Disable editing project budgets if user is only a viewer
+    return isUserOnlyViewer(user);
+  }, [user, selectedMasterClass, canEditClass, project.projectClass]);
+
+  const isReadOnly = isUserOnlyViewer(user) || !canEditClass(project.projectClass);
+
   useClickOutsideRef(
     projectRowRef,
     useCallback(() => {
-      if (projectRowRef?.current?.classList.contains('active')) {
+      if (projectRowRef.current?.classList.contains('active')) {
         projectRowRef.current.classList.remove('active');
       }
     }, []),
@@ -36,14 +73,18 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCo
       className={`project-row ${isSearched ? 'searched' : ''}`}
     >
       {/* HEADER */}
-      <ProjectHead project={project} sums={sums} />
+      <ProjectHead project={project} sums={sums} isReadOnly={isReadOnly} patchProject={patchProject} />
       {cells.map((c) => (
         <ProjectCell
           key={c.financeKey}
           cell={c}
           projectFinances={projectFinances}
           sapProject={project.sapProject}
-          projectClass={project.projectClass}
+          isSelectedYear={selectedYears.includes(c.year)}
+          forcedToFrame={forcedToFrame}
+          changeHistoryEnabled={changeHistoryEnabled}
+          isEditingDisabledForUser={isEditingDisabledForUser}
+          patchProject={patchProject}
         />
       ))}
     </tr>

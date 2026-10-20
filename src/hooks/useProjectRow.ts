@@ -158,7 +158,10 @@ const getTimelineDates = (
  * Creates a list of monthly data to be used for drawing the monthly graphs when expanding a
  * year in the PlanningView.
  */
-const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
+export const getMonthlyDataList = (
+  year: number,
+  timelineDates: ITimelineDates,
+): Array<IMonthlyData> => {
   const getMonthData = (year: number, month: number, type: CellType) => {
     const {
       planningStart,
@@ -538,8 +541,6 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
 
     const isLastOfType = getIsLastOfType(cellYear, timelineDates);
 
-    const monthlyDataList = getMonthlyDataList(cellYear, timelineDates);
-
     return {
       year: cellYear,
       startYear: year,
@@ -558,7 +559,6 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
       growDirections: [],
       financesToReset: null,
       affectsDates: false,
-      monthlyDataList,
       projectEstDates: {
         ...datesToUse,
       },

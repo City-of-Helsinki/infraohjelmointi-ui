@@ -39,7 +39,6 @@ const createCell = (overrides: Partial<IProjectCell> = {}): IProjectCell => ({
   title: 'Test project cell',
   id: 'project-1',
   affectsDates: true,
-  monthlyDataList: [],
   timelineDates: { ...baseTimelineDates },
   projectEstDates: { ...baseProjectEstDates },
   ...overrides,
