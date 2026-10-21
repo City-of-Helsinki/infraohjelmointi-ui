@@ -1,23 +1,27 @@
-import { CellType, IMonthlyData, ITimelineDates } from '@/interfaces/projectInterfaces';
+import { CellType, ITimelineDates } from '@/interfaces/projectInterfaces';
 import { FC, memo, useMemo } from 'react';
 import ProjectYearSummaryTable from './ProjectYearSummaryTable';
 import MonthlyGraphCell from './MonthlyGraphCell';
 import './styles.css';
 import { getProjectSapCurrentYearByYear } from '@/reducers/sapCostSlice';
 import { useAppSelector } from '@/hooks/common';
+import { getMonthlyDataList } from '@/hooks/useProjectRow';
 
 interface IProjectYearSummaryProps {
   id: string;
   startYear: number;
   year: number;
-  monthlyDataList: Array<IMonthlyData>;
   cellType: CellType;
   timelineDates: ITimelineDates;
   sapProject: string | undefined;
 }
 
 const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
-  const { year, monthlyDataList } = props;
+  const { year, timelineDates } = props;
+  const monthlyDataList = useMemo(
+    () => getMonthlyDataList(year, timelineDates),
+    [year, timelineDates],
+  );
   const projectSapValuesByYear = useAppSelector(getProjectSapCurrentYearByYear);
   const sapCurrentYear = projectSapValuesByYear[props.year] ?? {};
   const currentYear = new Date().getFullYear();

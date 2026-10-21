@@ -8,6 +8,34 @@ import moment from 'moment';
  */
 const momentFromHDSDate = (date?: string) => moment(date, 'DD.MM.YYYY');
 
+interface IHDSDateParts {
+  year: number;
+  month: number;
+  day: number;
+}
+
+const MAX_CACHE_SIZE = 10000;
+const hdsDatePartsCache = new Map<string, IHDSDateParts>();
+const daysInMonthCache = new Map<string, number>();
+
+// Parsing with moment is slow and the planning table parses the same dates thousands of times
+const getHDSDateParts = (date: string): IHDSDateParts => {
+  let parts = hdsDatePartsCache.get(date);
+  if (!parts) {
+    const parsed = momentFromHDSDate(date);
+    parts = {
+      year: Number.parseInt(parsed.format('YYYY')),
+      month: Number.parseInt(parsed.format('M')),
+      day: Number.parseInt(parsed.format('D')),
+    };
+    if (hdsDatePartsCache.size >= MAX_CACHE_SIZE) {
+      hdsDatePartsCache.clear();
+    }
+    hdsDatePartsCache.set(date, parts);
+  }
+  return parts;
+};
+
 /**
  * Checks if a date range is included in a year
  *
@@ -21,8 +49,8 @@ export const isInYearRange = (
   startDate?: string | null,
   endDate?: string | null,
 ): boolean => {
-  const startYear = startDate ? parseInt(momentFromHDSDate(startDate).format('YYYY')) : 0;
-  const endYear = endDate ? parseInt(momentFromHDSDate(endDate).format('YYYY')) : 0;
+  const startYear = startDate ? getHDSDateParts(startDate).year : 0;
+  const endYear = endDate ? getHDSDateParts(endDate).year : 0;
   return startYear && endYear ? year >= startYear && year <= endYear : false;
 };
 
@@ -91,7 +119,7 @@ export const getFirstDate = (date: string | null | undefined) => {
 };
 
 export const getYear = (date?: string | null): number | null =>
-  date ? parseInt(momentFromHDSDate(date).format('YYYY')) : null;
+  date ? getHDSDateParts(date).year : null;
 
 export const updateYear = (year: number | undefined, date?: string | null) => {
   if (date && year) {
@@ -106,20 +134,28 @@ export const updateYear = (year: number | undefined, date?: string | null) => {
  * @returns amount of days in that month
  */
 export const getDaysInMonthForYear = (year: number, month: number): number => {
-  // Create a Moment.js object representing the given month
-  const date = moment({ year, month: month - 1 });
-  return date.daysInMonth();
+  const key = `${year}-${month}`;
+  let days = daysInMonthCache.get(key);
+  if (days === undefined) {
+    // Create a Moment.js object representing the given month
+    days = moment({ year, month: month - 1 }).daysInMonth();
+    if (daysInMonthCache.size >= MAX_CACHE_SIZE) {
+      daysInMonthCache.clear();
+    }
+    daysInMonthCache.set(key, days);
+  }
+  return days;
 };
 
 export const getDayFromDate = (date?: string | null) => {
   if (date) {
-    return parseInt(momentFromHDSDate(date).format('D'));
+    return getHDSDateParts(date).day;
   } else return 0;
 };
 
 export const getMonthFromDate = (date?: string | null) => {
   if (date) {
-    return parseInt(momentFromHDSDate(date).format('M'));
+    return getHDSDateParts(date).month;
   } else return 0;
 };
 
