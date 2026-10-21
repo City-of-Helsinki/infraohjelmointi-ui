@@ -4,8 +4,14 @@ import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTra
 
 const mockDispatch = jest.fn();
 const mockTransitionProjectProgrammeStatus = jest.fn();
+const mockIsConfirmed = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
+
+jest.mock('@/hooks/useConfirmDialog', () => ({
+  __esModule: true,
+  default: () => ({ isConfirmed: mockIsConfirmed }),
+}));
 
 jest.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
@@ -36,6 +42,8 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
     mockDispatch.mockReset();
     mockTransitionProjectProgrammeStatus.mockReset();
     mockTransitionProjectProgrammeStatus.mockResolvedValue({ currentStatus: 'COMPLETE' });
+    mockIsConfirmed.mockReset();
+    mockIsConfirmed.mockResolvedValue(true);
   });
 
   it('transitions a draft programme to complete and reports success', async () => {
@@ -77,6 +85,11 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
 
+    expect(mockIsConfirmed).toHaveBeenCalledWith({
+      title: 'projectProgrammeForm.returnToDraftDialogTitle',
+      description: 'projectProgrammeForm.returnToDraftDialogDescription',
+      confirmButtonText: 'projectProgrammeForm.returnToDraftDialogConfirm',
+    });
     await waitFor(() => {
       expect(mockTransitionProjectProgrammeStatus).toHaveBeenCalledWith({
         id: 'programme-1',
@@ -93,6 +106,23 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
         }),
       );
     });
+  });
+
+  it('does not return the programme to draft when the confirmation is cancelled', async () => {
+    mockIsConfirmed.mockResolvedValue(false);
+
+    render(
+      <ProjectProgrammeStatusTransitionButtons
+        isProjectProgrammeComplete={true}
+        effectiveProjectProgrammeId="programme-1"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'projectProgrammeForm.returnToDraft' }));
+
+    await waitFor(() => expect(mockIsConfirmed).toHaveBeenCalled());
+    expect(mockTransitionProjectProgrammeStatus).not.toHaveBeenCalled();
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 
   it('reports an error when the transition fails', async () => {

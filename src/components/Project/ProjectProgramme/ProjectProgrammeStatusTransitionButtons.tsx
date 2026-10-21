@@ -1,7 +1,8 @@
-import { Button } from 'hds-react';
+import { Button, ButtonVariant } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useTransitionProjectProgrammeStatusMutation } from '@/api/projectProgrammeApi';
 import { useAppDispatch } from '@/hooks/common';
+import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
   ProjectProgrammeStatus,
@@ -18,6 +19,7 @@ function ProjectProgrammeStatusTransitionButtons({
 }: Readonly<ProjectProgrammeStatusTransitionButtonsProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { isConfirmed } = useConfirmDialog();
 
   const [transitionStatus] = useTransitionProjectProgrammeStatusMutation();
 
@@ -71,13 +73,24 @@ function ProjectProgrammeStatusTransitionButtons({
     }
   }
 
+  async function handleReturnToDraft() {
+    const confirmed = await isConfirmed({
+      title: t('projectProgrammeForm.returnToDraftDialogTitle'),
+      description: t('projectProgrammeForm.returnToDraftDialogDescription'),
+      confirmButtonText: 'projectProgrammeForm.returnToDraftDialogConfirm',
+    });
+    if (confirmed) {
+      await handleProgrammeStatusTransition('DRAFT');
+    }
+  }
+
   return (
     <>
       {isProjectProgrammeComplete && (
         <Button
           type="button"
-          onClick={() => handleProgrammeStatusTransition('DRAFT')}
-          variant={buttonOverrides?.markDraft?.variant}
+          onClick={handleReturnToDraft}
+          variant={buttonOverrides?.markDraft?.variant ?? ButtonVariant.Secondary}
           theme={buttonOverrides?.markDraft?.theme}
           style={buttonOverrides?.markDraft?.style}
         >
