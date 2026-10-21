@@ -784,18 +784,6 @@ describe('ConstructionHandoverForm attachments and links', () => {
     expect(mockPostHandoverAttachment).not.toHaveBeenCalled();
   });
 
-  it.each(['linkDesignDrawings', 'linkCostAllocation', 'linkContractBoundaries'])(
-    'does not submit when required link %s is empty',
-    async (linkField) => {
-      await act(async () => setupConstructionHandoverForm({ [linkField]: null }));
-
-      await clickSaveDraft();
-
-      expect(await screen.findByText('validation.required')).toBeInTheDocument();
-      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
-    },
-  );
-
   it('renders every attachment of the handover', async () => {
     await act(async () =>
       setupConstructionHandoverForm({

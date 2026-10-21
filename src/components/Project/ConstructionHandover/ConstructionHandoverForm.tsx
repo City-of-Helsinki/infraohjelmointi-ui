@@ -51,8 +51,8 @@ function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHan
     description: formData.description,
     constructionProcurementMethod: formData.constructionProcurementMethod.value,
     staraProcurementReason: formData.staraProcurementReason?.value ?? null,
-    constructionStart: formData.constructionStart,
-    constructionEnd: formData.constructionEnd,
+    constructionStart: formData.constructionStart || null,
+    constructionEnd: formData.constructionEnd || null,
     otherTimelineNotes: formData.otherTimelineNotes,
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
@@ -76,6 +76,7 @@ function ConstructionHandoverForm({
   const dispatch = useAppDispatch();
   const formMethods = useConstructionHandoverForm(constructionHandover);
   const {
+    getValues,
     handleSubmit,
     formState: { isDirty },
   } = formMethods;
@@ -208,7 +209,7 @@ function ConstructionHandoverForm({
 
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit(submitForm)}>
+      <form>
         <NameAndDescriptionSection
           shouldShowProcurementMethod={[
             ConstructionHandoverStatus.DRAFT,
@@ -248,7 +249,7 @@ function ConstructionHandoverForm({
                 )}
               </div>
               {showSaveDraftButton && (
-                <Button variant={ButtonVariant.Secondary} type="submit">
+                <Button variant={ButtonVariant.Secondary} onClick={() => submitForm(getValues())}>
                   {t('constructionHandoverForm.saveDraft')}
                 </Button>
               )}

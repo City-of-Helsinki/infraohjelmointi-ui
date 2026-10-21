@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { CONSTRUCTION_HANDOVER_ATTACHMENT_MAX_SIZE } from './handoverConstants';
 import { FormSectionTitle } from '@/components/shared';
 import { useFormContext } from 'react-hook-form';
-import { validateRequired } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
 import LinkField from '@/components/shared/LinkField';
 import FileInput from '@/components/shared/FileInput';
@@ -66,18 +66,9 @@ export default function AttachmentsAndLinksSection({
         label="constructionHandoverForm.attachmentsAndLinks"
         name="attachmentsAndLinks"
       />
-      <LinkField
-        {...getFieldProps('linkDesignDrawings')}
-        rules={{ ...validateRequired('linkDesignDrawings', t) }}
-      />
-      <LinkField
-        {...getFieldProps('linkCostAllocation')}
-        rules={{ ...validateRequired('linkCostAllocation', t) }}
-      />
-      <LinkField
-        {...getFieldProps('linkContractBoundaries')}
-        rules={{ ...validateRequired('linkContractBoundaries', t) }}
-      />
+      <LinkField {...getFieldProps('linkDesignDrawings')} />
+      <LinkField {...getFieldProps('linkCostAllocation')} />
+      <LinkField {...getFieldProps('linkContractBoundaries')} />
       {!isPostingAttachment && (
         <FileInput
           id="attachments-and-links-file-input"
@@ -85,6 +76,7 @@ export default function AttachmentsAndLinksSection({
             setValue('attachments', files, { shouldDirty: true });
           }}
           disabled={isHandoverLocked}
+          maxSize={CONSTRUCTION_HANDOVER_ATTACHMENT_MAX_SIZE}
         />
       )}
       {attachments.length > 0 && (
