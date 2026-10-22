@@ -9,22 +9,21 @@ import {
 
 const ASSIGNED = '8 03 Kadut/B Sillat';
 
-const restrictedUser = createMockUserWithAdGroups(
-  [UserRole.RESTRICTED_PROGRAMMER, UserRole.VIEWER],
-  { restricted_class_paths: [ASSIGNED] },
-);
+// The restricted group's name is configurable in the API, so only the flag identifies the role
+const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
+  is_restricted_programmer: true,
+  restricted_class_paths: [ASSIGNED],
+});
 
 describe('restricted programmer helpers (IO-756)', () => {
-  it('a restricted programmer with the viewer group is not only a viewer', () => {
+  it('a restricted programmer is not only a viewer, whatever their group names', () => {
     expect(isUserOnlyViewer(restrictedUser)).toBe(false);
     expect(isUserRestrictedProgrammer(restrictedUser)).toBe(true);
   });
 
-  it('coordinators and admins are never restricted', () => {
-    for (const role of [UserRole.COORDINATOR, UserRole.ADMIN]) {
-      const user = createMockUserWithAdGroups([role, UserRole.RESTRICTED_PROGRAMMER]);
-      expect(isUserRestrictedProgrammer(user)).toBe(false);
-    }
+  it('only the API flag makes a user restricted', () => {
+    expect(isUserRestrictedProgrammer(createMockUserWithAdGroups([UserRole.PLANNER]))).toBe(false);
+    expect(isUserRestrictedProgrammer(null)).toBe(false);
   });
 
   it('scope covers the assigned class and its sub classes', () => {
