@@ -19,6 +19,10 @@ export interface IUser {
    * Class paths a restricted programmer may edit (IO-756), empty for other users
    */
   restricted_class_paths?: Array<string>;
+  /**
+   * IDs of the classes a restricted programmer may edit, sub classes included (IO-756)
+   */
+  restricted_class_ids?: Array<string>;
 }
 
 export interface IAdGroup {
