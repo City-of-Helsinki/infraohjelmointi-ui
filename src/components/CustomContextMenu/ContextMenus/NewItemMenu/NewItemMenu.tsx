@@ -20,7 +20,8 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
   const { t } = useTranslation();
   const selections = useAppSelector(selectSelections);
   // Restricted programmers can create projects but not summing groups (IO-756)
-  const { isRestricted } = useRestrictedClassAccess();
+  const { isRestricted, canEditClass } = useRestrictedClassAccess();
+  const selectedClassId = selections.selectedSubClass?.id ?? selections.selectedClass?.id;
   const onOpenProjectProgrammedDialog = useCallback(() => {
     onCloseMenu();
     onShowProjectProgrammedDialog();
@@ -52,7 +53,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
           variant={ButtonVariant.Supplementary}
           iconStart={undefined}
           onClick={onOpenProjectProgrammedDialog}
-          disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
+          disabled={!selectedClassId || !canEditClass(selectedClassId)}
           data-testid="open-project-programmed-dialog"
         >
           {t(`projectProgrammedForm.addProjectsToProgramming`)}
