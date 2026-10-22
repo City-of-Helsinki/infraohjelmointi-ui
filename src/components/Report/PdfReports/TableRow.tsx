@@ -119,9 +119,13 @@ const styles = StyleSheet.create({
   costForecastCell: {
     ...cellStyles,
     ...constructionProgramCommonStyles,
-    width: '83px',
+    width: '10%',
+    flexShrink: 0,
     fontWeight: 'bold',
     borderLeft: '1px solid #808080',
+  },
+  constructionProgramRow: {
+    width: '100%',
   },
   planAndConStartCell: {
     ...cellStyles,
@@ -652,7 +656,11 @@ const ConstructionProgramRow: FC<IConstructionProgramRowProps> = memo(({ row, in
   if (!row || (row.name === '' && row.type !== 'empty')) return null;
 
   return (
-    <View wrap={false} style={getConstructionRowStyle(row.type ?? '', index)} key={row.id}>
+    <View
+      wrap={false}
+      style={[getConstructionRowStyle(row.type ?? '', index), styles.constructionProgramRow]}
+      key={row.id}
+    >
       <Text
         style={
           CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES.has(row.type)
