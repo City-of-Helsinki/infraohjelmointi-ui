@@ -12,6 +12,7 @@ interface IRadioCheckboxFieldProps {
   control: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
+  readOnlyVariant?: 'text' | 'input';
   disabled?: boolean;
 }
 
@@ -21,6 +22,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
   control,
   rules,
   readOnly,
+  readOnlyVariant = 'text',
   disabled,
 }) => {
   const { t } = useTranslation();
@@ -49,6 +51,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
               label={label ?? ''}
               control={control}
               readOnly={true}
+              readOnlyVariant={readOnlyVariant}
               readOnlyValue={options.find((o) => o.value == valueToString(value))?.label}
             />
           ) : (

@@ -11,6 +11,7 @@ interface INumberFieldProps {
   rules?: HookFormRulesType;
   required?: boolean;
   readOnly?: boolean;
+  readOnlyVariant?: 'text' | 'input';
   tooltip?: string;
   hideLabel?: boolean;
   disabled?: boolean;
@@ -24,6 +25,7 @@ const NumberField: FC<INumberFieldProps> = ({
   rules,
   required,
   readOnly,
+  readOnlyVariant = 'text',
   tooltip,
   hideLabel,
   disabled,
@@ -31,6 +33,7 @@ const NumberField: FC<INumberFieldProps> = ({
 }) => {
   const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
+  const isReadOnlyInput = readOnly && readOnlyVariant === 'input';
 
   return (
     <Controller
@@ -40,7 +43,7 @@ const NumberField: FC<INumberFieldProps> = ({
       render={({ field: { value, onChange, disabled: fieldDisabled }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
-            className={`input-${size}`}
+            className={`input-${size} ${isReadOnlyInput ? 'read-only-input' : ''}`}
             value={value ?? ''}
             onChange={onChange}
             label={!hideLabel ? t(label) : ''}
@@ -51,7 +54,7 @@ const NumberField: FC<INumberFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             helperText={tooltip}
-            disabled={disabled ?? fieldDisabled}
+            disabled={isReadOnlyInput || (disabled ?? fieldDisabled)}
           />
         </div>
       )}

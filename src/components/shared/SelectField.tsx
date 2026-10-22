@@ -22,6 +22,7 @@ interface ISelectFieldProps extends SelectProps {
   size?: 'full' | 'lg';
   shouldTranslate?: boolean;
   readOnly?: boolean;
+  readOnlyVariant?: 'text' | 'input';
   placeholder?: string;
   wrapperClassName?: string;
 }
@@ -41,6 +42,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   required,
   shouldTranslate = true,
   readOnly,
+  readOnlyVariant = 'text',
   placeholder,
   children,
   filter,
@@ -49,6 +51,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   ...rest
 }) => {
   const isRequired = required ?? !!rules?.required;
+  const showIcon = !readOnly || readOnlyVariant === 'input';
   const { t } = useTranslation();
 
   const translateOption = useCallback(
@@ -124,6 +127,9 @@ const SelectField: FC<ISelectFieldProps> = ({
         const hasValue = Array.isArray(value) ? value.length > 0 : Boolean(value?.value);
 
         const handleChange = (selectedOptions: Option[] = [], clickedOption?: Option) => {
+          if (readOnly) {
+            return;
+          }
           const options = multiSelect ? selectedOptions : clickedOption;
           onChange(options ?? { value: '', label: '' });
           if (shouldUpdateIcon && clickedOption?.value) {
@@ -139,11 +145,11 @@ const SelectField: FC<ISelectFieldProps> = ({
              * gray if the value is undefined
              */}
             <div
-              className={`select-field-wrapper ${size ? size : ''} ${iconKey ? 'with-icon' : ''} ${
+              className={`select-field-wrapper ${size ? size : ''} ${iconKey && showIcon ? 'with-icon' : ''} ${
                 !value || !value.value ? 'placeholder' : ''
               }`}
             >
-              {readOnly ? (
+              {readOnly && readOnlyVariant === 'text' ? (
                 <TextField
                   name={''}
                   label={label ?? ''}
@@ -154,23 +160,23 @@ const SelectField: FC<ISelectFieldProps> = ({
               ) : (
                 <HDSSelect
                   id={`select-field-${name}`}
-                  className={`custom-select ${iconKey ? 'icon' : ''}`}
+                  className={`custom-select ${iconKey && showIcon ? 'icon' : ''} ${readOnly ? 'read-only-select' : ''}`}
                   value={translatedValue}
                   onChange={handleChange}
                   onBlur={onBlur}
                   invalid={error ? true : false}
                   options={translatedOptions ?? []}
                   required={isRequired}
-                  disabled={isDisabled}
+                  disabled={readOnly || isDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
-                  icon={icon}
+                  icon={showIcon ? icon : undefined}
                   filter={filter}
                   texts={{
                     label: !hideLabel && label ? t(label) : undefined,
                     error: error?.message,
                     placeholder: placeholder ?? t('choose'),
                   }}
-                  clearable={Boolean(clearable && hasValue)}
+                  clearable={Boolean(clearable && hasValue && !readOnly)}
                   multiSelect={multiSelect}
                   {...rest}
                 />

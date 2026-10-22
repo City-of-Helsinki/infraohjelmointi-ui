@@ -54,6 +54,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           {projectMode === 'new' && (
             <TextField
               {...getFieldProps('name')}
+              readOnly={isUserOnlyViewer}
               rules={{ ...validateMaxLength(200, t), ...validateRequired('name', t) }}
             />
           )}
@@ -113,6 +114,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('address')}
+                readOnly={isUserOnlyViewer}
                 rules={{ ...validateRequired('address', t) }}
               />
             </div>
@@ -121,12 +123,14 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('postalCode')}
+                readOnly={isUserOnlyViewer}
                 infoText={showPostalCodeInfo ? t('projectForm.noPostalCodeFound') : undefined}
               />
             </div>
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('city')}
+                readOnly={isUserOnlyViewer}
                 infoText={showCityInfo ? t('projectForm.noCityFound') : undefined}
               />
             </div>

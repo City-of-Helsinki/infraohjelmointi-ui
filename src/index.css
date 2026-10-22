@@ -89,13 +89,13 @@ we give the container a 3rem margin left
   @apply !text-black-40;
 }
 
-.textarea-field textarea {
+.textarea-field:not(.read-only-input) textarea {
   max-height: 27rem !important;
   min-height: 3.5rem !important;
   resize: none !important;
 }
 
-.textarea-field.input-l textarea {
+.textarea-field.input-l:not(.read-only-input) textarea {
   /* overwrite the HDS textarea height token, since setting height with important will force it to always be that height */
   --textarea-height: 3.5rem !important;
 }

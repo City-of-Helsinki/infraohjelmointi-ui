@@ -44,7 +44,8 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
                 onClick={onOpenChangeHistory}
                 data-testid="open-project-history-button"
               >
-                {t('projectForm.changeHistory.button')}
+                moi
+                {/* {t('projectForm.changeHistory.button')} */}
               </Button>
               <Tooltip placement="auto">{t('projectForm.changeHistory.info')}</Tooltip>
             </div>

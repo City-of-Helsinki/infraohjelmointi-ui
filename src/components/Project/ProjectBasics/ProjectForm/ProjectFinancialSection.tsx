@@ -363,7 +363,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         </div>
         {isOtherBudgetOverrunReasonSelected && (
           <div className="form-col-md">
-            <RadioCheckboxField {...getFieldProps('onSchedule')} />
+            <RadioCheckboxField {...getFieldProps('onSchedule')} readOnly={isUserOnlyViewer} />
           </div>
         )}
       </div>

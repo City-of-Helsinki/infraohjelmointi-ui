@@ -13,6 +13,7 @@ interface IListFieldProps {
   label: string;
   fields?: Array<IForm>;
   readOnly?: boolean;
+  readOnlyVariant?: 'text' | 'input';
   cancelEdit?: boolean;
   disabled?: boolean;
 }
@@ -22,6 +23,7 @@ const ListField: FC<IListFieldProps> = ({
   label,
   fields,
   readOnly,
+  readOnlyVariant = 'text',
   cancelEdit,
   disabled,
 }) => {
@@ -134,7 +136,9 @@ const ListField: FC<IListFieldProps> = ({
                 </label>
 
                 {!editing || f.readOnly ? (
-                  <div className="list-field-values">
+                  <div
+                    className={`list-field-values ${readOnly && readOnlyVariant === 'input' ? 'read-only-list-value' : ''}`}
+                  >
                     <span>
                       {f.isSapProject
                         ? `${getSapCostValue(f)}`
