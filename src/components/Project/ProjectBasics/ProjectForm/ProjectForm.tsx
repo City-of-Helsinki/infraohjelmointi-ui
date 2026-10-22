@@ -521,9 +521,10 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         name: name,
         label: `projectForm.${name}`,
         control: control,
+        readOnlyVariant: isOnlyViewer ? ('input' as const) : undefined,
       };
     },
-    [control],
+    [control, isOnlyViewer],
   );
 
   const formProps = useMemo(
@@ -587,7 +588,11 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isUserProjectManagerCheck = useMemo(() => isUserOnlyProjectManager(user), [user]);
 
   return (
-    <form ref={formRef} data-testid="project-form" className="project-form">
+    <form
+      ref={formRef}
+      data-testid="project-form"
+      className={isOnlyViewer ? 'project-form viewer-only-project-form' : 'project-form'}
+    >
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
         {...formProps}

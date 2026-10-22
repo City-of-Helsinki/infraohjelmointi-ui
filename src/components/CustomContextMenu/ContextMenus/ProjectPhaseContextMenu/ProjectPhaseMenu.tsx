@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
 import { IPhaseMenuDetails } from '@/interfaces/eventInterfaces';
 import optionIcon from '@/utils/optionIcon';
+import { useAppSelector } from '@/hooks/common';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import './styles.css';
 
 interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
@@ -19,6 +22,8 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
 }) => {
   const { t } = useTranslation();
   const phases = useOptions('phases');
+  const user = useAppSelector(selectUser);
+  const isOnlyViewer = isUserOnlyViewer(user);
   const [selectedPhase, setSelectedPhase] = useState<string>(phase ?? '');
 
   const handleSetSelectedPhase = useCallback((nextPhase: string) => {
@@ -26,9 +31,12 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   }, []);
 
   const onSubmit = useCallback(() => {
+    if (isOnlyViewer) {
+      return;
+    }
     onSubmitPhase({ phase: selectedPhase });
     onCloseMenu();
-  }, [onCloseMenu, onSubmitPhase, selectedPhase]);
+  }, [isOnlyViewer, onCloseMenu, onSubmitPhase, selectedPhase]);
 
   useEffect(() => {
     if (phase) {
@@ -53,6 +61,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
             <button
               className="selection-button"
               data-testid={`select-${value}`}
+              disabled={isOnlyViewer}
               onClick={() => handleSetSelectedPhase(value)}
             >
               <div className="min-w-[2rem]">{optionIcon[label as keyof typeof optionIcon]}</div>
@@ -67,11 +76,13 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
           </li>
         ))}
       </ul>
-      <div className="phase-menu-footer">
-        <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
-          {t('save')}
-        </Button>
-      </div>
+      {!isOnlyViewer && (
+        <div className="phase-menu-footer">
+          <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
+            {t('save')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

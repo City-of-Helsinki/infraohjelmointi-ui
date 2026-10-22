@@ -253,24 +253,26 @@ const PlanningToolbar = () => {
         <div
           className={`planning-toolbar-right ${selectedYears.length ? 'monthly-view-open' : ''}`}
         >
-          <div>
-            <button
-              aria-label="ideal budget view"
-              className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-              disabled={isPlanningModeButtonDisabled}
-              onClick={moveToIdealView}
-            >
-              <IconMoneyBag />
-            </button>
-            <button
-              aria-label="force framed budget view"
-              className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-              disabled={isForcedToFrameModeButtonDisabled}
-              onClick={moveToForcedToFrameView}
-            >
-              <IconMoneyBagFill />
-            </button>
-          </div>
+          {!isUserOnlyViewer(user) && (
+            <div>
+              <button
+                aria-label="ideal budget view"
+                className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+                disabled={isPlanningModeButtonDisabled}
+                onClick={moveToIdealView}
+              >
+                <IconMoneyBag />
+              </button>
+              <button
+                aria-label="force framed budget view"
+                className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+                disabled={isForcedToFrameModeButtonDisabled}
+                onClick={moveToForcedToFrameView}
+              >
+                <IconMoneyBagFill />
+              </button>
+            </div>
+          )}
           <YearSelector />
         </div>
       }
