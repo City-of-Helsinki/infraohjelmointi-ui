@@ -6,6 +6,7 @@ import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import useTalpaLists from '@/hooks/useTalpaLists';
 import Link from '../shared/Link';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface IProjectDetailsProps {
   projectMode: 'edit' | 'new';
@@ -15,6 +16,8 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   const location = useLocation().pathname;
   const user = useAppSelector(selectUser);
   const isOnlyViewer = isUserOnlyViewer(user);
+  // Restricted programmers (IO-756) can't use Talpa or construction handovers
+  const { isRestricted } = useRestrictedClassAccess();
   useTalpaLists();
 
   const onBasicsPage = location.includes('basics');
@@ -34,7 +37,7 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
             {t('notes')}
           </Link>
         )}
-        {projectMode !== 'new' && !isOnlyViewer && (
+        {projectMode !== 'new' && !isOnlyViewer && !isRestricted && (
           <Link className={`button ${onTalpaPage ? 'buttonHighlighted' : ''}`} href="talpa">
             {t('talpa')}
           </Link>
@@ -47,7 +50,7 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
             {t('projectProgramme')}
           </Link>
         )}
-        {projectMode !== 'new' && !isOnlyViewer && (
+        {projectMode !== 'new' && !isOnlyViewer && !isRestricted && (
           <Link
             className={`button ${onConstructionHandoverPage ? 'buttonHighlighted' : ''}`}
             href="construction-handover"

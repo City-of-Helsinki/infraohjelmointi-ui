@@ -13,6 +13,7 @@ import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlic
 import { createSearchParams } from 'react-router-dom';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
 interface IPlanningHeadProps extends IPlanningRow {
@@ -37,6 +38,8 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const { search } = useLocation();
   const user = useAppSelector(selectUser);
+  // Restricted programmers (IO-756) can't manage summing groups
+  const { isRestricted } = useRestrictedClassAccess();
 
   const [groupDialogState, setGroupDialogState] = useState({
     groupDeleteOpen: false,
@@ -137,7 +140,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               <button
                 onClick={handleGroupRowMenu}
                 data-testid={`show-more-icon-${id}`}
-                disabled={isUserOnlyViewer(user)}
+                disabled={isUserOnlyViewer(user) || isRestricted}
               >
                 <IconMenuDots size={IconSize.Small} />
               </button>
