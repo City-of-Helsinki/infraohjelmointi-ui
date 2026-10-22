@@ -8,6 +8,67 @@
   margin-bottom: var(--spacing-l);
 }
 
+.project-form.viewer-only-project-form .read-only-select {
+  --dropdown-background-disabled: var(--color-white);
+  --dropdown-border-color-disabled: var(--color-black-50);
+  --dropdown-color-disabled: var(--color-black-90);
+}
+
+.project-form.viewer-only-project-form .read-only-select [class*='arrowAndSpaceForClearButton'] {
+  display: none;
+}
+
+.project-form.viewer-only-project-form .read-only-input {
+  --input-background-disabled: var(--color-white);
+  --input-border-color-disabled: var(--color-black-50);
+  --input-color-disabled: var(--color-black-90);
+}
+
+.project-form.viewer-only-project-form
+  input:not([type='radio']):not([type='checkbox']):not([type='file'])[readonly],
+.project-form.viewer-only-project-form .input-wrapper textarea[readonly] {
+  border: 2px solid var(--color-black-50);
+  background-color: var(--color-white);
+  color: var(--color-black-90);
+  padding-inline: var(--spacing-s);
+}
+
+.project-form.viewer-only-project-form .input-wrapper textarea[readonly] {
+  padding-block: var(--spacing-s);
+}
+
+.project-form.viewer-only-project-form .read-only-input textarea {
+  --textarea-height: auto;
+  min-height: 0;
+  max-height: none;
+  resize: none;
+}
+
+.project-form.viewer-only-project-form .read-only-input input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.project-form.viewer-only-project-form .read-only-input input::-webkit-inner-spin-button,
+.project-form.viewer-only-project-form .read-only-input input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.project-form.viewer-only-project-form .read-only-select [aria-disabled='true'] {
+  height: auto;
+  min-height: 3.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: default;
+}
+
+.project-form.viewer-only-project-form .read-only-select [class*='dropdownButtonOption'] {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+}
+
 .project-form .form-row {
   @apply flex w-full;
 }

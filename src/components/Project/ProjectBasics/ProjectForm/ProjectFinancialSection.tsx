@@ -217,7 +217,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,
     required?: boolean,
-    rules?: { validate: Record<string, (value?: IOption) => true | string> },
+    rules?: { validate: Record<string, (_value?: IOption) => true | string> },
   ) => (
     <SelectField
       {...getFieldProps(name)}
@@ -352,7 +352,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         </div>
         {isOtherBudgetOverrunReasonSelected && (
           <div className="form-col-md">
-            <RadioCheckboxField {...getFieldProps('onSchedule')} />
+            <RadioCheckboxField {...getFieldProps('onSchedule')} readOnly={isUserOnlyViewer} />
           </div>
         )}
       </div>
