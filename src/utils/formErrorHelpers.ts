@@ -1,5 +1,11 @@
 import { FieldErrors, FieldValues } from 'react-hook-form';
 
+/**
+ * React-hook-form error helpers used to scroll/focus the first invalid field on submit.
+ * Shared between forms that edit project data (e.g. ProjectForm and MyWorkloadEditDialog) so the
+ * "scroll to first error" behaviour stays consistent.
+ */
+
 const isHtmlElement = (value: unknown): value is HTMLElement =>
   typeof HTMLElement !== 'undefined' && value instanceof HTMLElement;
 
@@ -76,14 +82,21 @@ export const collectErrorFieldNames = <TFieldValues extends FieldValues>(
   return [...fieldNames];
 };
 
+/**
+ * Scrolls and focuses the first invalid field within a form/container, in document order.
+ * Works regardless of whether the container itself scrolls (e.g. a dialog) or the page does.
+ */
 export const scrollToFirstField = (
-  form: HTMLElement | null,
+  container: HTMLElement | null,
   preferredElements: HTMLElement[] = [],
   fieldNames: string[] = [],
+  options: { focus?: boolean } = {},
 ) => {
-  if (!form) {
+  if (!container) {
     return;
   }
+
+  const { focus = true } = options;
 
   const focusableSelector =
     'input:not([type="hidden"]), textarea, select, [role="combobox"], button, [tabindex]:not([tabindex="-1"])';
@@ -92,21 +105,21 @@ export const scrollToFirstField = (
     preferredElements.length > 0
       ? preferredElements
       : fieldNames
-          .map((fieldName) => form.querySelector<HTMLElement>(`[data-testid="${fieldName}"]`))
+          .map((fieldName) => container.querySelector<HTMLElement>(`[data-testid="${fieldName}"]`))
           .filter((element): element is HTMLElement => Boolean(element));
 
   const candidates = candidatesToSort
     .map((candidate) => candidate.querySelector<HTMLElement>(focusableSelector) ?? candidate)
     .sort((first, second) => {
-      const firstTop = first.getBoundingClientRect().top + window.scrollY;
-      const secondTop = second.getBoundingClientRect().top + window.scrollY;
+      const firstTop = first.getBoundingClientRect().top;
+      const secondTop = second.getBoundingClientRect().top;
 
       if (firstTop !== secondTop) {
         return firstTop - secondTop;
       }
 
-      const firstLeft = first.getBoundingClientRect().left + window.scrollX;
-      const secondLeft = second.getBoundingClientRect().left + window.scrollX;
+      const firstLeft = first.getBoundingClientRect().left;
+      const secondLeft = second.getBoundingClientRect().left;
       return firstLeft - secondLeft;
     });
 
@@ -116,12 +129,14 @@ export const scrollToFirstField = (
     return;
   }
 
-  const absoluteTop = focusTarget.getBoundingClientRect().top + window.scrollY;
-  const targetTop = Math.max(absoluteTop - 120, 0);
+  if (typeof focusTarget.scrollIntoView === 'function') {
+    focusTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    const absoluteTop = focusTarget.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(absoluteTop - 120, 0), behavior: 'smooth' });
+  }
 
-  window.scrollTo({ top: targetTop, behavior: 'smooth' });
-
-  if (typeof focusTarget.focus === 'function') {
+  if (focus && typeof focusTarget.focus === 'function') {
     focusTarget.focus({ preventScroll: true });
   }
 };

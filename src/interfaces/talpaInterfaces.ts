@@ -98,18 +98,17 @@ export interface ITalpaProjectOpening {
   project: string;
 }
 
-export interface ITalpaProjectOpeningRequest
-  extends Omit<
-    ITalpaProjectOpening,
-    | 'id'
-    | 'status'
-    | 'isLocked'
-    | 'projectNumberRange'
-    | 'projectType'
-    | 'serviceClass'
-    | 'assetClass'
-    | 'holdingTime'
-  > {
+export interface ITalpaProjectOpeningRequest extends Omit<
+  ITalpaProjectOpening,
+  | 'id'
+  | 'status'
+  | 'isLocked'
+  | 'projectNumberRange'
+  | 'projectType'
+  | 'serviceClass'
+  | 'assetClass'
+  | 'holdingTime'
+> {
   projectNumberRangeId: string;
   projectTypeId: string;
   serviceClassId: string;

@@ -51,46 +51,208 @@ export const validateEmail = (t: TFunction<'translation'>) => ({
   },
 });
 
+/**
+ * Date range validators that work directly on date string values, without depending on
+ * a specific react-hook-form form shape. These are shared between forms that edit the
+ * same project dates (e.g. ProjectForm and MyWorkloadEditDialog) to avoid duplicating the
+ * date order rules in multiple places.
+ */
+export const validateDateIsBefore = (
+  startDate: string | null,
+  endDate: string | null,
+  endDateFieldLabel: string,
+  t: TFunction<'translation'>,
+) => {
+  if (!isBefore(startDate, endDate)) {
+    return t('validation.isBefore', {
+      value: t(`validation.${endDateFieldLabel}`),
+    });
+  }
+  return true;
+};
+
+export const validateDateIsAfter = (
+  endDate: string | null,
+  startDate: string | null,
+  startDateFieldLabel: string,
+  t: TFunction<'translation'>,
+) => {
+  if (!isBefore(startDate, endDate)) {
+    return t('validation.isAfter', {
+      value: t(`validation.${startDateFieldLabel}`),
+    });
+  }
+  return true;
+};
+
+export const validateDateIsSameOrAfter = (
+  endDate: string | null,
+  startDate: string | null,
+  startDateFieldLabel: string,
+  t: TFunction<'translation'>,
+) => {
+  if (!isSameOrBefore(startDate, endDate)) {
+    return t('validation.isSameOrAfter', {
+      value: t(`validation.${startDateFieldLabel}`),
+    });
+  }
+  return true;
+};
+
 export const validateBefore = (
   startDate: string | null,
   endDateField: string,
   getValues: UseFormGetValues<IProjectForm>,
   t: TFunction<'translation'>,
-) => {
-  if (!isBefore(startDate, getValues(endDateField as keyof IProjectForm) as string)) {
-    return t('validation.isBefore', {
-      value: t(`validation.${endDateField}`),
-    });
-  }
-  return true;
-};
+) =>
+  validateDateIsBefore(
+    startDate,
+    getValues(endDateField as keyof IProjectForm) as string,
+    endDateField,
+    t,
+  );
 
 export const validateAfter = (
   endDate: string | null,
   startDateField: string,
   getValues: UseFormGetValues<IProjectForm>,
   t: TFunction<'translation'>,
-) => {
-  if (!isBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
-    return t('validation.isAfter', {
-      value: t(`validation.${startDateField}`),
-    });
-  }
-  return true;
-};
+) =>
+  validateDateIsAfter(
+    endDate,
+    getValues(startDateField as keyof IProjectForm) as string,
+    startDateField,
+    t,
+  );
 
 export const validateSameOrAfter = (
   endDate: string | null,
   startDateField: string,
   getValues: UseFormGetValues<IProjectForm>,
   t: TFunction<'translation'>,
-) => {
-  if (!isSameOrBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
-    return t('validation.isSameOrAfter', {
-      value: t(`validation.${startDateField}`),
-    });
+) =>
+  validateDateIsSameOrAfter(
+    endDate,
+    getValues(startDateField as keyof IProjectForm) as string,
+    startDateField,
+    t,
+  );
+
+/**
+ * The set of project schedule dates that have order rules between them (planning,
+ * presence, visibility and construction). Keyed by canonical names so the same rules
+ * can be reused by forms that name their fields differently (e.g. ProjectForm's
+ * `estPlanningStart` vs MyWorkloadEditDialog's `planningStart`).
+ */
+export interface IScheduleDates {
+  planningStart: string | null;
+  planningEnd: string | null;
+  presenceStart: string | null;
+  presenceEnd: string | null;
+  visibilityStart: string | null;
+  visibilityEnd: string | null;
+  constructionStart: string | null;
+  constructionEnd: string | null;
+}
+
+export type ScheduleDateField = keyof IScheduleDates;
+
+/**
+ * Cross-field date order validation shared by ProjectForm's schedule section and MyWorkloadEditDialog.
+ */
+export const validateScheduleDateOrder = (
+  field: ScheduleDateField,
+  value: string | null,
+  dates: IScheduleDates,
+  t: TFunction<'translation'>,
+): string | true => {
+  switch (field) {
+    case 'planningStart':
+      return validateDateIsBefore(value, dates.planningEnd, 'estPlanningEnd', t);
+
+    case 'planningEnd': {
+      const afterPlanningStart = validateDateIsAfter(
+        value,
+        dates.planningStart,
+        'estPlanningStart',
+        t,
+      );
+      if (afterPlanningStart !== true) {
+        return afterPlanningStart;
+      }
+      return validateDateIsBefore(value, dates.constructionStart, 'estConstructionStart', t);
+    }
+
+    case 'presenceStart': {
+      const beforePresenceEnd = validateDateIsBefore(value, dates.presenceEnd, 'presenceEnd', t);
+      if (beforePresenceEnd !== true) {
+        return beforePresenceEnd;
+      }
+      const afterPlanningStart = validateDateIsAfter(
+        value,
+        dates.planningStart,
+        'estPlanningStart',
+        t,
+      );
+      if (afterPlanningStart !== true) {
+        return afterPlanningStart;
+      }
+      return validateDateIsBefore(value, dates.planningEnd, 'estPlanningEnd', t);
+    }
+
+    case 'presenceEnd': {
+      const afterPresenceStart = validateDateIsAfter(
+        value,
+        dates.presenceStart,
+        'presenceStart',
+        t,
+      );
+      if (afterPresenceStart !== true) {
+        return afterPresenceStart;
+      }
+      return validateDateIsBefore(value, dates.planningEnd, 'estPlanningEnd', t);
+    }
+
+    case 'visibilityStart': {
+      const beforeVisibilityEnd = validateDateIsBefore(
+        value,
+        dates.visibilityEnd,
+        'visibilityEnd',
+        t,
+      );
+      if (beforeVisibilityEnd !== true) {
+        return beforeVisibilityEnd;
+      }
+      return validateDateIsAfter(value, dates.planningStart, 'estPlanningStart', t);
+    }
+
+    case 'visibilityEnd': {
+      const afterVisibilityStart = validateDateIsAfter(
+        value,
+        dates.visibilityStart,
+        'visibilityStart',
+        t,
+      );
+      if (afterVisibilityStart !== true) {
+        return afterVisibilityStart;
+      }
+      return validateDateIsBefore(value, dates.planningEnd, 'estPlanningEnd', t);
+    }
+
+    case 'constructionStart': {
+      const afterPlanningEnd = validateDateIsAfter(value, dates.planningEnd, 'estPlanningEnd', t);
+      if (afterPlanningEnd !== true) {
+        return afterPlanningEnd;
+      }
+      return validateDateIsBefore(value, dates.constructionEnd, 'estConstructionEnd', t);
+    }
+
+    case 'constructionEnd':
+      return validateDateIsAfter(value, dates.constructionStart, 'estConstructionStart', t);
+
+    default:
+      return true;
   }
-  return true;
 };
 
 export const getFieldsIfEmpty = (

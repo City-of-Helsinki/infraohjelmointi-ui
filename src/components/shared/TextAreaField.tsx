@@ -80,7 +80,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-            disabled={disabled}
+            disabled={disabled || fieldDisabled}
             tooltip={tooltip}
           />
         </div>

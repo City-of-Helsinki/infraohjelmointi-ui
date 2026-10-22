@@ -68,7 +68,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   );
 
   const translatedOptions = useMemo(
-    () => options?.map(translateOption),
+    () => options?.map((option) => translateOption(option)),
     [options, translateOption],
   );
 
@@ -79,7 +79,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       }
 
       const values = Array.isArray(value) ? value : [value];
-      return values.map(translateOption);
+      return values.map((option) => translateOption(option));
     },
     [translateOption],
   );
@@ -128,7 +128,7 @@ const SelectField: FC<ISelectFieldProps> = ({
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
-        const isDisabled = disabled || fieldDisabled;
+        const isDisabled = disabled ?? fieldDisabled;
         return (
           <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**

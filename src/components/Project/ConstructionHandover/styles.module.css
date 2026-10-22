@@ -1,0 +1,23 @@
+.mainRowButton {
+  background-color: #f5f5f5;
+}
+
+.mainRowSpan {
+  display: block;
+  background-color: #f5f5f5;
+}
+
+.constructionHandoverFinancingTable tbody tr:has(.mainRowButton) td,
+.constructionHandoverFinancingTable tbody tr:has(.mainRowSpan) td {
+  background-color: #f5f5f5;
+}
+
+.financingDialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.financingDialogInput {
+  max-width: 420px;
+}

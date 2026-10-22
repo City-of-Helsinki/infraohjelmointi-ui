@@ -4,6 +4,7 @@ import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
   mockBudgetOverrunReasons,
+  mockFinancingParties,
   mockProjectPhaseDetails,
   mockConstructionProcurementMethods,
   mockConstructionPhases,
@@ -142,6 +143,8 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockSapCosts);
     case lowerCaseUrl.includes('/budget-overrun-reasons/'):
       return Promise.resolve(mockBudgetOverrunReasons);
+    case url === '/financing-parties/':
+      return Promise.resolve(mockFinancingParties);
     case url === '/project-programmers/':
       return Promise.resolve(mockProgrammers);
     case url === '/talpa-project-ranges/':

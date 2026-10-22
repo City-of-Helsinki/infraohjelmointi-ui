@@ -138,6 +138,15 @@ export const getBudgetOverrunReasons = async () => {
   }
 };
 
+export const getFinancingParties = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/financing-parties/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getPriorities = async () => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-priority/`);

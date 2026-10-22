@@ -1,4 +1,5 @@
 import { IListState } from '@/reducers/listsSlice';
+import { DialogMode } from './common';
 
 const ADMIN_MENUS_MENU_TYPE = [
   'categories',
@@ -43,8 +44,6 @@ interface MenuItemDialogMessages {
   dialogHeader: string;
   dialogInputId: string;
 }
-
-type DialogMode = 'add' | 'edit' | 'delete';
 
 interface DialogState {
   open: boolean;

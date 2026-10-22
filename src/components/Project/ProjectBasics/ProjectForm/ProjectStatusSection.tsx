@@ -7,6 +7,7 @@ import {
   UseFormGetValues,
   UseFormSetValue,
   UseFormTrigger,
+  UseFormWatch,
   useWatch,
 } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -16,18 +17,29 @@ import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
-import { listItemToOption, mapIconKey } from '@/utils/common';
+import { mapIconKey } from '@/utils/common';
+import {
+  getProjectPhaseDetailOptions,
+  phaseDetailBelongsToPhase,
+  phaseHasDetails,
+} from '@/utils/projectPhaseDetails';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { Tooltip } from 'hds-react';
 import { IProject } from '@/interfaces/projectInterfaces';
+import useConstructionProcurementMethod from '@/hooks/useConstructionProcurementMethod';
+import {
+  createProjectPhaseResolver,
+  getProjectPhaseRequiredFields,
+} from '@/utils/projectValidationRules';
 
 interface IProjectStatusSectionProps {
   project: IProject | null;
   getValues: UseFormGetValues<IProjectForm>;
   setValue: UseFormSetValue<IProjectForm>;
+  watch: UseFormWatch<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -56,6 +68,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
   getValues,
   setValue,
+  watch,
   control,
   constructionEndYear,
   isInputDisabled,
@@ -70,27 +83,28 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const allPhaseDetails = useAppSelector((state: RootState) => state.lists.projectPhaseDetails);
   const categories = useOptions('categories');
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
-  const constructionProcurementMethods = useOptions('constructionProcurementMethods');
-  const staraProcurementReasons = useOptions('staraProcurementReasons');
 
   const watchedPhase = useWatchField('phase', control) as IOption | undefined;
   const currentPhase = watchedPhase?.value ?? '';
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
+  const phaseResolver = useMemo(
+    () => createProjectPhaseResolver(phases, allPhaseDetails),
+    [allPhaseDetails, phases],
+  );
 
-  const filteredPhaseDetails = useMemo(() => {
-    if (!currentPhase) return [];
-    return allPhaseDetails
-      .filter((detail) => detail.projectPhase?.id === currentPhase)
-      .map((detail) => listItemToOption(detail));
-  }, [allPhaseDetails, currentPhase]);
+  const filteredPhaseDetails = useMemo(
+    () => getProjectPhaseDetailOptions(allPhaseDetails, currentPhase),
+    [allPhaseDetails, currentPhase],
+  );
 
-  const watchedConstructionProcurementMethod = useWatchField(
-    'constructionProcurementMethod',
-    control,
-  ) as IOption | undefined;
-
-  const showStaraProcurementReason = watchedConstructionProcurementMethod?.label === 'Stara';
+  const { constructionProcurementMethods, staraProcurementReasons, showStaraProcurementReason } =
+    useConstructionProcurementMethod(
+      watch,
+      setValue,
+      'constructionProcurementMethod',
+      'staraProcurementReason',
+    );
 
   // Watch all fields that are checked in phaseRequirements so the ErrorSummary updates live
   const watchedRequiredFields = useWatch({
@@ -115,10 +129,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   useEffect(() => {
     const currentDetail = getValues('phaseDetail');
     if (currentDetail?.value) {
-      const detailBelongsToPhase = allPhaseDetails.some(
-        (d) => d.id === currentDetail.value && d.projectPhase?.id === currentPhase,
-      );
-      if (!detailBelongsToPhase) {
+      if (!phaseDetailBelongsToPhase(allPhaseDetails, currentDetail.value, currentPhase)) {
         setValue('phaseDetail', { value: '', label: '' }, { shouldDirty: true });
       }
     }
@@ -155,40 +166,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     );
   }, [getValues]);
 
-  const phaseByValue = useCallback(
-    (val: string) => phases.find((phase) => phase.label === val)?.value ?? '',
-    [phases],
-  );
-  const proposalPhase = phaseByValue('proposal');
-  const designPhase = phaseByValue('design');
-  const programmedPhase = phaseByValue('programming');
-  const planningPhase = phaseByValue('designPlanning');
-  const constructionWaitPhase = phaseByValue('constructionWait');
-  const constructionPreparationPhase = phaseByValue('constructionPreparation');
-  const constructionPhase = phaseByValue('construction');
-  const warrantyPeriodPhase = phaseByValue('warrantyPeriod');
-  const completedPhase = phaseByValue('completed');
-  const phasesThatNeedYearBounds = useMemo(
-    () =>
-      [
-        programmedPhase,
-        planningPhase,
-        constructionWaitPhase,
-        constructionPreparationPhase,
-        constructionPhase,
-        warrantyPeriodPhase,
-        completedPhase,
-      ].filter((phase): phase is string => phase !== ''),
-    [
-      programmedPhase,
-      planningPhase,
-      constructionWaitPhase,
-      constructionPreparationPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
-  );
+  const {
+    proposalPhase,
+    designPhase,
+    warrantyPeriodPhase,
+    completedPhase,
+    phasesThatNeedYearBounds,
+  } = phaseResolver;
 
   const validatePhase = useMemo(
     () => ({
@@ -244,69 +228,18 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const phaseRequirements = useMemo(() => {
     const phase = getValues('phase').value;
     const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
-    const fields: Array<string> = [];
-
-    const programmedRequirements = [
-      'planningStartYear',
-      'constructionEndYear',
-      'estPlanningStart',
-      'estConstructionEnd',
-      'category',
-      'masterClass',
-      'class',
-    ];
-
-    if (projectMode === 'new') {
-      programmedRequirements.push('address');
-    }
-
-    const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
-    const generalConstructionRequirements = [
-      'estConstructionStart',
-      'estConstructionEnd',
-      'personConstruction',
-    ];
-    const combinedRequirements = [
-      ...programmedRequirements,
-      ...planningRequirements,
-      ...generalConstructionRequirements,
-    ];
-
-    const hasDetailsForPhase = allPhaseDetails.some((d) => d.projectPhase?.id === phase);
-
-    switch (phase) {
-      case programmedPhase:
-        fields.push(...fieldsIfEmpty([...programmedRequirements]));
-        break;
-      case planningPhase:
-      case constructionWaitPhase:
-        fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
-        break;
-      case constructionPreparationPhase:
-      case constructionPhase:
-      case warrantyPeriodPhase:
-      case completedPhase:
-        fields.push(...fieldsIfEmpty([...combinedRequirements]));
-        break;
-    }
-
-    if (hasDetailsForPhase) {
-      fields.push(...fieldsIfEmpty(['phaseDetail']));
-    }
-
-    return fields;
+    return fieldsIfEmpty(
+      getProjectPhaseRequiredFields({
+        phaseId: phase,
+        projectMode,
+        phaseResolver,
+      }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    allPhaseDetails,
     getValues,
     projectMode,
-    programmedPhase,
-    planningPhase,
-    constructionWaitPhase,
-    constructionPreparationPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
+    phaseResolver,
     // watchedRequiredFields causes recomputation when any of the watched fields change
     watchedRequiredFields,
   ]);
@@ -316,9 +249,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       validate: {
         isPhaseDetailValid: (phaseDetail: IOption) => {
           const phase = getValues('phase');
-          const hasDetailsForPhase = allPhaseDetails.some(
-            (d) => d.projectPhase?.id === phase.value,
-          );
+          const hasDetailsForPhase = phaseHasDetails(allPhaseDetails, phase.value);
           if (hasDetailsForPhase && (!phaseDetail || phaseDetail.value === '')) {
             return t('validation.required', { field: t('validation.phaseDetail') });
           }

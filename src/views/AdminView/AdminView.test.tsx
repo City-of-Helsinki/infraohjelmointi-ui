@@ -1,7 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { RootState, setupStore } from '@/store';
-import { renderWithProviders } from '@/utils/testUtils';
+import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { act, waitFor, within, screen } from '@testing-library/react';
@@ -33,7 +33,10 @@ const defaultState: RootState = {
   },
 };
 
-const render = async (customState?: object | null, customRoute?: string) =>
+const render = async (
+  customState?: object | null,
+  customRoute?: string,
+): Promise<CustomRenderResult> =>
   await act(async () =>
     renderWithProviders(
       <>

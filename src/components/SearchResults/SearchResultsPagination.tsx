@@ -16,8 +16,8 @@ interface ISearchResultsPagination {
 }
 
 enum ButtonText {
-  'next' = 'Seuraava',
-  'previous' = 'Edellinen',
+  next = 'Seuraava',
+  previous = 'Edellinen',
 }
 
 const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous, count }) => {
@@ -83,7 +83,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   );
 
   return (
-    <div className="custom-pagination pb-4 pt-16" data-testid="search-results-pagination-container">
+    <div className="custom-pagination pt-16 pb-4" data-testid="search-results-pagination-container">
       {pageCount > 1 && (
         <Pagination
           data-testid="search-results-pagination"

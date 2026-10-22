@@ -4,7 +4,7 @@ import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { setIsSaving } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
-import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
+import { HookFormControlType, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import { selectUser } from '@/reducers/authSlice';
@@ -14,6 +14,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import optionIcon from '@/utils/optionIcon';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -30,10 +31,11 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
   const { t } = useTranslation();
   const [patchProject] = usePatchProjectMutation();
   const { formMethods } = useProjectHeaderForm(project);
+  const { canEditClass } = useRestrictedClassAccess();
 
   const projectGroupName = useMemo(() => {
     return project?.projectGroup
-      ? groups.find((g) => g.id === project.projectGroup)?.name ?? ''
+      ? (groups.find((g) => g.id === project.projectGroup)?.name ?? '')
       : '';
   }, [groups, project?.projectGroup]);
 
@@ -51,7 +53,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
         dispatch(setIsSaving(true));
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form);
 
         if ('favourite' in data) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
@@ -106,7 +108,10 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
             className="project-header-phase-select-container"
             data-testid="project-header-name-fields"
           >
-            <ProjectNameFields control={control} />
+            <ProjectNameFields
+              control={control}
+              isReadOnly={!!project && !canEditClass(project.projectClass)}
+            />
             {projectHeaderPhaseString && (
               <div className="project-header-phase">
                 <div className="project-header-icon">{icon}</div>

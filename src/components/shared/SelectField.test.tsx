@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import mockI18next from '@/mocks/mockI18next';
 import SelectField from './SelectField';
@@ -28,14 +28,8 @@ jest.mock('hds-react', () => {
   };
 });
 
-type FormValue = { value: string; label: string };
-type FormData = {
-  first?: FormValue;
-  second?: FormValue;
-};
-
 const TestForm = () => {
-  const { control, getValues } = useForm<FormData>({
+  const { control, getValues } = useForm<FieldValues>({
     defaultValues: {
       first: { value: 'test', label: 'Test' },
     },
@@ -60,7 +54,7 @@ const TestForm = () => {
 };
 
 const ReadOnlyForm = () => {
-  const { control } = useForm<FormData>({
+  const { control } = useForm<FieldValues>({
     defaultValues: {
       first: { value: 'test', label: 'Test' },
       second: undefined,

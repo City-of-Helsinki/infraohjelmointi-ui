@@ -14,7 +14,15 @@ import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 interface IPlanningRowState {
   expanded: boolean;
   searchedProjectId: string;
+  searchedGroupId: string;
 }
+
+// Resets via the given callback if value is falsy and has actually changed from current
+const resetIfCleared = (value: string | null, current: string, reset: () => void) => {
+  if (!value && value !== current) {
+    reset();
+  }
+};
 
 const PlanningRow: FC<
   IPlanningRow & {
@@ -28,9 +36,10 @@ const PlanningRow: FC<
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
     expanded: defaultExpanded,
     searchedProjectId: '',
+    searchedGroupId: '',
   });
 
-  const { expanded, searchedProjectId } = planningRowState;
+  const { expanded, searchedProjectId, searchedGroupId } = planningRowState;
 
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
@@ -49,10 +58,19 @@ const PlanningRow: FC<
       // Only apply global groupsExpanded if not in search mode
       setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
     }
-  }, [type, groupsExpanded, searchedProjectId]);
+
+    if (type === 'group' && !searchedGroupId) {
+      // Only apply global groupsExpanded if not in search mode
+      setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
+    }
+  }, [type, groupsExpanded, searchedProjectId, searchedGroupId]);
 
   const resetSearchedProjectId = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
+  }, []);
+
+  const resetSearchedGroupId = useCallback(() => {
+    setPlanningRowState((current) => ({ ...current, searchedGroupId: '' }));
   }, []);
 
   // Listens to the 'project' searchParam and sets the searchedProjectId and expanded to true if
@@ -60,31 +78,49 @@ const PlanningRow: FC<
   useEffect(() => {
     if (!search) {
       resetSearchedProjectId();
+      resetSearchedGroupId();
       return;
     }
 
     const projectId = new URLSearchParams(search).get('project');
+    const groupId = new URLSearchParams(search).get('group');
 
-    if (!projectId) {
-      if (projectId !== searchedProjectId) {
-        resetSearchedProjectId();
-      }
+    resetIfCleared(projectId, searchedProjectId, resetSearchedProjectId);
+    resetIfCleared(groupId, searchedGroupId, resetSearchedGroupId);
+
+    if (!projectId && !groupId) {
       return;
     }
 
-    const project = projectRows.filter((p) => p.id === projectId)[0];
+    const project = projectRows.find((p) => p.id === projectId);
+    const group = projectRows.find((g) => g.projectGroup === groupId);
 
     if (!project) {
       resetSearchedProjectId();
+    }
+
+    if (!group) {
+      resetSearchedGroupId();
+    }
+
+    if (!project && !group) {
       return;
     }
 
     setPlanningRowState((current) => ({
       ...current,
-      searchedProjectId: project.id,
+      searchedProjectId: project?.id ?? '',
+      searchedGroupId: group?.id ?? '',
       expanded: true,
     }));
-  }, [search, projectRows, resetSearchedProjectId, searchedProjectId]);
+  }, [
+    search,
+    projectRows,
+    resetSearchedProjectId,
+    resetSearchedGroupId,
+    searchedProjectId,
+    searchedGroupId,
+  ]);
 
   // Listens to searchedProjectId and scrolls the viewport to the project
   useEffect(() => {
@@ -125,7 +161,6 @@ const PlanningRow: FC<
           <PlanningCell {...props} cell={c} key={c.key} />
         ))}
       </tr>
-
       {expanded && (
         <>
           {projectRows.map((p) => (

@@ -82,7 +82,7 @@ export interface IProject {
   projectClass?: string;
   projectLocation?: string;
   projectDistrict?: string;
-  projectProgram?: string;
+  additionalInformation?: string;
   otherPersons?: IPerson[];
   responsibleZone?: IListItem;
   masterPlanAreaNumber?: string;
@@ -118,6 +118,8 @@ export interface IProjectRequest {
   description?: string;
   entityName?: string | null;
   hkrId?: string | null;
+  // IO-935: echoes hkrId once the user has confirmed the linked PW project
+  confirmedHkrId?: string;
   area?: string | null;
   hashTags?: Array<string>;
   sapProject?: string;
@@ -134,10 +136,10 @@ export interface IProjectRequest {
   estConstructionEnd?: string | null;
   estWarrantyPhaseStart?: string | null;
   estWarrantyPhaseEnd?: string | null;
-  presenceStart?: string;
-  presenceEnd?: string;
-  visibilityStart?: string;
-  visibilityEnd?: string;
+  presenceStart?: string | null;
+  presenceEnd?: string | null;
+  visibilityStart?: string | null;
+  visibilityEnd?: string | null;
   phaseDetail?: string | null;
   constructionProcurementMethod?: string | null;
   louhi?: boolean;
@@ -164,7 +166,7 @@ export interface IProjectRequest {
   planningStartYear?: number | null;
   projectClass?: string | null;
   projectLocation?: string | null;
-  projectProgram?: string | null;
+  additionalInformation?: string | null;
   responsibleZone?: string | null;
   masterPlanAreaNumber?: string | null;
   trafficPlanNumber?: string | null;
@@ -276,6 +278,53 @@ export interface IProjectsResponse {
   results: Array<IProject>;
   count: number;
   next?: string | null;
+}
+
+/**
+ * A single audit-log entry returned by GET /projects/<id>/history/ (IO-879).
+ * old_values / new_values are keyed either by form field name (form edits) or
+ * by calendar year as a string (financial edits); changed_fields is the union
+ * of those keys, provided by the backend so the UI does not have to derive it.
+ */
+export interface IProjectHistoryEntry {
+  id: string;
+  actor: string | null;
+  actor_username: string | null;
+  actor_first_name: string | null;
+  actor_last_name: string | null;
+  operation: 'CREATE' | 'UPDATE' | 'DELETE';
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
+  changed_fields: Array<string>;
+  endpoint: string | null;
+  createdDate: string;
+  updatedDate: string;
+}
+
+// IO-935: GET /projects/pw-project-name/?hkrId=
+export interface IPwProjectNameResponse {
+  hkrId: string;
+  // PW "Kohde"; null when PW sync is disabled or the field is empty in PW
+  name: string | null;
+  syncEnabled: boolean;
+}
+
+export interface IProjectHistoryResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Array<IProjectHistoryEntry>;
+}
+
+export interface IProjectHistoryRequest {
+  projectId: string;
+  /** Narrow to a single budget cell: only entries that touch this year. */
+  year?: number | string;
+  /** Narrow to a single form field: only entries that touch this field. */
+  field?: string;
+  operation?: 'CREATE' | 'UPDATE' | 'DELETE';
+  page?: number;
+  pageSize?: number;
 }
 
 export interface IProjectResponse {
@@ -433,4 +482,26 @@ export interface IProjectCell {
    * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties from the project
    */
   projectEstDates: IProjectEstDates;
+}
+
+// NOTE: It's planned that more task types will be added in the future
+export enum ProjectTaskType {
+  // Nimeä rakennuttamisen projektipäällikkö
+  NAME_CONSTRUCTION_PROJECT_MANAGER = 'NAME_CONSTRUCTION_PROJECT_MANAGER',
+}
+
+export interface IProjectTask extends Pick<
+  IProject,
+  | 'id'
+  | 'name'
+  | 'estPlanningStart'
+  | 'estPlanningEnd'
+  | 'estConstructionStart'
+  | 'estConstructionEnd'
+> {
+  constructionProcurementMethod: IListItem | null;
+  costForecast?: number | null;
+  budget?: number | null;
+  totalCost?: number | null;
+  taskType: ProjectTaskType;
 }

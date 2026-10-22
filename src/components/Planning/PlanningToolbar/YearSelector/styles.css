@@ -1,3 +1,4 @@
+@reference "../../../../index.css";
 .year-selector-container {
   @apply flex flex-col items-center justify-between;
 }
@@ -11,11 +12,11 @@
 }
 
 .year-slider {
-  @apply relative mb-1 h-[14px] w-[270px] rounded-md bg-gray;
+  @apply bg-gray relative mb-1 h-[14px] w-[270px] rounded-md;
 }
 
 .year-slider-selected {
-  @apply absolute right-0 h-[14px] w-[236px] -translate-x-[0.34rem] border-[1px] border-bus bg-bus-l;
+  @apply border-bus bg-bus-l absolute right-0 h-[14px] w-[236px] -translate-x-[0.34rem] border-[1px];
 }
 
 .year-slider-selected.past-years {
@@ -29,19 +30,19 @@
 .left-year-button {
   border: 1px solid var(--color-bus);
   border-radius: 2px;
-  @apply h-6 w-4 -translate-x-[1px] items-center justify-center bg-bus-l;
+  @apply bg-bus-l h-6 w-4 -translate-x-[1px] items-center justify-center;
 }
 
 .right-year-button {
   border: 1px solid var(--color-bus);
   border-radius: 2px;
-  @apply h-6 w-4 translate-x-[1px] items-center justify-center bg-bus-l;
+  @apply bg-bus-l h-6 w-4 translate-x-[1px] items-center justify-center;
 }
 
 .left-year-button svg {
-  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
+  @apply text-bus -translate-x-[4.5px] -translate-y-[2px];
 }
 
 .right-year-button svg {
-  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
+  @apply text-bus -translate-x-[4.5px] -translate-y-[2px];
 }

@@ -172,7 +172,7 @@ const useProjectFormValues = (project: IProject | null) => {
       masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
       trafficPlanNumber: value(project?.trafficPlanNumber),
       bridgeNumber: value(project?.bridgeNumber),
-      projectProgram: value(project?.projectProgram),
+      additionalInformation: value(project?.additionalInformation),
       personPlanning: personToOption(project?.personPlanning),
       personConstruction: personToOption(project?.personConstruction),
       personProgramming: personToOption(project?.personProgramming),

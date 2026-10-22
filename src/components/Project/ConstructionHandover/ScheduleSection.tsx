@@ -18,13 +18,13 @@ export default function ScheduleSection() {
           {...getFieldProps('constructionStart')}
           className="flex-1"
           size="full"
-          rules={{ ...validateRequired('constructionStart', t) }}
+          rules={{ ...validateRequired('startLatest', t) }}
         />
         <DateField
           {...getFieldProps('constructionEnd')}
           className="flex-1"
           size="full"
-          rules={{ ...validateRequired('constructionEnd', t) }}
+          rules={{ ...validateRequired('endLatest', t) }}
         />
       </div>
       <TextAreaField

@@ -29,7 +29,7 @@ const SearchTerms = () => {
           <Tag
             key="0"
             id="empty-all-btn"
-            className="h-4 whitespace-nowrap !bg-transparent"
+            className="h-4 !bg-transparent whitespace-nowrap"
             onDelete={deleteAllTerms}
           >
             {t('emptyTerms')}

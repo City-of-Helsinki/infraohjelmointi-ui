@@ -23,6 +23,7 @@ const render = async () =>
         <Route path="*" element={<SideBar />} />
         <Route path="/coordination" element={<PlanningView />} />
         <Route path="/planning" element={<PlanningView />} />
+        <Route path="/my-workload" element={<div data-testid="my-workload-view" />} />
       </>,
       {
         preloadedState: {
@@ -40,7 +41,7 @@ const render = async () =>
   );
 
 describe('SideBar', () => {
-  const navItems = ['coordination', 'planning', 'reports', 'admin'];
+  const navItems = ['coordination', 'planning', 'reports', 'myWorkload', 'admin'];
 
   const spyScrollTo = jest.fn();
   Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });
@@ -79,5 +80,11 @@ describe('SideBar', () => {
     const { getByRole, user, container } = await render();
     await user.click(getByRole('button', { name: matchExact(navItems[1]) }));
     expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
+  });
+
+  it('can navigate to my workload view', async () => {
+    const { getByRole, user, getByTestId } = await render();
+    await user.click(getByRole('button', { name: matchExact(navItems[3]) }));
+    expect(getByTestId('my-workload-view')).toBeInTheDocument();
   });
 });

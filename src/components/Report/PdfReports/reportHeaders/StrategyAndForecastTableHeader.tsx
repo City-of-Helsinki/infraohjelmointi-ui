@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 const cellStyles = {
   width: '56px',
@@ -64,8 +64,6 @@ const StrategyAndForecastTableHeader = ({
   isForecastReport,
   year = new Date().getFullYear(),
 }: StrategyTableHeaderProps) => {
-  const { t } = useTranslation();
-
   return (
     <View style={styles.tableHeader}>
       <View style={styles.tableHeaderRow}>

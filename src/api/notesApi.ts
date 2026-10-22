@@ -1,13 +1,43 @@
-import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { INote, INoteRequest, INoteImage } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
-import { notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import { hydrateObjectUrls, objectUrlCacheLifecycle } from '@/utils/fileUtils';
+
+async function hydrateNoteImages(note: INote): Promise<INote> {
+  if (!note.images || note.images.length === 0) {
+    return note;
+  }
+
+  return {
+    ...note,
+    images: await hydrateObjectUrls(
+      note.images,
+      (image) => image.url,
+      (image, downloadUrl) => ({ ...image, downloadUrl }),
+    ),
+  };
+}
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
     getNotesByProject: build.query<INote[], string>({
-      query: (projectId: string) => ({
-        url: `/projects/${projectId}/notes/`,
-      }),
+      async queryFn(projectId, _api, _extraOptions, baseQuery) {
+        const notesResult = await baseQuery({
+          url: `/projects/${projectId}/notes/`,
+        });
+
+        if (notesResult.error) {
+          return { error: notesResult.error };
+        }
+
+        const notes = (notesResult.data as INote[]) ?? [];
+        const hydratedNotes = await Promise.all(notes.map(hydrateNoteImages));
+
+        return { data: hydratedNotes };
+      },
+      ...objectUrlCacheLifecycle<INote[]>((notes) =>
+        notes.flatMap((note) => note.images?.map((image) => image.downloadUrl) ?? []),
+      ),
       providesTags: ['Notes'],
     }),
     postNote: build.mutation<INote, INoteRequest>({
@@ -61,6 +91,49 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
       },
       invalidatesTags: ['Notes'],
     }),
+    postNoteImage: build.mutation<INoteImage[], { noteId: string; formData: FormData }>({
+      query: ({ noteId, formData }) => ({
+        url: `/notes/${noteId}/images/`,
+        method: 'POST',
+        data: formData,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'saveError',
+              message: 'noteImagePostError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
+      invalidatesTags: ['Notes'],
+    }),
+    deleteNoteImage: build.mutation<undefined, { noteId: string; imageId: string }>({
+      query: ({ noteId, imageId }) => ({
+        url: `/notes/${noteId}/images/${imageId}/`,
+        method: 'DELETE',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          dispatch(
+            notifyError({
+              title: 'deleteError',
+              message: 'noteImageDeleteError',
+              type: 'toast',
+              duration: 6000,
+            }),
+          );
+        }
+      },
+      invalidatesTags: ['Notes'],
+    }),
   }),
 });
 
@@ -69,4 +142,6 @@ export const {
   usePostNoteMutation,
   useDeleteNoteMutation,
   usePatchNoteMutation,
+  usePostNoteImageMutation,
+  useDeleteNoteImageMutation,
 } = notesApi;

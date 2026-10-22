@@ -6,14 +6,13 @@ import {
 
 export const downloadCSV = (
   dataArray: (
-    | IConstructionProgramCsvRow
-    | IBudgetBookSummaryCsvRow
-    | IOperationalEnvironmentAnalysisCsvRow
+    IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisCsvRow
   )[],
   filename = 'report.csv',
 ) => {
   const csvString = arrayToCSV(dataArray);
-  const blob = new Blob([csvString], { type: 'text/csv' });
+  const csvWithBom = `\uFEFF${csvString}`;
+  const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   link.download = filename;
   link.href = window.URL.createObjectURL(blob);

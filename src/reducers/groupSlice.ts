@@ -17,7 +17,7 @@ interface IGroupUpdatePayload {
 interface IGroupsState {
   planning: { groups: Array<IGroup>; year: number };
   coordination: { groups: Array<IGroup>; year: number };
-  forcedToFrame: { groups: Array<IGroup>; year: number};
+  forcedToFrame: { groups: Array<IGroup>; year: number };
   error: unknown;
 }
 

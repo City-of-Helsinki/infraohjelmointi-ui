@@ -63,6 +63,7 @@ export const reports = [
   'constructionProgramForcedToFrame',
   'budgetBookSummary',
   'financialStatement',
+  'coordinationViewReport',
 ] as const;
 
 export interface IConstructionProgramCsvRow {
@@ -92,6 +93,7 @@ export enum Reports {
   ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',
   FinancialStatement = 'financialStatement',
+  CoordinationViewReport = 'coordinationViewReport',
 }
 
 export type ReportType = (typeof reports)[number];
@@ -155,8 +157,7 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   initial7?: string | number;
 }
 
-export interface IOperationalEnvironmentAnalysisCsvRow
-  extends IOperationalEnvironmentAnalysisFinanceProperties {
+export interface IOperationalEnvironmentAnalysisCsvRow extends IOperationalEnvironmentAnalysisFinanceProperties {
   id?: string;
   name: string;
   type?: ReportTableRowType;

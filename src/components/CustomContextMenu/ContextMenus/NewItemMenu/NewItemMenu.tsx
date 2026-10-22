@@ -5,6 +5,7 @@ import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelections } from '@/reducers/planningSlice';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface INewItemMenuProps extends INewItemMenuDetails {
   onCloseMenu: () => void;
@@ -18,6 +19,9 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
 }) => {
   const { t } = useTranslation();
   const selections = useAppSelector(selectSelections);
+  // Restricted programmers can create projects but not summing groups (IO-756)
+  const { isRestricted, canEditClass } = useRestrictedClassAccess();
+  const selectedClassId = selections.selectedSubClass?.id ?? selections.selectedClass?.id;
   const onOpenProjectProgrammedDialog = useCallback(() => {
     onCloseMenu();
     onShowProjectProgrammedDialog();
@@ -49,19 +53,21 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
           variant={ButtonVariant.Supplementary}
           iconStart={undefined}
           onClick={onOpenProjectProgrammedDialog}
-          disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
+          disabled={!selectedClassId || !canEditClass(selectedClassId)}
           data-testid="open-project-programmed-dialog"
         >
           {t(`projectProgrammedForm.addProjectsToProgramming`)}
         </Button>
-        <Button
-          variant={ButtonVariant.Supplementary}
-          iconStart={undefined}
-          onClick={onOpenGroupDialog}
-          data-testid="open-summing-group-dialog"
-        >
-          {t(`createSummingGroups`)}
-        </Button>
+        {!isRestricted && (
+          <Button
+            variant={ButtonVariant.Supplementary}
+            iconStart={undefined}
+            onClick={onOpenGroupDialog}
+            data-testid="open-summing-group-dialog"
+          >
+            {t(`createSummingGroups`)}
+          </Button>
+        )}
         <Button
           variant={ButtonVariant.Supplementary}
           iconStart={undefined}

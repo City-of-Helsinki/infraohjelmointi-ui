@@ -12,10 +12,10 @@
   display: inline-block;
   padding: 11px 27px;
   color: var(--color-bus) !important;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .buttonHighlighted {
-  border: none;
+  border: none !important;
   border-bottom: 5px solid var(--color-bus) !important;
 }

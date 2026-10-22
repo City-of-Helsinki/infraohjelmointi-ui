@@ -1,0 +1,231 @@
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import type {
+  IProjectProgrammeBasicInfo,
+  IProjectProgrammeForm,
+  IProjectProgrammeLinkFormItem,
+  IProjectProgrammeDesignCriteria,
+  IProjectProgrammeMaintenanceNeeds,
+  IProjectProgrammeInteractionAndRelatedProjects,
+  IProjectProgrammeOtherAttachments,
+  IProjectProgrammeUrbanSpacingPlanningCriteria,
+  IProjectProgrammeTrafficPlanningCriteria,
+} from '@/interfaces/projectProgrammeInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
+import useProjectDistrict from '@/hooks/useProjectDistrict';
+
+interface IProjectNameAndDistrict {
+  name?: string;
+  projectDistrict?: string;
+}
+
+function getDistrictValue(district: IProjectProgrammeBasicInfo['district']): string {
+  if (!district) {
+    return '';
+  }
+
+  if (typeof district === 'string') {
+    return district;
+  }
+
+  return district.name ?? '';
+}
+
+function getTextValue(value?: string | null): string {
+  return value ?? '';
+}
+
+function hasItems<T>(items?: T[] | null): items is T[] {
+  return (items?.length ?? 0) > 0;
+}
+
+function getLinksValue(
+  links?: IProjectProgrammeBasicInfo['links'] | IProjectProgrammeDesignCriteria['links'],
+): IProjectProgrammeLinkFormItem[] {
+  if (!hasItems(links)) {
+    return [{ value: '' }];
+  }
+
+  const normalizedLinks = links
+    .map((link) => {
+      if (typeof link === 'string') {
+        return { value: getTextValue(link) };
+      }
+
+      return { value: getTextValue(link?.value) };
+    })
+    .filter((link) => link.value !== '');
+
+  if (hasItems(normalizedLinks)) {
+    return normalizedLinks;
+  }
+
+  return [{ value: '' }];
+}
+
+function getBasicInfoValues(
+  basicInfo?: IProjectProgrammeBasicInfo,
+  project?: IProjectNameAndDistrict,
+): IProjectProgrammeBasicInfo {
+  return {
+    projectName: getTextValue(basicInfo?.projectName || project?.name),
+    district: getDistrictValue(basicInfo?.district) || getTextValue(project?.projectDistrict),
+    projectProgrammeCompiler: getTextValue(basicInfo?.projectProgrammeCompiler),
+    personsInvolved: getTextValue(basicInfo?.personsInvolved),
+    estimatedCosts: getTextValue(basicInfo?.estimatedCosts),
+    inspector: getTextValue(basicInfo?.inspector),
+    summary: getTextValue(basicInfo?.summary),
+    strategyGoals: getTextValue(basicInfo?.strategyGoals),
+    costClass: getTextValue(basicInfo?.costClass),
+    projectSize: getTextValue(basicInfo?.projectSize),
+    risks: getTextValue(basicInfo?.risks),
+    studyAndPlanningNeeds: getTextValue(basicInfo?.studyAndPlanningNeeds),
+    planningAndImplementationFeasibility: getTextValue(
+      basicInfo?.planningAndImplementationFeasibility,
+    ),
+    specialConsiderations: getTextValue(basicInfo?.specialConsiderations),
+    otherConsiderations: getTextValue(basicInfo?.otherConsiderations),
+    links: getLinksValue(basicInfo?.links),
+  };
+}
+
+function getDesignCriteriaValues(
+  designCriteria?: IProjectProgrammeDesignCriteria,
+): IProjectProgrammeDesignCriteria {
+  return {
+    guidingZoningRegulations: getTextValue(designCriteria?.guidingZoningRegulations),
+    siteValuesProtectionAndSignificance: getTextValue(
+      designCriteria?.siteValuesProtectionAndSignificance,
+    ),
+    relationshipToPublicAreaServices: getTextValue(
+      designCriteria?.relationshipToPublicAreaServices,
+    ),
+    links: getLinksValue(designCriteria?.links),
+  };
+}
+
+function getTrafficPlanningCriteriaValues(
+  trafficPlanningCriteria?: IProjectProgrammeTrafficPlanningCriteria,
+): IProjectProgrammeTrafficPlanningCriteria {
+  return {
+    targetTrafficChanges: getTextValue(trafficPlanningCriteria?.targetTrafficChanges),
+    pedestrianTraffic: getTextValue(trafficPlanningCriteria?.pedestrianTraffic),
+    bicycleTraffic: getTextValue(trafficPlanningCriteria?.bicycleTraffic),
+    carTraffic: getTextValue(trafficPlanningCriteria?.carTraffic),
+    serviceAndPickupTraffic: getTextValue(trafficPlanningCriteria?.serviceAndPickupTraffic),
+    otherTraffic: getTextValue(trafficPlanningCriteria?.otherTraffic),
+    accessibility: getTextValue(trafficPlanningCriteria?.accessibility),
+    noiseManagement: getTextValue(trafficPlanningCriteria?.noiseManagement),
+    winterMaintenance: getTextValue(trafficPlanningCriteria?.winterMaintenance),
+    links: getLinksValue(trafficPlanningCriteria?.links),
+  };
+}
+
+function getUrbanSpacingPlanningCriteriaValues(
+  urbanSpacingPlanningCriteria?: IProjectProgrammeUrbanSpacingPlanningCriteria,
+): IProjectProgrammeUrbanSpacingPlanningCriteria {
+  return {
+    targetUrbanAppearance: getTextValue(urbanSpacingPlanningCriteria?.targetUrbanAppearance),
+    surfaceMaterials: getTextValue(urbanSpacingPlanningCriteria?.surfaceMaterials),
+    structures: getTextValue(urbanSpacingPlanningCriteria?.structures),
+    technicalNetworksAndSystems: getTextValue(
+      urbanSpacingPlanningCriteria?.technicalNetworksAndSystems,
+    ),
+    lighting: getTextValue(urbanSpacingPlanningCriteria?.lighting),
+    greenery: getTextValue(urbanSpacingPlanningCriteria?.greenery),
+    lumoConsiderationAndProtection: getTextValue(
+      urbanSpacingPlanningCriteria?.lumoConsiderationAndProtection,
+    ),
+    natureTypes: getTextValue(urbanSpacingPlanningCriteria?.natureTypes),
+    equipmentAndFurnishings: getTextValue(urbanSpacingPlanningCriteria?.equipmentAndFurnishings),
+    waters: getTextValue(urbanSpacingPlanningCriteria?.waters),
+    stormwaterManagement: getTextValue(urbanSpacingPlanningCriteria?.stormwaterManagement),
+    links: getLinksValue(urbanSpacingPlanningCriteria?.links),
+  };
+}
+
+function getMaintenanceNeedsValues(
+  maintenanceNeeds?: IProjectProgrammeMaintenanceNeeds,
+): IProjectProgrammeMaintenanceNeeds {
+  return {
+    maintenanceNeeds: getTextValue(maintenanceNeeds?.maintenanceNeeds),
+    links: getLinksValue(maintenanceNeeds?.links),
+  };
+}
+
+function getInteractionAndRelatedProjectsValues(
+  interactionAndRelatedProjects?: IProjectProgrammeInteractionAndRelatedProjects,
+): IProjectProgrammeInteractionAndRelatedProjects {
+  return {
+    collaborationAndExperts: getTextValue(interactionAndRelatedProjects?.collaborationAndExperts),
+    interactionNotes: getTextValue(interactionAndRelatedProjects?.interactionNotes),
+    links: getLinksValue(interactionAndRelatedProjects?.links),
+  };
+}
+
+function getOtherAttachmentsValues(
+  otherAttachments?: IProjectProgrammeOtherAttachments,
+): IProjectProgrammeOtherAttachments {
+  return {
+    attachments: otherAttachments?.attachments ?? [],
+    newFiles: [],
+    removedAttachmentIds: [],
+    links: getLinksValue(otherAttachments?.links),
+  };
+}
+
+// Every section has to be listed here, reset() replaces the whole form value object.
+function getFormValues(
+  formData?: IProjectProgrammeForm,
+  project?: IProjectNameAndDistrict,
+): IProjectProgrammeForm {
+  const values: IProjectProgrammeForm = {
+    basicInfo: getBasicInfoValues(formData?.basicInfo, project),
+    designCriteria: getDesignCriteriaValues(formData?.designCriteria),
+    trafficPlanningCriteria: getTrafficPlanningCriteriaValues(formData?.trafficPlanningCriteria),
+    urbanSpacingPlanningCriteria: getUrbanSpacingPlanningCriteriaValues(
+      formData?.urbanSpacingPlanningCriteria,
+    ),
+    maintenanceNeeds: getMaintenanceNeedsValues(formData?.maintenanceNeeds),
+    interactionAndRelatedProjects: getInteractionAndRelatedProjectsValues(
+      formData?.interactionAndRelatedProjects,
+    ),
+    otherAttachments: getOtherAttachmentsValues(formData?.otherAttachments),
+  };
+
+  for (const section of Object.keys(values) as (keyof IProjectProgrammeForm)[]) {
+    Object.assign(values[section]!, {
+      attachments: formData?.[section]?.attachments ?? [],
+      newFiles: [],
+      removedAttachmentIds: [],
+    });
+  }
+
+  return values;
+}
+
+export default function useProjectProgrammeForm(
+  formData?: IProjectProgrammeForm,
+  project?: IProject,
+) {
+  const formMethods = useForm<IProjectProgrammeForm>({
+    defaultValues: getFormValues(),
+    mode: 'onBlur',
+  });
+
+  const { reset } = formMethods;
+
+  const projectDistrict = useProjectDistrict(project);
+
+  useEffect(() => {
+    // Get defaults to use for project name and district.
+    // Used in basic info as default values.
+    const projectNameAndDistrict: IProjectNameAndDistrict = {
+      name: project?.name,
+      projectDistrict: projectDistrict?.value,
+    };
+    reset(getFormValues(formData, projectNameAndDistrict));
+  }, [formData, reset, project?.name, projectDistrict]);
+
+  return formMethods;
+}

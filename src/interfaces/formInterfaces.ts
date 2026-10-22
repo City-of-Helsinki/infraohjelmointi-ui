@@ -1,6 +1,8 @@
 import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 import { FreeSearchFormObject, IOption } from './common';
+import { FinancingRowValues } from './constructionHandoverInterfaces';
 import { IProjectSapCost } from './sapCostsInterfaces';
+import type { IMyWorkloadEditFormValues } from '@/components/MyWorkload/Table/useMyWorkloadEditForm';
 
 export enum FormField {
   Select,
@@ -86,6 +88,7 @@ export interface IProjectForm {
   district: IOption;
   division: IOption;
   subDivision: IOption;
+  additionalInformation: string;
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
   onSchedule?: boolean | null;
@@ -162,21 +165,32 @@ export interface IProjectTalpaForm {
 }
 
 export interface IConstructionHandoverForm {
+  id?: string;
   name: string; // Hankkeen nimi
   description: string; // Hankkeen kuvaus
   constructionProcurementMethod: IOption; // Hankintatapa
+  staraProcurementReason: IOption | null; // Staran hankinnan peruste
   constructionStart: string | null; // Hankkeen aloituspäivämäärä
   constructionEnd: string | null; // Hankkeen lopetuspäivämäärä
   otherTimelineNotes: string; // Muut aikataulun sidoinnaisuudet ja välitavoitteet
+  constructionHandoverFinancing: FinancingRowValues[]; // Rahoitusrivit
   personPlanning: IOption; // Suunnittelu- ja tekniset asiat
   personFinancing: IOption; // Rahoitus- ja aikataulu
+  totalCost: string; // Kokonaiskustannus
+  linkDesignDrawings: string; // Suunnittelupiirustukset
+  linkCostAllocation: string; // Tilaajien välinen kustannusjako
+  linkContractBoundaries: string; // Urakkarajapiirustukset ja kustannusarvio
+  attachments?: File[] | null; // Liitetiedostot
+}
+
+export interface IConstructionHandoverFinalizingForm {
+  constructionProjectManager: IOption;
+  constructionProcurementMethod: IOption;
+  staraProcurementReason: IOption | null;
 }
 
 export interface IAppForms
-  extends IProjectHeaderForm,
-    IProjectForm,
-    IProjectNoteForm,
-    IHashTagsForm {}
+  extends IProjectHeaderForm, IProjectForm, IProjectNoteForm, IHashTagsForm {}
 
 export type HookFormControlType =
   | Control<FieldValues>
@@ -185,6 +199,7 @@ export type HookFormControlType =
   | Control<IHashTagsForm>
   | Control<ISearchForm>
   | Control<IGroupForm>
+  | Control<IMyWorkloadEditFormValues>
   | undefined;
 
 export type HookFormRulesType = Omit<
@@ -193,3 +208,5 @@ export type HookFormRulesType = Omit<
 >;
 
 export type FormValueType = string | boolean | IOption | IOption[] | string[] | null | undefined;
+
+export type FormMode = 'view' | 'edit';

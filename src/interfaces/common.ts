@@ -74,6 +74,7 @@ export type ListType =
   | 'projectSubDistricts'
   | 'projectSubSubDistricts'
   | 'budgetOverrunReasons'
+  | 'financingParties'
   | 'programmers'
   | 'priorities';
 
@@ -82,11 +83,7 @@ export type NotificationColorType = 'error' | 'info' | 'success';
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light' | 'medium';
 export type IconSizeType =
-  | IconSize.ExtraLarge
-  | IconSize.Large
-  | IconSize.Medium
-  | IconSize.Small
-  | IconSize.ExtraSmall;
+  IconSize.ExtraLarge | IconSize.Large | IconSize.Medium | IconSize.Small | IconSize.ExtraSmall;
 
 export interface IFreeSearchResults {
   hashtags: Array<IListItem>;
@@ -101,3 +98,5 @@ export interface ICoordinatorRequestParams {
   forcedToFrame: boolean;
   year: number;
 }
+
+export type DialogMode = 'add' | 'edit' | 'delete';

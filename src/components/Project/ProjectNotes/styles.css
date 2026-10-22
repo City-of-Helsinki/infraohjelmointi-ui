@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 .note-history {
   @apply pb-5;
 }
@@ -8,7 +9,7 @@
 
 /* adds a border with padding to each element */
 .note-history:after {
-  @apply mx-auto my-0 block w-[93%] border-t border-gray content-[''];
+  @apply border-gray mx-auto my-0 block w-[93%] border-t content-[''];
 }
 
 /* last history row will not have a border */
@@ -35,7 +36,7 @@
 }
 
 .note-container {
-  @apply mb-6 rounded-md border-none bg-silver-l;
+  @apply bg-silver-l mb-6 rounded-md border-none;
 }
 
 .note-header-container {
@@ -43,9 +44,9 @@
 }
 
 .note-footer {
-  @apply flex justify-between px-3 pb-4;
+  @apply flex justify-end px-3 pb-4;
 }
 
 .new-note-form-container {
-  @apply my-6 flex flex-col items-end border-[0.125rem] border-gray p-6;
+  @apply border-gray my-6 flex flex-col items-end border-[0.125rem] p-6;
 }

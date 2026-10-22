@@ -52,6 +52,7 @@ const render = async (customRoute?: string) =>
             constructionPhases: mockLists.mockConstructionPhases.data,
             responsibleZones: mockLists.mockResponsibleZones.data,
             responsiblePersons: mockLists.mockResponsiblePersons.data,
+
             responsiblePersonsRaw: [],
             programmedYears: [],
             projectDistricts: [],
@@ -67,6 +68,7 @@ const render = async (customRoute?: string) =>
             talpaServiceClasses: [],
             talpaAssetClasses: [],
             error: {},
+            financingParties: mockLists.mockFinancingParties.data,
           },
         },
       },

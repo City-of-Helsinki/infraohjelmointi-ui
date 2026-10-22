@@ -3,19 +3,158 @@ import {
   checkGroupHasBudgets,
   checkProjectHasBudgets,
   convertToGroupValues,
+  convertToReportRows,
   frameBudgetHandler,
+  getCoordinationViewReportPdfRows,
   getIsGroupOnSchedule,
   getIsProjectOnSchedule,
+  getReportData,
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
 import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterfaces';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
+import { t } from 'i18next';
 
 jest.mock('i18next', () => ({
   t: (key: string) => key,
 }));
 
 describe('reportHelpers', () => {
+  describe.each([Reports.Strategy, Reports.StrategyForcedToFrame])('%s project budgets', (type) => {
+    const year = new Date().getFullYear() + 1;
+    const buildRow = (
+      budget: string | null | undefined,
+      rowType: PlanningRowType = 'class',
+    ): IPlanningRow => ({
+      id: 'class-id',
+      key: 'class-id',
+      name: 'Report class',
+      path: '8 01 Report class',
+      type: rowType,
+      children: [],
+      defaultExpanded: false,
+      urlSearchParam: null,
+      cells: [
+        {
+          key: 'budget-cell',
+          year,
+          plannedBudget: '500.00',
+          displayFrameBudget: '500.00',
+          isCurrentOrPastYear: false,
+          isFrameBudgetOverlap: false,
+        },
+      ],
+      projectRows: [
+        createProject({
+          planningStartYear: year - 2,
+          constructionEndYear: year + 2,
+          finances: {
+            year,
+            budgetProposalCurrentYearPlus0: budget,
+            budgetProposalCurrentYearPlus1: '100.00',
+            budgetProposalCurrentYearPlus2: '200.00',
+          },
+        }),
+      ],
+    });
+    const convert = (row: IPlanningRow, selectedYear = year) =>
+      convertToReportRows(
+        [row],
+        type,
+        undefined,
+        t,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        selectedYear,
+      );
+
+    it.each([null, undefined, '', '   ', '0.00', '0', '0.0', '0,00', 'invalid'])(
+      'excludes a report-year budget of %p even with spending in later years',
+      (budget) => {
+        expect(convert(buildRow(budget))).toMatchObject([{ projects: [], costForecast: '500.00' }]);
+      },
+    );
+
+    it.each(['100.00', '-100.00'])('includes a nonzero report-year budget of %p', (budget) => {
+      expect(convert(buildRow(budget))).toMatchObject([{ projects: [{ id: 'project-id' }] }]);
+    });
+
+    it('excludes consecutive gap years without excluding funded years before and after them', () => {
+      const budgets = ['100.00', null, null, '200.00'];
+      budgets.forEach((budget, index) => {
+        const row = buildRow(budget);
+        row.projectRows[0].finances.year = year - 1 + index;
+        expect(convert(row, row.projectRows[0].finances.year)).toMatchObject([
+          {
+            projects: budget === null ? [] : [{ id: 'project-id' }],
+          },
+        ]);
+      });
+    });
+
+    it('removes a group when its last project has a gap-year budget', () => {
+      expect(convert(buildRow(null, 'group'))).toEqual([]);
+    });
+
+    it.each([null, '100.00'])(
+      'exports only funded projects to CSV for a budget of %p',
+      async (budget) => {
+        const selectedYear = type === Reports.StrategyForcedToFrame ? year - 1 : year;
+        let isolatedGetReportData = getReportData;
+        jest.isolateModules(() => {
+          isolatedGetReportData = require('./reportHelpers').getReportData;
+        });
+        const csvRows = await isolatedGetReportData(
+          t,
+          type,
+          [buildRow(budget)],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          selectedYear,
+        );
+        const projectName = { '\nreport.strategy.projectNameTitle': 'Default Project' };
+        if (budget === null) {
+          expect(csvRows).not.toContainEqual(expect.objectContaining(projectName));
+        } else {
+          expect(csvRows).toContainEqual(expect.objectContaining(projectName));
+        }
+        expect(csvRows).toContainEqual(expect.objectContaining({ [`\nTS ${year}`]: '500.00' }));
+      },
+    );
+
+    it.each([null, '', '0', '0.00', '100.00'])(
+      'preserves forecast filtering for a budget of %p',
+      (budget) => {
+        const row = buildRow(budget);
+        const forecastRows = convertToReportRows(
+          [row],
+          Reports.ForecastReport,
+          undefined,
+          t,
+          undefined,
+          undefined,
+          undefined,
+          [row],
+        );
+        expect(forecastRows).toMatchObject([
+          {
+            projects: budget === '0.00' ? [] : [{ id: 'project-id' }],
+          },
+        ]);
+      },
+    );
+  });
+
   describe('frameBudgetHandler', () => {
     it('should calculate frame budget from current year for forecast report', () => {
       const currentYear = new Date().getFullYear();
@@ -560,12 +699,7 @@ describe('reportHelpers', () => {
   // now use the full three-window-year check; the forecast report stays
   // current-year-only.
   describe('forced-to-frame budget checks (IO-896)', () => {
-    const budgetCheck = (
-      type: Reports,
-      plus0: string,
-      plus1: string,
-      plus2: string,
-    ) => ({
+    const budgetCheck = (type: Reports, plus0: string, plus1: string, plus2: string) => ({
       budgetProposalCurrentYearPlus0: plus0,
       budgetProposalCurrentYearPlus1: plus1,
       budgetProposalCurrentYearPlus2: plus2,
@@ -573,11 +707,7 @@ describe('reportHelpers', () => {
       type,
     });
 
-    const groupRow = (
-      plus0: string,
-      plus1: string,
-      plus2: string,
-    ): IConstructionProgramTableRow =>
+    const groupRow = (plus0: string, plus1: string, plus2: string): IConstructionProgramTableRow =>
       ({
         id: 'g1',
         name: 'Group',
@@ -589,7 +719,7 @@ describe('reportHelpers', () => {
         budgetProposalCurrentYearPlus1: plus1,
         budgetProposalCurrentYearPlus2: plus2,
         costForcedToFrameBudget: undefined,
-      } as unknown as IConstructionProgramTableRow);
+      }) as unknown as IConstructionProgramTableRow;
 
     describe('checkProjectHasBudgets', () => {
       it('keeps a forced-to-frame project funded only in +2 (regression)', () => {
@@ -619,9 +749,7 @@ describe('reportHelpers', () => {
       it('matches the planning report for the same finances', () => {
         const finances: [string, string, string] = ['0,0', '0,0', '200,0'];
         expect(
-          checkProjectHasBudgets(
-            budgetCheck(Reports.ConstructionProgram, ...finances),
-          ),
+          checkProjectHasBudgets(budgetCheck(Reports.ConstructionProgram, ...finances)),
         ).toBeTruthy();
         expect(
           checkProjectHasBudgets(
@@ -657,6 +785,99 @@ describe('reportHelpers', () => {
           ),
         ).toBeFalsy();
       });
+    });
+  });
+
+  describe('coordination view PDF rows', () => {
+    const buildCells = (baseValue: number): IPlanningCell[] =>
+      Array.from({ length: 11 }, (_, index) => ({
+        key: `cell-${baseValue}-${index}`,
+        year: 2026 + index,
+        plannedBudget: `${baseValue + index}`,
+        isCurrentOrPastYear: false,
+        isFrameBudgetOverlap: false,
+      }));
+
+    const buildPlanningRow = (
+      rowType: PlanningRowType,
+      name: string,
+      overrides: Partial<IPlanningRow> = {},
+    ): IPlanningRow => ({
+      type: rowType,
+      name,
+      path: name,
+      children: [],
+      projectRows: [],
+      id: `${rowType}-${name}`,
+      key: `${rowType}-${name}`,
+      defaultExpanded: true,
+      urlSearchParam: null,
+      cells: buildCells(10),
+      ...overrides,
+    });
+
+    it('preserves explicit hierarchy row types for numeric code rows and custom groups', () => {
+      const project = createProject({
+        name: 'Kohde A',
+        finances: {
+          budgetProposalCurrentYearPlus0: '1',
+          budgetProposalCurrentYearPlus1: '2',
+          budgetProposalCurrentYearPlus2: '3',
+          preliminaryCurrentYearPlus3: '4',
+          preliminaryCurrentYearPlus4: '5',
+          preliminaryCurrentYearPlus5: '6',
+          preliminaryCurrentYearPlus6: '7',
+          preliminaryCurrentYearPlus7: '8',
+          preliminaryCurrentYearPlus8: '9',
+          preliminaryCurrentYearPlus9: '10',
+          preliminaryCurrentYearPlus10: '11',
+        },
+      });
+
+      const customGroupRow = buildPlanningRow('group', 'Kunnossapidon kohdepaketti', {
+        cells: buildCells(30),
+      });
+
+      const subClassRow = buildPlanningRow('subClass', '801 Esirakentaminen', {
+        children: [customGroupRow],
+        projectRows: [project],
+        cells: buildCells(20),
+      });
+
+      const classRow = buildPlanningRow('class', '8 01 Katualueet', {
+        children: [subClassRow],
+      });
+
+      const masterClassRow = buildPlanningRow('masterClass', '8 Kaupunkiymparisto', {
+        children: [classRow],
+      });
+
+      const result = getCoordinationViewReportPdfRows([masterClassRow], 2026);
+      const targetKey = 'target';
+
+      expect(result.map((row) => row.rowType)).toEqual([
+        'masterClass',
+        'class',
+        'subClass',
+        'project',
+        'group',
+      ]);
+      expect(result.map((row) => row.values[targetKey])).toEqual([
+        '8 Kaupunkiymparisto',
+        '8 01 Katualueet',
+        '801 Esirakentaminen',
+        'Kohde A',
+        'Kunnossapidon kohdepaketti',
+      ]);
+    });
+
+    it('maps district-like planning row types to district hierarchy styling metadata', () => {
+      const districtPreviewRow = buildPlanningRow('districtPreview', 'Etelainen suurpiiri');
+
+      const result = getCoordinationViewReportPdfRows([districtPreviewRow], 2026);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].rowType).toBe('district');
     });
   });
 });

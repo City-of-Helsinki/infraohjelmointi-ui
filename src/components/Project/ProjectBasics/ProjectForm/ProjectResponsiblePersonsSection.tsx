@@ -6,6 +6,7 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import { defaultFilter } from 'hds-react';
+import { createProjectPhaseResolver } from '@/utils/projectValidationRules';
 
 interface IProjectResponsiblePersonsSectionProps {
   control: Control<IProjectForm>;
@@ -31,46 +32,16 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const phases = useOptions('phases');
   const programmers = useOptions('programmers');
 
-  const findPhase = (val: string) => phases.find((p) => p.label === val)?.value ?? '';
-  const planningPhase = findPhase('designPlanning');
-  const draftInitiationPhase = findPhase('draftInitiation');
-  const draftApprovalPhase = findPhase('draftApproval');
-  const constructionPlanPhase = findPhase('constructionPlan');
-  const constructionWaitPhase = findPhase('constructionWait');
-  const constructionPhase = findPhase('construction');
-  const warrantyPeriodPhase = findPhase('warrantyPeriod');
-  const completedPhase = findPhase('completed');
+  const phaseResolver = useMemo(() => createProjectPhaseResolver(phases), [phases]);
 
   const phasesThatNeedResponsiblePerson = useMemo(
-    () =>
-      [
-        planningPhase,
-        draftInitiationPhase,
-        draftApprovalPhase,
-        constructionPlanPhase,
-        constructionWaitPhase,
-        constructionPhase,
-        warrantyPeriodPhase,
-        completedPhase,
-      ].filter((phase): phase is string => phase !== ''),
-    [
-      completedPhase,
-      constructionPhase,
-      constructionWaitPhase,
-      planningPhase,
-      warrantyPeriodPhase,
-      constructionPlanPhase,
-      draftApprovalPhase,
-      draftInitiationPhase,
-    ],
+    () => phaseResolver.phasesThatNeedResponsiblePerson,
+    [phaseResolver],
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () =>
-      [constructionPhase, warrantyPeriodPhase, completedPhase].filter(
-        (phase): phase is string => phase !== '',
-      ),
-    [completedPhase, constructionPhase, warrantyPeriodPhase],
+    () => phaseResolver.phasesThatNeedConstructionPerson,
+    [phaseResolver],
   );
 
   const currentPhase = useWatch({

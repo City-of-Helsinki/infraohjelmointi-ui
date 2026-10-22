@@ -77,7 +77,7 @@ const getSearchTerms = (
         break;
       case 'hkrIds':
         for (const hkrId of value) {
-          searchTerms.push({ value: hkrId, type: key, id: hkrId})
+          searchTerms.push({ value: hkrId, type: key, id: hkrId });
         }
         break;
       default:

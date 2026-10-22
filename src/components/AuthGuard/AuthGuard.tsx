@@ -23,6 +23,7 @@ const PAGES = {
   PROJECT_BASICS: 'basics',
   PROJECT_NOTES: 'notes',
   PROJECT_TALPA: 'talpa',
+  PROJECT_PROGRAMME: 'project-programme',
   CONSTRUCTION_HANDOVER: 'construction-handover',
   SEARCH_RESULTS: 'search-results',
 };
@@ -198,6 +199,7 @@ const AuthGuard: FC = () => {
         !pathname.includes(PAGES.PROJECT_NOTES) &&
         !pathname.includes(PAGES.PROJECT_NEW) &&
         !pathname.includes(PAGES.PROJECT_TALPA) &&
+        !pathname.includes(PAGES.PROJECT_PROGRAMME) &&
         !pathname.includes(PAGES.CONSTRUCTION_HANDOVER);
       if (pathname.includes(PAGES.PROJECT) && pathIsInvalid) {
         return navigate(`${pathname.replace(/\/$/, '')}/${PAGES.PROJECT_BASICS}`);

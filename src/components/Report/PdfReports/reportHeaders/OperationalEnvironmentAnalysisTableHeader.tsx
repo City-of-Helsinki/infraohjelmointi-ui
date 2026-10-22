@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 const styles = StyleSheet.create({
   tableHeader: {
@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
 });
 
 const OperationalEnvironmentAnalysisTableHeader = () => {
-  const { t } = useTranslation();
   const currentPlusYears = [4, 5, 6, 7, 8, 9, 10];
   return (
     <View style={styles.tableHeader}>

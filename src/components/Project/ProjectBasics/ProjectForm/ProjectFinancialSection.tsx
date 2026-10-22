@@ -1,12 +1,7 @@
 import { FormSectionTitle, ListField, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import {
-  Control,
-  UseFormGetValues,
-  UseFormSetValue,
-  UseFormWatch,
-} from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
@@ -18,6 +13,7 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import { Option } from 'hds-react';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
 interface IProjectFinancialSectionProps {
   project: IProject | null;
@@ -51,6 +47,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const { t } = useTranslation();
 
   const { masterClasses, classes, subClasses } = classOptions;
+  const { isRestricted, canEditClass } = useRestrictedClassAccess();
 
   const isSaving = useAppSelector(selectIsProjectSaving);
   const sapCosts = useAppSelector(getProjectSapCosts);
@@ -184,9 +181,18 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           }
           return true;
         },
+        // Restricted programmers (IO-756) must save the project in one of their own classes
+        isClassInRestrictedScope: (masterClass?: IOption) => {
+          if (!isRestricted) {
+            return true;
+          }
+          const selectedClass =
+            getValues('subClass')?.value || getValues('class')?.value || masterClass?.value;
+          return canEditClass(selectedClass) || t('validation.restrictedClass');
+        },
       },
     }),
-    [getValues, phasesRequiringClass, t],
+    [getValues, phasesRequiringClass, t, isRestricted, canEditClass],
   );
 
   const validateClass = useMemo(

@@ -10,11 +10,7 @@ interface IReportYearSelectProps {
   className?: string;
 }
 
-const ReportYearSelect: FC<IReportYearSelectProps> = ({
-  value,
-  onChange,
-  className,
-}) => {
+const ReportYearSelect: FC<IReportYearSelectProps> = ({ value, onChange, className }) => {
   const { i18n, t } = useTranslation();
 
   const startYear = currentYear - 1;

@@ -8,9 +8,11 @@ import { mockEventSource } from './mocks/mockEventSource';
 import { TextEncoder, TextDecoder } from 'util';
 import { webcrypto } from 'node:crypto';
 import { mockResizeObserver } from './mocks/mockResizeObserver';
+import { mockScrollIntoView } from './mocks/mockScrollIntoView';
 
 mockEventSource();
 mockResizeObserver();
+mockScrollIntoView();
 
 process.env.REACT_APP_API_URL = 'localhost:4000';
 process.env.REACT_APP_AUTHORITY = 'test-authority-url';

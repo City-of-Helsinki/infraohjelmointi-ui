@@ -1,5 +1,20 @@
 import { IUser, UserRole } from '@/interfaces/userInterfaces';
 
+const createAdGroup = (name: UserRole, index: number) => ({
+  id: `mock-ad-group-${index + 1}`,
+  name,
+  display_name: name,
+});
+
+export const createMockUserWithAdGroups = (
+  adGroups: UserRole[],
+  userOverrides: Partial<IUser> = {},
+): IUser => ({
+  ...mockUser.data,
+  ad_groups: adGroups.map(createAdGroup),
+  ...userOverrides,
+});
+
 export const mockUser: { data: IUser } = {
   data: {
     last_login: null,
@@ -42,7 +57,7 @@ export const mockUser: { data: IUser } = {
       {
         id: '61336d5e-4b74-400f-a1d6-c9f96d3f1d4d',
         name: 'sg_kymp_sso_io_katselijat_muut' as UserRole,
-        display_name: 'sg_KYMP_sso_IO_Katselijat_Muut'
+        display_name: 'sg_KYMP_sso_IO_Katselijat_Muut',
       },
       {
         id: 'test-admin-role',

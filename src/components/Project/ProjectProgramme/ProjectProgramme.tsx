@@ -1,0 +1,329 @@
+import { Button, ButtonVariant, Notification } from 'hds-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { skipToken } from '@reduxjs/toolkit/query';
+import useGetProject from '@/hooks/useGetProject';
+import { useAppDispatch } from '@/hooks/common';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import {
+  useGetProjectProgrammeByProjectQuery,
+  usePostProjectProgrammeMutation,
+  usePostSwitchProjectProgrammeTypeMutation,
+} from '@/api/projectProgrammeApi';
+import ProjectProgrammeForm from './ProjectProgrammeForm';
+import {
+  getProjectProgrammeSections,
+  hasExtendedBasicInfoContent,
+  isSectionStarted,
+  ProjectProgrammeRequiredSectionId,
+  ProjectProgrammeSectionId,
+} from './sections/projectProgrammeSections';
+import StartProjectProgramme from './StartProjectProgramme';
+import ProjectProgrammeBottomBar from './ProjectProgrammeBottomBar';
+import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
+import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
+import SwitchToExtendedProgrammeNotification from './SwitchToExtendedProgrammeNotification';
+import ProgrammeCompletedNotification from './ProgrammeCompletedNotification';
+import { getMissingRequiredSections } from './sections/projectProgrammeSectionFields';
+import MissingRequiredFieldsNotification from './MissingRequiredFieldsNotification';
+import LocationSection from './sections/LocationSection';
+
+const isBriefProgramme = (projectProgramme: { briefProjectProgramme?: boolean | null }) => {
+  return projectProgramme.briefProjectProgramme ?? true;
+};
+
+function getErrorStatus(error: unknown): number | undefined {
+  if (typeof error !== 'object' || error === null || !('status' in error)) {
+    return undefined;
+  }
+
+  return typeof error.status === 'number' ? error.status : undefined;
+}
+
+function ProjectProgramme() {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const { data: project } = useGetProject();
+
+  const {
+    data: projectProgrammeFromProject,
+    error: projectProgrammeByProjectError,
+    isLoading: isLoadingProjectProgrammeByProject,
+    refetch: refetchProjectProgramme,
+  } = useGetProjectProgrammeByProjectQuery(project?.id ?? skipToken);
+
+  const [postProjectProgramme] = usePostProjectProgrammeMutation();
+  const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
+  const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
+  const [missingRequiredSections, setMissingRequiredSections] = useState<
+    ProjectProgrammeRequiredSectionId[]
+  >([]);
+  const missingFieldsNotificationRef = useRef<HTMLDivElement>(null);
+
+  const effectiveProjectProgramme = projectProgrammeFromProject;
+  useEffect(() => {
+    setMissingRequiredSections((sections) =>
+      sections.length > 0 ? getMissingRequiredSections(effectiveProjectProgramme) : sections,
+    );
+  }, [effectiveProjectProgramme]);
+
+  const projectProgrammeId = effectiveProjectProgramme?.id ?? null;
+
+  const briefProgramme = effectiveProjectProgramme
+    ? isBriefProgramme(effectiveProjectProgramme)
+    : true;
+  const hasProjectProgramme = Boolean(projectProgrammeId);
+  const projectProgrammeQueryStatus = getErrorStatus(projectProgrammeByProjectError);
+  const hasProjectProgrammeLoadError =
+    !hasProjectProgramme &&
+    projectProgrammeQueryStatus !== undefined &&
+    projectProgrammeQueryStatus !== 404;
+  const isProjectProgrammeComplete = effectiveProjectProgramme?.status === 'COMPLETE';
+  const hasBasicInfo = isSectionStarted(effectiveProjectProgramme?.basicInfo);
+  const hasDesignCriteria = isSectionStarted(effectiveProjectProgramme?.designCriteria);
+  const hasTrafficPlanningCriteria = isSectionStarted(
+    effectiveProjectProgramme?.trafficPlanningCriteria,
+  );
+  const hasUrbanSpacingPlanningCriteria = isSectionStarted(
+    effectiveProjectProgramme?.urbanSpacingPlanningCriteria,
+  );
+  const hasMaintenanceNeeds = isSectionStarted(effectiveProjectProgramme?.maintenanceNeeds);
+  const hasInteractionAndRelatedProjects = isSectionStarted(
+    effectiveProjectProgramme?.interactionAndRelatedProjects,
+  );
+  const hasOtherAttachments = isSectionStarted(effectiveProjectProgramme?.otherAttachments);
+
+  const PROJECT_PROGRAMME_SECTIONS = getProjectProgrammeSections(t, briefProgramme, {
+    hasBasicInfo,
+    hasDesignCriteria,
+    hasTrafficPlanningCriteria,
+    hasUrbanSpacingPlanningCriteria,
+    hasMaintenanceNeeds,
+    hasInteractionAndRelatedProjects,
+    hasOtherAttachments,
+  });
+
+  const hasSavedExtendedSection =
+    hasExtendedBasicInfoContent(effectiveProjectProgramme?.basicInfo) ||
+    PROJECT_PROGRAMME_SECTIONS.some((section) => !section.showInBrief && section.sectionIsStarted);
+
+  const sectionsInDraftState = useMemo(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
+        (section) => effectiveProjectProgramme?.[section.id]?.status === 'DRAFT',
+      ),
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+  );
+
+  const sectionsInCompletedState = useMemo(
+    () =>
+      PROJECT_PROGRAMME_SECTIONS.filter(
+        (section) => effectiveProjectProgramme?.[section.id]?.status === 'COMPLETE',
+      ),
+    [PROJECT_PROGRAMME_SECTIONS, effectiveProjectProgramme],
+  );
+
+  const hasActiveSection = Boolean(activeSection && projectProgrammeId);
+  const showLoadError = hasProjectProgrammeLoadError;
+  const showStartProjectProgramme = !showLoadError && !hasProjectProgramme;
+  const showActiveSectionForm = !showLoadError && hasProjectProgramme && hasActiveSection;
+  const showOverview = !showLoadError && hasProjectProgramme && !hasActiveSection;
+  const showSwitchToExtendedProgrammeNotification = briefProgramme && !isProjectProgrammeComplete;
+
+  function notifyMissingProject() {
+    dispatch(
+      notifyError({
+        title: 'saveError',
+        message: 'projectNotFound',
+        type: 'toast',
+      }),
+    );
+  }
+
+  async function handleStartProjectProgramme() {
+    if (!project?.id) {
+      notifyMissingProject();
+      return;
+    }
+
+    try {
+      await postProjectProgramme({ project: project.id }).unwrap();
+    } catch (error) {
+      const status = getErrorStatus(error);
+
+      if (status === 403) {
+        dispatch(
+          notifyError({
+            title: 'saveError',
+            message: 'projectProgrammeCreateForbidden',
+            type: 'toast',
+          }),
+        );
+        return;
+      }
+
+      dispatch(
+        notifyError({
+          title: 'saveError',
+          message: 'projectProgrammeCreateError',
+          type: 'toast',
+        }),
+      );
+    }
+  }
+
+  async function handleSwitchType() {
+    if (!effectiveProjectProgramme?.id) {
+      notifyMissingProject();
+      return;
+    }
+
+    try {
+      await switchType(effectiveProjectProgramme.id).unwrap();
+      dispatch(
+        notifySuccess({
+          title: 'patchSuccess',
+          message: 'projectProgrammeSwitchTypeSuccess',
+          type: 'toast',
+        }),
+      );
+    } catch (error) {
+      dispatch(
+        notifyError({
+          title: 'saveError',
+          message: 'projectProgrammeSwitchTypeError',
+          type: 'toast',
+        }),
+      );
+      return error;
+    }
+  }
+
+  function handleOpenSection(sectionId: ProjectProgrammeSectionId) {
+    if (!effectiveProjectProgramme?.id) {
+      notifyMissingProject();
+      return;
+    }
+
+    setActiveSection(sectionId);
+  }
+
+  function handleCloseSection() {
+    setActiveSection(null);
+  }
+
+  function handleMissingRequiredFields(sections: ProjectProgrammeRequiredSectionId[]) {
+    setMissingRequiredSections(sections);
+    globalThis.requestAnimationFrame(() => {
+      missingFieldsNotificationRef.current?.scrollIntoView?.({ block: 'center' });
+      missingFieldsNotificationRef.current?.focus();
+    });
+  }
+
+  if (isLoadingProjectProgrammeByProject) {
+    return null;
+  }
+
+  return (
+    <div className="project-programme-container">
+      <div className="project-programme-view" data-testid="project-programme-view">
+        {showLoadError && (
+          <div className="project-form mx-auto max-w-xl" data-testid="project-programme-load-error">
+            <Notification type="error" label={t('saveError')}>
+              <div className="project-programme-notification-content">
+                <p>{t('projectProgrammeForm.projectProgrammeLoadError')}</p>
+                <div>
+                  <Button
+                    variant={ButtonVariant.Secondary}
+                    onClick={() => refetchProjectProgramme()}
+                  >
+                    {t('projectProgrammeForm.retryLoadProjectProgramme')}
+                  </Button>
+                </div>
+              </div>
+            </Notification>
+          </div>
+        )}
+
+        {isProjectProgrammeComplete && <ProgrammeCompletedNotification />}
+
+        {showStartProjectProgramme && (
+          <StartProjectProgramme onStartProjectProgramme={handleStartProjectProgramme} />
+        )}
+
+        {showActiveSectionForm && activeSection && projectProgrammeId && (
+          <ProjectProgrammeForm
+            projectProgrammeId={projectProgrammeId}
+            activeSection={activeSection}
+            effectiveProjectProgramme={effectiveProjectProgramme}
+            briefProgramme={briefProgramme}
+            isProjectProgrammeComplete={isProjectProgrammeComplete}
+            onClose={handleCloseSection}
+            project={project}
+          />
+        )}
+
+        {showOverview && (
+          <div className="project-form mx-auto max-w-xl">
+            <div className="project-programme-notifications">
+              {missingRequiredSections.length > 0 && (
+                <MissingRequiredFieldsNotification
+                  missingFieldsNotificationRef={missingFieldsNotificationRef}
+                  handleOpenSection={handleOpenSection}
+                  PROJECT_PROGRAMME_SECTIONS={PROJECT_PROGRAMME_SECTIONS}
+                  missingRequiredSections={missingRequiredSections}
+                />
+              )}
+              {showSwitchToExtendedProgrammeNotification && (
+                <SwitchToExtendedProgrammeNotification handleSwitchType={handleSwitchType} />
+              )}
+              {effectiveProjectProgramme?.status === 'DRAFT' && (
+                <ProjectProgrammeDraftStateNotification
+                  sectionsInCompletedState={sectionsInCompletedState}
+                  sectionsInDraftState={sectionsInDraftState}
+                  onOpenSection={handleOpenSection}
+                  isProjectProgrammeComplete={isProjectProgrammeComplete}
+                  effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+                  effectiveProjectProgramme={effectiveProjectProgramme}
+                  onMissingRequiredFields={handleMissingRequiredFields}
+                />
+              )}
+            </div>
+            <LocationSection
+              projectProgramme={effectiveProjectProgramme}
+              programmeIsComplete={isProjectProgrammeComplete}
+            />
+            {PROJECT_PROGRAMME_SECTIONS.filter(
+              (section) => !briefProgramme || section.showInBrief,
+            ).map((section) => {
+              return (
+                <ProjectProgrammeSectionCard
+                  key={section.id}
+                  sectionIsStarted={section.sectionIsStarted}
+                  handleOpenSection={handleOpenSection}
+                  label={section.label}
+                  cardText={section.cardText}
+                  actionText={section.actionText}
+                  sectionId={section.id}
+                  projectProgramme={effectiveProjectProgramme}
+                  programmeIsComplete={isProjectProgrammeComplete}
+                />
+              );
+            })}
+            <ProjectProgrammeBottomBar
+              isBriefProgramme={briefProgramme}
+              hasSavedExtendedSection={hasSavedExtendedSection}
+              isProjectProgrammeComplete={isProjectProgrammeComplete}
+              effectiveProjectProgrammeId={effectiveProjectProgramme?.id ?? ''}
+              effectiveProjectProgramme={effectiveProjectProgramme}
+              onMissingRequiredFields={handleMissingRequiredFields}
+              handleSwitchType={handleSwitchType}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default ProjectProgramme;

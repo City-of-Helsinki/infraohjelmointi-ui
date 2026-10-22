@@ -1,0 +1,81 @@
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import classes from '../styles.module.css';
+
+import type { MyWorkloadTaskItem } from '@/interfaces/myWorkloadInterfaces';
+import {
+  Button,
+  ButtonPresetTheme,
+  ButtonVariant,
+  Card,
+  IconCalendarClock,
+  IconCalendarRecurring,
+  IconHammers,
+  IconMoneyBag,
+  IconPen,
+} from 'hds-react';
+import { formatBudgetEuro } from '@/utils/currencyUtils';
+import { ProjectTaskType } from '@/interfaces/projectInterfaces';
+
+interface MyWorkloadTaskCardProps {
+  task: MyWorkloadTaskItem;
+}
+
+const MyWorkloadTaskCard: FC<MyWorkloadTaskCardProps> = ({ task }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const onButtonClick = () => {
+    if (task.taskType === ProjectTaskType.NAME_CONSTRUCTION_PROJECT_MANAGER) {
+      navigate(`/project/${task.id}/construction-handover`);
+    }
+  };
+
+  return (
+    <Card heading={task.projectName} className={classes.taskCard}>
+      <div className={classes.taskDetails}>
+        <div className={classes.taskColumns}>
+          <p>
+            <IconCalendarClock aria-hidden="true" />
+            {`${t('myWorkloadView.tasks.planningPeriod')}: ${task.planningPeriod}`}
+          </p>
+          <p>
+            <IconCalendarRecurring aria-hidden="true" />
+            {`${t('myWorkloadView.tasks.constructionPeriod')}: ${task.constructionPeriod}`}
+          </p>
+        </div>
+        <div className={classes.taskColumns}>
+          <p>
+            <IconMoneyBag aria-hidden="true" />
+            {t(`myWorkloadView.tasks.budget.${task.taskType}`)}:{' '}
+            <span className={classes.noWrap}>{formatBudgetEuro(task.budget)}</span>
+          </p>
+          <p>
+            <IconMoneyBag aria-hidden="true" />
+            {t('myWorkloadView.tasks.totalCost')}:{' '}
+            <span className={classes.noWrap}>{formatBudgetEuro(task.totalCost)}</span>
+          </p>
+          <p>
+            <IconHammers aria-hidden="true" />
+            {`${t('myWorkloadView.tasks.constructionProcurementMethod')}: ${
+              task.constructionProcurementMethod
+            }`}
+          </p>
+        </div>
+        <div className={classes.taskColumns}>
+          <Button
+            variant={ButtonVariant.Primary}
+            theme={ButtonPresetTheme.Bus}
+            onClick={onButtonClick}
+            iconStart={<IconPen />}
+          >
+            {task.taskDescription}
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+export default MyWorkloadTaskCard;

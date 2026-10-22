@@ -1,7 +1,8 @@
+@reference "../../index.css";
 .admin-view {
-  @apply my-10 ml-14 mr-[7.5rem];
+  @apply my-10 mr-[7.5rem] ml-14;
 }
 
 .admin-view-title {
-  @apply mb-16 text-heading-l;
+  @apply text-heading-l mb-16;
 }

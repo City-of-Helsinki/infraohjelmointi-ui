@@ -1,3 +1,4 @@
+@reference "../../../../../index.css";
 #delete-group-dialog {
   @apply w-auto;
 }

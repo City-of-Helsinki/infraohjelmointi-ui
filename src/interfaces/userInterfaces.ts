@@ -11,6 +11,18 @@ export interface IUser {
   uuid: string;
   id: number;
   ad_groups: Array<IAdGroup>;
+  /**
+   * Set by the API, which owns the (configurable) group name and the coordinator/admin bypass (IO-756)
+   */
+  is_restricted_programmer?: boolean;
+  /**
+   * Class paths a restricted programmer may edit (IO-756), empty for other users
+   */
+  restricted_class_paths?: Array<string>;
+  /**
+   * IDs of the classes a restricted programmer may edit, sub classes included (IO-756)
+   */
+  restricted_class_ids?: Array<string>;
 }
 
 export interface IAdGroup {
@@ -29,4 +41,5 @@ export enum UserRole {
   VIEWER_OUTSIDE_ORGANIZATION = 'az_kymp_asgd_u_infraohjelmointi_ulkopuoliset',
   VIEWER_OUTSIDE_ORGANIZATION_ALT = '952da398-75b3-404a-b274-c8f351d7f5a7',
   ADMIN = 'sg_kymp_sso_io_admin',
+  CONSTRUCTION_MANAGEMENT_LEAD = 'sg_kymp_sso_io_rakennuttamisen_esihenkilot',
 }

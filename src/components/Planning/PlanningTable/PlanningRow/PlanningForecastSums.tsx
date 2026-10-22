@@ -88,7 +88,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
             budgetChange: parsedValue,
           },
         },
-        forcedToFrame: forcedToFrame
+        forcedToFrame: forcedToFrame,
       },
     };
     patchCoordinationClass(request);
@@ -98,7 +98,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     if ((!value && editBudgetChange) || budgetChange != value) {
       setInputValue(formattedNumberToNumber(budgetChange));
     }
-  }
+  };
 
   const isEditBudgetChangeDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame || editBudgetChange,
@@ -136,7 +136,8 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
           </div>
         )}
         {editBudgetChange && (
-          <input autoFocus
+          <input
+            autoFocus
             id="edit-budget-change-input"
             className="budget-change-input"
             type="number"

@@ -1,3 +1,4 @@
+@reference "../../../index.css";
 /*
 1. $color-brick
 2. #A80E00
@@ -30,8 +31,12 @@ and the indentation (sisennys) in the text continues as long as the text can be 
   @apply w-full;
 }
 
+.planning-table button:disabled {
+  @apply cursor-default;
+}
+
 .monthly-cell {
-  @apply w-[39px] min-w-[39px] max-w-[39px] cursor-pointer !p-0 !pr-0;
+  @apply w-[39px] max-w-[39px] min-w-[39px] cursor-pointer !p-0 !pr-0;
 }
 
 /* this creates a shadow over the hovered monthly cell */
@@ -40,7 +45,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 }
 
 .monthly-summary-cell {
-  @apply w-56 min-w-[14rem] max-w-[14rem];
+  @apply w-56 max-w-[14rem] min-w-[14rem];
 }
 
 .monthly-cell.summary-budget.start-month,
@@ -104,7 +109,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.collectiveSubLevel #coordinator-note,
 .group #coordinator-note {
   display: none;
-} 
+}
 
 .monthly-cell.districtPreview.framed,
 .monthly-summary-cell.districtPreview.framed,
@@ -128,18 +133,18 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 
 .monthly-cell.division,
 .monthly-summary-cell.division {
-  @apply border-b border-black-70 bg-[var(--color-division)];
+  @apply border-black-70 border-b bg-[var(--color-division)];
 }
 
 .monthly-cell.group,
 .monthly-summary-cell.group {
-  @apply border-b border-black-70 bg-[var(--color-group)];
+  @apply border-black-70 border-b bg-[var(--color-group)];
 }
 
 .monthly-summary-cell.project,
 .monthly-cell.project {
   /* setting height to 0 will allow height: 100% to work for child elements */
-  @apply h-24 border-b-[0.05rem] border-bus-m p-0;
+  @apply border-bus-m h-24 border-b-[0.05rem] p-0;
 }
 
 .monthly-summary-cell.project.none,

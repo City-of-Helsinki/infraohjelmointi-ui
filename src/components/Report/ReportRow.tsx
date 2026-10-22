@@ -37,6 +37,18 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   };
 
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
+    const fetchPaginatedProjects = async (
+      nextPath: string | null | undefined,
+      resultArray: typeof res.results,
+    ): Promise<typeof res.results> => {
+      if (nextPath == null) {
+        return resultArray;
+      }
+
+      const nextResults = await getProjectsWithParams({ fullPath: nextPath });
+      return fetchPaginatedProjects(nextResults.next, resultArray.concat(nextResults.results));
+    };
+
     // projects
     const res = await getProjectsWithParams(
       {
@@ -48,21 +60,16 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       },
       true,
     );
-    let resultArray = res.results;
-    let nextResultsPath = res.next;
-    while (nextResultsPath != null) {
-      const nextResults = await getProjectsWithParams({ fullPath: nextResultsPath });
-      resultArray = resultArray.concat(nextResults.results);
-      nextResultsPath = nextResults.next;
-    }
-    const projects = resultArray.filter(
-      (p) => p.phase.value !== 'proposal' && p.phase.value !== 'design',
-    );
+    const resultArray = await fetchPaginatedProjects(res.next, res.results);
+    const projects = resultArray.filter((p) => {
+      const phaseValue = p.phase?.value;
+      return phaseValue !== 'proposal' && phaseValue !== 'design';
+    });
 
     /* needed for the operational environment analysis report. The budgets of the projects that are in the warranty phase
        need to be added to the sums there separately and because of that we check here which projects are in this phase
        and do the calculations then in the reportsHelper.tsx */
-    const projectsInWarrantyPhase = res.results.filter((p) => p.phase.value === 'warrantyPeriod');
+    const projectsInWarrantyPhase = res.results.filter((p) => p.phase?.value === 'warrantyPeriod');
 
     // classes
     const classRes = await getCoordinationClasses({
@@ -119,9 +126,10 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       forcedToFrame: false,
       year: year,
     });
-    const projects = res.results.filter(
-      (p) => p.phase.value !== 'proposal' && p.phase.value !== 'design',
-    );
+    const projects = res.results.filter((p) => {
+      const phaseValue = p.phase?.value;
+      return phaseValue !== 'proposal' && phaseValue !== 'design';
+    });
 
     // classes
     const classRes = await getPlanningClasses(year);

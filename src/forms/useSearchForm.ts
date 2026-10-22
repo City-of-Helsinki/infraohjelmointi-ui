@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm, setSearchForm } from '@/reducers/searchSlice';
 import useMultiClassOptions from '@/hooks/useMultiClassOptions';
 import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { IOption } from '@/interfaces/common';
 
 const useSearchForm = () => {
@@ -39,11 +39,7 @@ const useSearchForm = () => {
     multiListsState.subClass,
   );
 
-  const {
-    reset,
-    watch,
-    getValues,
-  } = formMethods;
+  const { reset, watch, getValues } = formMethods;
 
   const setMultiListOption = useCallback((key: string, value: IOption) => {
     switch (key) {
@@ -66,7 +62,7 @@ const useSearchForm = () => {
    */
   useEffect(() => {
     const subscription = watch((form) => {
-      const formHasChanged = !_.isEqual(form, initialSearchForm);
+      const formHasChanged = !isEqual(form, initialSearchForm);
       setSubmitDisabled(!formHasChanged);
     });
     return () => subscription.unsubscribe();
@@ -75,10 +71,10 @@ const useSearchForm = () => {
   // Set form values to the store when the user chnages any values on the form
   useEffect(() => {
     const subscription = watch(() => {
-      dispatch(setSearchForm(getValues()))
+      dispatch(setSearchForm(getValues()));
     });
     return () => subscription.unsubscribe();
-  }, [dispatch, getValues, watch])
+  }, [dispatch, getValues, watch]);
 
   // Set the form and the multi-selections to match the values in redux storeFormValues
   useEffect(() => {

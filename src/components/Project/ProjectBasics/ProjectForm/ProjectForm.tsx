@@ -1,6 +1,6 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectProjectMode, setIsSaving, setProjectMode } from '@/reducers/projectSlice';
 import { IProject, IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -11,7 +11,7 @@ import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectFinancialSection from './ProjectFinancialSection';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
 import ProjectLocationSection from './ProjectLocationSection';
-import ProjectProgramSection from './ProjectProgramSection';
+import AdditionalInformationSection from './AdditionalInformationSection';
 import ProjectFormBanner from './ProjectFormBanner';
 import { useNavigate } from 'react-router';
 import './styles.css';
@@ -25,24 +25,41 @@ import {
 } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
-import { notifyError } from '@/reducers/notificationSlice';
+import { notifyError, notifyInfo } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
-import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
+import {
+  getProjectPatchErrorMessage,
+  getPwErrorMessage,
+  getPwErrorMessageForCodes,
+} from '@/utils/projectErrorMessage';
+import usePwLinkConfirmation, { normalizeHkrId } from '@/hooks/usePwLinkConfirmation';
+import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 import { FieldPath, SubmitErrorHandler } from 'react-hook-form';
 import {
   collectErrorElements,
   collectErrorFieldNames,
   scrollToFirstField,
-} from './projectFormErrorHelpers';
+} from '@/utils/formErrorHelpers';
 
 interface IProjectFormProps {
   project: IProject | null;
 }
+
+/** First human-readable string in a backend field error, or empty when there is none. */
+const readBackendFieldMessage = (fieldError: unknown): string => {
+  if (Array.isArray(fieldError)) {
+    return fieldError.find((item) => typeof item === 'string') ?? '';
+  }
+  if (typeof fieldError === 'string') {
+    return fieldError;
+  }
+  return '';
+};
 
 const ProjectForm = ({ project }: IProjectFormProps) => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName, useWatchField } =
@@ -51,11 +68,16 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const navigate = useNavigate();
   const [postProject] = usePostProjectMutation();
   const [patchProject] = usePatchProjectMutation();
+  const confirmPwLink = usePwLinkConfirmation();
 
   const user = useAppSelector(selectUser);
   const projectMode = useAppSelector(selectProjectMode);
 
-  const isOnlyViewer = isUserOnlyViewer(user);
+  const { canEditClass } = useRestrictedClassAccess();
+
+  // Restricted programmers (IO-756) can only view projects outside their own classes
+  const isOnlyViewer =
+    isUserOnlyViewer(user) || (projectMode === 'edit' && !canEditClass(project?.projectClass));
 
   const [newProjectId, setNewProjectId] = useState('');
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -110,17 +132,15 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
           continue;
         }
 
-        let message: string;
-        if (Array.isArray(fieldError)) {
-          message = fieldError.find((item) => typeof item === 'string') ?? '';
-        } else if (typeof fieldError === 'string') {
-          message = fieldError;
-        } else {
-          message = '';
-        }
-
+        let message = readBackendFieldMessage(fieldError);
         if (!message) {
           continue;
+        }
+
+        // PW error codes on hkrId (IO-865 / IO-935) are machine codes, not text
+        const pwMessage = backendField === 'hkrId' ? getPwErrorMessageForCodes(fieldError) : null;
+        if (pwMessage) {
+          message = t(`notification.message.${pwMessage}`);
         }
 
         setError(mappedField, {
@@ -315,11 +335,76 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         dispatch(setIsSaving(true));
         let data: IProjectRequest = dirtyFieldsToRequestObject(
           dirtyFields,
-          form as IAppForms,
+          form,
           hierarchyDistricts,
           hierarchyDivisions,
           hierarchySubDivisions,
         );
+
+        // IO-935: a new or changed hkrId must be confirmed against the PW
+        // project it points to before anything is saved and synced to PW.
+        let savedForm = form;
+        const newHkrId = normalizeHkrId(data.hkrId);
+        if (newHkrId && newHkrId !== normalizeHkrId(project?.hkrId)) {
+          const pwLink = await confirmPwLink(newHkrId, {
+            // The loader overlay would otherwise sit on top of the dialog
+            onDialogOpen: () => dispatch(clearLoading(CREATE_NEW_PROJECT)),
+          });
+          dispatch(setLoading({ text: 'Creating a new project', id: CREATE_NEW_PROJECT }));
+
+          if (pwLink.status === 'confirmed') {
+            data = { ...data, confirmedHkrId: newHkrId };
+          } else {
+            // A new project is not created without the hkrId the user entered.
+            // An existing one keeps its other edits, as it does when PW sync
+            // itself fails (IO-851); only the hkrId is left unsaved.
+            const { hkrId: _unsavedHkrId, ...otherChanges } = data;
+            const savesOtherChanges =
+              projectMode === 'edit' && Object.keys(otherChanges).length > 0;
+
+            if (pwLink.status === 'cancelled') {
+              // Keep what the user typed so a typo can be fixed; if the other
+              // changes are saved the field goes back to the saved hkrId, so
+              // say why it was not saved
+              if (savesOtherChanges) {
+                dispatch(
+                  notifyInfo({
+                    message: 'pwLinkNotConfirmed',
+                    title: 'pwLinkNotSaved',
+                    type: 'notification',
+                  }),
+                );
+              }
+            } else {
+              // If nothing else is saved, the typed hkrId stays in the field
+              // with this error. If the other changes are saved, the field goes
+              // back to the saved hkrId (the project refresh after the save
+              // resets the form anyway), so the toast is what tells the user.
+              setError('hkrId', {
+                type: 'server',
+                message: t(`notification.message.${pwLink.message}`),
+              });
+              dispatch(
+                notifyError({
+                  message: pwLink.message,
+                  title: projectMode === 'edit' ? 'pwLinkNotSaved' : 'createError',
+                  type: 'notification',
+                }),
+              );
+            }
+
+            if (!savesOtherChanges) {
+              dispatch(setIsSaving(false));
+              dispatch(clearLoading(CREATE_NEW_PROJECT));
+              return;
+            }
+            data = otherChanges;
+            savedForm = {
+              ...form,
+              hkrId: String(formMethods.formState.defaultValues?.hkrId ?? ''),
+            };
+          }
+        }
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
@@ -342,7 +427,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
           try {
             await patchProject({ id: project?.id, data }).unwrap();
-            reset(form);
+            reset(savedForm);
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
@@ -359,12 +444,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
               return;
             }
 
-            const hasBackendFieldErrors = setBackendFieldErrors(error);
+            setBackendFieldErrors(error);
             dispatch(
               notifyError({
-                message: hasBackendFieldErrors
-                  ? 'formSaveError'
-                  : getProjectPatchErrorMessage(error),
+                // A PW error on hkrId gets its own toast even though it is
+                // also shown as a field error (IO-865 / IO-935)
+                message: getProjectPatchErrorMessage(error),
                 title: 'saveError',
                 type: 'notification',
               }),
@@ -401,7 +486,9 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             dispatch(setIsSaving(false));
             dispatch(
               notifyError({
-                message: hasBackendFieldErrors ? 'formSaveError' : 'projectCreatingError',
+                message:
+                  getPwErrorMessage(error) ??
+                  (hasBackendFieldErrors ? 'formSaveError' : 'projectCreatingError'),
                 title: 'createError',
                 type: 'notification',
               }),
@@ -424,6 +511,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       projectMode,
       user,
       updateFinances,
+      confirmPwLink,
     ],
   );
 
@@ -545,7 +633,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
+      <AdditionalInformationSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
       {/* BANNER */}
       {!isOnlyViewer && (
         <ProjectFormBanner

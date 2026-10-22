@@ -1,9 +1,13 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { listItemsToOption } from '@/utils/common';
-import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import {
+  selectProjectDistricts,
+  selectProjectDivisions,
+  selectProjectSubDivisions,
+} from '@/reducers/listsSlice';
 
 /**
  * Populates the district, division and subDivision lists. Filters the available options of the lists
@@ -39,11 +43,11 @@ const useMultiLocationOptions = (
   );
 
   const getNextDivisions = useCallback(() => {
-    if (!_.isEmpty(subDivisions)) {
+    if (!isEmpty(subDivisions)) {
       return allDivisions.filter(
         (c) => selectedSubDivisionParent.findIndex((sc) => sc === c.id) !== -1,
       );
-    } else if (!_.isEmpty(districts)) {
+    } else if (!isEmpty(districts)) {
       return allDivisions.filter((c) => districts.findIndex((mc) => mc.value === c.parent) !== -1);
     } else {
       return allDivisions;
@@ -51,11 +55,11 @@ const useMultiLocationOptions = (
   }, [allDivisions, districts, selectedSubDivisionParent, subDivisions]);
 
   const getNextSubDivisions = useCallback(() => {
-    if (!_.isEmpty(divisions)) {
+    if (!isEmpty(divisions)) {
       return allSubDivisions.filter(
         (sc) => divisions.findIndex((fc) => sc.parent === fc.value) !== -1,
       );
-    } else if (!_.isEmpty(districts)) {
+    } else if (!isEmpty(districts)) {
       return allSubDivisions.filter(
         (sc) => getNextDivisions().findIndex((fc) => sc.parent === fc.id) !== -1,
       );
@@ -65,11 +69,11 @@ const useMultiLocationOptions = (
   }, [allSubDivisions, districts, divisions, getNextDivisions]);
 
   const getNextDistricts = useCallback(() => {
-    if (!_.isEmpty(divisions)) {
+    if (!isEmpty(divisions)) {
       return allDistricts.filter(
         (mc) => selectedDivisionParent.findIndex((c) => c === mc.id) !== -1,
       );
-    } else if (!_.isEmpty(subDivisions)) {
+    } else if (!isEmpty(subDivisions)) {
       return allDistricts.filter(
         (mc) => getNextDivisions().findIndex((sc) => sc.parent === mc.id) !== -1,
       );
@@ -78,8 +82,11 @@ const useMultiLocationOptions = (
     }
   }, [allDistricts, divisions, getNextDivisions, selectedDivisionParent, subDivisions]);
 
-  const renameDublicateLocationNames = (locations: IListItem[], allParentLocations: IListItem[]) => {
-    const locationNameCounts = locations.reduce((acc: {[key: string]: number}, location) => {
+  const renameDublicateLocationNames = (
+    locations: IListItem[],
+    allParentLocations: IListItem[],
+  ) => {
+    const locationNameCounts = locations.reduce((acc: { [key: string]: number }, location) => {
       acc[location.value] = (acc[location.value] || 0) + 1;
       return acc;
     }, {});
@@ -87,7 +94,9 @@ const useMultiLocationOptions = (
     const renamedLocations = locations.map((l) => {
       const isDuplicate = locationNameCounts[l.value] > 1;
       if (isDuplicate) {
-        const parentLoaction = allParentLocations.find((parentClass) => parentClass.id === l.parent);
+        const parentLoaction = allParentLocations.find(
+          (parentClass) => parentClass.id === l.parent,
+        );
         const newName = `${l.value} (${parentLoaction?.value ?? ''})`;
         return { ...l, value: newName };
       }
@@ -99,13 +108,16 @@ const useMultiLocationOptions = (
   const getRenamedLocations = () => {
     const distrcits = getNextDistricts();
     const renamedDivisions = renameDublicateLocationNames(getNextDivisions(), distrcits);
-    const renamedSubDivisions = renameDublicateLocationNames(getNextSubDivisions(), renamedDivisions);
+    const renamedSubDivisions = renameDublicateLocationNames(
+      getNextSubDivisions(),
+      renamedDivisions,
+    );
     return {
       districts: listItemsToOption(distrcits),
       divisions: listItemsToOption(renamedDivisions),
-      subDivisions: listItemsToOption(renamedSubDivisions)
-    }
-  }
+      subDivisions: listItemsToOption(renamedSubDivisions),
+    };
+  };
 
   return getRenamedLocations();
 };

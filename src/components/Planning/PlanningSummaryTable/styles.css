@@ -1,10 +1,11 @@
+@reference "../../../index.css";
 .planning-summary-table-container {
   --summary-table-width: calc(100% - 32rem);
   @apply relative w-[var(--summary-table-width)];
 }
 .scrollable-planning-summary-table {
   /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel */
-  @apply left-0 top-0 z-[100] flex  overflow-y-hidden overflow-x-scroll;
+  @apply top-0 left-0 z-[100] flex overflow-x-scroll overflow-y-hidden;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -18,11 +19,11 @@
 }
 
 .planning-summary-head-cell {
-  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+  @apply max-w-[var(--planning-cell-width)] min-w-[var(--planning-cell-width)] py-1 pr-4;
 }
 
 .planning-summary-frame-and-deviation-cell {
-  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+  @apply max-w-[var(--planning-cell-width)] min-w-[var(--planning-cell-width)] py-1 pr-4;
 }
 
 .planning-summary-table span {
@@ -30,7 +31,7 @@
 }
 
 .planned-budget-cell {
-  @apply h-[36px] min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] bg-bus-d py-1 pr-4 text-white first:bg-bus;
+  @apply bg-bus-d first:bg-bus h-[36px] max-w-[var(--planning-cell-width)] min-w-[var(--planning-cell-width)] py-1 pr-4 text-white;
 }
 
 .planned-budget-cell.framed {
@@ -78,7 +79,7 @@
 }
 
 .date-indicator {
-  @apply absolute top-8 z-50 hidden h-screen !w-[2px] bg-metro;
+  @apply bg-metro absolute top-8 z-50 hidden h-screen !w-[2px];
 }
 
 .date-indicator.framed {
