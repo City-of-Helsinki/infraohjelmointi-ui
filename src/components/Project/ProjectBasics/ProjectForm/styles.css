@@ -14,10 +14,6 @@
   --dropdown-color-disabled: var(--color-black-90);
 }
 
-.project-form.viewer-only-project-form .read-only-select [aria-disabled='true'] {
-  cursor: default;
-}
-
 .project-form.viewer-only-project-form .read-only-select [class*='arrowAndSpaceForClearButton'] {
   display: none;
 }
@@ -64,6 +60,7 @@
   min-height: 3.5rem;
   white-space: normal;
   overflow-wrap: anywhere;
+  cursor: default;
 }
 
 .project-form.viewer-only-project-form .read-only-select [class*='dropdownButtonOption'] {
