@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     paddingTop: '4px',
     paddingBottom: '4px',
     backgroundColor: '#0000bf',
+    width: '100%',
     fontSize: '8px',
     fontWeight: 500,
     color: 'white',
@@ -22,6 +23,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     flexDirection: 'row',
+    width: '100%',
   },
   firstCellsWrapper: {
     width: '328px',
@@ -43,7 +45,8 @@ const styles = StyleSheet.create({
   },
   costForecastCell: {
     ...cellStyles,
-    width: '83px',
+    width: '10%',
+    flexShrink: 0,
   },
   planAndConStartCell: {
     ...cellStyles,
@@ -61,13 +64,15 @@ const styles = StyleSheet.create({
 });
 
 const ConstructionProgramTableHeader = () => {
+  const [costForecastTitle, costForecastContinuation] = t('costForecast').split('\n');
+
   return (
     <View style={styles.tableHeader}>
       {/* Row 1 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.targetCell}>{t('target')}</Text>
         <Text style={styles.divisionCell}>{t('division')}</Text>
-        <Text style={styles.costForecastCell}>{t('costForecast')}</Text>
+        <Text style={styles.costForecastCell}>{costForecastTitle}</Text>
         <Text style={styles.planAndConStartCell}>{t('planningAnd')}</Text>
         <Text style={styles.previouslyUsedCell}>{t('previouslyUsed')}</Text>
         <Text style={styles.cell}>TA {new Date().getFullYear() + 1}</Text>
@@ -77,7 +82,9 @@ const ConstructionProgramTableHeader = () => {
       {/* Row 2 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.firstCellsWrapper} />
-        <Text style={styles.costForecastCell}>{t('report.shared.millionEuro')}</Text>
+        <Text style={styles.costForecastCell}>
+          {costForecastContinuation || t('report.shared.millionEuro')}
+        </Text>
         <Text style={styles.planAndConStartCell}>{t('constructionTiming')}</Text>
         <Text style={styles.previouslyUsedCell}>{t('report.shared.millionEuro')}</Text>
         <Text style={styles.cell}>{t('report.shared.millionEuro')}</Text>
