@@ -97,13 +97,16 @@
   @apply flex flex-col gap-4;
 }
 
-.project-programme-notifications {
+.project-programme-overview {
   @apply flex flex-col gap-6;
 }
 
-/* Hidden notifications render nothing, so the wrapper adds no space when all are hidden. */
-.project-programme-notifications:not(:empty) {
-  @apply mt-6;
+.project-programme-notifications {
+  display: contents;
+}
+
+.project-programme-overview > .project-programme-section {
+  margin-top: 0;
 }
 
 .project-programme-section {

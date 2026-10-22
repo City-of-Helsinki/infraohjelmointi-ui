@@ -19,6 +19,7 @@ jest.mock('@react-pdf/renderer', () => {
     Document: passthrough,
     Page: passthrough,
     View: passthrough,
+    Image: ({ src }: { src: string }) => <img src={src} alt="Location map" />,
     Text: ({
       children,
       render,
@@ -37,13 +38,14 @@ const sections = [
   { id: 'maintenanceNeeds' as const, label: 'Maintenance' },
 ];
 
-function renderDocument(projectProgramme: IProjectProgramme) {
+function renderDocument(projectProgramme: IProjectProgramme, locationMapSrc?: string) {
   return render(
     <ProjectProgrammePdfDocument
       projectProgramme={projectProgramme}
       sections={sections}
       projectName="Mock project"
       createdDate="5.10.2026"
+      locationMapSrc={locationMapSrc}
     />,
   );
 }
@@ -77,6 +79,26 @@ describe('ProjectProgrammePdfDocument', () => {
     );
     expect(screen.queryByRole('link', { name: 'javascript:alert(1)' })).not.toBeInTheDocument();
     expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText('projectProgrammeForm.locationSectionTitle')).not.toBeInTheDocument();
+  });
+
+  it.each([true, false])('renders the location map for brief=%s', (isBrief) => {
+    renderDocument({ id: '1', briefProjectProgramme: isBrief }, 'blob:location-map');
+
+    expect(screen.getByText('projectProgrammeForm.locationSectionTitle')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Location map' })).toHaveAttribute(
+      'src',
+      'blob:location-map',
+    );
+    expect(
+      screen
+        .getByRole('img', { name: 'Location map' })
+        .compareDocumentPosition(screen.getByText('Basic info')),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(
+      screen.getByText('Basic info').compareDocumentPosition(screen.getByText('Maintenance')),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it('renders complete tag and full title for an extended programme', () => {
