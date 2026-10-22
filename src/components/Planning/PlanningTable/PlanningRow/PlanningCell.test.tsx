@@ -9,6 +9,7 @@ import { formatNumber } from '@/utils/calculations';
 import { mockUser } from '@/mocks/mockUsers';
 import { patchCoordinationClass } from '@/services/classServices';
 import { updateMasterClass } from '@/reducers/classSlice';
+import { clearLoading } from '@/reducers/loaderSlice';
 import type { Mock } from 'vitest';
 
 vi.mock('react-i18next', () => ({
@@ -45,7 +46,7 @@ vi.mock('hds-react', () => ({
 }));
 
 describe('PlanningCell', () => {
-  it('dispatches immediate forcedToFrame class update after successful patch', async () => {
+  it('patches the forcedToFrame frame budget and leaves the state update to the finance-update event', async () => {
     const year = new Date().getFullYear();
     const id = 'test-coordinator-master-class-1';
     const updatedFrameBudget = 13000;
@@ -147,10 +148,22 @@ describe('PlanningCell', () => {
     fireEvent.blur(input);
 
     await waitFor(() => {
-      expect(patchCoordinationClass).toHaveBeenCalled();
-      expect(dispatchSpy).toHaveBeenCalledWith(
-        updateMasterClass({ data: updatedClass, type: 'forcedToFrame' }),
+      expect(patchCoordinationClass).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id,
+          data: expect.objectContaining({ forcedToFrame: true }),
+        }),
+      );
+      // the loader is cleared once the patch has settled
+      expect(dispatchSpy.mock.calls.some(([action]) => action.type === clearLoading.type)).toBe(
+        true,
       );
     });
+
+    // The new values arrive through the finance-update event (useUpdateEvents),
+    // the cell must not write the patch response to the store itself.
+    expect(dispatchSpy).not.toHaveBeenCalledWith(
+      updateMasterClass({ data: updatedClass, type: 'forcedToFrame' }),
+    );
   });
 });
