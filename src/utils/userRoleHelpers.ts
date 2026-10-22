@@ -67,7 +67,7 @@ export const isUserOnlyViewer = (user: IUser | null): boolean => {
     return false;
   }
 
-  return user.ad_groups.every(adGroupIsViewer);
+  return !isUserRestrictedProgrammer(user) && user.ad_groups.every(adGroupIsViewer);
 };
 
 export const isUserOnlyProjectAreaPlanner = (user: IUser | null) => {
@@ -96,15 +96,9 @@ export const isUserConstructionManagementLead = (user: IUser | null) => {
 
 /**
  * Restricted programmers (IO-756) may only edit projects in their assigned classes.
- * Coordinators and admins are never restricted, matching the API.
+ * The API decides this, so the group name stays configurable there.
  */
-export const isUserRestrictedProgrammer = (user: IUser | null) => {
-  if (!user || isUserCoordinator(user)) {
-    return false;
-  }
-
-  return user.ad_groups.some((ag) => ag.name === UserRole.RESTRICTED_PROGRAMMER);
-};
+export const isUserRestrictedProgrammer = (user: IUser | null) => !!user?.is_restricted_programmer;
 
 /**
  * True if the class path is one of the restricted programmer's assigned classes or below one.

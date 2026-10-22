@@ -17,7 +17,8 @@ const bridges = mockClass('bridges', '8 03 Kadut/B Sillat', 'master');
 const snow = mockClass('snow', '8 03 Kadut/B Lumi', 'master');
 const bridgesSub = mockClass('bridges-sub', '8 03 Kadut/B Sillat/Alue 1', 'bridges');
 
-const restrictedUser = createMockUserWithAdGroups([UserRole.RESTRICTED_PROGRAMMER], {
+const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
+  is_restricted_programmer: true,
   restricted_class_paths: [bridges.path],
 });
 
@@ -82,11 +83,10 @@ describe('useRestrictedClassAccess (IO-756)', () => {
     expect(canEditClass(null)).toBe(false);
   });
 
-  it('does not restrict a coordinator who is also in the restricted group', () => {
-    const coordinator = createMockUserWithAdGroups(
-      [UserRole.COORDINATOR, UserRole.RESTRICTED_PROGRAMMER],
-      { restricted_class_paths: [bridges.path] },
-    );
+  it('does not restrict a user the API does not flag', () => {
+    const coordinator = createMockUserWithAdGroups([UserRole.COORDINATOR], {
+      is_restricted_programmer: false,
+    });
     const { isRestricted, canEditClass } = renderWithUser(
       () => useRestrictedClassAccess(),
       coordinator,

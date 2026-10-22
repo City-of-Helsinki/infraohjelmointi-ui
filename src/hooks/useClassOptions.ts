@@ -16,7 +16,7 @@ import {
   isUserPlanner,
   isUserRestrictedProgrammer,
 } from '@/utils/userRoleHelpers';
-import { IClass, IProjectClassOption } from '@/interfaces/classInterfaces';
+import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
