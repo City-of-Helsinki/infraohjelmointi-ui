@@ -747,7 +747,6 @@
     "locationDragAndDropFieldLabel": "Raahaa sijaintikartta",
     "locationAttachFileButtonFieldLabel": "tai valitse tiedosto",
     "locationAttachFileButtonLabel": "Valitse tiedosto",
-    "locationAttachmentInfoText": "Hyväksytyt tiedostomuodot ovat .jpeg ja .png. Suurin sallittu tiedostokoko on 500 kb.",
     "deleteLocationMap": "Poista sijaintikartta",
     "deleteLocationMapDialog": {
       "title": "Poistetaanko sijaintikartta?",
