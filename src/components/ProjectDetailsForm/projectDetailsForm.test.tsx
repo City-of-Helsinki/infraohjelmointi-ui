@@ -16,7 +16,7 @@ describe('ProjectDetailsForm tabs', () => {
   const render = async () =>
     await act(async () =>
       renderWithProviders(
-        <Route path="/project/:projectId/*" element={<ProjectDetailsForm projectMode="edit" />}>
+        <Route path="/project/:projectId" element={<ProjectDetailsForm projectMode="edit" />}>
           <Route path="project-programme" element={<div data-testid="outlet" />} />
         </Route>,
         {
