@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ATTACHMENT_MAX_SIZE } from '@/utils/fileUtils';
 import { FormSectionTitle } from '@/components/shared';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +76,6 @@ export default function AttachmentsAndLinksSection({
             setValue('attachments', files, { shouldDirty: true });
           }}
           disabled={!canEditHandover}
-          maxSize={ATTACHMENT_MAX_SIZE}
         />
       )}
       {attachments.length > 0 && (
