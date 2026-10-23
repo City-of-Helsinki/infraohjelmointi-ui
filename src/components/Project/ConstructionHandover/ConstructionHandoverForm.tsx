@@ -31,7 +31,10 @@ import {
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
-import { isConstructionHandoverLocked } from './constructionHandoverUtils';
+import {
+  canEditConstructionHandover,
+  isConstructionHandoverLocked,
+} from './constructionHandoverUtils';
 import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
 import AttachmentsAndLinksSection from './AttachmentsAndLinksSection';
 import usePostAttachments from '@/hooks/usePostAttachments';
@@ -74,7 +77,21 @@ function ConstructionHandoverForm({
 }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useConstructionHandoverForm(constructionHandover);
+  const {
+    isProjectManager,
+    isPlanner,
+    isConstructionManagementLead,
+    isResponsiblePersonForProject,
+  } = useConstructionHandoverPermissions(project);
+
+  const isHandoverLocked = isConstructionHandoverLocked(constructionHandover);
+  const canEditHandover = canEditConstructionHandover(constructionHandover, {
+    isPlanner,
+    isProjectManager,
+    isResponsiblePersonForProject,
+  });
+
+  const formMethods = useConstructionHandoverForm(constructionHandover, canEditHandover);
   const {
     getValues,
     handleSubmit,
@@ -89,32 +106,14 @@ function ConstructionHandoverForm({
     postAttachment({ handoverId, formData }),
   );
 
-  const {
-    isProjectManager,
-    isPlanner,
-    isConstructionManagementLead,
-    isResponsiblePersonForProject,
-  } = useConstructionHandoverPermissions(project);
-
-  const isHandoverLocked = isConstructionHandoverLocked(constructionHandover);
   const showSubmitToProgrammerButton =
     constructionHandover.status === ConstructionHandoverStatus.DRAFT &&
     isProjectManager &&
     isResponsiblePersonForProject;
   const showSubmitToConstructionButton =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
-  const showSaveDraftButton =
-    !isConstructionHandoverLocked(constructionHandover) &&
-    !(
-      constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER &&
-      isProjectManager &&
-      isResponsiblePersonForProject
-    );
-  const showReturnToDraftButton = [
-    ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-    ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
-    ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
-  ].includes(constructionHandover.status);
+  const showSaveDraftButton = canEditHandover;
+  const showReturnToDraftButton = isHandoverLocked && isPlanner;
   const showNameProjectManagerNotification =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;
@@ -218,13 +217,13 @@ function ConstructionHandoverForm({
           ].includes(constructionHandover.status)}
         />
         <ScheduleSection />
-        <FinancingSection constructionHandover={constructionHandover} />
+        <FinancingSection canEditHandover={canEditHandover} />
         <ContactsSection />
         <AttachmentsAndLinksSection
           isPostingAttachment={isPostingAttachment}
           attachments={constructionHandover.attachments ?? []}
           onDeleteAttachment={handleDeleteAttachment}
-          isHandoverLocked={isHandoverLocked}
+          canEditHandover={canEditHandover}
         />
 
         <div

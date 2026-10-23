@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CONSTRUCTION_HANDOVER_ATTACHMENT_MAX_SIZE } from './handoverConstants';
+import { ATTACHMENT_MAX_SIZE } from '@/utils/fileUtils';
 import { FormSectionTitle } from '@/components/shared';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,20 +16,21 @@ interface IAttachmentsAndLinksSectionProps {
   isPostingAttachment: boolean;
   attachments: IConstructionHandoverAttachment[];
   onDeleteAttachment: (attachment: IConstructionHandoverAttachment) => void;
-  isHandoverLocked: boolean;
+  canEditHandover: boolean;
 }
 
 export default function AttachmentsAndLinksSection({
-  isHandoverLocked,
   isPostingAttachment,
   attachments,
   onDeleteAttachment,
+  canEditHandover,
 }: Readonly<IAttachmentsAndLinksSectionProps>) {
   const { t } = useTranslation();
   const { setValue } = useFormContext<IConstructionHandoverForm>();
   const { isConfirmed } = useConfirmDialog();
   const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const isDeleteButtonDisabled = !canEditHandover;
 
   function handleOpenImage(index: number) {
     setSelectedIndex(index);
@@ -75,8 +76,8 @@ export default function AttachmentsAndLinksSection({
           handleChange={(files) => {
             setValue('attachments', files, { shouldDirty: true });
           }}
-          disabled={isHandoverLocked}
-          maxSize={CONSTRUCTION_HANDOVER_ATTACHMENT_MAX_SIZE}
+          disabled={!canEditHandover}
+          maxSize={ATTACHMENT_MAX_SIZE}
         />
       )}
       {attachments.length > 0 && (
@@ -93,7 +94,7 @@ export default function AttachmentsAndLinksSection({
               backgroundColor="var(--color-info-light)"
               onView={() => handleOpenImage(index)}
               onDelete={() => handleDeleteAttachment(attachment)}
-              deleteButtonDisabled={isHandoverLocked}
+              deleteButtonDisabled={isDeleteButtonDisabled}
             />
           ))}
         </div>
