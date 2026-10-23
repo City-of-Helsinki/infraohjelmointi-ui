@@ -32,7 +32,7 @@ const onSigninCallback = (): void => {
 injectStore(store);
 
 root.render(
-  <BrowserRouter>
+  <BrowserRouter useTransitions={false}>
     <AuthProvider {...oidcConfig} onSigninCallback={onSigninCallback} automaticSilentRenew={true}>
       <Provider store={store}>
         <ConfirmDialogContextProvider>
