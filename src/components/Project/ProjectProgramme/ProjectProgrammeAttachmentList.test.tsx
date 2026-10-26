@@ -209,8 +209,9 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     const user = userEvent.setup();
     render(<AttachmentForm />);
     await user.click(showButtons()[1]);
-    expect(await screen.findByTitle(pdf.originalName)).toHaveAttribute('src', 'blob:preview-1');
-    expect(screen.getByTitle(pdf.originalName).parentElement).toHaveClass('w-full', 'pt-20');
+    const iframe = await within(await screen.findByRole('dialog')).findByTitle(pdf.originalName);
+    expect(iframe).toHaveAttribute('src', 'blob:preview-1');
+    expect(iframe.parentElement).toHaveClass('w-full', 'pt-20');
     expect(screen.queryByLabelText('attachmentSlideshowDialog.nextImage')).not.toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).getAllByRole('button')).toHaveLength(1);
     fireEvent.keyDown(window, { key: 'ArrowRight' });

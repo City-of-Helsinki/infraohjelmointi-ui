@@ -42,13 +42,16 @@ function useConstructionHandoverFormValues(
   };
 }
 
-export default function useConstructionHandoverForm(constructionHandover: IConstructionHandover) {
+export default function useConstructionHandoverForm(
+  constructionHandover: IConstructionHandover,
+  canEdit: boolean = !isConstructionHandoverLocked(constructionHandover),
+) {
   const formValues = useConstructionHandoverFormValues(constructionHandover);
 
   const formMethods = useForm<IConstructionHandoverForm>({
     values: formValues,
     mode: 'onBlur',
-    disabled: isConstructionHandoverLocked(constructionHandover),
+    disabled: !canEdit,
   });
 
   return formMethods;

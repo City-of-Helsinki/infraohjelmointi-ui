@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+export const ATTACHMENT_MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+
 /**
  * Formats a file size in bytes to kilobytes.
  * @param size The file size in bytes.

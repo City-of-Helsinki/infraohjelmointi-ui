@@ -4,11 +4,11 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Language } from '@/i18n/language';
 import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
+import { ATTACHMENT_MAX_SIZE } from '@/utils/fileUtils';
 import ProjectProgrammeAttachmentList from './ProjectProgrammeAttachmentList';
 import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
 export const OTHER_ATTACHMENTS_ACCEPT = '.jpg,.jpeg,.png,.pdf,.docx';
-export const OTHER_ATTACHMENTS_MAX_SIZE = 500 * 1024;
 
 interface ProjectProgrammeAttachmentsFieldProps {
   section: ProjectProgrammeSectionId;
@@ -61,7 +61,7 @@ export default function ProjectProgrammeAttachmentsField({
           buttonLabel={t('projectProgrammeForm.addAttachments')}
           language={language as Language}
           accept={OTHER_ATTACHMENTS_ACCEPT}
-          maxSize={OTHER_ATTACHMENTS_MAX_SIZE}
+          maxSize={ATTACHMENT_MAX_SIZE}
           defaultValue={newFiles.length > 0 ? newFiles : undefined}
           onChange={handleFilesChange}
           dragAndDrop
