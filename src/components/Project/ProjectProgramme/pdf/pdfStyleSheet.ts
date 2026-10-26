@@ -71,6 +71,11 @@ export const styles = StyleSheet.create({
     color: BLUE,
     marginBottom: '2px',
   },
+  locationMap: {
+    width: '100%',
+    height: 600,
+    objectFit: 'contain',
+  },
   footer: {
     position: 'absolute',
     bottom: '20px',

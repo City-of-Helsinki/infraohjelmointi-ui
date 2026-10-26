@@ -154,6 +154,39 @@ describe('ProjectProgramme', () => {
       ),
     );
 
+  it.each([
+    { brief: true, status: 'DRAFT' },
+    { brief: false, status: 'DRAFT' },
+    { brief: true, status: 'COMPLETE' },
+    { brief: false, status: 'COMPLETE' },
+  ] satisfies { brief: boolean; status: ProjectProgrammeStatus }[])(
+    'keeps notifications and sections in one spacing stack for brief=$brief, status=$status',
+    async ({ brief, status }) => {
+      mockProjectProgramme(brief, undefined, null, status);
+      await render();
+
+      const locationSection = screen.getByTestId('project-programme-location-form');
+      const overview = locationSection.parentElement!;
+      expect(overview).toHaveClass('project-programme-overview');
+      expect(overview.querySelectorAll('.project-form')).toHaveLength(0);
+
+      const notifications = overview.querySelector<HTMLDivElement>(
+        '.project-programme-notifications',
+      )!;
+      expect(notifications.nextElementSibling).toBe(locationSection);
+      if (status === 'COMPLETE') {
+        expect(
+          within(notifications).getByText(
+            'projectProgrammeForm.programmeCompletedNotificationTitle',
+          ),
+        ).toBeInTheDocument();
+        expect(notifications.children).toHaveLength(1);
+      } else {
+        expect(notifications.children).toHaveLength(brief ? 2 : 1);
+      }
+    },
+  );
+
   it('renders action buttons enabled when project programme id exists', async () => {
     await render();
 

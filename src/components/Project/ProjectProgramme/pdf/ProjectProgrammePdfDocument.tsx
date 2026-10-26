@@ -1,4 +1,4 @@
-import { Document, Link, Page, Text, View } from '@react-pdf/renderer';
+import { Document, Image, Link, Page, Text, View } from '@react-pdf/renderer';
 import { t } from 'i18next';
 import DocumentHeader from '@/components/Report/PdfReports/reportHeaders/DocumentHeader';
 import { getFieldsForSection } from '../sections/projectProgrammeSectionFields';
@@ -47,6 +47,7 @@ function ProjectProgrammePdfDocument({
   sections,
   projectName,
   createdDate,
+  locationMapSrc,
 }: Readonly<IProjectProgrammePdfDocumentProps>) {
   const isBrief = projectProgramme.briefProjectProgramme ?? true;
   const isComplete = projectProgramme.status === 'COMPLETE';
@@ -111,6 +112,13 @@ function ProjectProgrammePdfDocument({
             {t('projectProgrammeForm.pdfCreated', { date: createdDate })}
           </Text>
         </View>
+
+        {locationMapSrc && (
+          <View style={styles.section} wrap={false}>
+            <PdfSectionTitle title={t('projectProgrammeForm.locationSectionTitle')} />
+            <Image src={locationMapSrc} style={styles.locationMap} />
+          </View>
+        )}
 
         {sections.map(renderSection)}
 
