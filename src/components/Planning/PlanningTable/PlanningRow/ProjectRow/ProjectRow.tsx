@@ -1,8 +1,7 @@
 import { IProject } from '@/interfaces/projectInterfaces';
-import { FC, memo, useCallback, useMemo, useRef } from 'react';
+import { FC, memo, useMemo } from 'react';
 import ProjectCell from './ProjectCell';
 import useProjectRow from '@/hooks/useProjectRow';
-import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import ProjectHead from './ProjectHead';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
@@ -26,7 +25,6 @@ interface IProjectRowProps {
 }
 
 const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCosts }) => {
-  const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums, projectFinances } = useProjectRow(project, sapCosts[project.id]);
   const selectedYears = useAppSelector(selectSelectedYears);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
@@ -56,24 +54,19 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCo
 
   const isReadOnly = isUserOnlyViewer(user) || !canEditClass(project.projectClass);
 
-  useClickOutsideRef(
-    projectRowRef,
-    useCallback(() => {
-      if (projectRowRef.current?.classList.contains('active')) {
-        projectRowRef.current.classList.remove('active');
-      }
-    }, []),
-  );
-
   return (
     <tr
       id={`project-row-${project.id}`}
-      ref={projectRowRef}
       data-testid={`row-${project.id}-parent-${parentId}`}
       className={`project-row ${isSearched ? 'searched' : ''}`}
     >
       {/* HEADER */}
-      <ProjectHead project={project} sums={sums} isReadOnly={isReadOnly} patchProject={patchProject} />
+      <ProjectHead
+        project={project}
+        sums={sums}
+        isReadOnly={isReadOnly}
+        patchProject={patchProject}
+      />
       {cells.map((c) => (
         <ProjectCell
           key={c.financeKey}
