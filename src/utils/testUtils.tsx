@@ -66,7 +66,7 @@ export const renderWithProviders = (
   window.history.pushState({}, 'Test page', route);
 
   const renderResult = render(
-    <BrowserRouter>
+    <BrowserRouter useTransitions={false}>
       <AuthProvider {...oidcConfig}>
         <Provider store={store}>
           <Routes>

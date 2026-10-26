@@ -33,8 +33,8 @@
     "react-intersection-observer": "^9.4.1",
     "react-oidc-context": "^2.4.0",
     "react-redux": "^9.3.0",
-    "react-router": "6.8.2",
-    "react-router-dom": "6.8.2",
+    "react-router": "7.18.4",
+    "react-router-dom": "7.18.4",
     "react-scripts": "5.0.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "use-deep-compare-effect": "^1.8.1"
@@ -67,6 +67,7 @@
       "node_modules/(?!your-module-name)/\""
     ],
     "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
       "^@/(.*)$": "<rootDir>/src/$1"
     }
   },
