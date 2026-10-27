@@ -19,13 +19,7 @@ import {
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import {
-  selectChangeHistoryEnabled,
-  selectForcedToFrame,
-  selectSelectedYears,
-  selectSelections,
-} from '@/reducers/planningSlice';
+import { useAppDispatch } from '@/hooks/common';
 import ProjectCellHistory from './ProjectCellHistory';
 import {
   getCellTypeUpdateRequestData,
@@ -35,18 +29,21 @@ import {
   addActiveClassToProjectRow,
   convertToForcedToFrameProjectRequest,
 } from './projectCellUtils';
-import { selectUser } from '@/reducers/authSlice';
-import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
-import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
+
+export type PatchProjectTrigger = ReturnType<typeof usePatchProjectMutation>[0];
 
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
   sapProject: string | undefined;
-  projectClass?: string | null;
+  isSelectedYear: boolean;
+  forcedToFrame: boolean;
+  changeHistoryEnabled: boolean;
+  isEditingDisabledForUser: boolean;
+  patchProject: PatchProjectTrigger;
 }
 
 interface IProjectCellState {
@@ -60,20 +57,16 @@ const ProjectCell: FC<IProjectCellProps> = ({
   cell,
   projectFinances,
   sapProject,
-  projectClass,
+  isSelectedYear,
+  forcedToFrame,
+  changeHistoryEnabled,
+  isEditingDisabledForUser,
+  patchProject,
 }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
-  const selectedYears = useAppSelector(selectSelectedYears);
   const currentYear = new Date().getFullYear();
-  const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const changeHistoryEnabled = useAppSelector(selectChangeHistoryEnabled);
-  const [patchProject] = usePatchProjectMutation();
-
-  const user = useAppSelector(selectUser);
-  const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
-  const { canEditClass } = useRestrictedClassAccess();
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,
@@ -88,26 +81,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
     [formValue, type],
   );
 
-  const inputDisabled = useMemo(() => {
-    if (type === 'none') {
-      return true;
-    }
-
-    // Restricted programmers can only edit projects in their own classes (IO-756)
-    if (!canEditClass(projectClass)) {
-      return true;
-    }
-
-    // Project area planner can only edit projects under masterclass 808
-    if (isUserOnlyProjectAreaPlanner(user)) {
-      return !(
-        selectedMasterClass?.name.startsWith('808') || selectedMasterClass?.name.startsWith('8 08')
-      );
-    }
-
-    // Disable editing project budgets if user is only a viewer
-    return isUserOnlyViewer(user);
-  }, [type, user, selectedMasterClass, canEditClass, projectClass]);
+  const inputDisabled = type === 'none' || isEditingDisabledForUser;
 
   const updateCell = useCallback(
     async (req: IProjectRequest) => {
@@ -218,10 +192,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
     }
   }, [type]);
 
-  const selectedYearClass = useMemo(
-    () => (selectedYears.includes(year) ? 'selected-year' : ''),
-    [selectedYears, year],
-  );
+  const selectedYearClass = isSelectedYear ? 'selected-year' : '';
 
   const currentYearClass = useMemo(
     () => (year === currentYear ? 'current-year' : ''),
@@ -251,14 +222,6 @@ const ProjectCell: FC<IProjectCellProps> = ({
   useEffect(() => {
     setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
   }, [budget]);
-
-  // Sets isSelectedYear to true if the current cell is one of the selected years
-  useEffect(() => {
-    setProjectCellState((current) => ({
-      ...current,
-      isSelectedYear: selectedYears.includes(year),
-    }));
-  }, [selectedYears, year]);
 
   return (
     <>
