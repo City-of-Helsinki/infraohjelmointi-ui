@@ -143,10 +143,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   }, [currentPhase, filteredPhaseDetails.length, getFieldState, trigger]);
 
   useEffect(() => {
-    if (!showStaraProcurementReason) {
+    if (!showStaraProcurementReason && getValues('staraProcurementReason')?.value) {
       setValue('staraProcurementReason', { value: '', label: '' }, { shouldDirty: true });
     }
-  }, [showStaraProcurementReason, setValue]);
+  }, [showStaraProcurementReason, getValues, setValue]);
 
   const checkPhaseIsBeforeCurrent = (
     previousPhaseIndex: number | undefined,

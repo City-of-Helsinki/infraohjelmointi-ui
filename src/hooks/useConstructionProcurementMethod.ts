@@ -18,15 +18,16 @@ export default function useConstructionProcurementMethod<
 
   const constructionProcurementMethod = watch(procurementMethodField) as IOption | null;
   const showStaraProcurementReason = constructionProcurementMethod?.label === 'Stara';
+  const staraReasonValue = (watch(staraReasonField) as IOption | null)?.value;
 
   useEffect(() => {
-    if (!showStaraProcurementReason) {
+    if (!showStaraProcurementReason && staraReasonValue) {
       setValue(staraReasonField, {
         label: '',
         value: '',
       } as PathValue<FormType, StaraReasonField>);
     }
-  }, [setValue, showStaraProcurementReason, staraReasonField]);
+  }, [setValue, showStaraProcurementReason, staraReasonField, staraReasonValue]);
 
   return {
     constructionProcurementMethods,
