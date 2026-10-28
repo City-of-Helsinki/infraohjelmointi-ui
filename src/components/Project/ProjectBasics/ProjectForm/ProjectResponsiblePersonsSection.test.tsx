@@ -12,7 +12,21 @@ const PHASES = {
   completed: 'phase-id-completed',
 };
 
-const latestSelectProps: Record<string, any> = {};
+interface IMockOption {
+  value: string;
+  label: string;
+}
+
+interface IMockSelectFieldProps {
+  name: string;
+  options: IMockOption[];
+  control?: unknown;
+  rules?: { validate?: Record<string, (_value?: IMockOption) => true | string> };
+  required?: boolean;
+  [key: string]: unknown;
+}
+
+const latestSelectProps: Record<string, IMockSelectFieldProps> = {};
 
 // Mock the hooks
 jest.mock('react-i18next', () => ({
@@ -21,7 +35,14 @@ jest.mock('react-i18next', () => ({
 
 // Mock the SelectField component
 jest.mock('@/components/shared/SelectField', () => {
-  return function MockSelectField({ name, options, control, rules, required, ...props }: any) {
+  return function MockSelectField({
+    name,
+    options,
+    control,
+    rules,
+    required,
+    ...props
+  }: IMockSelectFieldProps) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { Controller } = require('react-hook-form');
     latestSelectProps[name] = { name, options, control, rules, required, ...props };
@@ -30,19 +51,23 @@ jest.mock('@/components/shared/SelectField', () => {
         name={name}
         control={control}
         rules={rules}
-        render={({ field }: { field: { value: any; onChange: (value: any) => void } }) => (
+        render={({
+          field,
+        }: {
+          field: { value: IMockOption | null; onChange: (value: IMockOption | null) => void };
+        }) => (
           <div>
             <select
               data-testid={name}
               required={Boolean(required)}
               value={field.value?.value || ''}
               onChange={(e) => {
-                const option = options.find((o: any) => o.value === e.target.value);
+                const option = options.find((o) => o.value === e.target.value);
                 field.onChange(option || null);
               }}
             >
               <option value="">Select...</option>
-              {options.map((option: any) => (
+              {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

@@ -24,7 +24,7 @@ export const CoordinatorNotesDialog = () => {
   const noteId = 'add-coordinator-note-title';
   const descriptionId = 'add-coordinator-note-content';
 
-  const handleClose = useCallback(async () => {
+  const handleClose = useCallback(() => {
     dispatch(setNotesDialogOpen(false));
   }, [dispatch]);
 
@@ -71,7 +71,7 @@ export const CoordinatorNotesDialog = () => {
         } else {
           setErrorNotification();
         }
-      } catch (e) {
+      } catch {
         setErrorNotification();
       }
     }

@@ -79,7 +79,7 @@ const useClassOptions = (currentClass: string | undefined) => {
     } else {
       return [];
     }
-  }, [classes, currentClass, selectedSubClass, subClasses, otherClassifications]);
+  }, [selectedSubClass, subClasses, otherClassifications]);
 
   // Restricted programmers only see their assigned classes and the classes above them (IO-756)
   const filterForRestrictedUser = useCallback(

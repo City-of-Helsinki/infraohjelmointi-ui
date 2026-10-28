@@ -4,6 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import useProjectForm from './useProjectForm';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
+import { IClassFinances } from '@/interfaces/classInterfaces';
 
 // Mock the hooks
 jest.mock('@/hooks/useClassOptions', () => ({
@@ -28,7 +29,7 @@ jest.mock('@/hooks/useLocationOptions', () => ({
 const mockUseAppSelector = jest.fn();
 const mockDispatch = jest.fn();
 jest.mock('@/hooks/common', () => ({
-  useAppSelector: (selector: any) => mockUseAppSelector(selector),
+  useAppSelector: (selector: unknown) => mockUseAppSelector(selector),
   useAppDispatch: () => mockDispatch,
 }));
 
@@ -104,7 +105,7 @@ describe('useProjectForm', () => {
 
   it('initializes with empty values when no project is selected', () => {
     // Mock the selectors to return stable values
-    const mockSelectors: Record<SelectorName, any> = {
+    const mockSelectors: Record<SelectorName, unknown> = {
       selectProjectMode: 'new',
       selectProjectUpdate: { project: { id: null } }, // Properly structured project update
       selectIsLoading: false,
@@ -152,7 +153,7 @@ describe('useProjectForm', () => {
       forCoordinatorOnly: false,
       relatedTo: null,
       parent: null,
-      finances: {} as any,
+      finances: {} as IClassFinances,
       defaultProgrammer: {
         id: 'default-programmer-id',
         firstName: 'Default',
@@ -165,7 +166,7 @@ describe('useProjectForm', () => {
       },
     };
 
-    const mockSelectors: Record<SelectorName, any> = {
+    const mockSelectors: Record<SelectorName, unknown> = {
       selectProjectMode: 'new',
       selectProjectUpdate: { project: { id: null } },
       selectIsLoading: false,
@@ -211,7 +212,7 @@ describe('useProjectForm', () => {
         } | null;
       }>;
     }) => {
-      const mockSelectors: Record<SelectorName, any> = {
+      const mockSelectors: Record<SelectorName, unknown> = {
         selectProjectMode: 'new',
         selectProjectUpdate: { project: { id: null } },
         selectIsLoading: false,

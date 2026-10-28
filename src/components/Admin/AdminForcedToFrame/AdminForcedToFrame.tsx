@@ -48,7 +48,7 @@ const AdminForcedToFrame = () => {
         lastModified: response.updatedDate,
       };
       dispatch(setForcedToFrameState(newValues));
-    } catch (e) {
+    } catch {
       dispatch(
         notifyError({
           message: 'forcedToFrameStatusUpdateError',
@@ -88,7 +88,7 @@ const AdminForcedToFrame = () => {
             duration: 5000,
           }),
         );
-      } catch (e) {
+      } catch {
         dispatch(
           notifyError({
             message: 'forcedToFrameDataUpdateError',

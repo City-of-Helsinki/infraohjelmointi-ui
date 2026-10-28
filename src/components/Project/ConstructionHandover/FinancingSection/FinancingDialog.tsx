@@ -82,6 +82,17 @@ const getSavedRowId = (saved: unknown): string | undefined => {
   return undefined;
 };
 
+const getInitialDialogValues = (
+  dialogState: FinancingDialogModifyProps['dialogState'],
+): FinancingRowValues => ({
+  financer: dialogState.values?.financer ?? '',
+  description: dialogState.values?.description ?? '',
+  budgetItem: dialogState.values?.budgetItem ?? '',
+  projectNumber: dialogState.values?.projectNumber ?? '',
+  budget: formatBudgetEuro(dialogState.values?.budget ?? ''),
+  id: dialogState.values?.id ?? '',
+});
+
 const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
   handleClose,
   dialogState,
@@ -99,17 +110,13 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
   }));
   const { Header, Content, ActionButtons } = Dialog;
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
-  const [dialogValues, setDialogValues] = useState<FinancingRowValues>(emptyDialogValues);
+  const [dialogValues, setDialogValues] = useState<FinancingRowValues>(() =>
+    getInitialDialogValues(dialogState),
+  );
 
   useEffect(() => {
-    setDialogValues({
-      financer: dialogState.values?.financer ?? '',
-      description: dialogState.values?.description ?? '',
-      budgetItem: dialogState.values?.budgetItem ?? '',
-      projectNumber: dialogState.values?.projectNumber ?? '',
-      budget: formatBudgetEuro(dialogState.values?.budget ?? ''),
-      id: dialogState.values?.id ?? '',
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
+    setDialogValues(getInitialDialogValues(dialogState));
   }, [dialogState]);
 
   const isOtherFinancingSelected = dialogValues.financer === 'OTHER';
@@ -196,6 +203,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
     postConstructionHandoverFinancing,
     project?.id,
     isKympFinancingSelected,
+    setSubmitAttempted,
   ]);
 
   const onBudgetBlur = useCallback((e: FocusEvent<HTMLInputElement>) => {
@@ -366,11 +374,7 @@ const DeleteRowDialog: FC<FinancingDialogDeleteProps> = ({
   const dispatch = useAppDispatch();
   const [deleteConstructionHandoverFinancing] = useDeleteConstructionHandoverFinancingMutation();
   const { Header, ActionButtons, Content } = Dialog;
-  const [deletableItemId, setDeletableItemId] = useState<string>('');
-
-  useEffect(() => {
-    setDeletableItemId(dialogState.itemId);
-  }, [dialogState]);
+  const deletableItemId = dialogState.itemId;
 
   const onDeleteRow = useCallback(async () => {
     if (!deletableItemId) return;

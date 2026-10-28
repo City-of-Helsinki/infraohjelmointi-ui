@@ -51,7 +51,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({
         } else {
           navigate('/planning', { replace: true });
         }
-      } catch (e) {
+      } catch {
         console.log('Error deleting project');
       }
     }

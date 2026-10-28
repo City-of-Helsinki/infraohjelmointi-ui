@@ -52,9 +52,10 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const isSaving = useAppSelector(selectIsProjectSaving);
   const sapCosts = useAppSelector(getProjectSapCosts);
 
+  const currentYearsSapValues = project?.currentYearsSapValues;
   const currentYearSapValues = useMemo(() => {
-    if (project?.currentYearsSapValues) {
-      const filteredSapValues = project.currentYearsSapValues
+    if (currentYearsSapValues) {
+      const filteredSapValues = currentYearsSapValues
         .filter((value) => value.project_id != null)
         .map((value) => ({
           id: value.project_id,
@@ -68,7 +69,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       return filteredSapValues.length > 0 ? filteredSapValues[0] : null;
     }
     return null;
-  }, [project?.currentYearsSapValues]);
+  }, [currentYearsSapValues]);
 
   const getSapProps = useCallback(
     () => ({
@@ -137,16 +138,26 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     [budgetOverrunReasons, getValues, t],
   );
 
+  const budgetOverrunReasonsLoaded = budgetOverrunReasons.length > 0;
+
   useEffect(() => {
+    // Without the options "other reason" cannot be detected, so saved values would be wiped
+    if (!budgetOverrunReasonsLoaded) {
+      return;
+    }
     if (!isOtherBudgetOverrunReasonSelected) {
       // Clear the "other reason" text field and reset "on schedule" when "other reason" is not selected
-      setValue('otherBudgetOverrunReason', '', { shouldValidate: true, shouldDirty: true });
-      setValue('onSchedule', null, { shouldDirty: true });
-    } else if (getValues('onSchedule') === null) {
+      if (getValues('otherBudgetOverrunReason')) {
+        setValue('otherBudgetOverrunReason', '', { shouldValidate: true, shouldDirty: true });
+      }
+      if (getValues('onSchedule') != null) {
+        setValue('onSchedule', null, { shouldDirty: true });
+      }
+    } else if (getValues('onSchedule') == null) {
       // Set "on schedule" to true by default when "other reason" is selected
       setValue('onSchedule', true, { shouldDirty: true });
     }
-  }, [isOtherBudgetOverrunReasonSelected, setValue, getValues]);
+  }, [budgetOverrunReasonsLoaded, isOtherBudgetOverrunReasonSelected, setValue, getValues]);
 
   const findPhase = useCallback(
     (value: string) => phases.find((phase) => phase.label === value)?.value ?? '',
@@ -217,7 +228,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,
     required?: boolean,
-    rules?: { validate: Record<string, (value?: IOption) => true | string> },
+    rules?: { validate: Record<string, (_value?: IOption) => true | string> },
   ) => (
     <SelectField
       {...getFieldProps(name)}

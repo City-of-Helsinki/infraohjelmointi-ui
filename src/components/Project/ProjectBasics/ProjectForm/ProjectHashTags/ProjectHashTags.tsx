@@ -47,11 +47,26 @@ interface IProjectHashTagsDialogProps {
 }
 
 interface IFormState {
-  hashTagsObject: IHashTagsObject;
   hashTagsForSearch: Array<IListItem>;
   hashTagsForSubmit: Array<IListItem>;
   popularHashTags: Array<IListItem>;
 }
+
+const getFormStateForSubmit = (
+  hashTagsForSubmit: Array<IListItem>,
+  selectableHashTags: Array<IListItem>,
+  selectablePopularHashTags: Array<IListItem>,
+): IFormState => ({
+  hashTagsForSubmit,
+  // Remove hashTags from popularHashTags and hashTagsForSearch that are already
+  // added to the project for submission
+  hashTagsForSearch: selectableHashTags.filter(
+    (ah) => !hashTagsForSubmit.some((hfs) => hfs.id === ah.id),
+  ),
+  popularHashTags: selectablePopularHashTags.filter(
+    (ph) => !hashTagsForSubmit.some((hfs) => hfs.id === ph.id),
+  ),
+});
 
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   (
@@ -84,61 +99,32 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       [allHashTags.popularHashTags],
     );
 
-    const [formState, setFormState] = useState<IFormState>({
-      hashTagsObject: {},
-      hashTagsForSearch: [],
-      hashTagsForSubmit: [],
-      popularHashTags: [],
-    });
-
-    const { hashTagsObject, hashTagsForSubmit, hashTagsForSearch, popularHashTags } = formState;
-
     // Create an object from the hashtags to not need to iterate when the user
     // chooses a hashtag from the search form
-    // Populates popularHashTags list
-    useEffect(() => {
-      setFormState((current) => ({
-        ...current,
-        hashTagsObject: Object.fromEntries(
-          allHashTags.hashTags.map(({ value, id }) => [
-            value,
-            {
-              id,
-              value,
-            },
-          ]),
-        ),
-        popularHashTags: selectablePopularHashTags,
-      }));
-    }, [allHashTags, selectablePopularHashTags]);
+    const hashTagsObject: IHashTagsObject = useMemo(
+      () => Object.fromEntries(allHashTags.hashTags.map(({ value, id }) => [value, { id, value }])),
+      [allHashTags.hashTags],
+    );
 
     // Add the existing projectHashTags to hashTagsForSubmit
+    const getInitialFormState = useCallback(
+      () =>
+        getFormStateForSubmit(
+          allHashTags.hashTags.filter(({ id }) => arrayHasValue(projectHashTags, id)),
+          selectableHashTags,
+          selectablePopularHashTags,
+        ),
+      [allHashTags.hashTags, projectHashTags, selectableHashTags, selectablePopularHashTags],
+    );
+
+    const [formState, setFormState] = useState<IFormState>(getInitialFormState);
+
     useEffect(() => {
-      if (projectHashTags && allHashTags) {
-        const hashTagsForSubmit = allHashTags.hashTags.filter(({ id }) =>
-          arrayHasValue(projectHashTags, id),
-        );
-        setFormState((current) => ({
-          ...current,
-          hashTagsForSubmit: hashTagsForSubmit,
-          // Remove hashTags from popularHashTags and hashTagsForSearch that are already
-          // added to the project for submission
-          hashTagsForSearch: selectableHashTags.filter(
-            (ah) => !hashTagsForSubmit.some((hfs) => hfs.id === ah.id),
-          ),
-          popularHashTags: selectablePopularHashTags.filter(
-            (ph) => !hashTagsForSubmit.some((hfs) => hfs.id === ph.id),
-          ),
-        }));
-      }
-    }, [
-      projectHashTags,
-      allHashTags,
-      selectableHashTags,
-      selectablePopularHashTags,
-      projectMode,
-      setHashTagsState,
-    ]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
+      setFormState(getInitialFormState());
+    }, [getInitialFormState]);
+
+    const { hashTagsForSubmit, hashTagsForSearch, popularHashTags } = formState;
 
     const onHashTagDelete = useCallback(
       (value: string) => {
@@ -325,13 +311,16 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({
   const { t } = useTranslation();
   const allHashTags = useAppSelector(selectHashTags);
   const formHashTags = watch('hashTags');
-  const [state, setState] = useState<IProjectHashTagsState>({
+  const [state, setState] = useState<IProjectHashTagsState>(() => ({
     openDialog: false,
-    projectHashTags: [],
-  });
+    projectHashTags: formHashTags
+      ? allHashTags.hashTags.filter(({ id }) => arrayHasValue(formHashTags, id))
+      : [],
+  }));
 
   useEffect(() => {
     if (formHashTags) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
       setState((current) => ({
         ...current,
         projectHashTags: allHashTags.hashTags.filter(({ id }) => arrayHasValue(formHashTags, id)),

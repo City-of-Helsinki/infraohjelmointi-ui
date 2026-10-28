@@ -316,6 +316,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     if (!isDirty && newProjectId) {
       dispatch(setProjectMode('edit'));
       navigate(`/project/${newProjectId}/basics`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
       setNewProjectId('');
     }
   }, [isDirty, newProjectId, navigate, projectMode, dispatch]);

@@ -77,6 +77,35 @@ describe('MyWorkloadTasks', () => {
     expect(screen.queryByTestId('my-workload-tasks-pagination-container')).not.toBeInTheDocument();
   });
 
+  it('shows the last available page when the task list shrinks', async () => {
+    const user = userEvent.setup();
+    const tasks = Array.from({ length: 22 }, (_, i) => createTask(i + 1));
+
+    const { rerender } = render(<MyWorkloadTasks listOfTasks={tasks} />);
+    await user.click(screen.getByRole('button', { name: 'Sivu 3' }));
+    expect(screen.getByText('Project 21 | option.Kilpailutus')).toBeInTheDocument();
+
+    rerender(<MyWorkloadTasks listOfTasks={tasks.slice(0, 5)} />);
+
+    expect(screen.getByText('Project 1 | option.Kilpailutus')).toBeInTheDocument();
+    expect(screen.getByText('Project 5 | option.Kilpailutus')).toBeInTheDocument();
+  });
+
+  it('resets to the first page when the task list empties and later refills', async () => {
+    const user = userEvent.setup();
+    const tasks = Array.from({ length: 22 }, (_, i) => createTask(i + 1));
+
+    const { rerender } = render(<MyWorkloadTasks listOfTasks={tasks} />);
+    await user.click(screen.getByRole('button', { name: 'Sivu 2' }));
+    expect(screen.getByText('Project 11 | option.Kilpailutus')).toBeInTheDocument();
+
+    rerender(<MyWorkloadTasks listOfTasks={[]} />);
+    rerender(<MyWorkloadTasks listOfTasks={tasks} />);
+
+    expect(screen.getByText('Project 1 | option.Kilpailutus')).toBeInTheDocument();
+    expect(screen.queryByText('Project 11 | option.Kilpailutus')).not.toBeInTheDocument();
+  });
+
   it('uses fallback text when construction procurement method is null', () => {
     const taskWithNullProcurementMethod = {
       ...createTask(1),
