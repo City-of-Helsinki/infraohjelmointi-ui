@@ -10,13 +10,7 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 
 jest.mock('react-i18next', () => mockI18next());
 
-function Fields({
-  viewer = false,
-  inputStyle = viewer,
-}: {
-  viewer?: boolean;
-  inputStyle?: boolean;
-}) {
+function Fields({ viewer = false }: { viewer?: boolean }) {
   const methods = useForm<FieldValues>({
     defaultValues: {
       text: 'Project name',
@@ -26,30 +20,16 @@ function Fields({
       choice: true,
     },
   });
-  const presentation = { readOnlyVariant: inputStyle ? ('input' as const) : undefined };
-
   return (
     <form className={viewer ? 'project-form viewer-only-project-form' : 'project-form'}>
       <FormProvider {...methods}>
-        <TextField
-          {...presentation}
-          name="text"
-          label="Name"
-          tooltip="Name helper"
-          readOnly={viewer}
-        />
-        <NumberField {...presentation} name="number" label="Cost" readOnly={viewer} />
-        <TextField {...presentation} name="editableText" label="Editable name" readOnly={false} />
-        <NumberField
-          {...presentation}
-          name="editableNumber"
-          label="Editable cost"
-          readOnly={false}
-        />
-        <DateField {...presentation} name="date" label="Date" readOnly={viewer} />
-        <TextAreaField {...presentation} name="description" label="Description" readOnly={viewer} />
+        <TextField name="text" label="Name" tooltip="Name helper" disabled={viewer} />
+        <NumberField name="number" label="Cost" disabled={viewer} />
+        <TextField name="editableText" label="Editable name" readOnly={false} />
+        <NumberField name="editableNumber" label="Editable cost" disabled={false} />
+        <DateField name="date" label="Date" disabled={viewer} />
+        <TextAreaField name="description" label="Description" disabled={viewer} />
         <RadioCheckboxField
-          {...presentation}
           name="choice"
           label="Choice"
           control={methods.control}
@@ -61,15 +41,15 @@ function Fields({
 }
 
 describe('Viewer-only project basics fields', () => {
-  it('preserves legacy read-only rendering without the input variant', () => {
-    render(<Fields viewer inputStyle={false} />);
+  it('renders viewer-only text, number, date, and textarea fields as disabled', () => {
+    render(<Fields viewer />);
 
     const text = screen.getByRole('textbox', { name: 'Name' });
     expect(text.tagName).toBe('INPUT');
-    expect(text).toHaveAttribute('readonly');
-    expect(text).not.toBeDisabled();
-    expect(screen.getByRole('spinbutton', { name: 'Cost' })).not.toBeDisabled();
-    expect(screen.getByRole('textbox', { name: 'Description' })).not.toBeDisabled();
+    expect(text).toBeDisabled();
+    expect(screen.getByRole('spinbutton', { name: 'Cost' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Date' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Description' })).toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveStyle('overflow: visible');
   });
 
@@ -84,21 +64,15 @@ describe('Viewer-only project basics fields', () => {
     expect(screen.getByRole('spinbutton', { name: 'Editable cost' })).toHaveValue(7);
   });
 
-  it('keeps text fields read-only and displays the yes/no value as a text field', async () => {
+  it('keeps disabled fields and displays the yes/no value as a text field', async () => {
     const user = userEvent.setup();
     render(<Fields viewer />);
 
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('readonly');
-    expect(screen.getByRole('spinbutton', { name: 'Cost' })).toHaveAttribute('readonly');
-    expect(screen.getByRole('textbox', { name: 'Date' })).toHaveAttribute('readonly');
-    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveAttribute('readonly');
-    expect(screen.getByRole('textbox', { name: 'Name' }).tagName).toBe('TEXTAREA');
     for (const label of ['Name', 'Date', 'Description']) {
       expect(screen.getByRole('textbox', { name: label })).toBeDisabled();
     }
     expect(screen.getByRole('spinbutton', { name: 'Cost' })).toBeDisabled();
-    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveStyle('overflow: hidden');
-    expect(within(screen.getByTestId('date')).queryByRole('button')).not.toBeInTheDocument();
+    expect(within(screen.getByTestId('date')).getByRole('button')).toBeDisabled();
     expect(screen.getByText('Name helper')).toBeVisible();
     expect(within(screen.getByTestId('choice')).getByDisplayValue('Kyllä')).toHaveAttribute(
       'readonly',
@@ -116,7 +90,7 @@ describe('Viewer-only project basics fields', () => {
     const user = userEvent.setup();
     render(<Fields />);
 
-    expect(screen.getByRole('textbox', { name: 'Name' })).not.toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
     expect(screen.getByRole('spinbutton', { name: 'Cost' })).not.toHaveAttribute('readonly');
     expect(within(screen.getByTestId('date')).getByRole('button')).toBeEnabled();
     expect(screen.getByTestId('choice-0')).toBeEnabled();

@@ -13,6 +13,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
 import { PatchProjectTrigger } from './ProjectCell';
+import { usePatchProjectMutation } from '@/api/projectApi';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -41,6 +42,10 @@ interface IProjectHeadProps {
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchProject }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
+<<<<<<< HEAD
+=======
+  const [patchProject] = usePatchProjectMutation();
+>>>>>>> 3f831f13 (fix(ui): fixed viewer only user related changes according to comments)
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
   const isPhaseValid = useProjectPhaseValidation({
@@ -96,7 +101,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         {/* Dots & Document */}
         <div className="project-left-icons-container">
           <button
-            className={isReadOnly ? 'pointer-events-none' : 'cursor-pointer'}
+            className={'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
             onClick={handleOpenPhaseMenu}
           >

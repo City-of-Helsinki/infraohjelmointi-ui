@@ -522,10 +522,9 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         name: name,
         label: `projectForm.${name}`,
         control: control,
-        readOnlyVariant: isOnlyViewer ? ('input' as const) : undefined,
       };
     },
-    [control, isOnlyViewer],
+    [control],
   );
 
   const formProps = useMemo(

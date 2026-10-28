@@ -249,7 +249,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       tooltip={tooltip}
       hideLabel={hideLabel}
       rules={validateMaxLength(10, t)}
-      readOnly={isUserOnlyViewer}
+      disabled={isUserOnlyViewer}
     />
   );
 
@@ -372,8 +372,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           <TextAreaField
             {...getFieldProps('otherBudgetOverrunReason')}
             rules={{ ...validateMaxLength(200, t), ...validateOtherReasonField }}
-            readOnly={isUserOnlyViewer}
-            disabled={!isOtherBudgetOverrunReasonSelected}
+            disabled={isUserOnlyViewer || !isOtherBudgetOverrunReasonSelected}
           />
         </div>
       </div>

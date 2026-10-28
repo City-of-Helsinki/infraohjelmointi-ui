@@ -248,35 +248,30 @@ describe('projectForm', () => {
     expect(await findByTestId('project-form')).toBeInTheDocument();
   });
 
-  it('opts only viewer basics into input-style read-only presentation', async () => {
+  it('disables viewer-only fields while preserving their read-only values', async () => {
     jest.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(true);
     const { findByTestId } = await render();
 
     expect(await findByTestId('project-form')).toHaveClass('viewer-only-project-form');
-    expect((await findByTestId('phase')).querySelector('.read-only-select')).not.toBeNull();
+    expect(within(await findByTestId('phase')).getByRole('textbox')).toBeDisabled();
     expect(within(await findByTestId('sapProject')).getByRole('textbox')).toBeDisabled();
-    expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('TEXTAREA');
+    expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
     expect(within(await findByTestId('hkrId')).getByRole('spinbutton')).toBeDisabled();
-    expect(
-      within(await findByTestId('estPlanningStart')).queryByRole('button'),
-    ).not.toBeInTheDocument();
-    expect(within(await findByTestId('programmed')).getByRole('textbox')).toBeDisabled();
+    expect(within(await findByTestId('estPlanningStart')).getByRole('button')).toBeDisabled();
+    expect(within(await findByTestId('programmed')).getByRole('textbox')).toHaveAttribute(
+      'readonly',
+    );
     expect(screen.queryByTestId('programmed-0')).not.toBeInTheDocument();
-    expect(
-      (await findByTestId('realizedCostLabel')).querySelectorAll('.read-only-list-value'),
-    ).toHaveLength(5);
+    expect(within(await findByTestId('realizedCostLabel')).queryByRole('spinbutton')).toBeNull();
   });
 
   it('preserves normal controls when the user is not viewer-only', async () => {
     const { findByTestId } = await render();
 
     expect(await findByTestId('project-form')).not.toHaveClass('viewer-only-project-form');
-    expect((await findByTestId('phase')).querySelector('.read-only-select')).toBeNull();
+    expect(within(await findByTestId('phase')).queryByRole('textbox')).toBeNull();
     expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
     expect(await findByTestId('programmed-0')).toBeEnabled();
-    expect(
-      (await findByTestId('realizedCostLabel')).querySelector('.read-only-list-value'),
-    ).toBeNull();
   });
 
   it('fills the fields with existing project data', async () => {

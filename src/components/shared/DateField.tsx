@@ -11,7 +11,6 @@ interface IDateFieldProps {
   rules?: HookFormRulesType;
   required?: boolean;
   readOnly?: boolean;
-  readOnlyVariant?: 'text' | 'input';
   helperText?: string;
   className?: string;
   size?: 'full' | 'l';
@@ -25,7 +24,6 @@ const DateField: FC<IDateFieldProps> = ({
   rules,
   required,
   readOnly,
-  readOnlyVariant = 'text',
   className = '',
   helperText,
   size = 'l',
@@ -33,7 +31,6 @@ const DateField: FC<IDateFieldProps> = ({
 }) => {
   const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
-  const isReadOnlyInput = readOnly && readOnlyVariant === 'input';
   const currentDate = new Date();
   const datePlus10Years = new Date(currentDate.getFullYear() + 10, 11, 31);
 
@@ -53,7 +50,7 @@ const DateField: FC<IDateFieldProps> = ({
             data-testid={name}
           >
             <HDSDateInput
-              className={`input-${size} date-input ${isReadOnlyInput ? 'read-only-input' : ''}`}
+              className={`input-${size} date-input`}
               onChange={onChange}
               onBlur={onBlur}
               value={value}
@@ -69,7 +66,7 @@ const DateField: FC<IDateFieldProps> = ({
               maxDate={datePlus10Years}
               disableDatePicker={readOnly}
               helperText={helperText}
-              disabled={isReadOnlyInput || (disabled ?? fieldDisabled)}
+              disabled={disabled ?? fieldDisabled}
             />
           </div>
         );

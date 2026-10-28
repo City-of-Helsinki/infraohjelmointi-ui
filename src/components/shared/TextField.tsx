@@ -3,7 +3,6 @@ import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
-import TextAreaField from './TextAreaField';
 
 interface ITextFieldProps extends Omit<TextInputProps, 'size' | 'id' | 'tooltip'> {
   name: string;
@@ -11,7 +10,6 @@ interface ITextFieldProps extends Omit<TextInputProps, 'size' | 'id' | 'tooltip'
   control?: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
-  readOnlyVariant?: 'text' | 'input';
   hideLabel?: boolean;
   tooltip?: string;
   disabled?: boolean;
@@ -29,7 +27,6 @@ const TextField: FC<ITextFieldProps> = ({
   control,
   rules,
   readOnly,
-  readOnlyVariant = 'text',
   hideLabel,
   tooltip,
   disabled,
@@ -43,28 +40,6 @@ const TextField: FC<ITextFieldProps> = ({
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
-
-  if (readOnly && readOnlyVariant === 'input') {
-    return (
-      <TextAreaField
-        name={name}
-        label={label}
-        control={control}
-        rules={rules}
-        readOnly
-        readOnlyVariant="input"
-        readOnlyValue={readOnlyValue}
-        hideLabel={hideLabel}
-        helperText={tooltip}
-        disabled={disabled}
-        wrapperClassName={wrapperClassName}
-        size={size === 'l' ? 'l' : 'xl'}
-        id={id}
-        rows={1}
-        defaultValue={defaultValue}
-      />
-    );
-  }
 
   return (
     <Controller

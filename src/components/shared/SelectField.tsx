@@ -8,32 +8,6 @@ import TextField from './TextField';
 
 type Option = { value: string; label: string };
 
-const hasSelectedValue = (value?: Option | Option[]) =>
-  Array.isArray(value) ? value.length > 0 : Boolean(value?.value);
-
-const getSelectFieldWrapperClassName = (
-  size: 'full' | 'lg' | undefined,
-  hasIcon: boolean,
-  value: unknown,
-) => {
-  const hasValue =
-    typeof value === 'object' && value !== null && 'value' in value && Boolean(value.value);
-
-  return `${size || ''} ${hasIcon ? 'with-icon' : ''} ${hasValue ? '' : 'placeholder'}`;
-};
-
-const getCustomSelectClassName = (hasIcon: boolean, readOnly: boolean | undefined) =>
-  `custom-select ${hasIcon ? 'icon' : ''} ${readOnly ? 'read-only-select' : ''}`;
-
-const isReadOnlyTextVariant = (readOnly: boolean | undefined, readOnlyVariant: 'text' | 'input') =>
-  readOnly && readOnlyVariant === 'text';
-
-const isSelectClearable = (
-  clearable: boolean | undefined,
-  hasValue: boolean,
-  readOnly: boolean | undefined,
-) => Boolean(clearable && hasValue && !readOnly);
-
 interface ISelectFieldProps extends SelectProps {
   name: string;
   control?: HookFormControlType;
@@ -48,7 +22,6 @@ interface ISelectFieldProps extends SelectProps {
   size?: 'full' | 'lg';
   shouldTranslate?: boolean;
   readOnly?: boolean;
-  readOnlyVariant?: 'text' | 'input';
   placeholder?: string;
   wrapperClassName?: string;
 }
@@ -68,7 +41,6 @@ const SelectField: FC<ISelectFieldProps> = ({
   required,
   shouldTranslate = true,
   readOnly,
-  readOnlyVariant = 'text',
   placeholder,
   children,
   filter,
@@ -77,7 +49,6 @@ const SelectField: FC<ISelectFieldProps> = ({
   ...rest
 }) => {
   const isRequired = required ?? !!rules?.required;
-  const showIcon = !readOnly || readOnlyVariant === 'input';
   const { t } = useTranslation();
 
   const translateOption = useCallback(
@@ -150,12 +121,9 @@ const SelectField: FC<ISelectFieldProps> = ({
       }) => {
         const translatedValue = translateValue(value);
         const readOnlyValue = translatedValue.at(0)?.label;
-        const hasValue = hasSelectedValue(value);
+        const hasValue = Array.isArray(value) ? value.length > 0 : Boolean(value?.value);
 
         const handleChange = (selectedOptions: Option[] = [], clickedOption?: Option) => {
-          if (readOnly) {
-            return;
-          }
           const options = multiSelect ? selectedOptions : clickedOption;
           onChange(options ?? { value: '', label: '' });
           if (shouldUpdateIcon && clickedOption?.value) {
@@ -171,40 +139,38 @@ const SelectField: FC<ISelectFieldProps> = ({
              * gray if the value is undefined
              */}
             <div
-              className={`select-field-wrapper ${getSelectFieldWrapperClassName(
-                size,
-                Boolean(iconKey && showIcon),
-                value,
-              )}`}
+              className={`select-field-wrapper ${size ? size : ''} ${iconKey ? 'with-icon' : ''} ${
+                !value || !value.value ? 'placeholder' : ''
+              }`}
             >
-              {isReadOnlyTextVariant(readOnly, readOnlyVariant) ? (
+              {readOnly ? (
                 <TextField
                   name={''}
                   label={label ?? ''}
                   control={control}
-                  readOnly={true}
+                  disabled={true}
                   readOnlyValue={readOnlyValue}
                 />
               ) : (
                 <HDSSelect
                   id={`select-field-${name}`}
-                  className={getCustomSelectClassName(Boolean(iconKey && showIcon), readOnly)}
+                  className={`custom-select ${iconKey ? 'icon' : ''}`}
                   value={translatedValue}
                   onChange={handleChange}
                   onBlur={onBlur}
-                  invalid={Boolean(error)}
+                  invalid={error ? true : false}
                   options={translatedOptions ?? []}
                   required={isRequired}
-                  disabled={readOnly || isDisabled}
+                  disabled={isDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
-                  icon={showIcon ? icon : undefined}
+                  icon={icon}
                   filter={filter}
                   texts={{
-                    label: hideLabel || !label ? undefined : t(label),
+                    label: !hideLabel && label ? t(label) : undefined,
                     error: error?.message,
                     placeholder: placeholder ?? t('choose'),
                   }}
-                  clearable={isSelectClearable(clearable, hasValue, readOnly)}
+                  clearable={Boolean(clearable && hasValue)}
                   multiSelect={multiSelect}
                   {...rest}
                 />
