@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.13.0...infraohjelmointi-ui-v1.13.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* Fixes to construction handover according to testing comments (IO-849) ([#624](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/624)) ([7bc19ea](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/7bc19eae4e13b579bad3376ff2d900042b894405))
+
 ## [1.13.0](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.12.0...infraohjelmointi-ui-v1.13.0) (2026-10-22)
 
 
