@@ -1,6 +1,6 @@
 @reference "../../../../index.css";
 .project-form-side-panel-container {
-  @apply sticky top-0 mx-6 max-w-[20.5rem] translate-y-[4rem] justify-center;
+  @apply sticky top-0 z-10 mx-6 max-w-[20.5rem] translate-y-[4rem] justify-center;
 }
 .project-form-side-panel {
   @apply flex w-full flex-col;
