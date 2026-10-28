@@ -5,9 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
 import { IPhaseMenuDetails } from '@/interfaces/eventInterfaces';
 import optionIcon from '@/utils/optionIcon';
-import { useAppSelector } from '@/hooks/common';
-import { selectUser } from '@/reducers/authSlice';
-import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import './styles.css';
 
 interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
@@ -17,13 +14,12 @@ interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
 const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   title,
   phase,
+  isReadOnly,
   onCloseMenu,
   onSubmitPhase,
 }) => {
   const { t } = useTranslation();
   const phases = useOptions('phases');
-  const user = useAppSelector(selectUser);
-  const isOnlyViewer = isUserOnlyViewer(user);
   const [selectedPhase, setSelectedPhase] = useState<string>(phase ?? '');
 
   useEffect(() => {
@@ -38,12 +34,12 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   }, []);
 
   const onSubmit = useCallback(() => {
-    if (isOnlyViewer) {
+    if (isReadOnly) {
       return;
     }
     onSubmitPhase({ phase: selectedPhase });
     onCloseMenu();
-  }, [isOnlyViewer, onCloseMenu, onSubmitPhase, selectedPhase]);
+  }, [isReadOnly, onCloseMenu, onSubmitPhase, selectedPhase]);
 
   return (
     <div className="phase-menu-container" data-testid={'project-phase-menu'}>
@@ -62,7 +58,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
             <button
               className="selection-button"
               data-testid={`select-${value}`}
-              disabled={isOnlyViewer}
+              disabled={isReadOnly}
               onClick={() => handleSetSelectedPhase(value)}
             >
               <div className="min-w-[2rem]">{optionIcon[label as keyof typeof optionIcon]}</div>
@@ -77,7 +73,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
           </li>
         ))}
       </ul>
-      {!isOnlyViewer && (
+      {!isReadOnly && (
         <div className="phase-menu-footer">
           <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
             {t('save')}

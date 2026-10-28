@@ -1,21 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import ProjectPhaseMenu from './ProjectPhaseMenu';
-
-jest.mock('@/hooks/common', () => ({
-  useAppSelector: jest.fn(() => null),
-}));
 
 jest.mock('@/hooks/useOptions', () => ({
   useOptions: () => [
     { value: 'phase-1', label: 'planning' },
     { value: 'phase-2', label: 'construction' },
   ],
-}));
-
-jest.mock('@/utils/userRoleHelpers', () => ({
-  isUserOnlyViewer: jest.fn(),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -30,20 +21,20 @@ describe('ProjectPhaseMenu', () => {
     jest.clearAllMocks();
   });
 
-  const renderMenu = () =>
+  const renderMenu = (isReadOnly: boolean) =>
     render(
       <ProjectPhaseMenu
         title="Project"
         phase="phase-1"
+        isReadOnly={isReadOnly}
         onCloseMenu={onCloseMenu}
         onSubmitPhase={onSubmitPhase}
       />,
     );
 
-  it('shows phases read-only without Save for viewer-only users and still allows closing', async () => {
-    jest.mocked(isUserOnlyViewer).mockReturnValue(true);
+  it('shows phases read-only without Save and still allows closing', async () => {
     const user = userEvent.setup();
-    renderMenu();
+    renderMenu(true);
 
     expect(screen.getByTestId('project-phase-menu')).toBeInTheDocument();
     expect(screen.getByTestId('select-phase-1')).toBeDisabled();
@@ -62,9 +53,8 @@ describe('ProjectPhaseMenu', () => {
   });
 
   it('preserves phase selection and saving for other users', async () => {
-    jest.mocked(isUserOnlyViewer).mockReturnValue(false);
     const user = userEvent.setup();
-    renderMenu();
+    renderMenu(false);
 
     expect(screen.getByTestId('select-phase-2')).toBeEnabled();
 

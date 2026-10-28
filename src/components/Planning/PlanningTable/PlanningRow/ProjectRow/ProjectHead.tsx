@@ -13,7 +13,6 @@ import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
 import { PatchProjectTrigger } from './ProjectCell';
-import { usePatchProjectMutation } from '@/api/projectApi';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -42,10 +41,6 @@ interface IProjectHeadProps {
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchProject }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
-<<<<<<< HEAD
-=======
-  const [patchProject] = usePatchProjectMutation();
->>>>>>> 3f831f13 (fix(ui): fixed viewer only user related changes according to comments)
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
   const isPhaseValid = useProjectPhaseValidation({
@@ -65,6 +60,9 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
+      if (isReadOnly) {
+        return;
+      }
       const phase = phases.find((p) => p.value === req.phase);
       if (phase) {
         const isValid = isPhaseValid(phase);
@@ -77,7 +75,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         .unwrap()
         .catch(() => dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })));
     },
-    [dispatch, isPhaseValid, phases, project.id, patchProject],
+    [dispatch, isReadOnly, isPhaseValid, phases, project.id, patchProject],
   );
 
   // Open the custom context menu for editing the project phase on click
@@ -88,11 +86,12 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         phaseMenuProps: {
           title: project.name,
           phase: project.phase?.id,
+          isReadOnly,
           onSubmitPhase,
         },
       });
     },
-    [onSubmitPhase, project.name, project.phase?.id],
+    [isReadOnly, onSubmitPhase, project.name, project.phase?.id],
   );
 
   return (

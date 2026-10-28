@@ -23,6 +23,7 @@ export interface ICellMenuDetails {
 export interface IPhaseMenuDetails {
   title: string;
   phase?: string;
+  isReadOnly: boolean;
   onSubmitPhase: (req: IProjectRequest) => void;
 }
 
