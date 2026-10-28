@@ -11,6 +11,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { getProjectProgrammeSections } from '../sections/projectProgrammeSections';
 import { getProjectProgrammePdfFileName } from './projectProgrammePdfUtils';
 import { createProjectProgrammePdfBlob } from './createProjectProgrammePdf';
+import { getDownloadUrl, revokeObjectUrls } from '@/utils/fileUtils';
 
 const LOADING_PROJECT_PROGRAMME_PDF = 'loading-project-programme-pdf';
 
@@ -28,7 +29,14 @@ export default function useProjectProgrammePdf() {
     setIsGenerating(true);
     dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PROJECT_PROGRAMME_PDF }));
 
+    let locationMapSrc: string | undefined;
     try {
+      if (projectProgramme.locationMap?.url) {
+        locationMapSrc = await getDownloadUrl(projectProgramme.locationMap.url);
+        if (!locationMapSrc) {
+          throw new Error('Could not download the project programme location map');
+        }
+      }
       const isBrief = projectProgramme.briefProjectProgramme ?? true;
       const sections = getProjectProgrammeSections(t, isBrief)
         .filter((section) => !isBrief || section.showInBrief)
@@ -40,6 +48,7 @@ export default function useProjectProgrammePdf() {
         sections,
         projectName,
         createdDate: now.format('D.M.YYYY'),
+        locationMapSrc,
       });
 
       saveAs(
@@ -60,6 +69,7 @@ export default function useProjectProgrammePdf() {
         }),
       );
     } finally {
+      revokeObjectUrls([locationMapSrc]);
       dispatch(clearLoading(LOADING_PROJECT_PROGRAMME_PDF));
       setIsGenerating(false);
     }

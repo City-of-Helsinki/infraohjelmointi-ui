@@ -1456,6 +1456,9 @@ describe('ProjectProgrammeForm other attachments', () => {
     expect(mockGetDownloadUrl).toHaveBeenCalledWith(
       '/project-programmes/programme-1/attachments/attachment-1/download/',
     );
-    expect(await screen.findByTitle('site-plan.pdf')).toHaveAttribute('src', 'blob:preview');
+    expect((await screen.findAllByTitle('site-plan.pdf'))[1]).toHaveAttribute(
+      'src',
+      'blob:preview',
+    );
   });
 });

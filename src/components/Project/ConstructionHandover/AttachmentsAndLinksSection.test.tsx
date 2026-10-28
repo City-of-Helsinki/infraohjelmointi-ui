@@ -43,14 +43,14 @@ const attachments: IConstructionHandoverAttachment[] = [
 interface ISetupProps {
   attachments?: IConstructionHandoverAttachment[];
   isPostingAttachment?: boolean;
-  isHandoverLocked?: boolean;
+  canEditHandover?: boolean;
   onDeleteAttachment?: jest.Mock;
 }
 
 function setup({
   attachments: initialAttachments = attachments,
   isPostingAttachment = false,
-  isHandoverLocked = false,
+  canEditHandover = true,
   onDeleteAttachment = jest.fn(),
 }: ISetupProps = {}) {
   const formRef: { current?: UseFormReturn<IConstructionHandoverForm> } = {};
@@ -70,8 +70,8 @@ function setup({
         <AttachmentsAndLinksSection
           attachments={initialAttachments}
           isPostingAttachment={isPostingAttachment}
-          isHandoverLocked={isHandoverLocked}
           onDeleteAttachment={onDeleteAttachment}
+          canEditHandover={canEditHandover}
         />
       </FormProvider>
     );
@@ -147,8 +147,8 @@ describe('AttachmentsAndLinksSection', () => {
     expect(screen.queryByLabelText('attachments.dragAndDrop')).not.toBeInTheDocument();
   });
 
-  it('disables the file input and delete buttons when handover is locked', () => {
-    setup({ isHandoverLocked: true });
+  it('disables the file input and delete buttons when handover cannot be edited', () => {
+    setup({ canEditHandover: false });
 
     expect(screen.getByLabelText('attachments.dragAndDrop')).toBeDisabled();
     screen

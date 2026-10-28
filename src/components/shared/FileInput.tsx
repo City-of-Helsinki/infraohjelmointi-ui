@@ -1,6 +1,7 @@
 import { Language } from '@/i18n/language';
 import { FileInput as HDSFileInput } from 'hds-react';
 import { useTranslation } from 'react-i18next';
+import { ATTACHMENT_MAX_SIZE } from '@/utils/fileUtils';
 
 interface IFileInputProps {
   id: string;
@@ -13,7 +14,7 @@ interface IFileInputProps {
 
 export default function FileInput({
   id,
-  maxSize = 512000,
+  maxSize = ATTACHMENT_MAX_SIZE,
   accept = '.jpg,.png',
   multiple = true,
   disabled,

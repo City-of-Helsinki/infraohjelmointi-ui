@@ -245,7 +245,11 @@ function ProjectProgramme() {
           </div>
         )}
 
-        {isProjectProgrammeComplete && <ProgrammeCompletedNotification />}
+        {isProjectProgrammeComplete && showActiveSectionForm && (
+          <div className="project-form mx-auto max-w-xl">
+            <ProgrammeCompletedNotification />
+          </div>
+        )}
 
         {showStartProjectProgramme && (
           <StartProjectProgramme onStartProjectProgramme={handleStartProjectProgramme} />
@@ -264,8 +268,9 @@ function ProjectProgramme() {
         )}
 
         {showOverview && (
-          <div className="project-form mx-auto max-w-xl">
+          <div className="project-form project-programme-overview mx-auto max-w-xl">
             <div className="project-programme-notifications">
+              {isProjectProgrammeComplete && <ProgrammeCompletedNotification />}
               {missingRequiredSections.length > 0 && (
                 <MissingRequiredFieldsNotification
                   missingFieldsNotificationRef={missingFieldsNotificationRef}

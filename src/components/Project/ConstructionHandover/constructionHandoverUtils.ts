@@ -20,3 +20,36 @@ export function isConstructionHandoverLocked({ status }: IConstructionHandover):
     ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
   ].includes(status);
 }
+
+interface IConstructionHandoverEditPermissions {
+  isPlanner: boolean;
+  isProjectManager: boolean;
+  isResponsiblePersonForProject: boolean;
+}
+
+/**
+ * Checks if the user is allowed to edit the construction handover.
+ * - Nobody can edit a locked handover.
+ * - Planners can edit in DRAFT and SUBMITTED_TO_PROGRAMMER statuses.
+ * - A project manager who is the responsible person for the project can edit only in DRAFT status.
+ */
+export function canEditConstructionHandover(
+  constructionHandover: IConstructionHandover,
+  {
+    isPlanner,
+    isProjectManager,
+    isResponsiblePersonForProject,
+  }: IConstructionHandoverEditPermissions,
+): boolean {
+  if (isConstructionHandoverLocked(constructionHandover)) {
+    return false;
+  }
+  if (isPlanner) {
+    return true;
+  }
+  return (
+    constructionHandover.status === ConstructionHandoverStatus.DRAFT &&
+    isProjectManager &&
+    isResponsiblePersonForProject
+  );
+}

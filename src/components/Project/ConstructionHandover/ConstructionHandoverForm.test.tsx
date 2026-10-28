@@ -8,6 +8,7 @@ import ConstructionHandoverForm from './ConstructionHandoverForm';
 import { createConstructionHandover, createProject } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 import { UserRole } from '@/interfaces/userInterfaces';
+import { RootState } from '@/store';
 
 const mockPatchConstructionHandover = jest.fn();
 const mockTransitionConstructionHandoverStatus = jest.fn();
@@ -59,7 +60,7 @@ jest.mock('hds-react', () => {
 function setupConstructionHandoverForm(
   constructionHandoverOverrides = {},
   projectOverrides = {},
-  preloadedState = {},
+  preloadedState: Partial<RootState> = withMockAuthUserAdGroups([UserRole.PLANNER]),
 ) {
   const constructionHandover = createConstructionHandover({
     linkDesignDrawings: 'https://example.com/design-drawings',
@@ -343,7 +344,24 @@ describe('ConstructionHandoverForm save draft button', () => {
   };
 
   it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
-    'shows save draft button for %s status when user is not the responsible person',
+    'shows save draft button for planner in %s status',
+    async (status) => {
+      await act(async () =>
+        setupConstructionHandoverForm(
+          { status },
+          responsibleProjectOverrides,
+          withMockAuthUserAdGroups([UserRole.PLANNER], { email: 'otheruser@example.com' }),
+        ),
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
+    'hides save draft button for project manager who is not the responsible person in %s status',
     async (status) => {
       await act(async () =>
         setupConstructionHandoverForm(
@@ -356,8 +374,11 @@ describe('ConstructionHandoverForm save draft button', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
-      ).toBeInTheDocument();
+        screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i }),
+      ).toBeDisabled();
     },
   );
 
@@ -391,6 +412,21 @@ describe('ConstructionHandoverForm save draft button', () => {
     expect(
       screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' }),
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i })).toBeDisabled();
+  });
+
+  it('enables form fields for responsible person when status is draft', async () => {
+    await act(async () =>
+      setupConstructionHandoverForm(
+        { status: ConstructionHandoverStatus.DRAFT },
+        responsibleProjectOverrides,
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+          email: 'planner@example.com',
+        }),
+      ),
+    );
+
+    expect(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i })).toBeEnabled();
   });
 
   it.each([
@@ -618,6 +654,20 @@ describe('ConstructionHandoverForm status transitions', () => {
     ).toBeInTheDocument();
   });
 
+  it('hides return to draft button from non-planners in locked status', async () => {
+    await act(async () =>
+      setupConstructionHandoverForm(
+        { status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION },
+        {},
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+      ),
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
+    ).toBeNull();
+  });
+
   it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
     'hides return to draft button for %s status',
     async (status) => {
@@ -783,18 +833,6 @@ describe('ConstructionHandoverForm attachments and links', () => {
     await waitFor(() => expect(mockPatchConstructionHandover).toHaveBeenCalled());
     expect(mockPostHandoverAttachment).not.toHaveBeenCalled();
   });
-
-  it.each(['linkDesignDrawings', 'linkCostAllocation', 'linkContractBoundaries'])(
-    'does not submit when required link %s is empty',
-    async (linkField) => {
-      await act(async () => setupConstructionHandoverForm({ [linkField]: null }));
-
-      await clickSaveDraft();
-
-      expect(await screen.findByText('validation.required')).toBeInTheDocument();
-      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
-    },
-  );
 
   it('renders every attachment of the handover', async () => {
     await act(async () =>

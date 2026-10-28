@@ -21,20 +21,20 @@
     "hds-react": "^4.8.0",
     "i18next": "^26.4.2",
     "i18next-browser-languagedetector": "^7.0.1",
-    "i18next-http-backend": "^4.0.2",
+    "i18next-http-backend": "^4.0.4",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.23",
     "moment": "^2.31.0",
     "oidc-client-ts": "^2.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.89.0",
+    "react-hook-form": "^7.90.0",
     "react-i18next": "^17.0.15",
     "react-intersection-observer": "^9.4.1",
     "react-oidc-context": "^2.4.0",
     "react-redux": "^9.3.0",
-    "react-router": "6.8.2",
-    "react-router-dom": "6.8.2",
+    "react-router": "7.18.4",
+    "react-router-dom": "7.18.4",
     "react-scripts": "5.0.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "use-deep-compare-effect": "^1.8.1"
@@ -67,6 +67,7 @@
       "node_modules/(?!your-module-name)/\""
     ],
     "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
       "^@/(.*)$": "<rootDir>/src/$1"
     }
   },
@@ -98,7 +99,7 @@
     "eslint-plugin-prettier": "5.0.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
     "ts-node": "^10.9.2"

@@ -183,4 +183,5 @@ export interface IProjectProgrammePdfDocumentProps {
   sections: IProjectProgrammePdfSection[];
   projectName: string;
   createdDate: string;
+  locationMapSrc?: string;
 }

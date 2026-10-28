@@ -7,15 +7,12 @@ import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { IconMenuDots, IconSize } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
-import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
-import { usePatchProjectMutation } from '@/api/projectApi';
-import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
+import { PatchProjectTrigger } from './ProjectCell';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -38,14 +35,12 @@ const PRIORITY_TEXT_COLOR_MAP: Record<string, string> = {
 interface IProjectHeadProps {
   project: IProject;
   sums: IProjectSums;
+  isReadOnly: boolean;
+  patchProject: PatchProjectTrigger;
 }
 
-const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
+const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchProject }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
-  const user = useAppSelector(selectUser);
-  const { canEditClass } = useRestrictedClassAccess();
-  const isReadOnly = isUserOnlyViewer(user) || !canEditClass(project.projectClass);
-  const [patchProject] = usePatchProjectMutation();
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
   const isPhaseValid = useProjectPhaseValidation({

@@ -37,20 +37,35 @@ export default function AttachmentListItem({
       className="border-b-coat-of-arms flex items-center justify-between gap-4 border-b-2 border-dotted p-[var(--spacing-xs)]"
       style={{ backgroundColor }}
     >
-      <div className="flex min-w-0 items-center gap-4">
+      <div className="flex items-center gap-2">
         <IconPhoto aria-hidden="true" />
-        <span className="truncate">
-          {attachment.downloadUrl ? (
-            <Link href={attachment.downloadUrl} download={attachment.name}>
-              {attachment.name}
-            </Link>
-          ) : (
-            attachment.name
-          )}
-          {attachment.size !== undefined && ` (${formatSizeToKilobytes(attachment.size)})`}
-        </span>
+        <div className="flex max-w-3xs flex-wrap">
+          <div className="truncate" title={attachment.name}>
+            {attachment.downloadUrl ? (
+              <Link href={attachment.downloadUrl} download={attachment.name}>
+                {attachment.name}
+              </Link>
+            ) : (
+              attachment.name
+            )}
+          </div>
+          <span>
+            {attachment.size !== undefined && ` (${formatSizeToKilobytes(attachment.size)})`}
+          </span>
+        </div>
       </div>
       <div>
+        {onView && (
+          <Button
+            variant={ButtonVariant.Supplementary}
+            theme={ButtonPresetTheme.Black}
+            size={ButtonSize.Small}
+            iconStart={<IconEye />}
+            onClick={onView}
+          >
+            {t('attachments.view')}
+          </Button>
+        )}
         {onDelete && (
           <Button
             variant={ButtonVariant.Supplementary}
@@ -61,17 +76,6 @@ export default function AttachmentListItem({
             disabled={deleteButtonDisabled}
           >
             {t('attachments.delete')}
-          </Button>
-        )}
-        {onView && (
-          <Button
-            variant={ButtonVariant.Supplementary}
-            theme={ButtonPresetTheme.Black}
-            size={ButtonSize.Small}
-            iconStart={<IconEye />}
-            onClick={onView}
-          >
-            {t('attachments.view')}
           </Button>
         )}
       </div>

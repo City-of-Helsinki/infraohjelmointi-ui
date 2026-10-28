@@ -141,7 +141,7 @@ const renderSection = async (
 
     return (
       <FormProvider {...formMethods}>
-        <FinancingSection constructionHandover={constructionHandover} />
+        <FinancingSection canEditHandover={true} />
       </FormProvider>
     );
   };

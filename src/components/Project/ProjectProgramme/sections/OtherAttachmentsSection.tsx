@@ -5,10 +5,7 @@ import { FormSectionTitle } from '@/components/shared';
 import ProjectProgrammeLinksField from '../ProjectProgrammeLinksField';
 import ProjectProgrammeAttachmentsField from '../ProjectProgrammeAttachmentsField';
 
-export {
-  OTHER_ATTACHMENTS_ACCEPT,
-  OTHER_ATTACHMENTS_MAX_SIZE,
-} from '../ProjectProgrammeAttachmentsField';
+export { OTHER_ATTACHMENTS_ACCEPT } from '../ProjectProgrammeAttachmentsField';
 
 const INFO_ITEM_KEYS = [
   'projectProgrammeForm.otherAttachmentsInfoItems.programmePlans',

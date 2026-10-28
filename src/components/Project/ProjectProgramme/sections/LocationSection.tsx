@@ -10,10 +10,9 @@ import {
   useSaveProjectProgrammeLocationMapMutation,
 } from '@/api/projectProgrammeApi';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
-import { getDownloadUrl } from '@/utils/fileUtils';
+import { ATTACHMENT_MAX_SIZE, getDownloadUrl } from '@/utils/fileUtils';
 import { LOCATION_MAP_ELEMENT_ID } from './projectProgrammeSections';
 
-const LOCATION_MAP_MAX_SIZE = 500 * 1024;
 const LOCATION_MAP_ACCEPT = '.jpg,.jpeg,.png';
 
 interface ILocationSectionProps {
@@ -173,10 +172,9 @@ function LocationSection({
               dragAndDropLabel={t('projectProgrammeForm.locationDragAndDropFieldLabel')}
               dragAndDropInputLabel={t('projectProgrammeForm.locationAttachFileButtonFieldLabel')}
               buttonLabel={t('projectProgrammeForm.locationAttachFileButtonLabel')}
-              helperText={t('projectProgrammeForm.locationAttachmentInfoText')}
               required
               language={language as Language}
-              maxSize={LOCATION_MAP_MAX_SIZE}
+              maxSize={ATTACHMENT_MAX_SIZE}
               accept={LOCATION_MAP_ACCEPT}
               disabled={isSavingLocationMap}
               dragAndDrop

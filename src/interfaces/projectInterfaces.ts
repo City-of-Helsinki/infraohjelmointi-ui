@@ -468,12 +468,6 @@ export interface IProjectCell {
    */
   affectsDates: boolean;
   /**
-   * A list of all the months for the current year with a percentage indicator of how much each month has planning
-   * and construction. This percentage is used to draw the "bar-chart" for the monthly view when selecting a year to
-   * view in the planning summary table.
-   */
-  monthlyDataList: Array<IMonthlyData>;
-  /**
    * The dates used to draw the timeline, these can be a combination of
    * estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd and planningStartYear and planningEndYear
    */

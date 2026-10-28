@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import {
   FinancingDialogState,
   FinancingRowValues,
-  IConstructionHandover,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { DialogMode } from '@/interfaces/menuItemsInterfaces';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
@@ -17,13 +16,12 @@ import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
 import { formatBudgetEuro, parseCurrency } from '@/utils/currencyUtils';
-import { isConstructionHandoverLocked } from '../constructionHandoverUtils';
 
 interface IFinancingSectionProps {
-  constructionHandover: IConstructionHandover;
+  canEditHandover: boolean;
 }
 
-const FinancingSection = ({ constructionHandover }: IFinancingSectionProps) => {
+const FinancingSection = ({ canEditHandover }: IFinancingSectionProps) => {
   const { t } = useTranslation();
   const { control, setValue, watch } = useFormContext<IConstructionHandoverForm>();
   const financingPartyOptions = useOptions('financingParties');
@@ -223,16 +221,12 @@ const FinancingSection = ({ constructionHandover }: IFinancingSectionProps) => {
           onEditRow={handleEdit}
           id={row.item.id}
           values={row.item}
-          disabled={isConstructionHandoverLocked(constructionHandover)}
+          disabled={!canEditHandover}
         />
       ) : null,
     deleteCell:
       row.showActions && row.item ? (
-        <DeleteCell
-          onDeleteRow={handleDelete}
-          id={row.item.id}
-          disabled={isConstructionHandoverLocked(constructionHandover)}
-        />
+        <DeleteCell onDeleteRow={handleDelete} id={row.item.id} disabled={!canEditHandover} />
       ) : null,
   }));
 
@@ -279,7 +273,7 @@ const FinancingSection = ({ constructionHandover }: IFinancingSectionProps) => {
           <p>{t('constructionHandoverForm.financingSection.tableEmptyText')}</p>
         )}
       </div>
-      {!isConstructionHandoverLocked(constructionHandover) && (
+      {canEditHandover && (
         <div className="input-wrapper">
           <Button
             variant={ButtonVariant.Secondary}

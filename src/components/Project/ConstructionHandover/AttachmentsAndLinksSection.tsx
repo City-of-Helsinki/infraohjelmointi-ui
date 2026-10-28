@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { FormSectionTitle } from '@/components/shared';
 import { useFormContext } from 'react-hook-form';
-import { validateRequired } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
 import LinkField from '@/components/shared/LinkField';
 import FileInput from '@/components/shared/FileInput';
@@ -16,20 +15,21 @@ interface IAttachmentsAndLinksSectionProps {
   isPostingAttachment: boolean;
   attachments: IConstructionHandoverAttachment[];
   onDeleteAttachment: (attachment: IConstructionHandoverAttachment) => void;
-  isHandoverLocked: boolean;
+  canEditHandover: boolean;
 }
 
 export default function AttachmentsAndLinksSection({
-  isHandoverLocked,
   isPostingAttachment,
   attachments,
   onDeleteAttachment,
+  canEditHandover,
 }: Readonly<IAttachmentsAndLinksSectionProps>) {
   const { t } = useTranslation();
   const { setValue } = useFormContext<IConstructionHandoverForm>();
   const { isConfirmed } = useConfirmDialog();
   const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const isDeleteButtonDisabled = !canEditHandover;
 
   function handleOpenImage(index: number) {
     setSelectedIndex(index);
@@ -66,25 +66,16 @@ export default function AttachmentsAndLinksSection({
         label="constructionHandoverForm.attachmentsAndLinks"
         name="attachmentsAndLinks"
       />
-      <LinkField
-        {...getFieldProps('linkDesignDrawings')}
-        rules={{ ...validateRequired('linkDesignDrawings', t) }}
-      />
-      <LinkField
-        {...getFieldProps('linkCostAllocation')}
-        rules={{ ...validateRequired('linkCostAllocation', t) }}
-      />
-      <LinkField
-        {...getFieldProps('linkContractBoundaries')}
-        rules={{ ...validateRequired('linkContractBoundaries', t) }}
-      />
+      <LinkField {...getFieldProps('linkDesignDrawings')} />
+      <LinkField {...getFieldProps('linkCostAllocation')} />
+      <LinkField {...getFieldProps('linkContractBoundaries')} />
       {!isPostingAttachment && (
         <FileInput
           id="attachments-and-links-file-input"
           handleChange={(files) => {
             setValue('attachments', files, { shouldDirty: true });
           }}
-          disabled={isHandoverLocked}
+          disabled={!canEditHandover}
         />
       )}
       {attachments.length > 0 && (
@@ -101,7 +92,7 @@ export default function AttachmentsAndLinksSection({
               backgroundColor="var(--color-info-light)"
               onView={() => handleOpenImage(index)}
               onDelete={() => handleDeleteAttachment(attachment)}
-              deleteButtonDisabled={isHandoverLocked}
+              deleteButtonDisabled={isDeleteButtonDisabled}
             />
           ))}
         </div>
