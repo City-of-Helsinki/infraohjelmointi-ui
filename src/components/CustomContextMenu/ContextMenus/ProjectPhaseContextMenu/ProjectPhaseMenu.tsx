@@ -14,6 +14,7 @@ interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
 const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   title,
   phase,
+  isReadOnly,
   onCloseMenu,
   onSubmitPhase,
 }) => {
@@ -33,9 +34,12 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   }, []);
 
   const onSubmit = useCallback(() => {
+    if (isReadOnly) {
+      return;
+    }
     onSubmitPhase({ phase: selectedPhase });
     onCloseMenu();
-  }, [onCloseMenu, onSubmitPhase, selectedPhase]);
+  }, [isReadOnly, onCloseMenu, onSubmitPhase, selectedPhase]);
 
   return (
     <div className="phase-menu-container" data-testid={'project-phase-menu'}>
@@ -54,6 +58,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
             <button
               className="selection-button"
               data-testid={`select-${value}`}
+              disabled={isReadOnly}
               onClick={() => handleSetSelectedPhase(value)}
             >
               <div className="min-w-[2rem]">{optionIcon[label as keyof typeof optionIcon]}</div>
@@ -68,11 +73,13 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
           </li>
         ))}
       </ul>
-      <div className="phase-menu-footer">
-        <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
-          {t('save')}
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="phase-menu-footer">
+          <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
+            {t('save')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

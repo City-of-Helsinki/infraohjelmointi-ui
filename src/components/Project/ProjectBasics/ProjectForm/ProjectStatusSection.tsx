@@ -484,8 +484,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('planningStartYear')}
             rules={validatePlanningStartYear}
             required={phasesThatNeedYearBounds.includes(currentPhase)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isInputDisabled || isUserOnlyViewer}
           />
         </div>
       </div>
@@ -495,8 +494,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('constructionEndYear')}
             rules={validateConstructionEndYear()}
             required={phasesThatNeedYearBounds.includes(currentPhase)}
-            disabled={isUserOnlyProjectManager ? false : isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isUserOnlyViewer || (isUserOnlyProjectManager ? false : isInputDisabled)}
           />
         </div>
       </div>

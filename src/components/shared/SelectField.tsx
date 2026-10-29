@@ -148,7 +148,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   name={''}
                   label={label ?? ''}
                   control={control}
-                  readOnly={true}
+                  disabled={true}
                   readOnlyValue={readOnlyValue}
                 />
               ) : (

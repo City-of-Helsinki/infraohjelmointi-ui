@@ -8,6 +8,18 @@
   margin-bottom: var(--spacing-l);
 }
 
+.viewer-only-project-form :disabled {
+  --input-background-disabled: var(--color-white);
+  --input-border-color-disabled: var(--color-black-50);
+  --input-color-disabled: var(--color-black-90);
+}
+
+.project-form.viewer-only-project-form .input-wrapper input:disabled,
+.project-form.viewer-only-project-form .input-wrapper input[readonly] {
+  border: var(--border-width, 2px) solid var(--color-black-50);
+  padding-inline: var(--spacing-s);
+}
+
 .project-form .form-row {
   @apply flex w-full;
 }

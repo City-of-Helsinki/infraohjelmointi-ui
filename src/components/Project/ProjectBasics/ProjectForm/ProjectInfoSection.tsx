@@ -54,6 +54,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           {projectMode === 'new' && (
             <TextField
               {...getFieldProps('name')}
+              disabled={isUserOnlyViewer}
               rules={{ ...validateMaxLength(200, t), ...validateRequired('name', t) }}
             />
           )}
@@ -70,8 +71,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <NumberField
             {...getFieldProps('hkrId')}
             rules={validateMaxLength(5, t)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isInputDisabled || isUserOnlyViewer}
           />
         </div>
       </div>
@@ -90,8 +90,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('sapProject')}
             control={control}
             rules={validateMaxLength(15, t)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isInputDisabled || isUserOnlyViewer}
           />
         </div>
       </div>
@@ -103,7 +102,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             size="l"
             rules={{ ...validateMaxLength(1000, t), ...validateRequired('description', t) }}
             formSaved={isSaving}
-            readOnly={isUserOnlyViewer}
+            disabled={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -113,6 +112,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('address')}
+                disabled={isUserOnlyViewer}
                 rules={{ ...validateRequired('address', t) }}
               />
             </div>
@@ -121,12 +121,14 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('postalCode')}
+                disabled={isUserOnlyViewer}
                 infoText={showPostalCodeInfo ? t('projectForm.noPostalCodeFound') : undefined}
               />
             </div>
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('city')}
+                disabled={isUserOnlyViewer}
                 infoText={showCityInfo ? t('projectForm.noCityFound') : undefined}
               />
             </div>

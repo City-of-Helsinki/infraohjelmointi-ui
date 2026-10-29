@@ -249,7 +249,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       tooltip={tooltip}
       hideLabel={hideLabel}
       rules={validateMaxLength(10, t)}
-      readOnly={isUserOnlyViewer}
+      disabled={isUserOnlyViewer}
     />
   );
 
@@ -363,7 +363,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         </div>
         {isOtherBudgetOverrunReasonSelected && (
           <div className="form-col-md">
-            <RadioCheckboxField {...getFieldProps('onSchedule')} />
+            <RadioCheckboxField {...getFieldProps('onSchedule')} readOnly={isUserOnlyViewer} />
           </div>
         )}
       </div>
@@ -372,8 +372,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           <TextAreaField
             {...getFieldProps('otherBudgetOverrunReason')}
             rules={{ ...validateMaxLength(200, t), ...validateOtherReasonField }}
-            readOnly={isUserOnlyViewer}
-            disabled={!isOtherBudgetOverrunReasonSelected}
+            disabled={isUserOnlyViewer || !isOtherBudgetOverrunReasonSelected}
           />
         </div>
       </div>

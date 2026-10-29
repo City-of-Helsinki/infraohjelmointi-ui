@@ -7,6 +7,19 @@ import PlanningRow from './PlanningRow';
 import { setGroupsExpanded } from '@/reducers/planningSlice';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import mockProject from '@/mocks/mockProject';
+import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
+import { IUser, UserRole } from '@/interfaces/userInterfaces';
+import * as events from '@/utils/events';
+import ProjectPhaseMenu from '@/components/CustomContextMenu/ContextMenus/ProjectPhaseContextMenu/ProjectPhaseMenu';
+import ProjectRow from './ProjectRow/ProjectRow';
+
+const mockPatchProject = jest.fn(() => ({ unwrap: () => Promise.resolve() }));
+
+jest.mock('@/api/projectApi', () => ({
+  ...jest.requireActual('@/api/projectApi'),
+  usePatchProjectMutation: () => [mockPatchProject],
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
@@ -315,4 +328,120 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
     });
     expect(projectRow()).toBeInTheDocument();
   });
+});
+
+describe('Planning project phase permissions', () => {
+  const permissionCases: {
+    name: string;
+    roles: UserRole[];
+    userOverrides: Partial<IUser>;
+    isReadOnly: boolean;
+  }[] = [
+    { name: 'viewer-only user', roles: [UserRole.VIEWER], userOverrides: {}, isReadOnly: true },
+    { name: 'planner', roles: [UserRole.PLANNER], userOverrides: {}, isReadOnly: false },
+    {
+      name: 'planner with a viewer role',
+      roles: [UserRole.PLANNER, UserRole.VIEWER],
+      userOverrides: {},
+      isReadOnly: false,
+    },
+    {
+      name: 'restricted programmer inside an assigned class',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: ['allowed-class'] },
+      isReadOnly: false,
+    },
+    {
+      name: 'restricted programmer outside an assigned class',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: ['other-class'] },
+      isReadOnly: true,
+    },
+    {
+      name: 'restricted programmer without assigned classes',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: [] },
+      isReadOnly: true,
+    },
+  ];
+
+  beforeEach(() => {
+    mockPatchProject.mockImplementation(() => ({ unwrap: () => Promise.resolve() }));
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each(permissionCases)(
+    'preserves phase permissions for $name',
+    async ({ roles, userOverrides, isReadOnly }) => {
+      const initialState = setupStore().getState();
+      const store = setupStore({
+        auth: { user: createMockUserWithAdGroups(roles, userOverrides), error: null },
+        lists: {
+          ...initialState.lists,
+          phases: [
+            { id: 'proposal', value: 'proposal' },
+            { id: 'design', value: 'design' },
+          ],
+        },
+      });
+      const project = {
+        ...mockProject.data,
+        projectClass: 'allowed-class',
+        phase: { id: 'proposal', value: 'proposal' },
+        programmed: false,
+      };
+      const dispatchMenu = jest
+        .spyOn(events, 'dispatchContextMenuEvent')
+        .mockImplementation(() => undefined);
+      const user = userEvent.setup();
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <table>
+              <tbody>
+                <ProjectRow project={project} parentId="test-group" sapCosts={{}} />
+              </tbody>
+            </table>
+          </MemoryRouter>
+        </Provider>,
+      );
+
+      await user.click(screen.getByTestId(`edit-phase-${project.id}`));
+
+      expect(dispatchMenu).toHaveBeenCalledTimes(1);
+      const menuProps = dispatchMenu.mock.calls[0][1].phaseMenuProps;
+      expect(menuProps?.isReadOnly).toBe(isReadOnly);
+      if (!menuProps) {
+        throw new Error('Expected the project phase menu to open');
+      }
+
+      const onCloseMenu = jest.fn();
+      render(
+        <Provider store={store}>
+          <ProjectPhaseMenu {...menuProps} onCloseMenu={onCloseMenu} />
+        </Provider>,
+      );
+
+      if (isReadOnly) {
+        expect(screen.getByTestId('select-design')).toBeDisabled();
+        expect(screen.queryByTestId('patch-project-phase')).not.toBeInTheDocument();
+        await user.click(screen.getByTestId('select-design'));
+        menuProps.onSubmitPhase({ phase: 'design' });
+        expect(mockPatchProject).not.toHaveBeenCalled();
+      } else {
+        await user.click(screen.getByTestId('select-design'));
+        await user.click(screen.getByTestId('patch-project-phase'));
+        expect(mockPatchProject).toHaveBeenCalledTimes(1);
+        expect(mockPatchProject).toHaveBeenCalledWith({
+          id: project.id,
+          data: { phase: 'design' },
+        });
+        expect(onCloseMenu).toHaveBeenCalledTimes(1);
+      }
+    },
+  );
 });

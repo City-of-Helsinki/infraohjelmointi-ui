@@ -60,6 +60,9 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
+      if (isReadOnly) {
+        return;
+      }
       const phase = phases.find((p) => p.value === req.phase);
       if (phase) {
         const isValid = isPhaseValid(phase);
@@ -72,7 +75,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         .unwrap()
         .catch(() => dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })));
     },
-    [dispatch, isPhaseValid, phases, project.id, patchProject],
+    [dispatch, isReadOnly, isPhaseValid, phases, project.id, patchProject],
   );
 
   // Open the custom context menu for editing the project phase on click
@@ -83,11 +86,12 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         phaseMenuProps: {
           title: project.name,
           phase: project.phase?.id,
+          isReadOnly,
           onSubmitPhase,
         },
       });
     },
-    [onSubmitPhase, project.name, project.phase?.id],
+    [isReadOnly, onSubmitPhase, project.name, project.phase?.id],
   );
 
   return (
@@ -96,7 +100,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
         {/* Dots & Document */}
         <div className="project-left-icons-container">
           <button
-            className={isReadOnly ? 'pointer-events-none' : 'cursor-pointer'}
+            className={'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
             onClick={handleOpenPhaseMenu}
           >
