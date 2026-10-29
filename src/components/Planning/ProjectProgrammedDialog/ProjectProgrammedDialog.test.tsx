@@ -177,7 +177,7 @@ describe('ProjectProgrammedDialog', () => {
 
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
-    expect(getRequest.lastCall[0]).toBe(
+    expect(getRequest.lastCall![0]).toBe(
       'localhost:4000/projects/search-results/?projectName=Planning&programmed=false&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&class=test-class-1&limit=30&order=new',
     );
 
@@ -192,7 +192,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(store.getState().events.projectUpdate?.project).toStrictEqual(mockPatchResponse.data[0]);
 
     const formPatchRequest = mockedAxios.patch.mock
-      .lastCall[1] as Array<IProjectPatchRequestObject>;
+      .lastCall![1] as Array<IProjectPatchRequestObject>;
 
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);

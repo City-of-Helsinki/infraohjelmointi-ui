@@ -234,7 +234,7 @@ describe('GroupDialog', () => {
     const year = new Date().getFullYear();
 
     // Check that the correct url was called
-    expect(getRequest.lastCall[0]).toBe(
+    expect(getRequest.lastCall![0]).toBe(
       `localhost:4000/projects/?class=c6294258-41b1-4ad6-afdf-0b10849ca000&inGroup=false&year=${year}&forcedToFrame=false&direct=false&programmed=true`,
     );
 
@@ -259,7 +259,7 @@ describe('GroupDialog', () => {
     });
 
     await act(async () => {
-      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroupRequest;
+      const formPostRequest = mockedAxios.post.mock.lastCall![1] as IGroupRequest;
 
       expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
       expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
