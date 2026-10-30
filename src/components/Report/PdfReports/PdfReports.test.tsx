@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { render } from '@testing-library/react';
 import { pdf } from '@react-pdf/renderer';
 import CoordinationViewReportPdfDocument from './CoordinationViewReportPdfDocument';
+import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 
 // @react-pdf/renderer bundles react-reconciler 0.23, which has no useSyncExternalStore,
 // so hooks built on it (react-i18next, react-redux) crash when rendered inside a PDF.
@@ -37,5 +39,23 @@ describe('PdfReports', () => {
 
     // pdf() renders the React tree synchronously; layout (fonts, images) is skipped
     expect(() => pdf(document)).not.toThrow();
+  });
+
+  it('renders category summary rows without missing React keys', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    try {
+      render(
+        <OperationalEnvironmentCategorySummary
+          rows={[{ id: 'class-1', name: 'Class 1', type: 'class', categories: [] }]}
+        />,
+      );
+
+      expect(consoleError).not.toHaveBeenCalledWith(
+        expect.stringContaining('Each child in a list should have a unique "key" prop'),
+      );
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

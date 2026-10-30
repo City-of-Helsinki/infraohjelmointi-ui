@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC, Fragment, memo } from 'react';
 import { JSX } from 'react/jsx-runtime';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { t } from 'i18next';
@@ -199,8 +199,8 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({ rows }) => {
     const tableRowsK5: JSX.Element[] = [];
 
     return (
-      <>
-        <View style={tableStyles.classRow} key={classRow.id}>
+      <Fragment key={classRow.id ?? classRow.name}>
+        <View style={tableStyles.classRow}>
           <Text style={tableStyles.firstCell}>{''}</Text>
           <Text style={tableStyles.descriptionCell}>{classRow.name}</Text>
           <Text style={tableStyles.euroValueCell}>{currentYear}</Text>
@@ -264,7 +264,7 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({ rows }) => {
             <CategorySummarySumRow categories={classRow.categories} />
           </>
         }
-      </>
+      </Fragment>
     );
   });
 

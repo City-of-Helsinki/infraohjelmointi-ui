@@ -68,6 +68,7 @@
       "node_modules/(?!your-module-name)/\""
     ],
     "moduleNameMapper": {
+      "^@react-pdf/renderer$": "<rootDir>/src/testUtils/reactPdfRendererMock.tsx",
       "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
       "^@/(.*)$": "<rootDir>/src/$1"
     }

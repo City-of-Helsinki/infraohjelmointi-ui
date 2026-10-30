@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   webpack: {
@@ -38,6 +39,12 @@ module.exports = {
           exportLocalsConvention: 'as-is',
         };
       });
+
+      webpackConfig.plugins.push(
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+        }),
+      );
 
       return webpackConfig;
     },
