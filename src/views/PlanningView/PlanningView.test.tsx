@@ -171,7 +171,7 @@ describe('PlanningView', () => {
       getProjectsWithParams({ params: 'test=123', direct: false, forcedToFrame: false, year }),
     );
 
-    const getMock = mockedAxios.get.mock.lastCall;
+    const getMock = mockedAxios.get.mock.lastCall!;
 
     expect(getMock[0]).toBe(
       `localhost:4000/projects/?test=123&year=${year}&forcedToFrame=false&direct=false`,
@@ -1274,7 +1274,7 @@ describe('PlanningView', () => {
           await user.click(getByTestId(`cell-input-${year}-${id}`));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual({
               finances: { year: year, budgetProposalCurrentYearPlus1: 40 },
@@ -1339,7 +1339,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchRequest);
           });
@@ -1418,7 +1418,7 @@ describe('PlanningView', () => {
 
           // Check that correct data was patched and construction end date has moved
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchConstructionEndRequest);
           });
@@ -1464,7 +1464,7 @@ describe('PlanningView', () => {
 
           // Check that correct data was patched and planning start has moved
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchPlanningStartRequest);
           });
@@ -1519,7 +1519,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-9/');
             expect(patchMock[1]).toStrictEqual(patchLastConRequest);
           });
@@ -1562,7 +1562,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
             expect(patchMock[1]).toStrictEqual(patchLastOverlapRequest);
           });
@@ -1604,7 +1604,7 @@ describe('PlanningView', () => {
           await user.click(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchAddConYearRequest);
           });
@@ -1645,7 +1645,7 @@ describe('PlanningView', () => {
           await user.click(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchAddPlanYearRequest);
           });
@@ -1686,7 +1686,7 @@ describe('PlanningView', () => {
           await user.click(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
             expect(patchMock[1]).toStrictEqual(patchAddOverlapPlanRequest);
           });
@@ -1729,7 +1729,7 @@ describe('PlanningView', () => {
           await user.click(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
             expect(patchMock[1]).toStrictEqual(patchAddOverlapConRequest);
           });
@@ -1772,7 +1772,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-12/');
             expect(patchMock[1]).toStrictEqual(deleteOverlapPlanRequest);
           });
@@ -1833,7 +1833,7 @@ describe('PlanningView', () => {
           await user.dblClick(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
           });
@@ -1898,7 +1898,7 @@ describe('PlanningView', () => {
           await user.dblClick(addYearButton);
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
           });
@@ -2057,7 +2057,7 @@ describe('PlanningView', () => {
 
           const year = new Date().getFullYear();
           // Check that the correct url was called
-          expect(getRequest.lastCall[0]).toBe(
+          expect(getRequest.lastCall![0]).toBe(
             `localhost:4000/projects/?class=test-class-1&inGroup=false&year=${year}&forcedToFrame=false&direct=false&programmed=true`,
           );
           const submitButton = await groupEditDialog.findByTestId('save-group-button');
@@ -2287,7 +2287,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('update-cell-type-to-planning'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchRequest);
           });
@@ -2360,7 +2360,7 @@ describe('PlanningView', () => {
           await user.click(await findByTestId('update-cell-type-to-construction'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock.lastCall;
+            const patchMock = mockedAxios.patch.mock.lastCall!;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchRequest_2);
           });

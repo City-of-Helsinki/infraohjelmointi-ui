@@ -485,7 +485,7 @@ describe('projectForm', () => {
     // simulate event and setting selected project since it happens in projectview
     await act(() => sendProjectUpdateEventForProject(mockPatchProjectResponse.data));
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(expectedValues, h.id),
     );
@@ -554,7 +554,7 @@ describe('projectForm', () => {
     await user.click(await findByTestId('confirm-dialog-button'));
 
     await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProjectRequest;
     expect(formPatchRequest.hkrId).toEqual(expectedValue);
     expect(formPatchRequest.confirmedHkrId).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
@@ -581,7 +581,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.type).toEqual(expectedValue.id);
     expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
@@ -606,7 +606,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.estPlanningStart).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
@@ -658,7 +658,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
@@ -681,7 +681,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
 
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
@@ -838,7 +838,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedDescription);
     expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
     expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
@@ -876,7 +876,7 @@ describe('projectForm', () => {
       );
       // setPhaseToProposalForSubmit also changed the phase, which is still saved
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
-      const patchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
+      const patchRequest = mockedAxios.patch.mock.lastCall![1] as IProjectRequest;
       expect(patchRequest.phase).toBeDefined();
       expect(patchRequest).not.toHaveProperty('hkrId');
       expect(patchRequest).not.toHaveProperty('confirmedHkrId');
@@ -966,7 +966,7 @@ describe('projectForm', () => {
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
       expect(getPwLookupCalls()).toHaveLength(0);
       expect(
-        (mockedAxios.patch.mock.lastCall[1] as IProjectRequest).confirmedHkrId,
+        (mockedAxios.patch.mock.lastCall![1] as IProjectRequest).confirmedHkrId,
       ).toBeUndefined();
     });
 
@@ -987,7 +987,7 @@ describe('projectForm', () => {
       expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
-      expect(mockedAxios.patch.mock.lastCall[1]).not.toHaveProperty('hkrId');
+      expect(mockedAxios.patch.mock.lastCall![1]).not.toHaveProperty('hkrId');
 
       // The field shows the saved hkrId again; the toast explains the rest
       await waitFor(() =>
@@ -1088,7 +1088,7 @@ describe('projectForm', () => {
         await rendered.user.click(await rendered.findByTestId('confirm-dialog-button'));
 
         await waitFor(() => expect(mockedAxios.post).toHaveBeenCalled());
-        const postRequest = mockedAxios.post.mock.lastCall[1] as IProjectRequest;
+        const postRequest = mockedAxios.post.mock.lastCall![1] as IProjectRequest;
         expect(postRequest.hkrId).toBe('1234');
         expect(postRequest.confirmedHkrId).toBe('1234');
       }, 30000);
@@ -1143,7 +1143,7 @@ describe('projectForm', () => {
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
       expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
-      expect((mockedAxios.patch.mock.lastCall[1] as IProjectRequest).hkrId).toBe('1234');
+      expect((mockedAxios.patch.mock.lastCall![1] as IProjectRequest).hkrId).toBe('1234');
     });
 
     it('shows a PW error code from the API as text, not as the raw code', async () => {
@@ -1202,7 +1202,7 @@ describe('projectForm', () => {
       await user.type(planningStartYearField, expectedPlanningStartYear.toString());
       await user.click(formSubmitButton);
 
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
     });
 
@@ -1235,7 +1235,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1272,7 +1272,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1308,7 +1308,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1347,7 +1347,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1381,7 +1381,7 @@ describe('projectForm', () => {
       await user.type(constructionEndYearField, expectedConstructionEndYear.toString());
       await user.click(formSubmitButton);
 
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
     });
   });

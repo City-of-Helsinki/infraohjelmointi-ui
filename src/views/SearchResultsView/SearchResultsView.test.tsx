@@ -199,7 +199,7 @@ describe('SearchResultsView', () => {
 
       await user.click(removeFirstTermButton);
 
-      expect(mockedAxios.get.mock.lastCall[0]).toBe(
+      expect(mockedAxios.get.mock.lastCall![0]).toBe(
         'localhost:4000/projects/search-results/?hashtag=hashtag-1&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
       );
 
@@ -271,7 +271,7 @@ describe('SearchResultsView', () => {
 
       await user.click(await findByText(limitOptions[2]));
 
-      expect(mockedAxios.get.mock.lastCall[0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
     });
   });
 
@@ -298,7 +298,7 @@ describe('SearchResultsView', () => {
 
       await user.click(await findByText('searchOrder.project'));
 
-      expect(mockedAxios.get.mock.lastCall[0].includes('&order=project')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('&order=project')).toBe(true);
     });
   });
 
@@ -553,17 +553,17 @@ describe('SearchResultsView', () => {
       // Next page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-next-button'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=2')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=2')).toBe(true);
 
       // Previous page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-previous-button'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=1')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=1')).toBe(true);
 
       // Page 4
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-page-4'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=4')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=4')).toBe(true);
     });
   });
 });

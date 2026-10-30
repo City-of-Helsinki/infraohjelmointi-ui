@@ -106,7 +106,7 @@ describe('ProjectHeader', () => {
     await user.click(getByRole('button', { name: /edit-project-name/i }));
     expect(queryByRole('textbox')).toBeNull();
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.name).toEqual(expectedName);
     expect(getByText(matchExact(expectedName))).toBeInTheDocument();
     expect(formPatchRequest.address).toEqual(expectedAddress);
