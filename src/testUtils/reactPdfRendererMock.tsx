@@ -22,5 +22,5 @@ export const Font = {
 };
 
 export const pdf = () => ({
-  toBlob: async () => new Blob([], { type: 'application/pdf' }),
+  toBlob: () => Promise.resolve(new Blob([], { type: 'application/pdf' })),
 });
