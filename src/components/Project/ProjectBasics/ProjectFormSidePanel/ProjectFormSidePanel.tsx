@@ -1,5 +1,6 @@
 import { FC, memo } from 'react';
-import { Button, ButtonVariant, Tooltip, IconEye } from 'hds-react';
+import { Button, ButtonVariant, Tooltip } from 'hds-react';
+import { IconEye } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { SideNavigation } from '../../../shared';
 import PWContainer from './PWContainer';

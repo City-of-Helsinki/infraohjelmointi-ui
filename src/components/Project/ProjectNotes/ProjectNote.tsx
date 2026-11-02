@@ -1,13 +1,6 @@
-import {
-  StatusLabel,
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconAngleDown,
-  IconAngleUp,
-  IconPenLine,
-  IconTrash,
-} from 'hds-react';
+import { StatusLabel } from 'hds-react';
+import { Button, ButtonSize, ButtonVariant } from 'hds-react';
+import { IconAngleDown, IconAngleUp, IconPenLine, IconTrash } from 'hds-react';
 import { INote } from '@/interfaces/noteInterfaces';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';

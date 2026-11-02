@@ -1,4 +1,5 @@
-import { Button, ButtonVariant, IconCross, IconCopy } from 'hds-react';
+import { Button, ButtonVariant } from 'hds-react';
+import { IconCross, IconCopy } from 'hds-react';
 import { FC, memo, useCallback } from 'react';
 import { GroupRowMenuDetails } from '@/interfaces/eventInterfaces';
 import { useTranslation } from 'react-i18next';
