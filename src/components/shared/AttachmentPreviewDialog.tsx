@@ -1,5 +1,4 @@
-import { Button, ButtonVariant, Dialog } from 'hds-react';
-import { IconAngleLeft, IconAngleRight, IconCross } from 'hds-react';
+import { Button, ButtonVariant, Dialog, IconAngleLeft, IconAngleRight, IconCross } from 'hds-react';
 import { memo, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 

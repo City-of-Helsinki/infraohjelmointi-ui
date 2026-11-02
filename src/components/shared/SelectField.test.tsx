@@ -1,8 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Tooltip } from 'hds-react';
+import { Tooltip, type Select } from 'hds-react';
 import type { ComponentProps } from 'react';
-import type { Select } from 'hds-react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import SelectField from './SelectField';
