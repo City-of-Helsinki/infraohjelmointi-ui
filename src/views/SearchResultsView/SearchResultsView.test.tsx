@@ -5,7 +5,6 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
 import { RootState, setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
@@ -22,11 +21,12 @@ import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ProjectView from '../ProjectView';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const store = setupStore();
 
@@ -122,7 +122,7 @@ describe('SearchResultsView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('SearchResultsHeader', () => {
@@ -396,7 +396,7 @@ describe('SearchResultsView', () => {
     it.skip('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
       const { container, user, findByTestId } = await render(searchActiveState);
 
-      const scrollIntoViewMock = jest.fn();
+      const scrollIntoViewMock = vi.fn();
 
       window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
 

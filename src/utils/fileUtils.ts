@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_URL } from '@/config/env';
 
 export const ATTACHMENT_MAX_SIZE = 2 * 1024 * 1024; // 2 MB
 
@@ -15,7 +16,7 @@ export const formatSizeToKilobytes = (size?: number | null) => {
   return `${Math.round(size / 1024)} kB`;
 };
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+const API_BASE_URL = API_URL || '';
 
 /**
  * Resolves a given URL against the API base URL.

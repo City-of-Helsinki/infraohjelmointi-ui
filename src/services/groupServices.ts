@@ -1,11 +1,11 @@
 import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const postGroup = async (request: IGroupRequest): Promise<IGroup> => {
   try {
-    const res = await axios.post(`${REACT_APP_API_URL}/project-groups/`, request);
+    const res = await axios.post(`${API_URL}/project-groups/`, request);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -14,7 +14,7 @@ export const postGroup = async (request: IGroupRequest): Promise<IGroup> => {
 
 export const getPlanningGroups = async (year: number): Promise<Array<IGroup>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-groups/?year=${year}`);
+    const res = await axios.get(`${API_URL}/project-groups/?year=${year}`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -27,7 +27,7 @@ export const getCoordinatorGroups = async (
 ): Promise<Array<IGroup>> => {
   try {
     const res = await axios.get(
-      `${REACT_APP_API_URL}/project-groups/coordinator/?year=${year}&forcedToFrame=${forcedToFrame}`,
+      `${API_URL}/project-groups/coordinator/?year=${year}&forcedToFrame=${forcedToFrame}`,
     );
     return res.data;
   } catch (e) {
@@ -37,7 +37,7 @@ export const getCoordinatorGroups = async (
 
 export const deleteGroup = async (id: string) => {
   try {
-    const res = await axios.delete(`${REACT_APP_API_URL}/project-groups/${id}/`);
+    const res = await axios.delete(`${API_URL}/project-groups/${id}/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -46,10 +46,7 @@ export const deleteGroup = async (id: string) => {
 
 export const patchGroup = async (request: IGroupPatchRequestObject): Promise<IGroup> => {
   try {
-    const res = await axios.patch(
-      `${REACT_APP_API_URL}/project-groups/${request.id}/`,
-      request.data,
-    );
+    const res = await axios.patch(`${API_URL}/project-groups/${request.id}/`, request.data);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

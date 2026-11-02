@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import SideBar from './SideBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
@@ -10,9 +9,9 @@ import PlanningView from '@/views/PlanningView';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockUser } from '@/mocks/mockUsers';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('axios');
+vi.mock('axios');
 
 const store = setupStore();
 
@@ -43,7 +42,7 @@ const render = async () =>
 describe('SideBar', () => {
   const navItems = ['coordination', 'planning', 'reports', 'myWorkload', 'admin'];
 
-  const spyScrollTo = jest.fn();
+  const spyScrollTo = vi.fn();
   Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });
 
   beforeEach(() => {
@@ -52,7 +51,7 @@ describe('SideBar', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders component wrapper', async () => {

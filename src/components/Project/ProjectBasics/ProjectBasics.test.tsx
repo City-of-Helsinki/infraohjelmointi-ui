@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectBasics from './ProjectBasics';
 import { act } from '@testing-library/react';
@@ -9,9 +8,9 @@ import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockUser } from '@/mocks/mockUsers';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/components/shared/TextAreaField', () => ({
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/components/shared/TextAreaField', () => ({
   __esModule: true,
   default: () => <textarea data-testid="mock-textarea-field" />,
 }));
@@ -42,7 +41,7 @@ const render = async () => {
   return rendered;
 };
 describe('ProjectBasics', () => {
-  const spyScrollTo = jest.fn();
+  const spyScrollTo = vi.fn();
 
   Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });
 

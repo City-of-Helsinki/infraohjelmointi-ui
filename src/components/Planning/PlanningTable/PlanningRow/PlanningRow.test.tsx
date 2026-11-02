@@ -13,14 +13,14 @@ import * as events from '@/utils/events';
 import ProjectPhaseMenu from '@/components/CustomContextMenu/ContextMenus/ProjectPhaseContextMenu/ProjectPhaseMenu';
 import ProjectRow from './ProjectRow/ProjectRow';
 
-const mockPatchProject = jest.fn(() => ({ unwrap: () => Promise.resolve() }));
+const mockPatchProject = vi.fn(() => ({ unwrap: () => Promise.resolve() }));
 
-jest.mock('@/api/projectApi', () => ({
-  ...jest.requireActual('@/api/projectApi'),
+vi.mock('@/api/projectApi', async () => ({
+  ...(await vi.importActual<typeof import('@/api/projectApi')>('@/api/projectApi')),
   usePatchProjectMutation: () => [mockPatchProject],
 }));
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
     i18n: {
@@ -33,7 +33,7 @@ jest.mock('react-i18next', () => ({
 // Mock scrollIntoView which is not available in test environment
 Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
   configurable: true,
-  value: jest.fn(),
+  value: vi.fn(),
 });
 
 const mockGroup: IPlanningRow = {
@@ -370,7 +370,7 @@ describe('Planning project phase permissions', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it.each(permissionCases)(
@@ -393,7 +393,7 @@ describe('Planning project phase permissions', () => {
         phase: { id: 'proposal', value: 'proposal' },
         programmed: false,
       };
-      const dispatchMenu = jest
+      const dispatchMenu = vi
         .spyOn(events, 'dispatchContextMenuEvent')
         .mockImplementation(() => undefined);
       const user = userEvent.setup();
@@ -419,7 +419,7 @@ describe('Planning project phase permissions', () => {
         throw new Error('Expected the project phase menu to open');
       }
 
-      const onCloseMenu = jest.fn();
+      const onCloseMenu = vi.fn();
       render(
         <Provider store={store}>
           <ProjectPhaseMenu {...menuProps} onCloseMenu={onCloseMenu} />

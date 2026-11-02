@@ -1,13 +1,12 @@
-import mockI18next from '@/mocks/mockI18next';
 import { Route } from 'react-router';
 import { act } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectDetailsForm from './projectDetailsForm';
 import { mockUser } from '@/mocks/mockUsers';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useTalpaLists', () => ({
+vi.mock('@/hooks/useTalpaLists', () => ({
   __esModule: true,
   default: () => undefined,
 }));

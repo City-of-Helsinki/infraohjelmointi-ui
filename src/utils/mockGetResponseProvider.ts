@@ -32,19 +32,19 @@ import mockProject from '@/mocks/mockProject';
 import { mockSapCosts } from '@/mocks/mockSapCosts';
 import { mockSearchResults } from '@/mocks/mockSearch';
 import axios, { AxiosRequestConfig } from 'axios';
+import type { Mocked, MockedFunction } from 'vitest';
+import { API_URL } from '@/config/env';
 
-jest.mock('axios');
-
-const mockedAxios = axios as jest.Mocked<typeof axios> & jest.MockedFunction<typeof axios>;
-const { REACT_APP_API_URL } = process.env;
+// Callers must vi.mock('axios') in their own test file.
+const mockedAxios = axios as Mocked<typeof axios> & MockedFunction<typeof axios>;
 
 const normalizeUrl = (url?: string) => {
   if (!url) {
     return '';
   }
 
-  if (REACT_APP_API_URL) {
-    return url.replace(REACT_APP_API_URL, '');
+  if (API_URL) {
+    return url.replace(API_URL, '');
   }
 
   return url;

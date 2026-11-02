@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
@@ -13,13 +12,14 @@ import { setupStore } from '@/store';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { projectApi } from '@/api/projectApi';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked, MockedFunction } from 'vitest';
 
 const store = setupStore();
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios> & jest.MockedFunction<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios> & MockedFunction<typeof axios>;
 
 const render = async () => {
   const rendered = renderWithProviders(
@@ -51,7 +51,7 @@ describe('ProjectView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the parent container', async () => {

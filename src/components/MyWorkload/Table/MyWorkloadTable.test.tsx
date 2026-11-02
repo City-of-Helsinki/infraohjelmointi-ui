@@ -1,13 +1,13 @@
-import mockI18next from '@/mocks/mockI18next';
 import { render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 import MyWorkloadTable from './MyWorkloadTable';
+import type { MockInstance } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-let consoleErrorSpy: jest.SpyInstance;
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+let consoleErrorSpy: MockInstance;
 
-jest.mock('./MyWorkloadEditDialog', () => ({
+vi.mock('./MyWorkloadEditDialog', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -96,7 +96,7 @@ const makePhaseSortRow = (
 
 describe('MyWorkloadTable', () => {
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args) => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
       const firstArg = String(args[0] ?? '');
       if (firstArg.includes('Could not parse CSS stylesheet')) {
         return;

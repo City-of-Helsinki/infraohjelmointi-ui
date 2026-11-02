@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
@@ -10,15 +9,15 @@ import { Route } from 'react-router';
 import { useSyncExternalStore } from 'react';
 import mockNoteImages from '@/mocks/mockNoteImages';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockUseGetNotesByProjectQuery = jest.fn();
-const mockPostNoteTrigger = jest.fn();
-const mockDeleteNoteTrigger = jest.fn();
-const mockPatchNoteTrigger = jest.fn();
-const mockPostNoteImageTrigger = jest.fn();
-const mockDeleteNoteImageTrigger = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockUseGetNotesByProjectQuery = vi.fn();
+const mockPostNoteTrigger = vi.fn();
+const mockDeleteNoteTrigger = vi.fn();
+const mockPatchNoteTrigger = vi.fn();
+const mockPostNoteImageTrigger = vi.fn();
+const mockDeleteNoteImageTrigger = vi.fn();
+const mockIsConfirmed = vi.fn();
 
 let mockNotesState: INote[] = [];
 const mockNotesSubscribers = new Set<() => void>();
@@ -55,8 +54,8 @@ const useMockedNotesQuery = () => {
   return { data };
 };
 
-jest.mock('@/api/notesApi', () => {
-  const originalModule = jest.requireActual('@/api/notesApi');
+vi.mock('@/api/notesApi', async () => {
+  const originalModule = await vi.importActual<typeof import('@/api/notesApi')>('@/api/notesApi');
   return {
     ...originalModule,
     useGetNotesByProjectQuery: (...args: unknown[]) => mockUseGetNotesByProjectQuery(...args),
@@ -68,7 +67,7 @@ jest.mock('@/api/notesApi', () => {
   };
 });
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({
     isConfirmed: mockIsConfirmed,
@@ -142,7 +141,7 @@ describe('ProjectNotes', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNotesSubscribers.clear();
   });
 

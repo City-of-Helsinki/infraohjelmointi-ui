@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { ProjectTaskType, type IProjectTask } from '@/interfaces/projectInterfaces';
 import MyWorkloadTasks from './MyWorkloadTasks';
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: {
@@ -12,14 +12,14 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-jest.mock('./MyWorkloadTaskCard', () => ({
+vi.mock('./MyWorkloadTaskCard', () => ({
   __esModule: true,
   default: ({ task }: { task: { projectName: string; constructionProcurementMethod: string } }) => (
     <div>{`${task.projectName} | ${task.constructionProcurementMethod}`}</div>
   ),
 }));
 
-jest.mock('hds-react', () => ({
+vi.mock('hds-react', () => ({
   Pagination: ({
     pageCount,
     onChange,

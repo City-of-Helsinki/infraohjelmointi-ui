@@ -7,7 +7,7 @@ import { IOption } from '@/interfaces/common';
 import { IClassFinances } from '@/interfaces/classInterfaces';
 
 // Mock the hooks
-jest.mock('@/hooks/useClassOptions', () => ({
+vi.mock('@/hooks/useClassOptions', () => ({
   __esModule: true,
   default: () => ({
     masterClasses: [],
@@ -16,7 +16,7 @@ jest.mock('@/hooks/useClassOptions', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useLocationOptions', () => ({
+vi.mock('@/hooks/useLocationOptions', () => ({
   __esModule: true,
   default: () => ({
     districts: [],
@@ -26,9 +26,9 @@ jest.mock('@/hooks/useLocationOptions', () => ({
 }));
 
 // Mock the Redux hooks
-const mockUseAppSelector = jest.fn();
-const mockDispatch = jest.fn();
-jest.mock('@/hooks/common', () => ({
+const mockUseAppSelector = vi.fn();
+const mockDispatch = vi.fn();
+vi.mock('@/hooks/common', () => ({
   useAppSelector: (selector: unknown) => mockUseAppSelector(selector),
   useAppDispatch: () => mockDispatch,
 }));

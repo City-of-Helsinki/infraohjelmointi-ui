@@ -1,14 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FieldValues, FormProvider, useForm } from 'react-hook-form';
-import mockI18next from '@/mocks/mockI18next';
 import TextField from '@/components/shared/TextField';
 import NumberField from '@/components/shared/NumberField';
 import DateField from '@/components/shared/DateField';
 import TextAreaField from '@/components/shared/TextAreaField';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 function Fields({ viewer = false }: { viewer?: boolean }) {
   const methods = useForm<FieldValues>({

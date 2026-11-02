@@ -7,12 +7,13 @@ import {
 import { IProject, IProjectsResponse } from '@/interfaces/projectInterfaces';
 import mockProject from '@/mocks/mockProject';
 import { getProjectsWithParams } from '@/services/projectServices';
+import type { MockedFunction } from 'vitest';
 
-jest.mock('@/services/projectServices', () => ({
-  getProjectsWithParams: jest.fn(),
+vi.mock('@/services/projectServices', () => ({
+  getProjectsWithParams: vi.fn(),
 }));
 
-const mockedGetProjectsWithParams = getProjectsWithParams as jest.MockedFunction<
+const mockedGetProjectsWithParams = getProjectsWithParams as MockedFunction<
   typeof getProjectsWithParams
 >;
 

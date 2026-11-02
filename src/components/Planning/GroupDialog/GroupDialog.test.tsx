@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
@@ -29,9 +28,10 @@ import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const store = setupStore();
 
@@ -89,7 +89,7 @@ const render = async () =>
       },
     ),
   );
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('GroupDialog', () => {
   beforeEach(() => {
@@ -97,7 +97,7 @@ describe('GroupDialog', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
@@ -141,7 +141,7 @@ describe('GroupDialog', () => {
   });
 
   it('can create new group with the groups form', async () => {
-    jest.setTimeout(10000);
+    vi.setConfig({ testTimeout: 10000 });
     const renderResult = await render();
 
     const mockPostResponse = {

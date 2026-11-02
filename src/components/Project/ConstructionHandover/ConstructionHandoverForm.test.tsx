@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithProviders, withMockAuthUserAdGroups } from '@/utils/testUtils';
 import { Route } from 'react-router';
@@ -10,33 +9,33 @@ import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInt
 import { UserRole } from '@/interfaces/userInterfaces';
 import { RootState } from '@/store';
 
-const mockPatchConstructionHandover = jest.fn();
-const mockTransitionConstructionHandoverStatus = jest.fn();
-const mockPostHandoverAttachment = jest.fn();
-const mockDeleteHandoverAttachment = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockPatchConstructionHandover = vi.fn();
+const mockTransitionConstructionHandoverStatus = vi.fn();
+const mockPostHandoverAttachment = vi.fn();
+const mockDeleteHandoverAttachment = vi.fn();
+const mockIsConfirmed = vi.fn();
 
-jest.mock('@/api/constructionHandoverApi', () => ({
+vi.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
   useTransitionConstructionHandoverStatusMutation: () => [mockTransitionConstructionHandoverStatus],
-  usePostConstructionHandoverFinancingMutation: () => [jest.fn()],
-  usePatchConstructionHandoverFinancingMutation: () => [jest.fn()],
-  useDeleteConstructionHandoverFinancingMutation: () => [jest.fn()],
+  usePostConstructionHandoverFinancingMutation: () => [vi.fn()],
+  usePatchConstructionHandoverFinancingMutation: () => [vi.fn()],
+  useDeleteConstructionHandoverFinancingMutation: () => [vi.fn()],
   usePostHandoverAttachmentMutation: () => [mockPostHandoverAttachment, { isLoading: false }],
   useDeleteHandoverAttachmentMutation: () => [mockDeleteHandoverAttachment],
 }));
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({
     isConfirmed: mockIsConfirmed,
   }),
 }));
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('hds-react', () => {
-  const actual = jest.requireActual('hds-react');
+vi.mock('hds-react', async () => {
+  const actual = await vi.importActual<typeof import('hds-react')>('hds-react');
 
   return {
     ...actual,
@@ -87,7 +86,7 @@ describe('ConstructionHandoverForm copy link', () => {
   it('copies to clipboard and dispatches success notification when copy button is clicked', async () => {
     const { store } = await act(async () => setupConstructionHandoverForm());
 
-    const writeTextSpy = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
     const copyButton = screen.getByRole('button', { name: 'copyLink' });
 
@@ -116,7 +115,7 @@ describe('ConstructionHandoverForm copy link', () => {
   it('dispatches error notification when clipboard write fails', async () => {
     const { store } = await act(async () => setupConstructionHandoverForm());
 
-    const writeTextSpy = jest
+    const writeTextSpy = vi
       .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Clipboard unavailable'));
 
@@ -505,7 +504,7 @@ describe('ConstructionHandoverForm status transitions', () => {
   });
 
   it('does not submit handover to programmer when patching draft changes fails', async () => {
-    const unwrap = jest.fn().mockRejectedValue(new Error('Patch failed'));
+    const unwrap = vi.fn().mockRejectedValue(new Error('Patch failed'));
     mockPatchConstructionHandover.mockReturnValue({ unwrap });
 
     const projectOverrides = {

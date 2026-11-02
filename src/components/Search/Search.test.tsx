@@ -1,5 +1,4 @@
 import axios from 'axios';
-import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import {
   mockProjectCategories,
@@ -31,11 +30,12 @@ import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { Route } from 'react-router';
 import SearchResultsView from '@/views/SearchResultsView/SearchResultsView';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 const store = setupStore();
 
 const render = async () =>
@@ -82,7 +82,7 @@ const render = async () =>
   );
 describe('Search', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be hidden by default', async () => {

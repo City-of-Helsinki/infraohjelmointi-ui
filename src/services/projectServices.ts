@@ -12,14 +12,14 @@ import {
 } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   try {
     const endOfFullPath = req.fullPath?.split('/projects')[1];
     const url = endOfFullPath
-      ? `${REACT_APP_API_URL}/projects${endOfFullPath}`
-      : `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`;
+      ? `${API_URL}/projects${endOfFullPath}`
+      : `${API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`;
     const res = await axios.get(url);
     return res.data;
   } catch (e) {
@@ -31,7 +31,7 @@ export const patchProjects = async (
   request: IProjectsPatchRequestObject,
 ): Promise<Array<IProject>> => {
   try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data);
+    const res = await axios.patch(`${API_URL}/projects/bulk-update/`, request.data);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -40,7 +40,7 @@ export const patchProjects = async (
 
 export const patchForcedToFrameProjects = async (): Promise<IAppStateValue> => {
   try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/forced-to-frame/`);
+    const res = await axios.patch(`${API_URL}/projects/bulk-update/forced-to-frame/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -59,12 +59,12 @@ export const getProjectsWithParams = async (
   }`;
 
   const url = isCoordinator
-    ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
-    : `${REACT_APP_API_URL}/projects/?${allParams}`;
+    ? `${API_URL}/projects/coordinator/?${allParams}`
+    : `${API_URL}/projects/?${allParams}`;
 
   const nextPageUrl = isCoordinator
-    ? `${REACT_APP_API_URL}/projects/coordinator/${fullPath?.split('/projects/coordinator/')[1]}`
-    : `${REACT_APP_API_URL}/projects/${fullPath?.split('/projects/')[1]}`;
+    ? `${API_URL}/projects/coordinator/${fullPath?.split('/projects/coordinator/')[1]}`
+    : `${API_URL}/projects/${fullPath?.split('/projects/')[1]}`;
 
   try {
     const axiosConfig = options?.signal ? { signal: options.signal } : undefined;
@@ -80,7 +80,7 @@ export const getProjectsWithFreeSearch = async (
 ): Promise<IFreeSearchResults> => {
   try {
     const res = await axios.get(
-      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${encodeURIComponent(searchWord)}`,
+      `${API_URL}/projects/search-results/?freeSearch=${encodeURIComponent(searchWord)}`,
     );
     return res.data;
   } catch (e) {

@@ -1,10 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from 'react';
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form';
-import mockI18next from '@/mocks/mockI18next';
 import LinkField from './LinkField';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const TestForm = ({
   value,

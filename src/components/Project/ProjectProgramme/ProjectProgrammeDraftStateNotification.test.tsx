@@ -1,14 +1,13 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act, render, screen } from '@testing-library/react';
 import { ButtonPresetTheme, ButtonVariant } from 'hds-react';
 import ProjectProgrammeDraftStateNotification from './ProjectProgrammeDraftStateNotification';
 
-const mockActionButtons = jest.fn();
-const mockStatusTransitionButtons = jest.fn();
+const mockActionButtons = vi.fn();
+const mockStatusTransitionButtons = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('./ProjectProgrammeActionButtons', () => ({
+vi.mock('./ProjectProgrammeActionButtons', () => ({
   __esModule: true,
   default: (props: unknown) => {
     mockActionButtons(props);
@@ -16,7 +15,7 @@ jest.mock('./ProjectProgrammeActionButtons', () => ({
   },
 }));
 
-jest.mock('./ProjectProgrammeStatusTransitionButtons', () => ({
+vi.mock('./ProjectProgrammeStatusTransitionButtons', () => ({
   __esModule: true,
   default: (props: unknown) => {
     mockStatusTransitionButtons(props);
@@ -25,7 +24,7 @@ jest.mock('./ProjectProgrammeStatusTransitionButtons', () => ({
 }));
 
 describe('ProjectProgrammeDraftStateNotification', () => {
-  const onOpenSection = jest.fn();
+  const onOpenSection = vi.fn();
 
   beforeEach(() => {
     onOpenSection.mockReset();

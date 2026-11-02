@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import TopBar from './TopBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
@@ -10,11 +9,12 @@ import PlanningView from '@/views/PlanningView/PlanningView';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import * as mockLists from '@/mocks/mockLists';
+import type { Mocked } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('axios');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const store = setupStore();
 

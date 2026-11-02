@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route } from 'react-router';
@@ -14,29 +13,29 @@ import {
   ProjectProgrammeSectionId,
 } from './sections/projectProgrammeSections';
 
-const mockDispatch = jest.fn();
-const mockPostProjectProgrammeSection = jest.fn();
-const mockPatchProjectProgrammeSection = jest.fn();
-const mockTransitionProjectProgrammeSectionStatus = jest.fn();
-const mockTransitionProjectProgrammeStatus = jest.fn();
-const mockPostProjectProgrammeAttachments = jest.fn();
-const mockDeleteProjectProgrammeAttachment = jest.fn();
-const mockGetDownloadUrl = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockDispatch = vi.fn();
+const mockPostProjectProgrammeSection = vi.fn();
+const mockPatchProjectProgrammeSection = vi.fn();
+const mockTransitionProjectProgrammeSectionStatus = vi.fn();
+const mockTransitionProjectProgrammeStatus = vi.fn();
+const mockPostProjectProgrammeAttachments = vi.fn();
+const mockDeleteProjectProgrammeAttachment = vi.fn();
+const mockGetDownloadUrl = vi.fn();
+const mockIsConfirmed = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({ isConfirmed: mockIsConfirmed }),
 }));
 
-jest.mock('@/hooks/common', () => ({
-  ...jest.requireActual('@/hooks/common'),
+vi.mock('@/hooks/common', async () => ({
+  ...(await vi.importActual<typeof import('@/hooks/common')>('@/hooks/common')),
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/api/projectProgrammeApi', () => ({
+vi.mock('@/api/projectProgrammeApi', () => ({
   usePostProjectProgrammeSectionMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPostProjectProgrammeSection(...args) }),
   ],
@@ -59,8 +58,8 @@ jest.mock('@/api/projectProgrammeApi', () => ({
   ],
 }));
 
-jest.mock('@/utils/fileUtils', () => ({
-  ...jest.requireActual('@/utils/fileUtils'),
+vi.mock('@/utils/fileUtils', async () => ({
+  ...(await vi.importActual<typeof import('@/utils/fileUtils')>('@/utils/fileUtils')),
   getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
@@ -128,7 +127,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('saves changed section fields before marking the section ready', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -185,7 +184,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -207,7 +206,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('does not mark a section ready when required fields are missing', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -259,7 +258,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={completedFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -289,7 +288,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -321,7 +320,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -356,7 +355,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -414,7 +413,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={{}}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
               project={{ name: 'Autofilled project' } as IProject}
             />
           }
@@ -458,7 +457,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('submits changed fields and links for basic info section', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -506,7 +505,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('submits changed fields and links for design criteria section', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -554,7 +553,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('creates a missing section when the user submits its first changes', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -615,7 +614,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('creates traffic planning criteria from all required user-entered fields', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -670,7 +669,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('creates urban spacing planning criteria from all required user-entered fields', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -738,7 +737,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -764,7 +763,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('does not send anything and closes when nothing was changed', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -793,7 +792,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('saves a draft with required fields missing and trims whitespace-only dirty values', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -841,7 +840,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('dispatches form save error and keeps form open on failed submit', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     mockPatchProjectProgrammeSection.mockRejectedValue({ status: 400 });
 
     await act(async () =>
@@ -882,7 +881,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('submits changed fields and links for maintenance needs section', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -930,7 +929,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('submits changed fields and links for interaction and related projects section', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -978,7 +977,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('creates maintenance needs section from user-entered fields', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -1024,7 +1023,7 @@ describe('ProjectProgrammeForm save logic', () => {
   });
 
   it('creates interaction and related projects section from user-entered fields', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     await act(async () =>
       renderWithProviders(
@@ -1088,7 +1087,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -1115,7 +1114,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -1142,7 +1141,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -1167,7 +1166,7 @@ describe('ProjectProgrammeForm save logic', () => {
               effectiveProjectProgramme={baseFormData}
               briefProgramme={false}
               isProjectProgrammeComplete={false}
-              onClose={jest.fn()}
+              onClose={vi.fn()}
             />
           }
         />,
@@ -1192,7 +1191,7 @@ describe('ProjectProgrammeForm other attachments', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockPostProjectProgrammeSection.mockResolvedValue({});
     mockPatchProjectProgrammeSection.mockResolvedValue({});
     mockTransitionProjectProgrammeSectionStatus.mockResolvedValue({});
@@ -1200,12 +1199,12 @@ describe('ProjectProgrammeForm other attachments', () => {
     mockDeleteProjectProgrammeAttachment.mockResolvedValue(undefined);
     mockGetDownloadUrl.mockResolvedValue('blob:preview');
     mockIsConfirmed.mockResolvedValue(true);
-    global.URL.revokeObjectURL = jest.fn();
+    global.URL.revokeObjectURL = vi.fn();
   });
 
   async function renderOtherAttachmentsForm(
     effectiveProjectProgramme: IProjectProgrammeForm,
-    onClose = jest.fn(),
+    onClose = vi.fn(),
     activeSection: ProjectProgrammeSectionId = 'otherAttachments',
   ) {
     const user = userEvent.setup();
@@ -1257,7 +1256,7 @@ describe('ProjectProgrammeForm other attachments', () => {
             attachments: [{ ...savedAttachment, id: 'other', originalName: 'other.pdf' }],
           },
         },
-        jest.fn(),
+        vi.fn(),
         section,
       );
 
@@ -1302,7 +1301,7 @@ describe('ProjectProgrammeForm other attachments', () => {
   );
 
   it('creates a missing content section before uploading its attachments', async () => {
-    const user = await renderOtherAttachmentsForm({}, jest.fn(), 'designCriteria');
+    const user = await renderOtherAttachmentsForm({}, vi.fn(), 'designCriteria');
     await uploadFile(user);
     await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.saveDraft' }));
 
@@ -1370,7 +1369,7 @@ describe('ProjectProgrammeForm other attachments', () => {
   });
 
   it('creates the section and uploads selected files on save draft', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     const user = await renderOtherAttachmentsForm({}, onClose);
 
     await uploadFile(user);
@@ -1421,7 +1420,7 @@ describe('ProjectProgrammeForm other attachments', () => {
       status: 413,
       data: { detail: 'Tiedosto on liian suuri.' },
     });
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     const user = await renderOtherAttachmentsForm({ otherAttachments: { links: [] } }, onClose);
 
     await uploadFile(user);

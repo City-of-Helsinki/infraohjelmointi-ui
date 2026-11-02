@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import {
   mockConstructionPhases,
   mockPlanningPhases,
@@ -11,24 +10,25 @@ import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
+import type { MockInstance } from 'vitest';
 
-const mockNavigate = jest.fn();
-const mockPatchProject = jest.fn();
-const mockGetProjectById = jest.fn();
-let consoleErrorSpy: jest.SpyInstance;
+const mockNavigate = vi.fn();
+const mockPatchProject = vi.fn();
+const mockGetProjectById = vi.fn();
+let consoleErrorSpy: MockInstance;
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('react-router-dom', () => {
-  const actualModule = jest.requireActual('react-router-dom');
+vi.mock('react-router-dom', async () => {
+  const actualModule = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return {
     ...actualModule,
     useNavigate: () => mockNavigate,
   };
 });
 
-jest.mock('@/api/projectApi', () => {
-  const actualModule = jest.requireActual('@/api/projectApi');
+vi.mock('@/api/projectApi', async () => {
+  const actualModule = await vi.importActual<typeof import('@/api/projectApi')>('@/api/projectApi');
   return {
     ...actualModule,
     useGetProjectByIdQuery: () => mockGetProjectById(),
@@ -74,8 +74,8 @@ const renderDialog = (
   project: MyWorkloadTableRow | null = baseProject,
 ) => {
   const store = setupStore();
-  const onClose = jest.fn();
-  const onSave = jest.fn();
+  const onClose = vi.fn();
+  const onSave = vi.fn();
 
   const renderResult = renderWithProviders(
     <Route
@@ -108,7 +108,7 @@ const renderDialog = (
 
 describe('MyWorkloadEditDialog', () => {
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args) => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
       const firstArg = String(args[0] ?? '');
       if (firstArg.includes('Could not parse CSS stylesheet')) {
         return;
@@ -123,7 +123,7 @@ describe('MyWorkloadEditDialog', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetProjectById.mockReturnValue({ data: undefined, isFetching: false });
   });
 

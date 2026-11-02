@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { TFunction } from 'i18next';
 import { Route } from 'react-router';
 import { act, screen, waitFor, within } from '@testing-library/react';
@@ -8,39 +7,40 @@ import ProjectProgramme from './ProjectProgramme';
 import { ProjectProgrammeStatus } from '@/interfaces/projectProgrammeInterfaces';
 import { getProjectProgrammeSections } from './sections/projectProgrammeSections';
 import { getFieldsForSection } from './sections/projectProgrammeSectionFields';
+import { useAppSelector } from '@/hooks/common';
 
-const mockSwitchType = jest.fn();
-const mockTransitionProjectProgrammeStatus = jest.fn();
-const mockTransitionProjectProgrammeSectionStatus = jest.fn();
-const mockPostProjectProgramme = jest.fn();
-const mockPostProjectProgrammeSection = jest.fn();
-const mockPatchProjectProgrammeSection = jest.fn();
-const mockSaveProjectProgrammeLocationMap = jest.fn();
-const mockDeleteProjectProgrammeLocationMap = jest.fn();
-const mockGetDownloadUrl = jest.fn();
-const mockIsConfirmed = jest.fn();
-const mockGetProject = jest.fn();
-const mockGetProjectProgrammeByProject = jest.fn();
-const mockRefetchProjectProgramme = jest.fn();
+const mockSwitchType = vi.fn();
+const mockTransitionProjectProgrammeStatus = vi.fn();
+const mockTransitionProjectProgrammeSectionStatus = vi.fn();
+const mockPostProjectProgramme = vi.fn();
+const mockPostProjectProgrammeSection = vi.fn();
+const mockPatchProjectProgrammeSection = vi.fn();
+const mockSaveProjectProgrammeLocationMap = vi.fn();
+const mockDeleteProjectProgrammeLocationMap = vi.fn();
+const mockGetDownloadUrl = vi.fn();
+const mockIsConfirmed = vi.fn();
+const mockGetProject = vi.fn();
+const mockGetProjectProgrammeByProject = vi.fn();
+const mockRefetchProjectProgramme = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/common', () => ({
-  useAppDispatch: () => jest.fn(),
-  useAppSelector: jest.fn(),
+vi.mock('@/hooks/common', () => ({
+  useAppDispatch: () => vi.fn(),
+  useAppSelector: vi.fn(),
 }));
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({ isConfirmed: (...args: unknown[]) => mockIsConfirmed(...args) }),
 }));
 
-jest.mock('@/hooks/useGetProject', () => ({
+vi.mock('@/hooks/useGetProject', () => ({
   __esModule: true,
   default: () => mockGetProject(),
 }));
 
-jest.mock('@/api/projectProgrammeApi', () => ({
+vi.mock('@/api/projectProgrammeApi', () => ({
   useGetProjectProgrammeByProjectQuery: () => mockGetProjectProgrammeByProject(),
   usePostProjectProgrammeMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockPostProjectProgramme(...args) }),
@@ -70,12 +70,12 @@ jest.mock('@/api/projectProgrammeApi', () => ({
     (...args: unknown[]) => ({ unwrap: () => mockDeleteProjectProgrammeLocationMap(...args) }),
     { isLoading: false },
   ],
-  usePostProjectProgrammeAttachmentsMutation: () => [() => ({ unwrap: jest.fn() })],
-  useDeleteProjectProgrammeAttachmentMutation: () => [() => ({ unwrap: jest.fn() })],
+  usePostProjectProgrammeAttachmentsMutation: () => [() => ({ unwrap: vi.fn() })],
+  useDeleteProjectProgrammeAttachmentMutation: () => [() => ({ unwrap: vi.fn() })],
 }));
 
-jest.mock('@/utils/fileUtils', () => ({
-  ...jest.requireActual('@/utils/fileUtils'),
+vi.mock('@/utils/fileUtils', async () => ({
+  ...(await vi.importActual<typeof import('@/utils/fileUtils')>('@/utils/fileUtils')),
   getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
@@ -106,9 +106,8 @@ describe('ProjectProgramme', () => {
 
   beforeEach(() => {
     mockGetDownloadUrl.mockResolvedValue('blob:location-map');
-    const { useAppSelector } = jest.requireMock('@/hooks/common');
 
-    useAppSelector.mockImplementation(
+    vi.mocked(useAppSelector).mockImplementation(
       (selector: (state: ReturnType<typeof store.getState>) => unknown) =>
         selector(store.getState()),
     );
@@ -792,7 +791,7 @@ describe('ProjectProgramme', () => {
 
   it('shows the saved location map fetched with authentication', async () => {
     const originalRevokeObjectUrl = URL.revokeObjectURL;
-    URL.revokeObjectURL = jest.fn();
+    URL.revokeObjectURL = vi.fn();
     mockProgrammeWithLocationMap();
 
     try {

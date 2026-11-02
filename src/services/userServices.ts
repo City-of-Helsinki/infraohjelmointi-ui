@@ -1,21 +1,12 @@
 import axios from 'axios';
 
 import { User } from 'oidc-client-ts';
-
-const {
-  REACT_APP_API_ID,
-  REACT_APP_API_TOKEN_GRANT_TYPE,
-  REACT_APP_AUTHORITY,
-  REACT_APP_CLIENT_ID,
-  REACT_APP_OPEN_ID_CONFIG,
-} = process.env;
+import { API_ID, API_TOKEN_GRANT_TYPE, AUTHORITY, CLIENT_ID, OPEN_ID_CONFIG } from '@/config/env';
 
 const API_TOKEN_KEY = 'infraohjelmointi_api_token';
 
 const getUserFromSessionStorage = () => {
-  const oidcStorage = sessionStorage.getItem(
-    `oidc.user:${REACT_APP_AUTHORITY}:${REACT_APP_CLIENT_ID}`,
-  );
+  const oidcStorage = sessionStorage.getItem(`oidc.user:${AUTHORITY}:${CLIENT_ID}`);
 
   if (!oidcStorage) {
     return null;
@@ -26,7 +17,7 @@ const getUserFromSessionStorage = () => {
 
 const getTokenEndpoint = async (): Promise<string | undefined> => {
   try {
-    const res = await axios.get(REACT_APP_OPEN_ID_CONFIG ?? '');
+    const res = await axios.get(OPEN_ID_CONFIG ?? '');
     return res.data.token_endpoint;
   } catch (e) {
     return Promise.reject(e);
@@ -43,8 +34,8 @@ export const getApiToken = async (): Promise<void> => {
       const res = await axios.post(
         tokenEndpoint,
         {
-          grant_type: REACT_APP_API_TOKEN_GRANT_TYPE,
-          audience: REACT_APP_API_ID,
+          grant_type: API_TOKEN_GRANT_TYPE,
+          audience: API_ID,
           permission: '#access',
         },
         {

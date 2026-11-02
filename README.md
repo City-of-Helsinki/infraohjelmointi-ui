@@ -24,8 +24,9 @@
 
 ### Serving the application
 
-- To serve the application run `yarn run`
-- To build the application run `yarn run build`
+- To serve the application run `yarn start` (Vite dev server on port 4000)
+- To build the application run `yarn run build` (output in `build/`)
+- To preview the production build run `yarn run preview`
 
 ### Formatting and validation
 
@@ -83,7 +84,7 @@ We create the whole hierarchy-tree of routes in `index.tsx`, using the new `crea
 - Run all tests: `yarn test`
 - For running specific tests use the same command and specify a file i.e: `yarn test App.test.tsx`
 
-This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. There is also a `test-utils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
+This project uses [Vitest](https://vitest.dev/) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. Test environment variables are defined in `.env.test`. There is also a `testUtils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
 
 ### Localization
 

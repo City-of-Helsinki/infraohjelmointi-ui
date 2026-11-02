@@ -1,11 +1,10 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectToolbar from './ProjectToolbar';
 import { Route } from 'react-router';
 import { mockUser } from '@/mocks/mockUsers';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const render = async () =>
   await act(async () =>

@@ -2,11 +2,11 @@ import { IClass, IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { ICoordinatorRequestParams } from '@/interfaces/common';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const getPlanningClasses = async (year: number): Promise<Array<IClass>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-classes/?year=${year}`);
+    const res = await axios.get(`${API_URL}/project-classes/?year=${year}`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -18,7 +18,7 @@ export const getCoordinationClasses = async (
 ): Promise<Array<IClass>> => {
   try {
     const res = await axios.get(
-      `${REACT_APP_API_URL}/project-classes/coordinator/?forcedToFrame=${req.forcedToFrame}&year=${req.year}`,
+      `${API_URL}/project-classes/coordinator/?forcedToFrame=${req.forcedToFrame}&year=${req.year}`,
     );
     return res.data;
   } catch (e) {
@@ -29,7 +29,7 @@ export const getCoordinationClasses = async (
 export const patchCoordinationClass = async (request: IClassPatchRequest) => {
   try {
     const res = await axios.patch(
-      `${REACT_APP_API_URL}/project-classes/coordinator/${request.id}/`,
+      `${API_URL}/project-classes/coordinator/${request.id}/`,
       request.data,
     );
     return res.data;

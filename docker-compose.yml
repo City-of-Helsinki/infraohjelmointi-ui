@@ -8,6 +8,8 @@ services:
       dockerfile: ./Dockerfile
     environment:
       DEV_SERVER: 'true'
+      # UID 1001 has no home directory; yarn needs a writable one for its cache and global folder.
+      HOME: /tmp
     volumes:
       - .:/app:cached
     ports:

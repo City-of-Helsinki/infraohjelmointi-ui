@@ -9,35 +9,36 @@ import { formatNumber } from '@/utils/calculations';
 import { mockUser } from '@/mocks/mockUsers';
 import { patchCoordinationClass } from '@/services/classServices';
 import { updateMasterClass } from '@/reducers/classSlice';
+import type { Mock } from 'vitest';
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
   }),
 }));
 
-jest.mock('@/services/classServices', () => ({
-  patchCoordinationClass: jest.fn(),
+vi.mock('@/services/classServices', () => ({
+  patchCoordinationClass: vi.fn(),
 }));
 
-jest.mock('@/services/locationServices', () => ({
-  patchCoordinationLocation: jest.fn(),
+vi.mock('@/services/locationServices', () => ({
+  patchCoordinationLocation: vi.fn(),
 }));
 
-jest.mock('@/hooks/useOnClickOutsideRef', () => jest.fn());
+vi.mock('@/hooks/useOnClickOutsideRef', () => ({ default: vi.fn() }));
 
-jest.mock('./PlanningForecastSums', () => () => null);
+vi.mock('./PlanningForecastSums', () => ({ default: () => null }));
 
-jest.mock('@/components/CoordinatorNotesModal', () => ({
+vi.mock('@/components/CoordinatorNotesModal', () => ({
   CoordinatorNotesModal: () => null,
 }));
 
-jest.mock('./HoverTooltip/TooltipWrapper', () => ({
+vi.mock('./HoverTooltip/TooltipWrapper', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('hds-react', () => ({
+vi.mock('hds-react', () => ({
   IconAlertCircle: () => null,
   IconSpeechbubble: () => null,
   IconSpeechbubbleText: () => null,
@@ -67,7 +68,7 @@ describe('PlanningCell', () => {
       },
     });
 
-    const dispatchSpy = jest.spyOn(store, 'dispatch');
+    const dispatchSpy = vi.spyOn(store, 'dispatch');
 
     const updatedClass = {
       id,
@@ -97,7 +98,7 @@ describe('PlanningCell', () => {
       },
     };
 
-    (patchCoordinationClass as jest.Mock).mockResolvedValueOnce(updatedClass);
+    (patchCoordinationClass as Mock).mockResolvedValueOnce(updatedClass);
 
     const planningCellProps: React.ComponentProps<typeof PlanningCell> = {
       type: 'masterClass',

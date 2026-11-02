@@ -10,7 +10,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import useProjectForm from './useProjectForm';
 
 // Mock dependencies
-jest.mock('@/hooks/useClassOptions', () => ({
+vi.mock('@/hooks/useClassOptions', () => ({
   __esModule: true,
   default: () => ({
     masterClasses: [],
@@ -19,7 +19,7 @@ jest.mock('@/hooks/useClassOptions', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useLocationOptions', () => ({
+vi.mock('@/hooks/useLocationOptions', () => ({
   __esModule: true,
   default: () => ({
     districts: [],
@@ -28,12 +28,12 @@ jest.mock('@/hooks/useLocationOptions', () => ({
   }),
 }));
 
-jest.mock('@/utils/projectProgrammerUtils', () => ({
+vi.mock('@/utils/projectProgrammerUtils', () => ({
   useProjectProgrammer: () => ({
-    getProgrammerForClass: jest.fn(() => null),
+    getProgrammerForClass: vi.fn(() => null),
     // IO-411: stubbed to null so this refresh test keeps exercising the
     // "no auto-fill" path.
-    getProgrammerForDistrict: jest.fn(() => null),
+    getProgrammerForDistrict: vi.fn(() => null),
   }),
 }));
 
@@ -73,7 +73,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('useProjectForm - Refresh Bug Fix', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should NOT reset form when user has made changes (isDirty = true)', async () => {

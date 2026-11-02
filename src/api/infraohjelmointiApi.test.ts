@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { axiosBaseQuery } from './infraohjelmointiApi';
+import type { MockedFunction } from 'vitest';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('axiosBaseQuery', () => {
-  const mockedAxios = axios as jest.MockedFunction<typeof axios>;
+  const mockedAxios = axios as MockedFunction<typeof axios>;
 
   beforeEach(() => {
     mockedAxios.mockReset();

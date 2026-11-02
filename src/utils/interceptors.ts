@@ -3,12 +3,11 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { AUTHORITY } from '@/config/env';
 
 let store: AppStore;
 
 const API_TOKEN_KEY = 'infraohjelmointi_api_token';
-
-const { REACT_APP_AUTHORITY } = process.env;
 
 // Add urls here that you don't want the interceptor to add a loader to
 const urlsToExclueFromLoading = [
@@ -63,7 +62,7 @@ axios.interceptors.response.use(
 );
 
 const handleRequest = (req: InternalAxiosRequestConfig) => {
-  if (req.url?.startsWith(REACT_APP_AUTHORITY as string)) {
+  if (req.url?.startsWith(AUTHORITY as string)) {
     return req;
   }
 

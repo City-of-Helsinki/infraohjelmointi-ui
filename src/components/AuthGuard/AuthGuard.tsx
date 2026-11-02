@@ -9,6 +9,7 @@ import { IUser } from '@/interfaces/userInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { useTranslation } from 'react-i18next';
 import { useLazyGetUserQuery } from '@/api/authApi';
+import { MAINTENANCE_MODE } from '@/config/env';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -43,8 +44,6 @@ const AuthGuard: FC = () => {
   const { isConfirmed } = useConfirmDialog();
   const { t } = useTranslation();
   const [fetchUser] = useLazyGetUserQuery();
-
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
@@ -263,7 +262,7 @@ const AuthGuard: FC = () => {
         navigate(PAGES.PLANNING);
       }
     }
-  }, [location, navigate, user, isAuthenticated, authError, MAINTENANCE_MODE]);
+  }, [location, navigate, user, isAuthenticated, authError]);
 
   // Handle token expiration detection and user notification about expired token
   useEffect(() => {

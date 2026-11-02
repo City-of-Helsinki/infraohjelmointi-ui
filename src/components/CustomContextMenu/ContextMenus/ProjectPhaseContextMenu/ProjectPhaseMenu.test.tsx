@@ -2,23 +2,23 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ProjectPhaseMenu from './ProjectPhaseMenu';
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: () => [
     { value: 'phase-1', label: 'planning' },
     { value: 'phase-2', label: 'construction' },
   ],
 }));
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 describe('ProjectPhaseMenu', () => {
-  const onCloseMenu = jest.fn();
-  const onSubmitPhase = jest.fn();
+  const onCloseMenu = vi.fn();
+  const onSubmitPhase = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderMenu = (isReadOnly: boolean) =>

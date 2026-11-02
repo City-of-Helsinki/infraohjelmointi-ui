@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Control, Controller, FormProvider, useForm } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { fireEvent } from '@testing-library/react';
 
@@ -29,13 +29,13 @@ interface IMockSelectFieldProps {
 const latestSelectProps: Record<string, IMockSelectFieldProps> = {};
 
 // Mock the hooks
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 // Mock the SelectField component
-jest.mock('@/components/shared/SelectField', () => {
-  return function MockSelectField({
+vi.mock('@/components/shared/SelectField', () => ({
+  default: function MockSelectField({
     name,
     options,
     control,
@@ -43,13 +43,11 @@ jest.mock('@/components/shared/SelectField', () => {
     required,
     ...props
   }: IMockSelectFieldProps) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { Controller } = require('react-hook-form');
     latestSelectProps[name] = { name, options, control, rules, required, ...props };
     return (
       <Controller
         name={name}
-        control={control}
+        control={control as Control}
         rules={rules}
         render={({
           field,
@@ -78,10 +76,10 @@ jest.mock('@/components/shared/SelectField', () => {
         )}
       />
     );
-  };
-});
+  },
+}));
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: (key: string) => {
     if (key === 'responsiblePersons') {
       return [
@@ -129,33 +127,33 @@ const mockClassData: {
   subClasses: [],
 };
 
-jest.mock('@/hooks/useClassOptions', () => ({
+vi.mock('@/hooks/useClassOptions', () => ({
   __esModule: true,
   default: () => mockClassData,
 }));
 
 // Mock all the Redux selectors
-jest.mock('@/reducers/classSlice', () => ({
+vi.mock('@/reducers/classSlice', () => ({
   selectAllPlanningClasses: () => mockClassData.masterClasses,
   selectPlanningClasses: () => mockClassData.classes,
   selectPlanningSubClasses: () => mockClassData.subClasses,
 }));
 
-jest.mock('@/reducers/projectSlice', () => ({
+vi.mock('@/reducers/projectSlice', () => ({
   selectProject: () => null,
   selectProjectMode: () => 'new',
 }));
 
-jest.mock('@/reducers/eventsSlice', () => ({
+vi.mock('@/reducers/eventsSlice', () => ({
   selectProjectUpdate: () => null,
 }));
 
-jest.mock('@/reducers/loaderSlice', () => ({
+vi.mock('@/reducers/loaderSlice', () => ({
   selectIsLoading: () => false,
   selectIsProjectCardLoading: () => false,
 }));
 
-jest.mock('@/reducers/listsSlice', () => ({
+vi.mock('@/reducers/listsSlice', () => ({
   selectProjectDistricts: () => [],
   selectProjectDivisions: () => [],
   selectProjectSubDivisions: () => [],
