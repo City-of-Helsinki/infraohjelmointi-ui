@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SelectProps, Tooltip } from 'hds-react';
+import { Tooltip } from 'hds-react';
+import type { ComponentProps } from 'react';
+import type { Select } from 'hds-react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import SelectField from './SelectField';
@@ -23,7 +25,7 @@ vi.mock('hds-react', async () => {
     }: {
       onChange?: (selectedOptions: unknown[], clickedOption?: unknown) => void;
       clearable?: boolean;
-    } & Pick<SelectProps, 'tooltip' | 'texts' | 'disabled'>) =>
+    } & Pick<ComponentProps<typeof Select>, 'tooltip' | 'texts' | 'disabled'>) =>
       disabled ? (
         <actual.Select
           {...props}

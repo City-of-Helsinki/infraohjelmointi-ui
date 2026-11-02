@@ -5,7 +5,8 @@
 
 /* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
 :root {
-  --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+  --infra-font-default: HelsinkiGroteskPro, Arial, sans-serif;
+  --font-default: var(--infra-font-default);
   --planning-cell-width: 5.5rem;
   --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
 }

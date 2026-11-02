@@ -3,6 +3,7 @@ import { Button, ButtonVariant, Dialog, IconAngleUp, IconAngleDown } from 'hds-r
 import { useTranslation } from 'react-i18next';
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
+import { IconAngleUp, IconAngleDown } from 'hds-react';
 import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';

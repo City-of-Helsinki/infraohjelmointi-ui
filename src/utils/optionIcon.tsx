@@ -11,7 +11,7 @@ import {
   IconScrollContent,
   IconShield,
   IconUser,
-} from 'hds-react/icons';
+} from 'hds-react';
 
 const optionIcon = {
   proposal: <IconQuestionCircle />,

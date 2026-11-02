@@ -128,11 +128,14 @@ describe('AdminView', () => {
 
     it('can search for hashtags in the table', async () => {
       const { findByTestId, user } = await render(null, '/admin/hashtags');
+      const toolbar = await findByTestId('admin-hashtags-toolbar');
+      const clearButton = within(toolbar).getByRole('button', { name: 'clearSearchField' });
 
-      await user.type(
-        (await findByTestId('admin-hashtags-toolbar')).getElementsByTagName('input')[0],
-        'testhashtag',
+      expect(clearButton).toBe(
+        toolbar.querySelector("button[class*='TextInput-module_clearButton']"),
       );
+
+      await user.type(toolbar.getElementsByTagName('input')[0], 'testhashtag');
 
       // displays the hashtags that contain the search word
       expect(await findByTestId('value-0')).toHaveTextContent('testhashtag1');
