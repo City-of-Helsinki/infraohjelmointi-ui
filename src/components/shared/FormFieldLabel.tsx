@@ -1,4 +1,5 @@
-import { Button, ButtonVariant, IconPenLine } from 'hds-react';
+import { Button, ButtonVariant } from 'hds-react';
+import { IconPenLine } from 'hds-react';
 import { FC, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
 

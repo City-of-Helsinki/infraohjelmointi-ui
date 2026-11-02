@@ -1,6 +1,7 @@
 import { FC, useCallback } from 'react';
-import { Header, Logo, logoFi, IconAngleLeft, IconSearch, IconSignin } from 'hds-react';
+import { Header, Logo, logoFi } from 'hds-react';
 import { useTranslation } from 'react-i18next';
+import { IconAngleLeft, IconSearch, IconSignin } from 'hds-react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { selectUser } from '@/reducers/authSlice';
