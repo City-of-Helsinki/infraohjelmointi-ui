@@ -1,7 +1,6 @@
 import { Button, ButtonVariant, IconAngleLeft } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
-import { IconAngleLeft } from 'hds-react';
 import { useLocation, useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';

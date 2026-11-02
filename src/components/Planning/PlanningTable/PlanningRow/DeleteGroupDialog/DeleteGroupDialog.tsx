@@ -8,7 +8,6 @@ import {
   IconTrash,
 } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { IconAlertCircle, IconTrash } from 'hds-react';
 import { deleteGroupThunk } from '@/reducers/groupSlice';
 import { useAppDispatch } from '@/hooks/common';
 import './styles.css';
