@@ -1,7 +1,6 @@
 import SearchTerms from './SearchTerms';
 import './styles.css';
-import { Button, ButtonSize, ButtonVariant } from 'hds-react';
-import { IconSliders } from 'hds-react/icons';
+import { Button, ButtonSize, ButtonVariant, IconSliders } from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { memo, useCallback, useMemo } from 'react';
 import { toggleSearch } from '@/reducers/searchSlice';

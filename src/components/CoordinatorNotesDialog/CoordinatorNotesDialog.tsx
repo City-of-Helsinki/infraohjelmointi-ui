@@ -9,8 +9,7 @@ import {
   setNotesDialogOpen,
 } from '@/reducers/planningSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import { Button, ButtonVariant, IconCross } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, ButtonVariant, IconCross, Dialog } from 'hds-react';
 import './styles.css';
 import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
 import { selectUser } from '@/reducers/authSlice';

@@ -1,8 +1,15 @@
 import useConfirmDialog from '@/hooks/useConfirmDialog';
-import { Dialog, Button, IconQuestionCircle, ButtonVariant, ButtonPresetTheme } from 'hds-react';
+import {
+  Dialog,
+  Button,
+  IconQuestionCircle,
+  ButtonVariant,
+  ButtonPresetTheme,
+  IconAlertCircle,
+  IconTrash,
+} from 'hds-react';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 
 const titleId = 'confirmation-dialog-title';
 const descriptionId = 'confirmation-dialog-info';

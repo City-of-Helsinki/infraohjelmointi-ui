@@ -1,10 +1,8 @@
 import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
-import { Button, ButtonVariant } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, ButtonVariant, Dialog, IconAngleUp, IconAngleDown } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
-import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
 import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';

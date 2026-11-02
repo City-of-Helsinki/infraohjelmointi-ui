@@ -1,8 +1,7 @@
 import { IListItem, IOption } from '@/interfaces/common';
-import { defaultFilter } from 'hds-react';
+import { defaultFilter, Select } from 'hds-react';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Select } from 'hds-react';
 
 interface IHashTagSearchProps {
   onHashTagClick: (value: string) => void;

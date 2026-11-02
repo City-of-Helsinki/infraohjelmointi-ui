@@ -1,6 +1,5 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { TextInput } from 'hds-react';
-import { IconPenLine } from 'hds-react/icons';
+import { TextInput, IconPenLine } from 'hds-react';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconButton } from '../../shared';

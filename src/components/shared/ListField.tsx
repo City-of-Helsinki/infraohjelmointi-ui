@@ -1,10 +1,9 @@
 import { IForm } from '@/interfaces/formInterfaces';
-import { NumberInput } from 'hds-react';
+import { NumberInput, Tooltip } from 'hds-react';
 import { FC, memo, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
-import { Tooltip } from 'hds-react';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import { formatNumberToContainSpaces } from '@/utils/common';
 

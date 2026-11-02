@@ -1,6 +1,5 @@
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { SelectionGroup } from 'hds-react';
-import { RadioButton as HDSRadioButton } from 'hds-react';
+import { SelectionGroup, RadioButton as HDSRadioButton } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

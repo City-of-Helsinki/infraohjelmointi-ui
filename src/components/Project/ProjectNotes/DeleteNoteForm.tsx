@@ -1,7 +1,12 @@
-import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react';
-import { IconAlertCircle, IconTrash } from 'hds-react/icons';
+import {
+  Button,
+  ButtonPresetTheme,
+  ButtonVariant,
+  IconAlertCircle,
+  IconTrash,
+  Dialog,
+} from 'hds-react';
 import { FC, memo, useCallback } from 'react';
-import { Dialog } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { useDeleteNoteMutation } from '@/api/notesApi';

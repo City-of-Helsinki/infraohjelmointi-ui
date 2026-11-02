@@ -7,11 +7,12 @@ import {
   IconMoneyBagFill,
   IconEyeCrossed,
   IconEye,
-} from 'hds-react/icons/';
+  Button,
+  ButtonVariant,
+} from 'hds-react';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent, hideTooltipImmediately } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
-import { Button, ButtonVariant } from 'hds-react';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';

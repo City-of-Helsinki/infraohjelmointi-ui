@@ -1,7 +1,6 @@
 import { useAppSelector } from '@/hooks/common';
 import { HookFormControlType, IProjectForm } from '@/interfaces/formInterfaces';
-import { Button } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, Dialog } from 'hds-react';
 import {
   useState,
   MouseEvent,

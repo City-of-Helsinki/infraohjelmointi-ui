@@ -1,5 +1,4 @@
-import { Tag } from 'hds-react';
-import { SearchInput } from 'hds-react';
+import { Tag, SearchInput } from 'hds-react';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue } from '@/utils/common';

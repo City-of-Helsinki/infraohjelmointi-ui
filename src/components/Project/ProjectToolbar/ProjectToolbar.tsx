@@ -1,6 +1,5 @@
-import { IconMap, IconPlusCircle, IconShare } from 'hds-react/icons';
+import { IconMap, IconPlusCircle, IconShare, Button, ButtonVariant } from 'hds-react';
 import { Toolbar } from '../../shared';
-import { Button, ButtonVariant } from 'hds-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
