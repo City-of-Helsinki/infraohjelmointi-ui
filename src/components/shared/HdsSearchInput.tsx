@@ -82,25 +82,23 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   const handleSend = useCallback((searchValue: string) => onSubmit?.(searchValue), [onSubmit]);
 
   return (
-    <>
-      <Search
-        id={id}
-        data-testid={dataTestId}
-        className={className}
-        ref={searchInputRef}
-        value={value}
-        onChange={handleChange}
-        onSearch={getSuggestions ? handleSearch : undefined}
-        onSend={handleSend}
-        hideSubmitButton={hideSearchButton}
-        texts={{
-          label,
-          assistive: helperText,
-          searchClearButtonAriaLabel: clearButtonAriaLabel ?? t('clearSearchField', { label }),
-          searchButtonAriaLabel,
-        }}
-      />
-    </>
+    <Search
+      id={id}
+      data-testid={dataTestId}
+      className={className}
+      ref={searchInputRef}
+      value={value}
+      onChange={handleChange}
+      onSearch={getSuggestions ? handleSearch : undefined}
+      onSend={handleSend}
+      hideSubmitButton={hideSearchButton}
+      texts={{
+        label,
+        assistive: helperText,
+        searchClearButtonAriaLabel: clearButtonAriaLabel ?? t('clearSearchField', { label }),
+        searchButtonAriaLabel,
+      }}
+    />
   );
 };
 
