@@ -1,9 +1,8 @@
-import { FC, memo, useEffect, useRef } from 'react';
+import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea, TextAreaProps } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import autosize from 'autosize';
 
 interface ITextAreaFieldProps extends TextAreaProps {
   testId?: string;
@@ -14,7 +13,6 @@ interface ITextAreaFieldProps extends TextAreaProps {
   readOnly?: boolean;
   hideLabel?: boolean;
   size?: 'l' | 'xl';
-  formSaved?: boolean;
   disabled?: boolean;
 }
 
@@ -27,32 +25,11 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   readOnly,
   hideLabel,
   size,
-  formSaved,
   disabled,
   tooltip,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Autosize the textarea
-  useEffect(() => {
-    if (textAreaRef && textAreaRef.current) {
-      const element = textAreaRef.current;
-      autosize(element);
-      element.style.overflow = 'visible';
-    }
-  }, [textAreaRef]);
-
-  // Autosize the textarea if form is saved successfully, this helps with resizing
-  // since the backend will remove all empty rows
-  useEffect(() => {
-    if (formSaved && textAreaRef && textAreaRef.current) {
-      const element = textAreaRef.current;
-      element.style.height = 'auto';
-      element.style.height = `${element.scrollHeight}px`;
-    }
-  }, [formSaved]);
 
   return (
     <Controller
@@ -67,11 +44,10 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             data-testid={testId}
-            ref={textAreaRef}
             onChange={onChange}
             onBlur={onBlur}
             value={value ?? ''}
-            className={`textarea-field input-${size || 'xl'}`}
+            className={`input-${size || 'xl'}`}
             label={t(label)}
             hideLabel={hideLabel}
             id={label}
