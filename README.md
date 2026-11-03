@@ -55,8 +55,8 @@ If using VS Code, download the [Prettier - Code formatter](https://marketplace.v
 ### Ways of working
 ##### Commits
 
-To make our commits more informative those should be written in a format of Conventional Commits i.e. a suitable prefix should be added in the beginning
-of every commit e.g. **feat:** built a notification or **refactor**:... etc. The Conventional Commits could be properly configured to the project in the future.
+Commits are validated in CI using Conventional Commits. Add a suitable prefix at the beginning of every commit, e.g.
+**feat:** built a notification or **refactor:** simplify the component.
 
 ##### Hotfixes
 
