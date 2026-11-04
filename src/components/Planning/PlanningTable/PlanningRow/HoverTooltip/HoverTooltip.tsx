@@ -2,12 +2,12 @@ import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import './styles.css';
 
 interface IHoverTooltipProps {
-  text?: string | JSX.Element;
+  text?: string | React.JSX.Element;
   id?: string;
 }
 
 interface ITooltipState {
-  tooltip: string | JSX.Element;
+  tooltip: string | React.JSX.Element;
   rect?: DOMRect | DOMRectReadOnly | null;
 }
 

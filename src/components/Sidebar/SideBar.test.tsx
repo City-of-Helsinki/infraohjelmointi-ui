@@ -1,7 +1,7 @@
 import SideBar from './SideBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';

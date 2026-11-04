@@ -5,7 +5,7 @@ interface IDialogWrapperProps {
   isOpen: boolean;
   name: string;
   title: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   children: ReactNode;
   variant?: 'danger';
   size?: 'l';
