@@ -1,8 +1,13 @@
 import { FC, memo, useCallback } from 'react';
-import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react';
-import { Dialog } from 'hds-react';
+import {
+  Button,
+  ButtonPresetTheme,
+  ButtonVariant,
+  Dialog,
+  IconAlertCircle,
+  IconTrash,
+} from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { deleteGroupThunk } from '@/reducers/groupSlice';
 import { useAppDispatch } from '@/hooks/common';
 import './styles.css';

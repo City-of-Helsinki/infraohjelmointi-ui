@@ -1,8 +1,7 @@
 import useProjectNoteForm from '@/forms/useNoteForm';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { INoteRequest } from '@/interfaces/noteInterfaces';
-import { Button, ButtonSize } from 'hds-react';
-import { TextArea } from 'hds-react';
+import { Button, ButtonSize, TextArea } from 'hds-react';
 import { memo, useCallback, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

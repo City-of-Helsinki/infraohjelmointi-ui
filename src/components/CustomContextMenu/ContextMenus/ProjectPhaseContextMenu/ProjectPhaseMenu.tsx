@@ -1,5 +1,4 @@
-import { Button, ButtonSize } from 'hds-react';
-import { IconCheck, IconCross } from 'hds-react/icons';
+import { Button, ButtonSize, IconCheck, IconCross } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';

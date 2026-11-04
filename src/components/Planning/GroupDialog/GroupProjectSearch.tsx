@@ -1,8 +1,7 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { getLocationParent, listItemToOption } from '@/utils/common';
-import { Tag } from 'hds-react';
-import { SearchInput } from 'hds-react';
+import { Tag, SearchInput } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';

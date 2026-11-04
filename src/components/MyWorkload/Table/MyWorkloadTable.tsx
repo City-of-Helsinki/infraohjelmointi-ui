@@ -1,7 +1,5 @@
 import { FC, memo, MouseEvent, useCallback, useMemo, useState } from 'react';
-import { Pagination, Table } from 'hds-react';
-import type { TableProps } from 'hds-react';
-import { IconAngleRight } from 'hds-react/icons';
+import { Pagination, Table, type TableProps, IconAngleRight } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import {
   MyWorkloadTableRow,
