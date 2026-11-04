@@ -11,7 +11,7 @@ import {
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
 import { saveAs } from 'file-saver';
 import {

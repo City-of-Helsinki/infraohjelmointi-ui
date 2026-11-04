@@ -15,8 +15,8 @@ let dateIndicatorStartPosition = 0;
 const PlanningSummaryTable = () => {
   const { heads, cells } = useSummaryRows();
 
-  const planningSummaryTableRef = useRef() as React.MutableRefObject<HTMLTableElement>;
-  const dateIndicatorRef = useRef() as React.MutableRefObject<HTMLDivElement>;
+  const planningSummaryTableRef = useRef<HTMLTableElement>(null);
+  const dateIndicatorRef = useRef<HTMLDivElement>(null);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const { element: planningTable } = useScrollableElement('planning-table-container');
@@ -32,6 +32,9 @@ const PlanningSummaryTable = () => {
         left: planningTable?.scrollLeft,
       });
       const dateIndicatorElement = dateIndicatorRef.current;
+      if (!dateIndicatorElement) {
+        return;
+      }
       const positionLeft = dateIndicatorStartPosition - (planningTable?.scrollLeft ?? 0);
       dateIndicatorElement.style.left = `${positionLeft}px`;
 
@@ -121,14 +124,14 @@ const PlanningSummaryTable = () => {
           <tbody data-testid="planning-summary-body">
             {/* Planned budget row */}
             <tr data-testid="planning-summary-planned-budget-row">
-              {cells.map((c) => (
-                <PlanningSummaryTablePlannedBudgetCell {...c} />
+              {cells.map(({ key, ...cell }) => (
+                <PlanningSummaryTablePlannedBudgetCell key={key} {...cell} />
               ))}
             </tr>
             {/* Frame budget and deviation row */}
             <tr data-testid="planning-summary-realized-budget-row" className="align-top">
-              {cells.map((c) => (
-                <PlanningSummaryTableRealizedBudgetCell {...c} />
+              {cells.map(({ key, ...cell }) => (
+                <PlanningSummaryTableRealizedBudgetCell key={key} {...cell} />
               ))}
             </tr>
           </tbody>

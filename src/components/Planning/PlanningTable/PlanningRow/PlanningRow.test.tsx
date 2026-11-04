@@ -104,6 +104,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       ...initialState,
     },
   });
+  const { key, ...groupProps } = mockGroup;
 
   return {
     store,
@@ -113,7 +114,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
         <MemoryRouter initialEntries={[`/planning${search}`]}>
           <table>
             <tbody>
-              <PlanningRow {...mockGroup} sapCosts={{}} />
+              <PlanningRow key={key} {...groupProps} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>
@@ -246,13 +247,14 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
         changeHistoryEnabled: false,
       },
     });
+    const { key, ...groupProps } = groupWithProject;
 
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/planning?group=test-group-1']}>
           <table>
             <tbody>
-              <PlanningRow {...groupWithProject} sapCosts={{}} />
+              <PlanningRow key={key} {...groupProps} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>

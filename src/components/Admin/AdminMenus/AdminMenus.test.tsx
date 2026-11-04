@@ -1,7 +1,7 @@
 import { renderWithProviders } from '@/utils/testUtils';
 import AdminMenus from './AdminMenus';
 import { setupStore, RootState } from '@/store';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { Route } from 'react-router';
 import { screen, waitFor } from '@testing-library/react';
 import { useOptions } from '@/hooks/useOptions';

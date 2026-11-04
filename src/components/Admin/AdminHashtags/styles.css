@@ -1,7 +1,6 @@
 @reference "../../../index.css";
-/* set a fixed height to keep the pagination in place */
 .admin-hashtags-table-container {
-  @apply mt-8 h-[540px];
+  @apply mt-8;
 }
 
 /* hashtag name cell */
@@ -40,9 +39,8 @@
   @apply flex !w-[6.5rem] items-center gap-2;
 }
 
-/* we set the containers height to 0 since otherwise the HDS Button forces the table row to become too high */
 .archived-button-container {
-  @apply flex h-0 items-center justify-end;
+  @apply flex items-center justify-end;
 }
 
 /* we remove the padding and margin from the span inside the button since otherwise it overflows the table */

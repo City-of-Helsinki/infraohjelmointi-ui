@@ -6,7 +6,7 @@ import {
   mockProjectTypes,
   mockResponsiblePersons,
 } from '@/mocks/mockLists';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import Search from './Search';
 import {
   mockClasses,

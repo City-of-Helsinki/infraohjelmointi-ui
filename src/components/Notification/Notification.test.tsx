@@ -3,7 +3,7 @@ import { renderWithProviders } from '@/utils/testUtils';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import { mockUser } from '@/mocks/mockUsers';

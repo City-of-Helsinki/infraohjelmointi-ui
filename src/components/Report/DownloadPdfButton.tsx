@@ -141,7 +141,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
     try {
       dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PDF_DATA }));
 
-      let document: JSX.Element | undefined = undefined;
+      let document: React.JSX.Element | undefined = undefined;
       switch (type) {
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame:

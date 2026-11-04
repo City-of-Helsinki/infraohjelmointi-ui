@@ -10,7 +10,7 @@ import {
 } from './sections/projectProgrammeSections';
 
 interface MissingRequiredFieldsNotificationProps {
-  missingFieldsNotificationRef: RefObject<HTMLDivElement>;
+  missingFieldsNotificationRef: RefObject<HTMLDivElement | null>;
   handleOpenSection(sectionId: ProjectProgrammeSectionId): void;
   PROJECT_PROGRAMME_SECTIONS: IProjectProgrammeSectionConfig[];
   missingRequiredSections: ProjectProgrammeRequiredSectionId[];
