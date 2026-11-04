@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
@@ -23,10 +22,11 @@ import { mockLocations, mockDistricts, mockDivisions } from '@/mocks/mockLocatio
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { mockUser } from '@/mocks/mockUsers';
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+import type { Mocked } from 'vitest';
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 const store = setupStore();
 
 const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
@@ -90,7 +90,7 @@ describe('ProjectProgrammedDialog', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {

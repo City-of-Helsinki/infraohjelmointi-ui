@@ -1,16 +1,16 @@
-import mockI18next from '@/mocks/mockI18next';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm, UseFormReturn } from 'react-hook-form';
 import AttachmentsAndLinksSection from './AttachmentsAndLinksSection';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { IConstructionHandoverAttachment } from '@/interfaces/constructionHandoverInterfaces';
+import type { Mock } from 'vitest';
 
-const mockIsConfirmed = jest.fn();
+const mockIsConfirmed = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({
     isConfirmed: mockIsConfirmed,
@@ -44,14 +44,14 @@ interface ISetupProps {
   attachments?: IConstructionHandoverAttachment[];
   isPostingAttachment?: boolean;
   canEditHandover?: boolean;
-  onDeleteAttachment?: jest.Mock;
+  onDeleteAttachment?: Mock;
 }
 
 function setup({
   attachments: initialAttachments = attachments,
   isPostingAttachment = false,
   canEditHandover = true,
-  onDeleteAttachment = jest.fn(),
+  onDeleteAttachment = vi.fn(),
 }: ISetupProps = {}) {
   const formRef: { current?: UseFormReturn<IConstructionHandoverForm> } = {};
 

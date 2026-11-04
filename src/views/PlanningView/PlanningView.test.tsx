@@ -5,7 +5,6 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import mockI18next from '@/mocks/mockI18next';
 import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import PlanningView from './PlanningView';
@@ -45,19 +44,21 @@ import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/components/shared', () => {
-  const actualModule = jest.requireActual('@/components/shared');
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/components/shared', async () => {
+  const actualModule =
+    await vi.importActual<typeof import('@/components/shared')>('@/components/shared');
   return {
     ...actualModule,
     Icon: ({ text }: { text?: string }) => (text ? <span>{text}</span> : null),
   };
 });
-jest.setTimeout(7000);
+vi.setConfig({ testTimeout: 7000 });
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const store = setupStore();
 
@@ -151,7 +152,7 @@ describe('PlanningView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the container', async () => {

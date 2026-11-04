@@ -3,14 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { SelectProps, Tooltip } from 'hds-react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useState } from 'react';
-import mockI18next from '@/mocks/mockI18next';
 import SelectField from './SelectField';
 import TextField from './TextField';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('hds-react', () => {
-  const actual = jest.requireActual('hds-react');
+vi.mock('hds-react', async () => {
+  const actual = await vi.importActual<typeof import('hds-react')>('hds-react');
 
   return {
     ...actual,

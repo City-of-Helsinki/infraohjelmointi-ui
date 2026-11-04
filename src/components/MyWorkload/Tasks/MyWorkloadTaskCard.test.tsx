@@ -1,15 +1,14 @@
-import mockI18next from '@/mocks/mockI18next';
 import { MyWorkloadTaskItem } from '@/interfaces/myWorkloadInterfaces';
 import { ProjectTaskType } from '@/interfaces/projectInterfaces';
 import { fireEvent, render, screen } from '@testing-library/react';
 import MyWorkloadTaskCard from './MyWorkloadTaskCard';
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('react-router-dom', () => {
-  const actualModule = jest.requireActual('react-router-dom');
+vi.mock('react-router-dom', async () => {
+  const actualModule = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return {
     ...actualModule,
     useNavigate: () => mockNavigate,

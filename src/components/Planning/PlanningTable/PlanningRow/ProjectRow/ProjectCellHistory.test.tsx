@@ -1,19 +1,19 @@
 import { renderWithProviders } from '@/utils/testUtils';
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, screen } from '@testing-library/react';
 import { Route } from 'react-router';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
 import ProjectCellHistory from './ProjectCellHistory';
 import { useLazyGetProjectHistoryQuery } from '@/api/projectApi';
+import type { Mock } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/api/projectApi', () => ({
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/api/projectApi', async () => ({
   __esModule: true,
-  ...jest.requireActual('@/api/projectApi'),
-  useLazyGetProjectHistoryQuery: jest.fn(),
+  ...(await vi.importActual<typeof import('@/api/projectApi')>('@/api/projectApi')),
+  useLazyGetProjectHistoryQuery: vi.fn(),
 }));
 
-const mockedUseLazyGetProjectHistoryQuery = useLazyGetProjectHistoryQuery as jest.Mock;
+const mockedUseLazyGetProjectHistoryQuery = useLazyGetProjectHistoryQuery as Mock;
 
 const makeEntry = (id: string, first: string, last: string): IProjectHistoryEntry => ({
   id,
@@ -36,9 +36,9 @@ const renderCell = () =>
   );
 
 describe('ProjectCellHistory (IO-881)', () => {
-  const trigger = jest.fn();
+  const trigger = vi.fn();
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('fetches the year-scoped history on hover and shows 2 latest + a show-more expander', async () => {
     const results = [

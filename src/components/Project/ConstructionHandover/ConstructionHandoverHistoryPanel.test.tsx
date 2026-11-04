@@ -1,19 +1,21 @@
 import { renderWithProviders } from '@/utils/testUtils';
-import mockI18next from '@/mocks/mockI18next';
 import { screen } from '@testing-library/react';
 import { Route } from 'react-router';
 import { IConstructionHandoverHistoryEntry } from '@/interfaces/constructionHandoverInterfaces';
 import ConstructionHandoverHistoryPanel from './ConstructionHandoverHistoryPanel';
 import { useGetConstructionHandoverHistoryQuery } from '@/api/constructionHandoverApi';
+import type { Mock } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/api/constructionHandoverApi', () => ({
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/api/constructionHandoverApi', async () => ({
   __esModule: true,
-  ...jest.requireActual('@/api/constructionHandoverApi'),
-  useGetConstructionHandoverHistoryQuery: jest.fn(),
+  ...(await vi.importActual<typeof import('@/api/constructionHandoverApi')>(
+    '@/api/constructionHandoverApi',
+  )),
+  useGetConstructionHandoverHistoryQuery: vi.fn(),
 }));
 
-const mockedQuery = useGetConstructionHandoverHistoryQuery as jest.Mock;
+const mockedQuery = useGetConstructionHandoverHistoryQuery as Mock;
 
 const statusEntry: IConstructionHandoverHistoryEntry = {
   id: 'entry-status',
@@ -49,12 +51,12 @@ const renderPanel = () =>
   renderWithProviders(
     <Route
       path="/"
-      element={<ConstructionHandoverHistoryPanel isOpen onClose={jest.fn()} handoverId="h1" />}
+      element={<ConstructionHandoverHistoryPanel isOpen onClose={vi.fn()} handoverId="h1" />}
     />,
   );
 
 describe('ConstructionHandoverHistoryPanel (IO-883)', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders status changes as before → after pills', async () => {
     mockedQuery.mockReturnValue({
@@ -144,7 +146,7 @@ describe('ConstructionHandoverHistoryPanel (IO-883)', () => {
       <Route
         path="/"
         element={
-          <ConstructionHandoverHistoryPanel isOpen={false} onClose={jest.fn()} handoverId="h1" />
+          <ConstructionHandoverHistoryPanel isOpen={false} onClose={vi.fn()} handoverId="h1" />
         }
       />,
     );

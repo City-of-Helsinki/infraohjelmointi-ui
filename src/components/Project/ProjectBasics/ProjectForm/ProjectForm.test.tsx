@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
@@ -41,12 +40,13 @@ import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import * as userRoleHelpers from '@/utils/userRoleHelpers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(15000);
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.setConfig({ testTimeout: 15000 });
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const getFormField = (name: string) => {
   const normalizedName = name.replace(/\s\*$/, '');
@@ -234,12 +234,12 @@ const getPwLookupCalls = () =>
 
 describe('projectForm', () => {
   beforeEach(() => {
-    jest.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(false);
+    vi.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(false);
     mockGetResponseProvider();
     routeAxiosConfigCallsToMethodMocks(mockedAxios);
   });
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
@@ -249,7 +249,7 @@ describe('projectForm', () => {
   });
 
   it('disables viewer-only fields while preserving their read-only values', async () => {
-    jest.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(true);
+    vi.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(true);
     const { findByTestId } = await render();
 
     expect(await findByTestId('project-form')).toHaveClass('viewer-only-project-form');
@@ -1210,7 +1210,7 @@ describe('projectForm', () => {
       const project = getProjectWithShiftableFinances();
       const expectedPlanningEnd = '01.04.2027';
       const expectedFinances = moveBudgetBackwards(project.finances, 2028, 2027);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
       const responseProject: { data: IProject } = {
@@ -1247,7 +1247,7 @@ describe('projectForm', () => {
       });
       const expectedPlanningEnd = '01.04.2026';
       const expectedFinances = moveBudgetBackwards(project.finances, 2027, 2026);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
       const responseProject: { data: IProject } = {
@@ -1281,7 +1281,7 @@ describe('projectForm', () => {
       const project = getProjectWithShiftableFinances();
       const expectedConstructionStart = '10.04.2030';
       const expectedFinances = moveBudgetForwards(project.finances, 2029, 2030);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({
           estConstructionStart: expectedConstructionStart,
@@ -1320,7 +1320,7 @@ describe('projectForm', () => {
       });
       const expectedConstructionStart = '10.04.2031';
       const expectedFinances = moveBudgetForwards(project.finances, 2030, 2031);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({
           estConstructionStart: expectedConstructionStart,
@@ -1388,7 +1388,7 @@ describe('projectForm', () => {
 
   it('can delete a project', async () => {
     const project = mockProject.data;
-    const deleteProjectInitiateSpy = jest.spyOn(
+    const deleteProjectInitiateSpy = vi.spyOn(
       projectApiHooks.projectApi.endpoints.deleteProject,
       'initiate',
     );

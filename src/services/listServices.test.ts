@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getProgrammers } from './listServices';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('listServices', () => {
   describe('getProgrammers', () => {

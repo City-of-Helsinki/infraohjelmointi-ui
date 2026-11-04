@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
+import { MAINTENANCE_MODE } from '@/config/env';
 import './styles.css';
 
 const TopBar: FC = () => {
@@ -15,14 +16,13 @@ const TopBar: FC = () => {
   const dispatch = useAppDispatch();
 
   const { SkipLink, ActionBar, ActionBarItem, ActionBarSubItem, ActionBarButton } = Header;
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   const handleOpenSearch = useCallback(() => {
     if (MAINTENANCE_MODE || !user || user?.ad_groups.length === 0) {
       return; // Do nothing if disabled
     }
     dispatch(toggleSearch());
-  }, [dispatch, MAINTENANCE_MODE, user]);
+  }, [dispatch, user]);
 
   const navigateBack = useCallback(() => navigate(-1), [navigate]);
 

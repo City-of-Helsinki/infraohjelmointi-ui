@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithProviders, withMockAuthUserAdGroups } from '@/utils/testUtils';
 import { Route } from 'react-router';
@@ -9,15 +8,15 @@ import { createConstructionHandover, createProject } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 import { UserRole } from '@/interfaces/userInterfaces';
 
-const mockPatchConstructionHandover = jest.fn();
+const mockPatchConstructionHandover = vi.fn();
 
-jest.mock('@/api/constructionHandoverApi', () => ({
+vi.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
 }));
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: (listName: string) => {
     if (listName === 'responsiblePersons') {
       return [{ value: 'manager-1', label: 'Project Manager' }];
@@ -35,14 +34,14 @@ jest.mock('@/hooks/useOptions', () => ({
   },
 }));
 
-jest.mock('@/components/shared', () => ({
+vi.mock('@/components/shared', () => ({
   SelectField: ({ name, label }: { name: string; label: string }) => (
     <div data-testid={`select-${name}`}>{label}</div>
   ),
 }));
 
-jest.mock('hds-react', () => {
-  const actual = jest.requireActual('hds-react');
+vi.mock('hds-react', async () => {
+  const actual = await vi.importActual<typeof import('hds-react')>('hds-react');
 
   return {
     ...actual,

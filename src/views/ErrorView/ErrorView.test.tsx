@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act } from '@testing-library/react';
 import { renderWithProviders } from '../../utils/testUtils';
 import ErrorView from './ErrorView';
@@ -6,8 +5,8 @@ import { Route } from 'react-router';
 import PlanningView from '../PlanningView/PlanningView';
 import { mockUser } from '@/mocks/mockUsers';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const render = async () =>
   await act(async () =>

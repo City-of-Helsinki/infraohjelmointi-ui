@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import ProjectTalpaForm, { mapTalpaFormToRequest } from './ProjectTalpaForm';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
@@ -21,32 +20,33 @@ import {
   patchTalpaProjectOpening,
   postTalpaProjectOpening,
 } from '@/services/talpaServices';
+import type { MockedFunction } from 'vitest';
 
-jest.mock('file-saver', () => ({
-  saveAs: jest.fn(),
+vi.mock('file-saver', () => ({
+  saveAs: vi.fn(),
 }));
 
-jest.mock('@/services/talpaServices', () => ({
-  downloadExcel: jest.fn(),
-  getTalpaProjectOpeningByProject: jest.fn(),
-  patchTalpaProjectOpening: jest.fn(),
-  postTalpaProjectOpening: jest.fn(),
-  markTalpaProjectAsSent: jest.fn(),
+vi.mock('@/services/talpaServices', () => ({
+  downloadExcel: vi.fn(),
+  getTalpaProjectOpeningByProject: vi.fn(),
+  patchTalpaProjectOpening: vi.fn(),
+  postTalpaProjectOpening: vi.fn(),
+  markTalpaProjectAsSent: vi.fn(),
 }));
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const downloadExcelMock = downloadExcel as jest.MockedFunction<typeof downloadExcel>;
-const patchTalpaProjectOpeningMock = patchTalpaProjectOpening as jest.MockedFunction<
+const downloadExcelMock = downloadExcel as MockedFunction<typeof downloadExcel>;
+const patchTalpaProjectOpeningMock = patchTalpaProjectOpening as MockedFunction<
   typeof patchTalpaProjectOpening
 >;
-const postTalpaProjectOpeningMock = postTalpaProjectOpening as jest.MockedFunction<
+const postTalpaProjectOpeningMock = postTalpaProjectOpening as MockedFunction<
   typeof postTalpaProjectOpening
 >;
-const getTalpaProjectOpeningByProjectMock = getTalpaProjectOpeningByProject as jest.MockedFunction<
+const getTalpaProjectOpeningByProjectMock = getTalpaProjectOpeningByProject as MockedFunction<
   typeof getTalpaProjectOpeningByProject
 >;
-const saveAsMock = saveAs as jest.MockedFunction<typeof saveAs>;
+const saveAsMock = saveAs as MockedFunction<typeof saveAs>;
 
 async function render(talpaProjectOverrides: Partial<ITalpaProjectOpening> = {}) {
   return await act(async () =>
@@ -217,7 +217,7 @@ describe('talpa form', () => {
 
   describe('submit form', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       getTalpaProjectOpeningByProjectMock.mockResolvedValue(mockTalpaProject);
       patchTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);
       postTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);

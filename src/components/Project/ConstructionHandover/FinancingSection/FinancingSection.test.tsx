@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
@@ -10,9 +9,9 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { createConstructionHandover } from '@/mocks/createMocks';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: (name?: string) => {
     if (name === 'financingParties') {
       return [
@@ -27,8 +26,8 @@ jest.mock('@/hooks/useOptions', () => ({
   },
 }));
 
-jest.mock('hds-react', () => {
-  const actual = jest.requireActual('hds-react');
+vi.mock('hds-react', async () => {
+  const actual = await vi.importActual<typeof import('hds-react')>('hds-react');
 
   return {
     ...actual,
@@ -63,7 +62,7 @@ jest.mock('hds-react', () => {
   };
 });
 
-jest.mock('./FinancingDialog', () => ({
+vi.mock('./FinancingDialog', () => ({
   __esModule: true,
   default: ({
     onRowSaved,

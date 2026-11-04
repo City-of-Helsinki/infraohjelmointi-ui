@@ -8,7 +8,6 @@ import {
   getCoordinationViewReportPdfRows,
   getIsGroupOnSchedule,
   getIsProjectOnSchedule,
-  getReportData,
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
@@ -16,7 +15,7 @@ import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterf
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { t } from 'i18next';
 
-jest.mock('i18next', () => ({
+vi.mock('i18next', () => ({
   t: (key: string) => key,
 }));
 
@@ -105,10 +104,8 @@ describe('reportHelpers', () => {
       'exports only funded projects to CSV for a budget of %p',
       async (budget) => {
         const selectedYear = type === Reports.StrategyForcedToFrame ? year - 1 : year;
-        let isolatedGetReportData = getReportData;
-        jest.isolateModules(() => {
-          isolatedGetReportData = require('./reportHelpers').getReportData;
-        });
+        vi.resetModules();
+        const { getReportData: isolatedGetReportData } = await import('./reportHelpers');
         const csvRows = await isolatedGetReportData(
           t,
           type,

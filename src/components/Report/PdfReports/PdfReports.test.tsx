@@ -42,7 +42,7 @@ describe('PdfReports', () => {
   });
 
   it('renders category summary rows without missing React keys', () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
     try {
       render(

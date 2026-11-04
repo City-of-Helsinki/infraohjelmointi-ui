@@ -1,5 +1,4 @@
 import axios from 'axios';
-import mockI18next from '@/mocks/mockI18next';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import { act } from 'react-dom/test-utils';
@@ -8,11 +7,12 @@ import { Route } from 'react-router';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
 import { authApi } from '@/api/authApi';
+import type { MockedFunction } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('axios');
 
-const axiosMock = axios as jest.MockedFunction<typeof axios>;
+const axiosMock = axios as MockedFunction<typeof axios>;
 
 const store = setupStore();
 

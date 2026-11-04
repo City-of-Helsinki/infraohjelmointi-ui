@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectHeader from './ProjectHeader';
 import axios from 'axios';
@@ -9,11 +8,12 @@ import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCall
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import { mockGroups } from '@/mocks/mockGroups';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const store = setupStore();
 
@@ -40,7 +40,7 @@ describe('ProjectHeader', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders all component wrappers', async () => {

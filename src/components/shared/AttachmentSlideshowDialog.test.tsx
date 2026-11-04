@@ -1,23 +1,22 @@
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AttachmentSlideshowDialog from './AttachmentSlideshowDialog';
 import mockNoteImages from '@/mocks/mockNoteImages';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const attachments = mockNoteImages;
 
 describe('AttachmentSlideshowDialog', () => {
   it('shows a single image without navigation or a counter', () => {
-    const onPrevious = jest.fn();
-    const onNext = jest.fn();
+    const onPrevious = vi.fn();
+    const onNext = vi.fn();
     const { getByRole, queryByText, queryByLabelText } = render(
       <AttachmentSlideshowDialog
         isOpen
         attachments={[{ fileName: 'preview.jpg', downloadUrl: 'https://example.com/preview.jpg' }]}
         selectedIndex={0}
-        onClose={jest.fn()}
+        onClose={vi.fn()}
         onPrevious={onPrevious}
         onNext={onNext}
       />,
@@ -41,7 +40,7 @@ describe('AttachmentSlideshowDialog', () => {
         isOpen
         attachments={[{ fileName: 'first.jpg' }, { fileName: 'second.jpg' }]}
         selectedIndex={0}
-        onClose={jest.fn()}
+        onClose={vi.fn()}
       />,
     );
 
@@ -53,13 +52,13 @@ describe('AttachmentSlideshowDialog', () => {
   });
 
   it.each(['previous', 'next'])('supports only the %s navigation callback', (direction) => {
-    const onNavigate = jest.fn();
+    const onNavigate = vi.fn();
     const { getByLabelText } = render(
       <AttachmentSlideshowDialog
         isOpen
         attachments={[{ fileName: 'first.jpg' }, { fileName: 'second.jpg' }]}
         selectedIndex={0}
-        onClose={jest.fn()}
+        onClose={vi.fn()}
         onPrevious={direction === 'previous' ? onNavigate : undefined}
         onNext={direction === 'next' ? onNavigate : undefined}
       />,
@@ -75,12 +74,12 @@ describe('AttachmentSlideshowDialog', () => {
   });
 
   it('removes keyboard navigation listeners when closed or unmounted', () => {
-    const onPrevious = jest.fn();
-    const onNext = jest.fn();
+    const onPrevious = vi.fn();
+    const onNext = vi.fn();
     const props = {
       attachments,
       selectedIndex: 0,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       onPrevious,
       onNext,
     };
@@ -109,9 +108,9 @@ describe('AttachmentSlideshowDialog', () => {
         isOpen
         attachments={attachments}
         selectedIndex={10}
-        onClose={jest.fn()}
-        onPrevious={jest.fn()}
-        onNext={jest.fn()}
+        onClose={vi.fn()}
+        onPrevious={vi.fn()}
+        onNext={vi.fn()}
       />,
     );
 
@@ -119,9 +118,9 @@ describe('AttachmentSlideshowDialog', () => {
   });
 
   it('calls close, previous and next handlers from buttons', async () => {
-    const onClose = jest.fn();
-    const onPrevious = jest.fn();
-    const onNext = jest.fn();
+    const onClose = vi.fn();
+    const onPrevious = vi.fn();
+    const onNext = vi.fn();
     const user = userEvent.setup();
 
     const { getByRole, getByLabelText } = render(
@@ -145,9 +144,9 @@ describe('AttachmentSlideshowDialog', () => {
   });
 
   it('responds to keyboard navigation only when open', () => {
-    const onClose = jest.fn();
-    const onPrevious = jest.fn();
-    const onNext = jest.fn();
+    const onClose = vi.fn();
+    const onPrevious = vi.fn();
+    const onNext = vi.fn();
 
     const { rerender } = render(
       <AttachmentSlideshowDialog

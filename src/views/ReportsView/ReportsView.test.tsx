@@ -1,11 +1,10 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act, within } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import ReportsView from './ReportsView';
 import { reports } from '@/interfaces/reportInterfaces';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const render = async () =>
   await act(async () => renderWithProviders(<Route path="*" element={<ReportsView />} />));

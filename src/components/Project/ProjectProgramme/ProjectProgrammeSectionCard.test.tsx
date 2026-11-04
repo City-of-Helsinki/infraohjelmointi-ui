@@ -4,21 +4,21 @@ import { renderWithProviders } from '@/utils/testUtils';
 import ProjectProgrammeSectionCard from './ProjectProgrammeSectionCard';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 
-const mockDispatch = jest.fn();
-const mockTransitionSectionStatus = jest.fn();
+const mockDispatch = vi.fn();
+const mockTransitionSectionStatus = vi.fn();
 
-jest.mock('@/hooks/common', () => ({
-  ...jest.requireActual('@/hooks/common'),
+vi.mock('@/hooks/common', async () => ({
+  ...(await vi.importActual<typeof import('@/hooks/common')>('@/hooks/common')),
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/api/projectProgrammeApi', () => ({
+vi.mock('@/api/projectProgrammeApi', () => ({
   useTransitionProjectProgrammeSectionStatusMutation: () => [
     (...args: unknown[]) => ({ unwrap: () => mockTransitionSectionStatus(...args) }),
   ],
 }));
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: { language: 'fi' },
@@ -27,7 +27,7 @@ jest.mock('react-i18next', () => ({
 
 describe('ProjectProgrammeSectionCard readonly sections', () => {
   const baseProps = {
-    handleOpenSection: jest.fn(),
+    handleOpenSection: vi.fn(),
     label: 'Basic info',
     cardText: 'Please fill this section',
     actionText: 'projectProgrammeForm.fillBasicInfo',

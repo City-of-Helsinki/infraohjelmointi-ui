@@ -5,13 +5,13 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const getTalpaProjectOpeningByProject = async (
   projectId: string,
 ): Promise<ITalpaProjectOpening> => {
   const res = await axios.get<ITalpaProjectOpening>(
-    `${REACT_APP_API_URL}/talpa-project-opening/by-project/${projectId}/`,
+    `${API_URL}/talpa-project-opening/by-project/${projectId}/`,
   );
   return res.data;
 };
@@ -20,7 +20,7 @@ export const postTalpaProjectOpening = async (
   request: ITalpaProjectPostRequestObject,
 ): Promise<ITalpaProjectOpening> => {
   const res = await axios.post<ITalpaProjectOpening>(
-    `${REACT_APP_API_URL}/talpa-project-opening/`,
+    `${API_URL}/talpa-project-opening/`,
     request.data,
   );
   return res.data;
@@ -30,7 +30,7 @@ export const patchTalpaProjectOpening = async (
   request: ITalpaProjectPatchRequestObject,
 ): Promise<ITalpaProjectOpening> => {
   const res = await axios.patch<ITalpaProjectOpening>(
-    `${REACT_APP_API_URL}/talpa-project-opening/${request.id}/`,
+    `${API_URL}/talpa-project-opening/${request.id}/`,
     request.data,
   );
   return res.data;
@@ -40,7 +40,7 @@ export const markTalpaProjectAsSent = async (
   talpaProjectId: string,
 ): Promise<ITalpaProjectOpening> => {
   const res = await axios.post<ITalpaProjectOpening>(
-    `${REACT_APP_API_URL}/talpa-project-opening/${talpaProjectId}/send-to-talpa/`,
+    `${API_URL}/talpa-project-opening/${talpaProjectId}/send-to-talpa/`,
   );
   return res.data;
 };
@@ -82,7 +82,7 @@ export const downloadExcel = async (
 ): Promise<IDownloadExcelResult | undefined> => {
   try {
     const res = await axios.get<Blob>(
-      `${REACT_APP_API_URL}/talpa-project-opening/${talpaProjectId}/download-excel/`,
+      `${API_URL}/talpa-project-opening/${talpaProjectId}/download-excel/`,
       {
         responseType: 'blob',
       },

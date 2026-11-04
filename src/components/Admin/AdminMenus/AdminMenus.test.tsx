@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import AdminMenus from './AdminMenus';
 import { setupStore, RootState } from '@/store';
@@ -7,15 +6,17 @@ import { Route } from 'react-router';
 import { screen, waitFor } from '@testing-library/react';
 import { useOptions } from '@/hooks/useOptions';
 import * as listServices from '@/services/listServices';
+import type { Mock } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/services/listServices', () => {
-  const actual = jest.requireActual('@/services/listServices');
+vi.mock('@/services/listServices', async () => {
+  const actual =
+    await vi.importActual<typeof import('@/services/listServices')>('@/services/listServices');
 
   return {
     ...actual,
-    postMenuListItem: jest.fn(),
+    postMenuListItem: vi.fn(),
   };
 });
 
@@ -55,8 +56,8 @@ describe('AdminMenus', () => {
 
   beforeAll(() => {
     class MockIntersectionObserver implements Partial<IntersectionObserver> {
-      observe = jest.fn();
-      disconnect = jest.fn();
+      observe = vi.fn();
+      disconnect = vi.fn();
     }
 
     Object.defineProperty(window, 'IntersectionObserver', {
@@ -67,7 +68,7 @@ describe('AdminMenus', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders side navigation and cards', async () => {
@@ -107,7 +108,7 @@ describe('AdminMenus', () => {
   });
 
   it('updates responsible person options immediately after adding a responsible person via admin menu', async () => {
-    const postMenuListItemMock = listServices.postMenuListItem as jest.Mock;
+    const postMenuListItemMock = listServices.postMenuListItem as Mock;
     postMenuListItemMock.mockResolvedValueOnce({
       id: '11',
       firstName: 'Matti',
