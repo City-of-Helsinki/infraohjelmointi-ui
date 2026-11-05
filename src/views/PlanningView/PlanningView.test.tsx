@@ -6,7 +6,7 @@ import {
   mockSubClasses,
 } from '@/mocks/mockClasses';
 import { setupStore } from '@/store';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { CustomRenderResult, optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import PlanningView from './PlanningView';
 import useUpdateEvents from '@/hooks/useUpdateEvents';
 import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
@@ -2051,7 +2051,9 @@ describe('PlanningView', () => {
           );
 
           // Adding project to the group
-          await user.click(await groupEditDialog.findByText('not-in-group-project'));
+          await user.click(
+            await groupEditDialog.findByRole('option', optionWithLabel('not-in-group-project')),
+          );
           // Length is 2 since there is already a project under this group
           await waitFor(() => expect(getAllByTestId('project-selections')).toHaveLength(2));
           const getRequest = mockedAxios.get.mock;

@@ -1,20 +1,11 @@
 import { Search } from 'hds-react';
-import { ChangeEvent, FC, MouseEvent, useCallback, useEffect, useRef } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ISearchOption {
   label: string;
   value: string;
 }
-
-interface ISearchState {
-  value: string;
-  options: ISearchOption[];
-  requestId: number;
-}
-
-type HdsSearchChangeEvent =
-  ChangeEvent<HTMLInputElement> | MouseEvent<HTMLButtonElement> | { target: { value: string } };
 
 interface IHdsSearchInputProps {
   id?: string;
@@ -46,84 +37,42 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   onSubmit,
 }) => {
   const { t } = useTranslation();
-  const searchStateRef = useRef<ISearchState>({
-    value: value ?? '',
-    options: [],
-    requestId: 0,
-  });
+  const searchClearButtonAriaLabel = clearButtonAriaLabel ?? t('clearSearchField', { label });
+  const texts = useMemo(
+    () => ({
+      label,
+      assistive: helperText,
+      searchClearButtonAriaLabel,
+      searchButtonAriaLabel,
+    }),
+    [label, helperText, searchClearButtonAriaLabel, searchButtonAriaLabel],
+  );
   const getSuggestionsRef = useRef(getSuggestions);
+  const onChangeRef = useRef(onChange);
+  const onSubmitRef = useRef(onSubmit);
+  const valueRef = useRef(value);
+  const selectedOptionRef = useRef<string>();
 
   useEffect(() => {
     getSuggestionsRef.current = getSuggestions;
-  }, [getSuggestions]);
-  useEffect(() => {
-    if (value !== undefined && searchStateRef.current.value !== value) {
-      searchStateRef.current = {
-        value,
-        options: [],
-        requestId: searchStateRef.current.requestId + 1,
-      };
-    }
-  }, [value]);
-  useEffect(
-    () => () => {
-      searchStateRef.current.requestId += 1;
-      searchStateRef.current.options = [];
-    },
-    [],
-  );
+    onChangeRef.current = onChange;
+    onSubmitRef.current = onSubmit;
+    valueRef.current = value;
+  }, [getSuggestions, onChange, onSubmit, value]);
 
   const handleSearch = useCallback(async (searchValue: string) => {
-    const requestId = ++searchStateRef.current.requestId;
-    try {
-      const suggestions = (await getSuggestionsRef.current?.(searchValue)) ?? [];
-      if (
-        requestId === searchStateRef.current.requestId &&
-        searchValue === searchStateRef.current.value
-      ) {
-        searchStateRef.current.options = suggestions.map((option, index) => ({
-          ...option,
-          value: `${option.value}-${index}`,
-        }));
-      }
-    } catch (error) {
-      if (requestId === searchStateRef.current.requestId) throw error;
+    selectedOptionRef.current = undefined;
+    const suggestions = (await getSuggestionsRef.current?.(searchValue)) ?? [];
+    if (valueRef.current !== undefined && valueRef.current !== searchValue) {
+      return { options: [] };
     }
-    return { options: searchStateRef.current.options };
+    return {
+      options: suggestions.map((option, index) => ({
+        ...option,
+        value: `${option.value}-${index}`,
+      })),
+    };
   }, []);
-
-  const updateValue = useCallback(
-    (nextValue: string) => {
-      searchStateRef.current = {
-        value: nextValue,
-        options: [],
-        requestId: searchStateRef.current.requestId + 1,
-      };
-      onChange?.(nextValue);
-    },
-    [onChange],
-  );
-
-  const handleChange = useCallback(
-    (event: HdsSearchChangeEvent) => {
-      if ('type' in event) {
-        if (event.type === 'change') updateValue(event.currentTarget.value);
-        if (event.type === 'click') updateValue('');
-        return;
-      }
-
-      // HDS 5.2.2 Search's input effect reports internal search/value mismatches as
-      // { target: { value: internalSearch } }, without a React event. Selection
-      // updates internalSearch through this same path. Only current suggestions
-      // may be submitted; typing clears them before HDS can echo the old text.
-      const selectedLabel = event.target.value;
-      if (searchStateRef.current.options.some((option) => option.label === selectedLabel)) {
-        updateValue(selectedLabel);
-        onSubmit?.(selectedLabel);
-      }
-    },
-    [updateValue, onSubmit],
-  );
 
   return (
     <Search
@@ -131,16 +80,19 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
       data-testid={dataTestId}
       className={className}
       value={value}
-      onChange={handleChange}
+      onChange={(event) => event.type && onChange?.(event.target.value)}
       onSearch={getSuggestions ? handleSearch : undefined}
+      onClose={(selectedOptions) => {
+        const [selectedOption] = selectedOptions;
+        if (selectedOption && selectedOption.value !== selectedOptionRef.current) {
+          selectedOptionRef.current = selectedOption.value;
+          onChangeRef.current?.(selectedOption.label);
+          onSubmitRef.current?.(selectedOption.label);
+        }
+      }}
       onSend={onSubmit}
       hideSubmitButton={hideSearchButton}
-      texts={{
-        label,
-        assistive: helperText,
-        searchClearButtonAriaLabel: clearButtonAriaLabel ?? t('clearSearchField', { label }),
-        searchButtonAriaLabel,
-      }}
+      texts={texts}
     />
   );
 };

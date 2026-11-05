@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Search } from 'hds-react';
 import { useState } from 'react';
+import { optionWithLabel } from '@/utils/testUtils';
 import HdsSearchInput from './HdsSearchInput';
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
@@ -17,10 +18,12 @@ const ControlledSearch = ({
   onChange,
   onSubmit,
   getSuggestions,
+  resetOnSubmit = false,
 }: {
   onChange: (value: string) => void;
   onSubmit: (value: string) => void;
   getSuggestions?: (query: string) => Promise<SearchOption[]>;
+  resetOnSubmit?: boolean;
 }) => {
   const [value, setValue] = useState('');
   return (
@@ -34,7 +37,10 @@ const ControlledSearch = ({
           onChange(nextValue);
           setValue(nextValue);
         }}
-        onSubmit={onSubmit}
+        onSubmit={(nextValue) => {
+          onSubmit(nextValue);
+          if (resetOnSubmit) setValue('');
+        }}
         getSuggestions={getSuggestions}
       />
       <button type="button" onClick={() => setValue('')}>
@@ -45,6 +51,36 @@ const ControlledSearch = ({
 };
 
 describe('HdsSearchInput with real HDS', () => {
+  it('preserves HDS metadata across ordinary parent renders', () => {
+    const { rerender } = render(<HdsSearchInput label="Projects" onChange={vi.fn()} />);
+    const inputId = screen.getByRole('searchbox').id;
+
+    rerender(<HdsSearchInput label="Projects" onChange={vi.fn()} />);
+
+    expect(screen.getByRole('searchbox')).toHaveAttribute('id', inputId);
+  });
+
+  it('updates memoized texts when their props change', () => {
+    const { rerender } = render(
+      <HdsSearchInput label="Projects" helperText="Find projects" clearButtonAriaLabel="Clear" />,
+    );
+
+    rerender(
+      <HdsSearchInput
+        label="Groups"
+        helperText="Find groups"
+        clearButtonAriaLabel="Clear groups"
+        searchButtonAriaLabel="Submit groups"
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('searchbox', { name: 'Groups' })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toHaveAccessibleDescription('Find groups');
+    expect(screen.getByRole('button', { name: 'Clear groups' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Submit groups' })).toBeInTheDocument();
+  });
+
   it('verifies HDS itself reports controlled/internal value mismatches without a React event', () => {
     const onChange = vi.fn();
     render(<Search value="Alpha" onChange={onChange} texts={{ label: 'Projects' }} />);
@@ -89,7 +125,7 @@ describe('HdsSearchInput with real HDS', () => {
       />,
     );
     await user.type(screen.getByRole('combobox'), 'Alpha');
-    await screen.findByText('Alpha project');
+    await screen.findByRole('option', optionWithLabel('Alpha project'));
     expect(screen.getByRole('combobox')).toHaveValue('Alpha');
     expect(onChange.mock.calls.map(([value]) => value)).toEqual([
       'A',
@@ -114,7 +150,7 @@ describe('HdsSearchInput with real HDS', () => {
 
     const input = screen.getByRole('combobox');
     await user.type(input, 'Alpha');
-    await screen.findByText('Alpha');
+    await screen.findByRole('option', optionWithLabel('Alpha'));
     await user.type(input, ' project');
 
     expect(input).toHaveValue('Alpha project');
@@ -156,7 +192,7 @@ describe('HdsSearchInput with real HDS', () => {
       />,
     );
     await user.type(screen.getByRole('combobox'), 'Al');
-    const option = await screen.findByText('Alpha project');
+    const option = await screen.findByRole('option', optionWithLabel('Alpha project'));
     if (method === 'mouse') await user.click(option);
     else await user.keyboard('{ArrowDown}{Enter}');
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Alpha project');
@@ -173,6 +209,29 @@ describe('HdsSearchInput with real HDS', () => {
     expect(onSubmit).toHaveBeenLastCalledWith('Alpha');
   });
 
+  it('can select the same suggestion again after submission resets the value', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <ControlledSearch
+        onChange={vi.fn()}
+        onSubmit={onSubmit}
+        getSuggestions={async () => options}
+        resetOnSubmit
+      />,
+    );
+    const input = screen.getByRole('combobox');
+
+    for (const expectedCount of [1, 2]) {
+      await user.type(input, 'Al');
+      await user.click(await screen.findByRole('option', optionWithLabel('Alpha project')));
+
+      expect(input).toHaveValue('');
+      expect(onSubmit).toHaveBeenCalledTimes(expectedCount);
+      expect(onSubmit).toHaveBeenLastCalledWith('Alpha project');
+    }
+  });
+
   it('selects a retained suggestion after submitting and reopening', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -185,12 +244,12 @@ describe('HdsSearchInput with real HDS', () => {
     );
     const input = screen.getByRole('combobox');
     await user.type(input, 'Al');
-    await screen.findByText('Alpha project');
+    await screen.findByRole('option', optionWithLabel('Alpha project'));
     await user.click(screen.getByRole('button', { name: 'Submit' }));
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Al');
 
     await user.click(input);
-    await user.click(await screen.findByText('Alpha project'));
+    await user.click(await screen.findByRole('option', optionWithLabel('Alpha project')));
 
     expect(input).toHaveValue('Alpha project');
     expect(onSubmit).toHaveBeenCalledTimes(2);
@@ -224,10 +283,10 @@ describe('HdsSearchInput with real HDS', () => {
     await user.type(screen.getByRole('combobox'), 'b');
     await waitFor(() => expect(pending.has('b')).toBe(true));
     await act(async () => pending.get('b')?.([{ label: 'Beta project', value: 'beta' }]));
-    await screen.findByText('Beta project');
+    await screen.findByRole('option', optionWithLabel('Beta project'));
     await act(async () => pending.get('a')?.(options));
-    expect(screen.queryByText('Alpha project')).not.toBeInTheDocument();
-    await user.click(screen.getByText('Beta project'));
+    expect(screen.queryByRole('option', optionWithLabel('Alpha project'))).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', optionWithLabel('Beta project')));
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Beta project');
   });
 
@@ -251,7 +310,9 @@ describe('HdsSearchInput with real HDS', () => {
       await user.click(screen.getByRole('button', { name: buttonName }));
       await act(async () => resolveSearch?.(options));
       expect(screen.getByRole('combobox')).toHaveValue('');
-      expect(screen.queryByText('Alpha project')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('option', optionWithLabel('Alpha project')),
+      ).not.toBeInTheDocument();
       expect(onSubmit).not.toHaveBeenCalled();
     },
   );
