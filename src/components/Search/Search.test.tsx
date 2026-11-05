@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { renderWithProviders } from '@/utils/testUtils';
+import { optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import {
   mockProjectCategories,
   mockProjectPhases,
@@ -183,7 +183,7 @@ describe('Search', () => {
   it('can use the free search field to get suggestions and add selections to search params', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResults);
 
-    const { user, store, getByText, queryByText, getByTestId } = await render();
+    const { user, store, getByText, queryByText, getByTestId, getByRole } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -193,16 +193,16 @@ describe('Search', () => {
     // check that the full search response is rendered
     await waitFor(async () => {
       mockFreeSearchResults.data.projects?.forEach((p) => {
-        expect(getByText(p.value)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(p.value))).toBeInTheDocument();
       });
       mockFreeSearchResults.data.hashtags?.forEach((h) => {
-        expect(getByText(`#${h.value}`)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(`#${h.value}`))).toBeInTheDocument();
       });
       mockFreeSearchResults.data.groups?.forEach((g) => {
-        expect(getByText(g.value)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(g.value))).toBeInTheDocument();
       });
-      await user.click(getByText('#leikkipuisto'));
     });
+    await user.click(getByRole('option', optionWithLabel('#leikkipuisto')));
 
     const getRequest = mockedAxios.get.mock;
 
@@ -241,13 +241,13 @@ describe('Search', () => {
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-    const { user, store, getByText, getByTestId } = await render();
+    const { user, store, getByText, getByTestId, findByRole } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
     await user.type(getByText('searchForm.searchWord'), specialFreeSearch);
 
-    await waitFor(() => expect(getByText(specialProjectName)).toBeInTheDocument());
+    const projectOption = await findByRole('option', optionWithLabel(specialProjectName));
 
     // Test that the free search request is encoded correctly
     const freeSearchRequestCall = mockedAxios.get.mock.calls.find(([url]) =>
@@ -260,7 +260,7 @@ describe('Search', () => {
 
     expect(freeSearchRequestUrl).toContain(`freeSearch=${encodeURIComponent(specialFreeSearch)}`);
 
-    await user.click(getByText(specialProjectName));
+    await user.click(projectOption);
     await user.click(getByTestId('search-projects-button'));
 
     await waitFor(() => expect(getByTestId('search-results-view')).toBeInTheDocument());

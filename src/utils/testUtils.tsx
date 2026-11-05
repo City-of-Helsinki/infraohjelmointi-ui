@@ -15,6 +15,10 @@ import { IUser, UserRole } from '@/interfaces/userInterfaces';
 
 type UserEvent = ReturnType<typeof userEvent.setup>;
 
+export const optionWithLabel = (label: string) => ({
+  name: (_accessibleName: string, element: Element | null) => element?.textContent === label,
+});
+
 const oidcConfig = {
   authority: 'authority',
   client_id: 'client',

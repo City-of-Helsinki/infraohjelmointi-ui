@@ -201,25 +201,28 @@
 }
 
 .editDialogActionButtonRow {
-  display: grid;
+  display: flex;
   gap: var(--spacing-s);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
+  padding: var(--spacing-s) var(--spacing-l) var(--spacing-m);
+}
+
+.editDialogActionButtonRow > .editDialogActionButton {
+  flex: 1;
+  min-width: 0;
 }
 
 .editDialogActionButton {
   width: 100%;
 }
 
-.editDialogFooterActionButton {
-  width: 100%;
-}
-
 @media (max-width: 768px) {
   .editDialogDateRow,
-  .editDialogPlanningEstimateRow,
-  .editDialogActionButtonRow {
+  .editDialogPlanningEstimateRow {
     grid-template-columns: 1fr;
+  }
+
+  .editDialogActionButtonRow {
+    flex-direction: column;
   }
 }
 

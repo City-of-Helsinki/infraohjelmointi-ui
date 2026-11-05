@@ -1,7 +1,7 @@
 import { FC, MouseEvent, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useAppSelector } from '@/hooks/common';
-import { IconStar, IconStarFill } from 'hds-react/icons';
+import { IconStar, IconStarFill } from 'hds-react';
 import { IconButton } from '../../shared';
 import { IProjectHeaderFieldProps } from './ProjectHeader';
 import { selectProjectMode } from '@/reducers/projectSlice';

@@ -1,4 +1,5 @@
-import { Tag, SearchInput } from 'hds-react';
+import { Tag } from 'hds-react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue } from '@/utils/common';
@@ -80,7 +81,7 @@ const HkrIdSearch = ({
         control={control as Control<FieldValues>}
         render={({ field: { onChange, value } }) => (
           <>
-            <SearchInput
+            <HdsSearchInput
               label={t('searchForm.hkrIdSearch')}
               value={searchWord}
               onChange={handleSetSearchWord}

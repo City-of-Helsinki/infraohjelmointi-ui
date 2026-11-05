@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { renderWithProviders } from '@/utils/testUtils';
+import { optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
@@ -221,13 +221,9 @@ describe('GroupDialog', () => {
       'Vanha',
     );
 
-    await waitFor(async () => {
-      const project = await dialog.findByText('Vanha yrttimaantie');
-      expect(project).toBeInTheDocument();
-
-      await user.click(project);
-      expect((await findAllByTestId('project-selections')).length).toBe(1);
-    });
+    const project = await dialog.findByRole('option', optionWithLabel('Vanha yrttimaantie'));
+    await user.click(project);
+    expect(await findAllByTestId('project-selections')).toHaveLength(1);
 
     const getRequest = mockedAxios.get.mock;
 

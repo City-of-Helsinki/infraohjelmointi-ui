@@ -1,4 +1,4 @@
-import { IconAngleDown, IconAngleUp, IconMenuDots, IconSize } from 'hds-react/icons';
+import { IconAngleDown, IconAngleUp, IconMenuDots, IconSize } from 'hds-react';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IOption } from '@/interfaces/common';

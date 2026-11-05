@@ -33,9 +33,10 @@ const PWContainer: FC<IPWContainerProps> = ({ pwFolderLink }) => {
                   className="pw-folder-link"
                   data-testid="pw-folder-link"
                   external
-                  openInNewTab
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={`${t('nav.pwFolderLink')}. ${t('opensInNewTab')}`}
                   openInExternalDomainAriaLabel={t(`opensExternalWebsite`) || ''}
-                  openInNewTabAriaLabel={t(`opensInNewTab`) || ''}
                 >
                   {t(`nav.pwFolderLink`)}
                 </Link>

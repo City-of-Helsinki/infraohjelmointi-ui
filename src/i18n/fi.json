@@ -988,6 +988,7 @@
   "adviceSearchTitle": "Et ole vielä etsinyt mitään.",
   "adviceSearchText": "Avaa haku etsiäksesi projekteja.",
   "emptyTerms": "Tyhjennä hakuehdot",
+  "clearSearchField": "Tyhjennä hakukenttä: {{label}}",
   "order": "Järjestys",
   "organize": "Järjestä",
   "searchResults": "Hakutulokset",

@@ -1,6 +1,6 @@
 import useDoubleClick from '@/hooks/useDoubleClick';
 import { ProjectCellGrowDirection } from '@/interfaces/projectInterfaces';
-import { IconAngleLeft } from 'hds-react/icons';
+import { IconAngleLeft } from 'hds-react';
 import { memo, useRef } from 'react';
 
 const EditTimelineButton = ({

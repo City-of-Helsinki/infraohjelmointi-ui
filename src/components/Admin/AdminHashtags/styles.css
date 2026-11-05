@@ -28,7 +28,7 @@
 }
 
 /* hide the clear button for hashtags search */
-.admin-hashtags-search > div > div > button:nth-child(1) {
+.admin-hashtags-search button[class*='TextInput-module_clearButton'] {
   @apply hidden;
 }
 

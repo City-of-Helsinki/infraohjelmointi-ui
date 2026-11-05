@@ -72,7 +72,14 @@ describe('ProjectBasics', () => {
 
     expect(await findByTestId('side-panel')).toBeInTheDocument();
     expect(await findByTestId('pw-folder-container')).toBeInTheDocument();
-    expect(await findByTestId('pw-folder-link')).toBeInTheDocument();
+    const pwFolderLink = await findByTestId('pw-folder-link');
+    expect(pwFolderLink).toHaveAttribute('target', '_blank');
+    expect(pwFolderLink).toHaveAttribute('rel', 'noopener');
+    expect(pwFolderLink).toHaveAttribute(
+      'aria-label',
+      'nav.pwFolderLink. opensInNewTab. opensExternalWebsite',
+    );
+    expect(pwFolderLink.textContent).toBe('nav.pwFolderLink');
 
     for (const navItem of navItems) {
       expect(

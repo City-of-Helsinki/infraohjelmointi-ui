@@ -1,7 +1,8 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { getLocationParent, listItemToOption } from '@/utils/common';
-import { Tag, SearchInput } from 'hds-react';
+import { Tag } from 'hds-react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
 import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
@@ -189,12 +190,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
         control={control}
         render={({ field: { onChange } }) => (
           <>
-            <SearchInput
+            <HdsSearchInput
               label={t('groupForm.searchForProjects')}
               getSuggestions={getSuggestions}
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
-              suggestionLabelField="label"
               helperText={t('groupForm.suggestionHelperText') || ''}
               hideSearchButton={true}
               value={searchWord}

@@ -1,14 +1,14 @@
-import { FC, memo, useCallback, useMemo, useState } from 'react';
+import { ComponentProps, FC, memo, useCallback, useMemo, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select as HDSSelect, SelectProps } from 'hds-react';
+import { Select as HDSSelect } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
 import TextField from './TextField';
 
 type Option = { value: string; label: string };
 
-interface ISelectFieldProps extends SelectProps {
+interface ISelectFieldProps extends ComponentProps<typeof HDSSelect> {
   name: string;
   control?: HookFormControlType;
   options?: Array<Option>;

@@ -1,6 +1,11 @@
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
+import {
+  CustomRenderResult,
+  optionWithLabel,
+  renderWithProviders,
+  sendProjectUpdateEvent,
+} from '@/utils/testUtils';
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
@@ -170,9 +175,11 @@ describe('ProjectProgrammedDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-
-    await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
+    const project = await dialog.findByRole(
+      'option',
+      optionWithLabel(mockSearchResults.data.results[0].name),
+    );
+    await user.click(project);
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
     const getRequest = mockedAxios.get.mock;
