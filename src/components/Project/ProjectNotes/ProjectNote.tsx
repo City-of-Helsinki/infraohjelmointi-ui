@@ -19,16 +19,16 @@ import NoteAttachmentList from './NoteAttachmentList';
 import { useDeleteNoteImageMutation } from '@/api/notesApi';
 
 interface IProjectNoteProps {
-import {
-  StatusLabel,
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconAngleDown,
-  IconAngleUp,
-  IconPenLine,
-  IconTrash,
-} from 'hds-react';
+  note: INote;
+}
+
+const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
+  const { t } = useTranslation();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openModifiedInfo, setOpenModifiedInfo] = useState(false);
+  const author = `${note.updatedBy?.first_name} ${note.updatedBy?.last_name}`;
+  const hasHistory = note.history?.length > 0;
 
   const handleOpenDeleteDialog = useCallback(
     () => setOpenDeleteDialog((currentState) => !currentState),

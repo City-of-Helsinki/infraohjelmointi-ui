@@ -1,11 +1,20 @@
 import { Search } from 'hds-react';
-import { ChangeEvent, FC, useCallback, useEffect, useRef } from 'react';
+import { ChangeEvent, FC, MouseEvent, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ISearchOption {
   label: string;
   value: string;
 }
+
+interface ISearchState {
+  value: string;
+  options: ISearchOption[];
+  requestId: number;
+}
+
+type HdsSearchChangeEvent =
+  ChangeEvent<HTMLInputElement> | MouseEvent<HTMLButtonElement> | { target: { value: string } };
 
 interface IHdsSearchInputProps {
   id?: string;
@@ -37,60 +46,94 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   onSubmit,
 }) => {
   const { t } = useTranslation();
-  const suggestionsRef = useRef<ISearchOption[]>([]);
+  const searchStateRef = useRef<ISearchState>({
+    value: value ?? '',
+    options: [],
+    requestId: 0,
+  });
   const getSuggestionsRef = useRef(getSuggestions);
-  const valueRef = useRef(value);
-  const searchInputRef = useRef<HTMLInputElement & { submit: () => void }>(null);
 
   useEffect(() => {
     getSuggestionsRef.current = getSuggestions;
   }, [getSuggestions]);
   useEffect(() => {
-    valueRef.current = value;
+    if (value !== undefined && searchStateRef.current.value !== value) {
+      searchStateRef.current = {
+        value,
+        options: [],
+        requestId: searchStateRef.current.requestId + 1,
+      };
+    }
   }, [value]);
+  useEffect(
+    () => () => {
+      searchStateRef.current.requestId += 1;
+      searchStateRef.current.options = [];
+    },
+    [],
+  );
 
   const handleSearch = useCallback(async (searchValue: string) => {
-    const suggestions = (await getSuggestionsRef.current?.(searchValue)) ?? [];
-    const options = suggestions.map((option, index) => ({
-      ...option,
-      value: `${option.value}-${index}`,
-    }));
-    suggestionsRef.current = suggestions;
-    return { options };
+    const requestId = ++searchStateRef.current.requestId;
+    try {
+      const suggestions = (await getSuggestionsRef.current?.(searchValue)) ?? [];
+      if (
+        requestId === searchStateRef.current.requestId &&
+        searchValue === searchStateRef.current.value
+      ) {
+        searchStateRef.current.options = suggestions.map((option, index) => ({
+          ...option,
+          value: `${option.value}-${index}`,
+        }));
+      }
+    } catch (error) {
+      if (requestId === searchStateRef.current.requestId) throw error;
+    }
+    return { options: searchStateRef.current.options };
   }, []);
 
+  const updateValue = useCallback(
+    (nextValue: string) => {
+      searchStateRef.current = {
+        value: nextValue,
+        options: [],
+        requestId: searchStateRef.current.requestId + 1,
+      };
+      onChange?.(nextValue);
+    },
+    [onChange],
+  );
+
   const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const searchValue = event.target.value;
-      if (event.nativeEvent) {
-        onChange?.(searchValue);
+    (event: HdsSearchChangeEvent) => {
+      if ('type' in event) {
+        if (event.type === 'change') updateValue(event.currentTarget.value);
+        if (event.type === 'click') updateValue('');
         return;
       }
 
-      // HDS reports selections and clears with synthetic change events. It also
-      // emits a stale value after ordinary typing, which must not replace it.
-      if (suggestionsRef.current.some((option) => option.label === searchValue)) {
-        suggestionsRef.current = [];
-        onChange?.(searchValue);
-        onSubmit?.(searchValue);
-      } else if (searchInputRef.current?.value === '' && valueRef.current) {
-        onChange?.('');
+      // HDS 5.2.2 Search's input effect reports internal search/value mismatches as
+      // { target: { value: internalSearch } }, without a React event. Selection
+      // updates internalSearch through this same path. Only current suggestions
+      // may be submitted; typing clears them before HDS can echo the old text.
+      const selectedLabel = event.target.value;
+      if (searchStateRef.current.options.some((option) => option.label === selectedLabel)) {
+        updateValue(selectedLabel);
+        onSubmit?.(selectedLabel);
       }
     },
-    [onChange, onSubmit],
+    [updateValue, onSubmit],
   );
-  const handleSend = useCallback((searchValue: string) => onSubmit?.(searchValue), [onSubmit]);
 
   return (
     <Search
       id={id}
       data-testid={dataTestId}
       className={className}
-      ref={searchInputRef}
       value={value}
       onChange={handleChange}
       onSearch={getSuggestions ? handleSearch : undefined}
-      onSend={handleSend}
+      onSend={onSubmit}
       hideSubmitButton={hideSearchButton}
       texts={{
         label,

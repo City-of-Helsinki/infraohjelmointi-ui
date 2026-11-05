@@ -29,6 +29,14 @@
   @apply border-gray mt-4 border-b;
 }
 
+.search-form :is(.free-search, .hkr-id-search) > :first-child {
+  @apply w-full max-w-full;
+}
+
+.search-form .hkr-id-search {
+  @apply col-span-2;
+}
+
 .free-search .search-selections {
   @apply my-2 flex flex-wrap gap-2;
 }
