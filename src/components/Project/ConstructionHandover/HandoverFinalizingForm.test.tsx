@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithProviders, withMockAuthUserAdGroups } from '@/utils/testUtils';
 import { Route } from 'react-router';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import HandoverFinalizingForm from './HandoverFinalizingForm';
 import { createConstructionHandover, createProject } from '@/mocks/createMocks';

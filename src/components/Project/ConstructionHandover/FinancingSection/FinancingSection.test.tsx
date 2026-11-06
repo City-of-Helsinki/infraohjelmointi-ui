@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { Route } from 'react-router';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import FinancingSection from './FinancingSection';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { createConstructionHandover } from '@/mocks/createMocks';

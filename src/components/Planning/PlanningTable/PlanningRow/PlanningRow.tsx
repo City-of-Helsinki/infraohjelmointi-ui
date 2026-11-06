@@ -178,8 +178,8 @@ const PlanningRowContent: FC<PlanningRowProps & { groupsExpanded: boolean }> = (
             />
           ))}
           {/* Render the rows recursively for each childRows */}
-          {props.children.map((c) => (
-            <PlanningRow {...c} sapCosts={sapCosts} />
+          {props.children.map(({ key, ...child }) => (
+            <PlanningRow key={key} {...child} sapCosts={sapCosts} />
           ))}
         </>
       )}

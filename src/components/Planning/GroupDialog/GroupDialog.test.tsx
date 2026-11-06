@@ -3,7 +3,7 @@ import { optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
