@@ -49,7 +49,6 @@ describe('Viewer-only project basics fields', () => {
     expect(screen.getByRole('spinbutton', { name: 'Cost' })).toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Date' })).toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Description' })).toBeDisabled();
-    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveStyle('overflow: visible');
   });
 
   it('allows individual fields to remain editable through explicit props', async () => {

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
 import { validateMaxLength, validateRequired, validateRequiredSelect } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsProjectSaving, selectProjectMode } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
@@ -38,7 +38,6 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   const typeQualifiers = useOptions('typeQualifiers');
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
-  const isSaving = useAppSelector(selectIsProjectSaving);
 
   const address = watch('address');
   const postalCode = watch('postalCode');
@@ -101,7 +100,6 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('description')}
             size="l"
             rules={{ ...validateMaxLength(1000, t), ...validateRequired('description', t) }}
-            formSaved={isSaving}
             disabled={isUserOnlyViewer}
           />
         </div>

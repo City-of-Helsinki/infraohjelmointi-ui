@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from 'react';
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form';
 import LinkField from './LinkField';
+import mockProject from '@/mocks/mockProject';
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
@@ -29,9 +30,21 @@ describe('LinkField', () => {
   it('renders a safe external link for a valid http(s) url', () => {
     render(<TestForm value="  https://example.com/path  " />);
 
-    const link = screen.getByRole('link', { name: 'https://example.com/path' });
+    const link = screen.getByRole('link', { name: /https:\/\/example.com\/path/ });
     expect(link).toHaveAttribute('href', 'https://example.com/path');
     expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders a safe external link for a valid pw: url', () => {
+    const pwLink = mockProject.data.pwFolderLink;
+
+    render(<TestForm value={`  ${pwLink}  `} />);
+
+    const escapedPwLink = (pwLink ?? '').replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const link = screen.getByRole('link', { name: new RegExp(escapedPwLink) });
+    expect(link).toHaveAttribute('href', pwLink);
+    expect(link).not.toHaveAttribute('target');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
