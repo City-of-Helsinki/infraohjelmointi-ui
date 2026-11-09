@@ -1,4 +1,5 @@
 import {
+  selectAllPlanningClasses,
   selectPlanningClasses,
   selectPlanningSubClasses,
   selectPlanningMasterClasses,
@@ -9,7 +10,7 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import { selectUser } from '@/reducers/authSlice';
 import {
-  isClassPathOnRestrictedScopePath,
+  getRestrictedVisibleClassIds,
   isUserAdmin,
   isUserCoordinator,
   isUserOnlyProjectAreaPlanner,
@@ -26,6 +27,7 @@ import { IClass } from '@/interfaces/classInterfaces';
  */
 const useClassOptions = (currentClass: string | undefined) => {
   const user = useAppSelector(selectUser);
+  const allClasses = useAppSelector(selectAllPlanningClasses);
   const masterClasses = useAppSelector(selectPlanningMasterClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
@@ -82,12 +84,18 @@ const useClassOptions = (currentClass: string | undefined) => {
   }, [selectedSubClass, subClasses, otherClassifications]);
 
   // Restricted programmers only see their assigned classes and the classes above them (IO-756)
+  const restrictedVisibleClassIds = useMemo(
+    () =>
+      isUserRestrictedProgrammer(user) ? getRestrictedVisibleClassIds(user, allClasses) : null,
+    [user, allClasses],
+  );
+
   const filterForRestrictedUser = useCallback(
     (classList: Array<IClass>) =>
-      isUserRestrictedProgrammer(user)
-        ? classList.filter((c) => isClassPathOnRestrictedScopePath(user, c.path))
+      restrictedVisibleClassIds
+        ? classList.filter((c) => restrictedVisibleClassIds.has(c.id))
         : classList,
-    [user],
+    [restrictedVisibleClassIds],
   );
 
   const filteredMasterClasses = useMemo(() => {

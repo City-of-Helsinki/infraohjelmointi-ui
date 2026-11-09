@@ -16,11 +16,15 @@ const otherMaster = mockClass('other-master', '8 04 Puistot', null);
 const bridges = mockClass('bridges', '8 03 Kadut/B Sillat', 'master');
 const snow = mockClass('snow', '8 03 Kadut/B Lumi', 'master');
 const bridgesSub = mockClass('bridges-sub', '8 03 Kadut/B Sillat/Alue 1', 'bridges');
+// IO-961: a real sub class whose path has drifted, and a class elsewhere whose path wrongly
+// looks like it is below the assigned class
+const bridgesDrifted = mockClass('bridges-drifted', '8 04 Puistot/Alue 2', 'bridges');
+const snowLookalike = mockClass('snow-lookalike', '8 03 Kadut/B Sillat/Alue 3', 'snow');
 
 const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
   is_restricted_programmer: true,
   restricted_class_paths: [bridges.path],
-  restricted_class_ids: ['bridges', 'bridges-sub'],
+  restricted_class_ids: ['bridges', 'bridges-sub', 'bridges-drifted'],
 });
 
 const renderWithUser = <T,>(hook: () => T, user: IUser) => {
@@ -29,10 +33,18 @@ const renderWithUser = <T,>(hook: () => T, user: IUser) => {
       auth: () => ({ user }),
       class: () => ({
         planning: {
-          allClasses: [master, otherMaster, bridges, snow, bridgesSub],
+          allClasses: [
+            master,
+            otherMaster,
+            bridges,
+            snow,
+            bridgesSub,
+            bridgesDrifted,
+            snowLookalike,
+          ],
           masterClasses: [master, otherMaster],
           classes: [bridges, snow],
-          subClasses: [bridgesSub],
+          subClasses: [bridgesSub, bridgesDrifted, snowLookalike],
           otherClassifications: [],
         },
       }),
@@ -57,7 +69,16 @@ describe('useClassOptions for restricted programmers (IO-756)', () => {
   it('offers the sub classes of the assigned class', () => {
     const options = renderWithUser(() => useClassOptions('bridges'), restrictedUser);
 
-    expect(values(options.subClasses)).toEqual(['bridges-sub']);
+    expect(values(options.subClasses)).toEqual(['bridges-sub', 'bridges-drifted']);
+  });
+
+  it('follows parent ids, not paths (IO-961)', () => {
+    const options = renderWithUser(() => useClassOptions('snow'), restrictedUser);
+
+    // The look-alike's path starts with the assigned class's path, but its parent is snow
+    expect(values(options.subClasses)).toEqual([]);
+    // The selected class itself is out of scope, so only the assigned sibling is offered
+    expect(values(options.classes)).toEqual(['bridges']);
   });
 
   it('does not filter the options of a planner', () => {
