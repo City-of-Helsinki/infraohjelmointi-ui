@@ -51,7 +51,7 @@
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.5",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.6.8",
@@ -71,7 +71,7 @@
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "postcss": "^8.5.28",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^4.3.5",
     "ts-node": "^10.9.2",
     "vite": "^8.3.5",
     "vitest": "^5.0.5"
