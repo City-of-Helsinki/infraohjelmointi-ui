@@ -1,18 +1,28 @@
+import { IClass } from '@/interfaces/classInterfaces';
 import { UserRole } from '@/interfaces/userInterfaces';
 import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
 import {
-  isClassPathInRestrictedScope,
-  isClassPathOnRestrictedScopePath,
+  getRestrictedVisibleClassIds,
   isUserOnlyViewer,
   isUserRestrictedProgrammer,
 } from './userRoleHelpers';
 
-const ASSIGNED = '8 03 Kadut/B Sillat';
+const mockClass = (id: string, path: string, parent: string | null): IClass =>
+  ({ id, name: path.split('/').pop(), path, parent }) as IClass;
+
+const allClasses = [
+  mockClass('master', '8 03 Kadut', null),
+  mockClass('other-master', '8 04 Puistot', null),
+  mockClass('bridges', '8 03 Kadut/B Sillat', 'master'),
+  mockClass('snow', '8 03 Kadut/B Lumi', 'master'),
+  mockClass('bridges-sub', '8 03 Kadut/B Sillat/Alue 1', 'bridges'),
+];
 
 // The restricted group's name is configurable in the API, so only the flag identifies the role
 const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
   is_restricted_programmer: true,
-  restricted_class_paths: [ASSIGNED],
+  restricted_class_paths: ['8 03 Kadut/B Sillat'],
+  restricted_class_ids: ['bridges', 'bridges-sub'],
 });
 
 describe('restricted programmer helpers (IO-756)', () => {
@@ -26,18 +36,38 @@ describe('restricted programmer helpers (IO-756)', () => {
     expect(isUserRestrictedProgrammer(null)).toBe(false);
   });
 
-  it('scope covers the assigned class and its sub classes', () => {
-    expect(isClassPathInRestrictedScope(restrictedUser, ASSIGNED)).toBe(true);
-    expect(isClassPathInRestrictedScope(restrictedUser, `${ASSIGNED}/Alue 1`)).toBe(true);
-    expect(isClassPathInRestrictedScope(restrictedUser, '8 03 Kadut')).toBe(false);
-    // A sibling whose name starts with the same text is not in scope
-    expect(isClassPathInRestrictedScope(restrictedUser, `${ASSIGNED} ja tunnelit`)).toBe(false);
-    expect(isClassPathInRestrictedScope(restrictedUser, undefined)).toBe(false);
+  it('visible classes are the editable classes and the classes above them', () => {
+    expect([...getRestrictedVisibleClassIds(restrictedUser, allClasses)].sort()).toEqual([
+      'bridges',
+      'bridges-sub',
+      'master',
+    ]);
   });
 
-  it('the scope path also includes the classes above the assigned class', () => {
-    expect(isClassPathOnRestrictedScopePath(restrictedUser, '8 03 Kadut')).toBe(true);
-    expect(isClassPathOnRestrictedScopePath(restrictedUser, '8 04 Puistot')).toBe(false);
-    expect(isClassPathOnRestrictedScopePath(restrictedUser, '8 03 Kadut/B Lumi')).toBe(false);
+  it('the classes above are found by parent id, whatever the paths say (IO-961)', () => {
+    const drifted = [
+      mockClass('master', '8 03 Kadut', null),
+      // A path that no longer matches the parent links
+      mockClass('bridges', '8 04 Puistot/B Sillat', 'master'),
+    ];
+    const user = { ...restrictedUser, restricted_class_ids: ['bridges'] };
+
+    expect([...getRestrictedVisibleClassIds(user, drifted)].sort()).toEqual(['bridges', 'master']);
+  });
+
+  it('keeps the editable ids when their classes are not in the list', () => {
+    // e.g. before the classes have loaded
+    expect([...getRestrictedVisibleClassIds(restrictedUser, [])].sort()).toEqual([
+      'bridges',
+      'bridges-sub',
+    ]);
+  });
+
+  it('shows nothing for a user without classes and survives a parent cycle', () => {
+    expect(getRestrictedVisibleClassIds(null, allClasses).size).toBe(0);
+
+    const cyclic = [mockClass('a', 'a', 'b'), mockClass('b', 'b', 'a')];
+    const user = { ...restrictedUser, restricted_class_ids: ['a'] };
+    expect([...getRestrictedVisibleClassIds(user, cyclic)].sort()).toEqual(['a', 'b']);
   });
 });

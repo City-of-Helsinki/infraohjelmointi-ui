@@ -16,7 +16,8 @@ export interface IUser {
    */
   is_restricted_programmer?: boolean;
   /**
-   * Class paths a restricted programmer may edit (IO-756), empty for other users
+   * Paths of a restricted programmer's assigned classes (IO-756), empty for other users.
+   * For display only: access is decided by restricted_class_ids (IO-961).
    */
   restricted_class_paths?: Array<string>;
   /**
