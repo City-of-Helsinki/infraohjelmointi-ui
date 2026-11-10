@@ -400,7 +400,7 @@ describe('ProjectProgramme', () => {
       name: 'projectProgrammeForm.modifyInformation',
     });
 
-    expect(modifyInformationButton).toHaveClass('Button-module_secondary__1nABp');
+    expect(modifyInformationButton.className).toMatch(/\bButton-module_secondary__/);
     expect(
       screen.getByRole('button', { name: 'projectProgrammeForm.switchToBriefProgramme' }),
     ).toBeInTheDocument();

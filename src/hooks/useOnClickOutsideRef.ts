@@ -7,7 +7,7 @@ import { RefObject, useEffect, useRef } from 'react';
  * and is currently used in PlanningForecastSums.tsx and PlanningCell.tsx. Improvements are welcome.
  */
 const useOnClickOutsideRef = (
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   callback: () => unknown,
   elementRendered?: boolean,
 ) => {

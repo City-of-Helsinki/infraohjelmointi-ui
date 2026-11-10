@@ -271,7 +271,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     }
   }, [clearErrors, getValues, phaseDetails, selectedPhaseId, setValue]);
 
-  const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement>) => {
+  const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement | null>) => {
     const button = containerRef.current?.querySelector('button');
     if (button) {
       button.click();
@@ -279,7 +279,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   }, []);
 
   const onDateInputClick = useCallback(
-    (containerRef: RefObject<HTMLDivElement>) => (event: MouseEvent<HTMLInputElement>) => {
+    (containerRef: RefObject<HTMLDivElement | null>) => (event: MouseEvent<HTMLInputElement>) => {
       event.stopPropagation();
       openDatePicker(containerRef);
     },

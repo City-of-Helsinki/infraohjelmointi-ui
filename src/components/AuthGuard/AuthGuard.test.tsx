@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import AuthGuard from './AuthGuard';
 import { Route } from 'react-router';
 import { mockError } from '@/mocks/mockError';

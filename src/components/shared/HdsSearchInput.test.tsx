@@ -51,13 +51,31 @@ const ControlledSearch = ({
 };
 
 describe('HdsSearchInput with real HDS', () => {
-  it('preserves HDS metadata across ordinary parent renders', () => {
-    const { rerender } = render(<HdsSearchInput label="Projects" onChange={vi.fn()} />);
-    const inputId = screen.getByRole('searchbox').id;
+  it('preserves HDS metadata across ordinary parent renders', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onSubmit = vi.fn();
+    const getSuggestions = async () => options;
+    const { rerender } = render(
+      <ControlledSearch onChange={onChange} onSubmit={onSubmit} getSuggestions={getSuggestions} />,
+    );
+    const input = screen.getByRole('combobox');
+    const inputId = input.id;
+    await user.type(input, 'Al');
+    await screen.findByRole('option', optionWithLabel('Alpha project'));
+    const notifications = screen.getByTestId('hds-search-screen-reader-notifications');
+    const announcements = notifications.textContent;
+    expect(announcements).not.toBe('');
 
-    rerender(<HdsSearchInput label="Projects" onChange={vi.fn()} />);
+    rerender(
+      <ControlledSearch onChange={onChange} onSubmit={onSubmit} getSuggestions={getSuggestions} />,
+    );
 
-    expect(screen.getByRole('searchbox')).toHaveAttribute('id', inputId);
+    expect(input).toHaveAttribute('id', inputId);
+    expect(input).toHaveValue('Al');
+    expect(notifications).toHaveTextContent(announcements ?? '');
+    await user.click(screen.getByRole('option', optionWithLabel('Alpha project')));
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Alpha project');
   });
 
   it('updates memoized texts when their props change', () => {
@@ -209,6 +227,60 @@ describe('HdsSearchInput with real HDS', () => {
     expect(onSubmit).toHaveBeenLastCalledWith('Alpha');
   });
 
+  it('does not show a submit button when onSubmit is absent', () => {
+    render(<HdsSearchInput label="Projects" searchButtonAriaLabel="Submit" />);
+
+    expect(screen.queryByRole('button', { name: 'Submit' })).not.toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toHaveAttribute('type', 'text');
+  });
+
+  it.each(['mouse', 'keyboard'])('submits an uncontrolled suggestion using %s', async (method) => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onSubmit = vi.fn();
+    render(
+      <HdsSearchInput
+        label="Projects"
+        onChange={onChange}
+        onSubmit={onSubmit}
+        getSuggestions={async () => options}
+      />,
+    );
+
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'Al');
+    const option = await screen.findByRole('option', optionWithLabel('Alpha project'));
+    if (method === 'mouse') await user.click(option);
+    else await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(input).toHaveValue('Alpha project');
+    expect(onChange).toHaveBeenLastCalledWith('Alpha project');
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Alpha project');
+  });
+
+  it.each(['mouse', 'keyboard'])(
+    'submits a suggestion matching the complete typed label using %s',
+    async (method) => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn();
+      render(
+        <ControlledSearch
+          onChange={vi.fn()}
+          onSubmit={onSubmit}
+          getSuggestions={async () => options}
+        />,
+      );
+
+      await user.type(screen.getByRole('combobox'), 'Alpha project');
+      const option = await screen.findByRole('option', optionWithLabel('Alpha project'));
+      expect(onSubmit).not.toHaveBeenCalled();
+      if (method === 'mouse') await user.click(option);
+      else await user.keyboard('{ArrowDown}{Enter}');
+
+      expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Alpha project');
+    },
+  );
+
   it('can select the same suggestion again after submission resets the value', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -290,6 +362,33 @@ describe('HdsSearchInput with real HDS', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Beta project');
   });
 
+  it('does not replace current suggestions with an older response for the same query', async () => {
+    const user = userEvent.setup();
+    const pending: Array<(results: SearchOption[]) => void> = [];
+    const getSuggestions = vi.fn(
+      () => new Promise<SearchOption[]>((resolve) => pending.push(resolve)),
+    );
+    const onSubmit = vi.fn();
+    render(
+      <ControlledSearch onChange={vi.fn()} onSubmit={onSubmit} getSuggestions={getSuggestions} />,
+    );
+    const input = screen.getByRole('combobox');
+
+    await user.type(input, 'a');
+    await waitFor(() => expect(pending).toHaveLength(1));
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    await user.type(input, 'a');
+    await waitFor(() => expect(pending).toHaveLength(2));
+
+    await act(async () => pending[1]([{ label: 'Current project', value: 'current' }]));
+    await screen.findByRole('option', optionWithLabel('Current project'));
+    await act(async () => pending[0](options));
+
+    expect(screen.queryByRole('option', optionWithLabel('Alpha project'))).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', optionWithLabel('Current project')));
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Current project');
+  });
+
   it.each(['Clear', 'Reset external value'])(
     'does not restore pending results after %s',
     async (buttonName) => {
@@ -316,4 +415,32 @@ describe('HdsSearchInput with real HDS', () => {
       expect(onSubmit).not.toHaveBeenCalled();
     },
   );
+
+  it('does not restore cached suggestions after an external reset with a request pending', async () => {
+    const user = userEvent.setup();
+    const pending = new Map<string, (results: SearchOption[]) => void>();
+    const getSuggestions = vi.fn(
+      (query: string) => new Promise<SearchOption[]>((resolve) => pending.set(query, resolve)),
+    );
+    const onSubmit = vi.fn();
+    render(
+      <ControlledSearch onChange={vi.fn()} onSubmit={onSubmit} getSuggestions={getSuggestions} />,
+    );
+    const input = screen.getByRole('combobox');
+
+    await user.type(input, 'a');
+    await waitFor(() => expect(pending.has('a')).toBe(true));
+    await act(async () => pending.get('a')?.(options));
+    await screen.findByRole('option', optionWithLabel('Alpha project'));
+    await user.type(input, 'b');
+    await waitFor(() => expect(pending.has('ab')).toBe(true));
+
+    await user.click(screen.getByRole('button', { name: 'Reset external value' }));
+    await act(async () => pending.get('ab')?.([{ label: 'About project', value: 'about' }]));
+
+    expect(input).toHaveValue('');
+    expect(screen.queryByRole('option', optionWithLabel('Alpha project'))).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', optionWithLabel('About project'))).not.toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });

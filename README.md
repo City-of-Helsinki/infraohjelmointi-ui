@@ -18,6 +18,8 @@
 
 ### Setup
 
+Use Node.js 24.x and Yarn Classic (1.x). HDS 6 requires Node.js 24.
+
 1. `yarn run create-env` to create your own development and production .env files
 2. `yarn install`
 3. `yarn start`

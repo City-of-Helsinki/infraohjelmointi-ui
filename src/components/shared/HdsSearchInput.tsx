@@ -51,7 +51,7 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   const onChangeRef = useRef(onChange);
   const onSubmitRef = useRef(onSubmit);
   const valueRef = useRef(value);
-  const selectedOptionRef = useRef<string>();
+  const selectedOptionRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     getSuggestionsRef.current = getSuggestions;

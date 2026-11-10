@@ -8,7 +8,7 @@ import {
   IconAlertCircle,
   IconTrash,
 } from 'hds-react';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const titleId = 'confirmation-dialog-title';
@@ -21,7 +21,6 @@ const descriptionId = 'confirmation-dialog-info';
  * This component is rendered at the bottom of App.tsx and triggering it should only be done using the useConfirmDialog()-hook.
  */
 const ConfirmDialog = () => {
-  const openConfirmationDialogButtonRef = useRef(null);
   const { t } = useTranslation();
 
   const { title, description, isOpen, proceed, cancel, dialogType, confirmButtonText } =
@@ -42,7 +41,6 @@ const ConfirmDialog = () => {
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       isOpen={isOpen}
-      focusAfterCloseRef={openConfirmationDialogButtonRef}
       variant={dialogType === 'delete' ? 'danger' : 'primary'}
     >
       <Dialog.Header
