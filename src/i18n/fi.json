@@ -865,6 +865,9 @@
       "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
       "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
       "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
+      "personalDataRemoved": "Hankkeen henkilötiedot poistettiin.",
+      "personalDataRemoveError": "Henkilötietojen poistossa tapahtui virhe.",
+      "personalDataRetentionLoadError": "Poistettavien henkilötietojen haku epäonnistui.",
       "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
       "linkCopyFailed": "Linkin kopiointi epäonnistui",
       "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen.",
@@ -1237,6 +1240,28 @@
       "locked": "Lukittu",
       "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
       "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään lukuun ottamatta kuluvan vuoden tietoja. Tietojen siirtoa ei voi myöhemmin peruuttaa."
+    },
+    "personaldataretention": {
+      "name": "Henkilötietojen poisto",
+      "description": "Poista henkilöiden nimet, sähköpostiosoitteet ja puhelinnumerot hankkeista, joiden takuuajan päättymisestä on kulunut viisi vuotta.",
+      "button": "Siirry henkilötietojen poistoon",
+      "info": "Alla ovat hankkeet, joiden takuuajan päättymisestä on kulunut vähintään viisi vuotta ja joissa on vielä henkilötietoja. Tietoja ei poisteta automaattisesti, vaan poisto vahvistetaan hankekohtaisesti.",
+      "empty": "Poistettavia henkilötietoja ei ole.",
+      "projectName": "Hanke",
+      "warrantyPhaseEnd": "Takuuaika päättyi",
+      "retentionDueDate": "Poistettava viimeistään",
+      "personalData": "Henkilötiedot",
+      "removeButton": "Poista henkilötiedot",
+      "confirmButton": "Poista henkilötiedot",
+      "confirmTitle": "Poistetaanko hankkeen henkilötiedot?",
+      "confirmDescription": "Hankkeen {{projectName}} henkilötiedot poistetaan. Poistoa ei voi peruuttaa.",
+      "summary": {
+        "projectPersons": "Hankkeen henkilöt",
+        "programmers": "Ohjelmoija",
+        "handovers": "Rakennuttamiseen siirrot",
+        "taskPersons": "Tehtävien henkilöt",
+        "programmeNames": "Hankeohjelman nimet"
+      }
     }
   },
   "projectCount": "Projektien määrä",

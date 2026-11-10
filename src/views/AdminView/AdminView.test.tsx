@@ -61,14 +61,15 @@ describe('AdminView', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the title and admin functions using the outlet and has all but hashtag and menus functions disabled', async () => {
+  it('renders the title and admin functions using the outlet and has the unimplemented functions disabled', async () => {
     const { findByTestId, getByTestId } = await render();
 
     expect(await findByTestId('admin-view-title')).toHaveTextContent('helloUser');
 
+    const enabledFunctions = ['hashtags', 'menus', 'forcedtoframestate', 'personaldataretention'];
     adminFunctions.forEach((af) => {
       expect(getByTestId(`admin-card-${af}`)).toBeInTheDocument();
-      if (af === 'hashtags' || af === 'menus' || af === 'forcedtoframestate') {
+      if (enabledFunctions.includes(af)) {
         expect(getByTestId(`admin-card-button-${af}`)).not.toBeDisabled();
       } else {
         expect(getByTestId(`admin-card-button-${af}`)).toBeDisabled();
