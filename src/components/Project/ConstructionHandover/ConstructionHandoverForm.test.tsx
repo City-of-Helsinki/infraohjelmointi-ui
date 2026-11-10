@@ -641,63 +641,229 @@ describe('ConstructionHandoverForm status transitions', () => {
     ).not.toBeInTheDocument();
   });
 
-  it.each([
-    ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-    ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
-    ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
-  ])('shows return to draft button for %s status', async (status) => {
-    await act(async () => setupConstructionHandoverForm({ status }));
+  describe('return to previous status', () => {
+    const returnButtonName = 'constructionHandoverForm.returnToPreviousStatus';
 
-    expect(
-      screen.getByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
-    ).toBeInTheDocument();
-  });
+    beforeEach(() => {
+      mockIsConfirmed.mockReset();
+      mockIsConfirmed.mockResolvedValue(true);
+      mockPatchConstructionHandover.mockReset();
+      mockPatchConstructionHandover.mockReturnValue({ unwrap: () => Promise.resolve() });
+    });
 
-  it('hides return to draft button from non-planners in locked status', async () => {
-    await act(async () =>
-      setupConstructionHandoverForm(
-        { status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION },
-        {},
-        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
-      ),
-    );
-
-    expect(
-      screen.queryByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
-    ).toBeNull();
-  });
-
-  it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
-    'hides return to draft button for %s status',
-    async (status) => {
+    it.each([
+      [ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER, ConstructionHandoverStatus.DRAFT],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      ],
+      [
+        ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+        ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      ],
+      [
+        ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+        ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+      ],
+    ])('returns handover from %s to %s after confirmation', async (status, previousStatus) => {
       await act(async () => setupConstructionHandoverForm({ status }));
 
-      expect(
-        screen.queryByRole('button', { name: 'constructionHandoverForm.returnToDraft' }),
-      ).toBeNull();
-    },
-  );
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
+      });
 
-  it('returns handover to draft when return to draft button is clicked', async () => {
-    await act(async () =>
-      setupConstructionHandoverForm({
-        status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-      }),
+      await waitFor(() => {
+        expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+          id: 'handover-1',
+          to: previousStatus,
+          from: status,
+        });
+      });
+      expect(mockIsConfirmed).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'constructionHandoverForm.returnToPreviousStatusDialogTitle',
+          confirmButtonText: 'constructionHandoverForm.returnToPreviousStatusDialogConfirm',
+        }),
+      );
+      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+    });
+
+    it('hides return button in draft status', async () => {
+      await act(async () =>
+        setupConstructionHandoverForm({ status: ConstructionHandoverStatus.DRAFT }),
+      );
+
+      expect(screen.queryByRole('button', { name: returnButtonName })).toBeNull();
+    });
+
+    it('hides return button from non-planners', async () => {
+      await act(async () =>
+        setupConstructionHandoverForm(
+          { status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION },
+          {},
+          withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+        ),
+      );
+
+      expect(screen.queryByRole('button', { name: returnButtonName })).toBeNull();
+    });
+
+    it('does not return handover when confirmation is cancelled', async () => {
+      mockIsConfirmed.mockResolvedValue(false);
+      await act(async () =>
+        setupConstructionHandoverForm({
+          status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        }),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
+      });
+
+      await waitFor(() => expect(mockIsConfirmed).toHaveBeenCalled());
+      expect(mockTransitionConstructionHandoverStatus).not.toHaveBeenCalled();
+    });
+
+    it('saves unsaved changes before returning handover', async () => {
+      await act(async () =>
+        setupConstructionHandoverForm({
+          status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        }),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i }), {
+          target: { value: 'Updated handover name' },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
+      });
+
+      await waitFor(() =>
+        expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+          id: 'handover-1',
+          to: ConstructionHandoverStatus.DRAFT,
+          from: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        }),
+      );
+      expect(mockPatchConstructionHandover).toHaveBeenCalledTimes(1);
+      expect(mockPatchConstructionHandover.mock.invocationCallOrder[0]).toBeLessThan(
+        mockTransitionConstructionHandoverStatus.mock.invocationCallOrder[0],
+      );
+    });
+
+    it('does not return handover when saving unsaved changes fails', async () => {
+      mockPatchConstructionHandover.mockReturnValue({
+        unwrap: () => Promise.reject(new Error('Patch failed')),
+      });
+      await act(async () =>
+        setupConstructionHandoverForm({
+          status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        }),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i }), {
+          target: { value: 'Updated handover name' },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
+      });
+
+      await waitFor(() => expect(mockPatchConstructionHandover).toHaveBeenCalled());
+      expect(mockTransitionConstructionHandoverStatus).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('return to draft', () => {
+    const returnToDraftButtonName = 'constructionHandoverForm.returnToDraft';
+    const lockedStatuses = [
+      ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+      ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+    ];
+
+    beforeEach(() => {
+      mockIsConfirmed.mockReset();
+      mockIsConfirmed.mockResolvedValue(true);
+    });
+
+    it.each(lockedStatuses)(
+      'shows both return buttons for planner in %s status',
+      async (status) => {
+        await act(async () => setupConstructionHandoverForm({ status }));
+
+        expect(screen.getByRole('button', { name: returnToDraftButtonName })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'constructionHandoverForm.returnToPreviousStatus' }),
+        ).toBeInTheDocument();
+      },
     );
 
-    const returnToDraftButton = screen.getByRole('button', {
-      name: 'constructionHandoverForm.returnToDraft',
+    it.each([ConstructionHandoverStatus.DRAFT, ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER])(
+      'hides return to draft button in %s status',
+      async (status) => {
+        await act(async () => setupConstructionHandoverForm({ status }));
+
+        expect(screen.queryByRole('button', { name: returnToDraftButtonName })).toBeNull();
+      },
+    );
+
+    it('hides return to draft button from non-planners', async () => {
+      await act(async () =>
+        setupConstructionHandoverForm(
+          { status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION },
+          {},
+          withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+        ),
+      );
+
+      expect(screen.queryByRole('button', { name: returnToDraftButtonName })).toBeNull();
     });
 
-    await act(async () => {
-      fireEvent.click(returnToDraftButton);
-    });
+    it.each(lockedStatuses)(
+      'returns handover from %s to draft after confirmation',
+      async (status) => {
+        await act(async () => setupConstructionHandoverForm({ status }));
 
-    await waitFor(() => {
-      expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
-        id: 'handover-1',
-        to: ConstructionHandoverStatus.DRAFT,
+        await act(async () => {
+          fireEvent.click(screen.getByRole('button', { name: returnToDraftButtonName }));
+        });
+
+        await waitFor(() =>
+          expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+            id: 'handover-1',
+            to: ConstructionHandoverStatus.DRAFT,
+            from: status,
+          }),
+        );
+        expect(mockIsConfirmed).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'constructionHandoverForm.returnToDraftDialogTitle',
+            confirmButtonText: 'constructionHandoverForm.returnToDraftDialogConfirm',
+          }),
+        );
+      },
+    );
+
+    it('does not return handover to draft when confirmation is cancelled', async () => {
+      mockIsConfirmed.mockResolvedValue(false);
+      await act(async () =>
+        setupConstructionHandoverForm({
+          status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        }),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: returnToDraftButtonName }));
       });
+
+      await waitFor(() => expect(mockIsConfirmed).toHaveBeenCalled());
+      expect(mockTransitionConstructionHandoverStatus).not.toHaveBeenCalled();
     });
   });
 });

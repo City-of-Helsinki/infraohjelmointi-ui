@@ -10,8 +10,12 @@ import {
   IConstructionHandoverPatchRequest,
   IConstructionHandoverTransitionResponse,
 } from '@/interfaces/constructionHandoverInterfaces';
-import { notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { t } from 'i18next';
+import {
+  getConstructionHandoverStatusLabelKey,
+  isBackwardConstructionHandoverTransition,
+} from '@/components/Project/ConstructionHandover/constructionHandoverUtils';
 import { hydrateObjectUrls, objectUrlCacheLifecycle } from '@/utils/fileUtils';
 
 async function hydrateHandoverAttachments(
@@ -130,32 +134,47 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
     }),
     transitionConstructionHandoverStatus: build.mutation<
       IConstructionHandoverTransitionResponse,
-      { id: string; to: ConstructionHandoverStatus }
+      // `from` is only used client-side to pick the notification; it is not sent to the backend
+      { id: string; to: ConstructionHandoverStatus; from?: ConstructionHandoverStatus }
     >({
       query: ({ id, to }) => ({
         url: `/construction-handovers/${id}/transitions/`,
         method: 'POST',
         data: { to },
       }),
-      async onQueryStarted({ to }, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ to, from }, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          const title =
-            to === ConstructionHandoverStatus.DRAFT ? 'returnSuccess' : 'statusTransitionSuccess';
-          const message =
-            to === ConstructionHandoverStatus.DRAFT
-              ? 'constructionHandoverReturnedToDraft'
-              : 'constructionHandoverStatusTransitionSuccess';
+          const isReturn = !!from && isBackwardConstructionHandoverTransition(from, to);
           dispatch(
-            notifySuccess({
-              title: title,
-              message: message,
-              parameter: t(`constructionHandoverForm.toStatus.${to}`),
-              type: 'toast',
-            }),
+            notifySuccess(
+              isReturn
+                ? {
+                    title: 'returnSuccess',
+                    message:
+                      to === ConstructionHandoverStatus.DRAFT
+                        ? 'constructionHandoverReturnedToDraft'
+                        : 'constructionHandoverReturnedToStatus',
+                    parameter: t(getConstructionHandoverStatusLabelKey(to)),
+                    type: 'toast',
+                  }
+                : {
+                    title: 'statusTransitionSuccess',
+                    message: 'constructionHandoverStatusTransitionSuccess',
+                    parameter: t(`constructionHandoverForm.toStatus.${to}`),
+                    type: 'toast',
+                  },
+            ),
           );
         } catch (error) {
           console.error('Error transitioning construction handover status: ', error);
+          dispatch(
+            notifyError({
+              title: 'saveError',
+              message: 'constructionHandoverStatusTransitionError',
+              type: 'toast',
+            }),
+          );
         }
       },
       invalidatesTags: ['ConstructionHandovers', 'ProjectTasks'],
