@@ -51,6 +51,38 @@ const ControlledSearch = ({
 };
 
 describe('HdsSearchInput with real HDS', () => {
+  it('sets native maxlength without truncating an existing value', () => {
+    const { rerender } = render(<HdsSearchInput label="Projects" maxLength={5} value="123456" />);
+    const input = screen.getByRole('searchbox', { name: 'Projects' });
+    expect(input).toHaveAttribute('maxlength', '5');
+    expect(input).toHaveValue('123456');
+
+    rerender(<HdsSearchInput label="Projects" value="123456" />);
+    expect(screen.getByRole('searchbox', { name: 'Projects' })).not.toHaveAttribute('maxlength');
+    expect(screen.getByRole('searchbox', { name: 'Projects' })).toHaveValue('123456');
+  });
+
+  it('disables the input and buttons explicitly and re-enables them when requested', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <HdsSearchInput label="Projects" disabled onChange={onChange} onSubmit={vi.fn()} />,
+    );
+    const input = screen.getByRole('searchbox', { name: 'Projects' });
+    expect(input).toBeDisabled();
+    expect(input.closest('fieldset')).toHaveAttribute('inert');
+    screen.getAllByRole('button').forEach((button) => expect(button).toBeDisabled());
+    onChange.mockClear();
+    await user.type(input, '12345');
+    expect(onChange).not.toHaveBeenCalled();
+
+    rerender(<HdsSearchInput label="Projects" disabled={false} onChange={onChange} />);
+    expect(screen.getByRole('searchbox', { name: 'Projects' })).toBeEnabled();
+    expect(screen.getByRole('searchbox').closest('fieldset')).not.toHaveAttribute('inert');
+    await user.type(screen.getByRole('searchbox'), '12345');
+    expect(onChange).toHaveBeenCalled();
+  });
+
   it('preserves HDS metadata across ordinary parent renders', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

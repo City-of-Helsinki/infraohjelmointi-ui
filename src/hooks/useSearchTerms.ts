@@ -80,6 +80,10 @@ const getSearchTerms = (
           searchTerms.push({ value: hkrId, type: key, id: hkrId });
         }
         break;
+      case 'withoutHkrId':
+        value &&
+          searchTerms.push({ value: translate('searchTag.withoutHkrId'), type: key, id: key });
+        break;
       default:
         break;
     }
@@ -126,6 +130,9 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
       break;
     case 'hkrIds':
       form[type] = searchForm[type].filter((v) => v !== value);
+      break;
+    case 'withoutHkrId':
+      form.withoutHkrId = false;
       break;
   }
   return form;

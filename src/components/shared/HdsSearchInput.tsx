@@ -16,6 +16,8 @@ interface IHdsSearchInputProps {
   clearButtonAriaLabel?: string;
   searchButtonAriaLabel?: string;
   hideSearchButton?: boolean;
+  disabled?: boolean;
+  maxLength?: number;
   value?: string;
   getSuggestions?: (inputValue: string) => Promise<ISearchOption[]>;
   onChange?: (value: string) => void;
@@ -31,6 +33,8 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   clearButtonAriaLabel,
   searchButtonAriaLabel,
   hideSearchButton,
+  disabled,
+  maxLength,
   value,
   getSuggestions,
   onChange,
@@ -53,6 +57,16 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   const valueRef = useRef(value);
   const selectedOptionRef = useRef<string | undefined>(undefined);
 
+  const setInputMaxLength = useCallback(
+    (container: HTMLFieldSetElement | null) => {
+      const input = container?.querySelector('input');
+      if (!input) return;
+      if (maxLength === undefined) input.removeAttribute('maxlength');
+      else input.maxLength = maxLength;
+    },
+    [maxLength],
+  );
+
   useEffect(() => {
     getSuggestionsRef.current = getSuggestions;
     onChangeRef.current = onChange;
@@ -74,11 +88,12 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
     };
   }, []);
 
-  return (
+  const searchInput = (
     <Search
       id={id}
       data-testid={dataTestId}
       className={className}
+      disabled={disabled}
       value={value}
       onChange={(event) => event.type && onChange?.(event.target.value)}
       onSearch={getSuggestions ? handleSearch : undefined}
@@ -94,6 +109,19 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
       hideSubmitButton={hideSearchButton}
       texts={texts}
     />
+  );
+
+  return disabled === undefined && maxLength === undefined ? (
+    searchInput
+  ) : (
+    <fieldset
+      ref={setInputMaxLength}
+      disabled={disabled}
+      inert={disabled}
+      className="m-0 min-w-0 border-0 p-0"
+    >
+      {searchInput}
+    </fieldset>
   );
 };
 

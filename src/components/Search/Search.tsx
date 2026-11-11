@@ -31,7 +31,7 @@ const Search = () => {
 
   const { formMethods, submitDisabled, classOptions, locationOptions } = useSearchForm();
 
-  const { handleSubmit, getValues, control } = formMethods;
+  const { handleSubmit, getValues, setValue, control } = formMethods;
 
   const phases = useOptions('phases');
   const programmedYearMin = useOptions('programmedYears');
@@ -104,7 +104,7 @@ const Search = () => {
               <CheckboxField {...formProps('programmedYes')} />
               <CheckboxField {...formProps('programmedNo')} />
             </Fieldset>
-            <HkrIdSearch control={control} getValues={getValues} />
+            <HkrIdSearch control={control} getValues={getValues} setValue={setValue} />
             <SelectField
               {...formProps('programmedYearMin')}
               options={programmedYearMin}

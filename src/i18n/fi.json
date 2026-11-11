@@ -446,6 +446,7 @@
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
     "hkrIdSearch": "PW Hanketunnus",
+    "withoutHkrId": "Hae hankkeet, joilla ei ole pw-tunnusta",
     "personConstruction": "Rakennuttamisen vastuuhenkilö",
     "filter": "Rajaa projekteja",
     "programmed": "Ohjelmoitu",
@@ -893,6 +894,7 @@
     "subDivision": "Osa-alue",
     "programmedNo": "Ohjelmoitu: ei",
     "programmedYes": "Ohjelmoitu: kyllä",
+    "withoutHkrId": "Hae hankkeet, joilla ei ole pw-tunnusta",
     "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
     "programmedYearMax": "Ohjelmoitu vuosi max {{label}}",
     "notProgrammed": "Ei ohjelmoitu"
