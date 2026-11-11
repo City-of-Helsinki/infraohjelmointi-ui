@@ -1,4 +1,5 @@
 import { Button, ButtonVariant, IconCheckCircle, IconPen, StatusLabel } from 'hds-react';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
@@ -296,41 +297,33 @@ function ProjectProgrammeForm({
           )}
         </fieldset>
 
-        <div className="project-form-banner">
-          <div className="project-form-banner-container">
-            <div className="project-programme-actions">
-              {!isFormReadOnly && (
-                <>
-                  <Button
-                    variant={ButtonVariant.Primary}
-                    type="button"
-                    onClick={handleSubmit(handleMarkSectionReady)}
-                  >
-                    {t('projectProgrammeForm.markSectionReady')}
-                  </Button>
-                  <Button
-                    variant={ButtonVariant.Secondary}
-                    type="button"
-                    disabled={!isDirty}
-                    onClick={() => submitDraft(getValues(), activeSection)}
-                  >
-                    {t('projectProgrammeForm.saveDraft')}
-                  </Button>
-                </>
-              )}
+        <FormBottomBar>
+          {!isFormReadOnly && (
+            <>
+              <Button
+                variant={ButtonVariant.Primary}
+                type="button"
+                onClick={handleSubmit(handleMarkSectionReady)}
+              >
+                {t('projectProgrammeForm.markSectionReady')}
+              </Button>
               <Button
                 variant={ButtonVariant.Secondary}
                 type="button"
-                onClick={handleShowChangeHistory}
+                disabled={!isDirty}
+                onClick={() => submitDraft(getValues(), activeSection)}
               >
-                {t('projectProgrammeForm.changeHistory')}
+                {t('projectProgrammeForm.saveDraft')}
               </Button>
-              <Button variant={ButtonVariant.Secondary} type="button" onClick={onClose}>
-                {t('projectProgrammeForm.cancel')}
-              </Button>
-            </div>
-          </div>
-        </div>
+            </>
+          )}
+          <Button variant={ButtonVariant.Secondary} type="button" onClick={handleShowChangeHistory}>
+            {t('projectProgrammeForm.changeHistory')}
+          </Button>
+          <Button variant={ButtonVariant.Secondary} type="button" onClick={onClose}>
+            {t('projectProgrammeForm.cancel')}
+          </Button>
+        </FormBottomBar>
       </form>
     </FormProvider>
   );

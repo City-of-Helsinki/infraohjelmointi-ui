@@ -42,6 +42,7 @@ import useConstructionHandoverPermissions from './useConstructionHandoverPermiss
 import AttachmentsAndLinksSection from './AttachmentsAndLinksSection';
 import usePostAttachments from '@/hooks/usePostAttachments';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -134,7 +135,8 @@ function ConstructionHandoverForm({
   const showNameProjectManagerNotification =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;
-  const showSubmitTooltip = showSubmitToProgrammerButton || showSubmitToConstructionButton;
+  const showSubmitToProgrammerOrConstructionButton =
+    showSubmitToProgrammerButton || showSubmitToConstructionButton;
 
   function handleDeleteAttachment(attachment: IConstructionHandoverAttachment) {
     deleteHandoverAttachment({
@@ -279,73 +281,66 @@ function ConstructionHandoverForm({
           canEditHandover={canEditHandover}
         />
 
-        <div
-          className="project-form-banner"
-          style={{ height: showSubmitTooltip || showReturnToDraftButton ? '110px' : undefined }}
+        <FormBottomBar
+          containerClassName={`${showSubmitToProgrammerOrConstructionButton || showReturnToDraftButton ? 'items-end' : 'items-center'}`}
         >
-          <div className="project-form-banner-container">
-            <div
-              className={`flex gap-6 ${showSubmitTooltip || showReturnToDraftButton ? 'items-end' : 'items-center'}`}
-            >
-              <div className="flex flex-col items-end">
-                {showSubmitTooltip && (
-                  <Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>
-                )}
-                {showSubmitToProgrammerButton && (
-                  <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
-                    {t('constructionHandoverForm.submitToProgrammer')}
-                  </Button>
-                )}
-                {showSubmitToConstructionButton && (
-                  <Button type="button" onClick={handleSubmit(submitToConstruction)}>
-                    {t('constructionHandoverForm.submitToConstruction')}
-                  </Button>
-                )}
-              </div>
-              {showSaveDraftButton && (
-                <Button variant={ButtonVariant.Secondary} onClick={() => submitForm(getValues())}>
-                  {t('constructionHandoverForm.saveDraft')}
+          {showSubmitToProgrammerOrConstructionButton && (
+            <div>
+              {<Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>}
+              {showSubmitToProgrammerButton && (
+                <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
+                  {t('constructionHandoverForm.submitToProgrammer')}
                 </Button>
               )}
-              {showReturnToPreviousStatusButton && (
-                <Button
-                  variant={ButtonVariant.Secondary}
-                  type="button"
-                  onClick={returnToPreviousStatus}
-                >
-                  {t('constructionHandoverForm.returnToPreviousStatus')}
+              {showSubmitToConstructionButton && (
+                <Button type="button" onClick={handleSubmit(submitToConstruction)}>
+                  {t('constructionHandoverForm.submitToConstruction')}
                 </Button>
-              )}
-              {showReturnToDraftButton && (
-                <div className="flex flex-col items-end">
-                  <Tooltip>{t('constructionHandoverForm.returnToDraftTooltip')}</Tooltip>
-                  <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
-                    {t('constructionHandoverForm.returnToDraft')}
-                  </Button>
-                </div>
-              )}
-              <Button
-                variant={ButtonVariant.Secondary}
-                iconStart={<IconLink />}
-                type="button"
-                onClick={onCopyLinkClick}
-              >
-                {t('copyLink')}
-              </Button>
-              {showNameProjectManagerNotification && (
-                <div>
-                  <Notification
-                    label={t('constructionHandoverForm.nameProjectManagerNotification')}
-                    type="error"
-                    size={NotificationSize.Small}
-                  >
-                    {t('constructionHandoverForm.nameProjectManagerNotification')}
-                  </Notification>
-                </div>
               )}
             </div>
-          </div>
-        </div>
+          )}
+          {showSaveDraftButton && (
+            <Button variant={ButtonVariant.Secondary} onClick={() => submitForm(getValues())}>
+              {t('constructionHandoverForm.saveDraft')}
+            </Button>
+          )}
+          {showReturnToDraftButton && (
+            <div>
+              <Tooltip>{t('constructionHandoverForm.returnToDraftTooltip')}</Tooltip>
+              <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
+                {t('constructionHandoverForm.returnToDraft')}
+              </Button>
+            </div>
+          )}
+          {showReturnToPreviousStatusButton && (
+            <Button
+              variant={ButtonVariant.Secondary}
+              type="button"
+              onClick={returnToPreviousStatus}
+            >
+              {t('constructionHandoverForm.returnToPreviousStatus')}
+            </Button>
+          )}
+          <Button
+            variant={ButtonVariant.Secondary}
+            iconStart={<IconLink />}
+            type="button"
+            onClick={onCopyLinkClick}
+          >
+            {t('copyLink')}
+          </Button>
+          {showNameProjectManagerNotification && (
+            <div>
+              <Notification
+                label={t('constructionHandoverForm.nameProjectManagerNotification')}
+                type="error"
+                size={NotificationSize.Small}
+              >
+                {t('constructionHandoverForm.nameProjectManagerNotification')}
+              </Notification>
+            </div>
+          )}
+        </FormBottomBar>
       </form>
     </FormProvider>
   );
