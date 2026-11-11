@@ -21,7 +21,6 @@ const allClasses = [
 // The restricted group's name is configurable in the API, so only the flag identifies the role
 const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
   is_restricted_programmer: true,
-  restricted_class_paths: ['8 03 Kadut/B Sillat'],
   restricted_class_ids: ['bridges', 'bridges-sub'],
 });
 

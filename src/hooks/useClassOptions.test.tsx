@@ -23,7 +23,6 @@ const snowLookalike = mockClass('snow-lookalike', '8 03 Kadut/B Sillat/Alue 3', 
 
 const restrictedUser = createMockUserWithAdGroups([UserRole.VIEWER], {
   is_restricted_programmer: true,
-  restricted_class_paths: [bridges.path],
   restricted_class_ids: ['bridges', 'bridges-sub', 'bridges-drifted'],
 });
 
