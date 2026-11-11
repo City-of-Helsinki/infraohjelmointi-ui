@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconPlus, Link } from 'hds-react';
-import { TextField } from '@/components/shared';
+import LinkField from '@/components/shared/LinkField';
 import type { IProjectProgrammeForm } from '@/interfaces/projectProgrammeInterfaces';
 import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 import { FormMode } from '@/interfaces/formInterfaces';
@@ -46,11 +46,10 @@ function ProjectProgrammeLinksField({
         }
 
         return (
-          <TextField
+          <LinkField<IProjectProgrammeForm>
             key={field.formId}
             name={`${section}.links.${index}.value`}
             label={`${t('projectProgrammeForm.linkLabel')} ${index + 1}`}
-            size="full"
           />
         );
       })}
