@@ -20,6 +20,26 @@ interface ISearchTerm {
   type: string;
 }
 
+const getFreeSearchTerms = (value: FreeSearchFormObject): Array<ISearchTerm> => {
+  const searchTerms = [];
+  for (const freeSearchValue of Object.values(value)) {
+    switch (freeSearchValue.type) {
+      case 'groups':
+      case 'projects':
+      case 'hashtags':
+        searchTerms.push({
+          value: freeSearchValue.label,
+          type: 'freeSearchParams',
+          id: freeSearchValue.value,
+        });
+        break;
+      default:
+        break;
+    }
+  }
+  return searchTerms;
+};
+
 /**
  * Build a search param with all the choices from the search form
  *
@@ -63,17 +83,7 @@ const getSearchTerms = (
         value.value && searchTerms.push({ value: value.label, type: key, id: value.value });
         break;
       case 'freeSearchParams':
-        for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
-          switch (v.type) {
-            case 'groups':
-            case 'projects':
-            case 'hashtags':
-              searchTerms.push({ value: v.label, type: key, id: v.value });
-              break;
-            default:
-              break;
-          }
-        }
+        searchTerms.push(...getFreeSearchTerms(value as FreeSearchFormObject));
         break;
       case 'hkrIds':
         for (const hkrId of value) {
