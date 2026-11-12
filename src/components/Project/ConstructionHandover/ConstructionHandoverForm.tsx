@@ -33,6 +33,7 @@ import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
 import {
   canEditConstructionHandover,
+  canReturnToPreviousConstructionHandoverStatus,
   getConstructionHandoverStatusLabelKey,
   getPreviousConstructionHandoverStatus,
   isConstructionHandoverLocked,
@@ -86,6 +87,7 @@ function ConstructionHandoverForm({
     isPlanner,
     isConstructionManagementLead,
     isResponsiblePersonForProject,
+    isConstructionResponsiblePersonForProject,
   } = useConstructionHandoverPermissions(project);
 
   const isHandoverLocked = isConstructionHandoverLocked(constructionHandover);
@@ -119,7 +121,16 @@ function ConstructionHandoverForm({
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
   const showSaveDraftButton = canEditHandover;
   const showReturnToDraftButton = isHandoverLocked && isPlanner;
-  const showReturnToPreviousStatusButton = isPlanner && previousStatus !== null;
+  const showReturnToPreviousStatusButton = canReturnToPreviousConstructionHandoverStatus(
+    constructionHandover.status,
+    {
+      isPlanner,
+      isProjectManager,
+      isConstructionManagementLead,
+      isResponsiblePersonForProject,
+      isConstructionResponsiblePersonForProject,
+    },
+  );
   const showNameProjectManagerNotification =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;

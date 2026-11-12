@@ -643,6 +643,34 @@ describe('ConstructionHandoverForm status transitions', () => {
 
   describe('return to previous status', () => {
     const returnButtonName = 'constructionHandoverForm.returnToPreviousStatus';
+    const constructionPersonProjectOverrides = {
+      personPlanning: {
+        id: 'person-1',
+        firstName: 'Planning',
+        lastName: 'Person',
+        email: 'planning@example.com',
+        title: '',
+        phone: '123456789',
+      },
+      personConstruction: {
+        id: 'person-3',
+        firstName: 'Construction',
+        lastName: 'Manager',
+        email: 'construction@example.com',
+        title: '',
+        phone: '123456789',
+      },
+    };
+    const plannerState = withMockAuthUserAdGroups([UserRole.PLANNER]);
+    const constructionManagementLeadState = withMockAuthUserAdGroups([
+      UserRole.CONSTRUCTION_MANAGEMENT_LEAD,
+    ]);
+    const constructionPersonState = withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+      email: 'construction@example.com',
+    });
+    const planningPersonState = withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], {
+      email: 'planning@example.com',
+    });
 
     beforeEach(() => {
       mockIsConfirmed.mockReset();
@@ -652,41 +680,68 @@ describe('ConstructionHandoverForm status transitions', () => {
     });
 
     it.each([
-      [ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER, ConstructionHandoverStatus.DRAFT],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        ConstructionHandoverStatus.DRAFT,
+        plannerState,
+      ],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        ConstructionHandoverStatus.DRAFT,
+        planningPersonState,
+      ],
       [
         ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
         ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        plannerState,
+      ],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        constructionManagementLeadState,
       ],
       [
         ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
         ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        constructionManagementLeadState,
+      ],
+      [
+        ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+        ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        constructionPersonState,
       ],
       [
         ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
         ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+        constructionPersonState,
       ],
-    ])('returns handover from %s to %s after confirmation', async (status, previousStatus) => {
-      await act(async () => setupConstructionHandoverForm({ status }));
+    ])(
+      'returns handover from %s to %s after confirmation',
+      async (status, previousStatus, state) => {
+        await act(async () =>
+          setupConstructionHandoverForm({ status }, constructionPersonProjectOverrides, state),
+        );
 
-      await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
-      });
-
-      await waitFor(() => {
-        expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
-          id: 'handover-1',
-          to: previousStatus,
-          from: status,
+        await act(async () => {
+          fireEvent.click(screen.getByRole('button', { name: returnButtonName }));
         });
-      });
-      expect(mockIsConfirmed).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'constructionHandoverForm.returnToPreviousStatusDialogTitle',
-          confirmButtonText: 'constructionHandoverForm.returnToPreviousStatusDialogConfirm',
-        }),
-      );
-      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
-    });
+
+        await waitFor(() => {
+          expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+            id: 'handover-1',
+            to: previousStatus,
+            from: status,
+          });
+        });
+        expect(mockIsConfirmed).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'constructionHandoverForm.returnToPreviousStatusDialogTitle',
+            confirmButtonText: 'constructionHandoverForm.returnToPreviousStatusDialogConfirm',
+          }),
+        );
+        expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+      },
+    );
 
     it('hides return button in draft status', async () => {
       await act(async () =>
@@ -696,13 +751,37 @@ describe('ConstructionHandoverForm status transitions', () => {
       expect(screen.queryByRole('button', { name: returnButtonName })).toBeNull();
     });
 
-    it('hides return button from non-planners', async () => {
+    it.each([
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        'construction management lead',
+        constructionManagementLeadState,
+      ],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+        'project manager who is not the planning person',
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], { email: 'other@example.com' }),
+      ],
+      [
+        ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+        'project manager',
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
+      ],
+      [ConstructionHandoverStatus.PROJECT_MANAGER_NAMED, 'planner', plannerState],
+      [ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION, 'planner', plannerState],
+      [
+        ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+        'construction management lead',
+        constructionManagementLeadState,
+      ],
+      [
+        ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+        'project manager who is not the construction person',
+        withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER], { email: 'other@example.com' }),
+      ],
+    ])('hides return button in %s status from %s', async (status, _role, state) => {
       await act(async () =>
-        setupConstructionHandoverForm(
-          { status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION },
-          {},
-          withMockAuthUserAdGroups([UserRole.PROJECT_MANAGER]),
-        ),
+        setupConstructionHandoverForm({ status }, constructionPersonProjectOverrides, state),
       );
 
       expect(screen.queryByRole('button', { name: returnButtonName })).toBeNull();
@@ -793,14 +872,11 @@ describe('ConstructionHandoverForm status transitions', () => {
     });
 
     it.each(lockedStatuses)(
-      'shows both return buttons for planner in %s status',
+      'shows return to draft button for planner in %s status',
       async (status) => {
         await act(async () => setupConstructionHandoverForm({ status }));
 
         expect(screen.getByRole('button', { name: returnToDraftButtonName })).toBeInTheDocument();
-        expect(
-          screen.getByRole('button', { name: 'constructionHandoverForm.returnToPreviousStatus' }),
-        ).toBeInTheDocument();
       },
     );
 

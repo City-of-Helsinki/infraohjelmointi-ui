@@ -2,6 +2,7 @@ import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInt
 import { createConstructionHandover } from '@/mocks/createMocks';
 import {
   canEditConstructionHandover,
+  canReturnToPreviousConstructionHandoverStatus,
   getPreviousConstructionHandoverStatus,
   isBackwardConstructionHandoverTransition,
 } from './constructionHandoverUtils';
@@ -55,6 +56,53 @@ describe('getPreviousConstructionHandoverStatus', () => {
     ],
   ])('previous status of %s is %s', (status, expected) => {
     expect(getPreviousConstructionHandoverStatus(status)).toBe(expected);
+  });
+});
+
+describe('canReturnToPreviousConstructionHandoverStatus', () => {
+  const noRoles = {
+    isPlanner: false,
+    isProjectManager: false,
+    isConstructionManagementLead: false,
+    isResponsiblePersonForProject: false,
+    isConstructionResponsiblePersonForProject: false,
+  };
+  const plannerRoles = { ...noRoles, isPlanner: true, isProjectManager: true };
+  const leadRoles = { ...noRoles, isConstructionManagementLead: true };
+  const planningPersonRoles = {
+    ...noRoles,
+    isProjectManager: true,
+    isResponsiblePersonForProject: true,
+  };
+  const constructionPersonRoles = {
+    ...noRoles,
+    isProjectManager: true,
+    isConstructionResponsiblePersonForProject: true,
+  };
+
+  it.each([
+    [ConstructionHandoverStatus.DRAFT, plannerRoles, false],
+    [ConstructionHandoverStatus.DRAFT, planningPersonRoles, false],
+    [ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER, planningPersonRoles, true],
+    [ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER, plannerRoles, true],
+    [ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER, leadRoles, false],
+    [ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION, plannerRoles, true],
+    [ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION, leadRoles, true],
+    [ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION, planningPersonRoles, false],
+    [ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION, constructionPersonRoles, false],
+    [ConstructionHandoverStatus.PROJECT_MANAGER_NAMED, leadRoles, true],
+    [ConstructionHandoverStatus.PROJECT_MANAGER_NAMED, constructionPersonRoles, true],
+    [ConstructionHandoverStatus.PROJECT_MANAGER_NAMED, plannerRoles, false],
+    [ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION, constructionPersonRoles, true],
+    [ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION, plannerRoles, false],
+    [ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION, leadRoles, false],
+    [
+      ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+      { ...noRoles, isConstructionResponsiblePersonForProject: true },
+      false,
+    ],
+  ])('status %s with permissions %j returns %s', (status, permissions, expected) => {
+    expect(canReturnToPreviousConstructionHandoverStatus(status, permissions)).toBe(expected);
   });
 });
 

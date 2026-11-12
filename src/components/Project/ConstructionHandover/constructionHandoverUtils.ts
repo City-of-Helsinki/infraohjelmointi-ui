@@ -30,6 +30,57 @@ export function getPreviousConstructionHandoverStatus(
   return index > 0 ? CONSTRUCTION_HANDOVER_STATUS_ORDER[index - 1] : null;
 }
 
+interface IConstructionHandoverTransitionPermissions {
+  isPlanner: boolean;
+  isProjectManager: boolean;
+  isConstructionManagementLead: boolean;
+  isResponsiblePersonForProject: boolean;
+  isConstructionResponsiblePersonForProject: boolean;
+}
+
+function canMoveForwardToConstructionHandoverStatus(
+  status: ConstructionHandoverStatus,
+  {
+    isPlanner,
+    isProjectManager,
+    isConstructionManagementLead,
+    isResponsiblePersonForProject,
+    isConstructionResponsiblePersonForProject,
+  }: IConstructionHandoverTransitionPermissions,
+): boolean {
+  switch (status) {
+    case ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER:
+      return isProjectManager && isResponsiblePersonForProject;
+    case ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION:
+      return isPlanner;
+    case ConstructionHandoverStatus.PROJECT_MANAGER_NAMED:
+      return isConstructionManagementLead;
+    case ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION:
+      return isProjectManager && isConstructionResponsiblePersonForProject;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Stepping back is allowed for whoever can make the forward step into or out of the current status.
+ */
+export function canReturnToPreviousConstructionHandoverStatus(
+  status: ConstructionHandoverStatus,
+  permissions: IConstructionHandoverTransitionPermissions,
+): boolean {
+  if (getPreviousConstructionHandoverStatus(status) === null) {
+    return false;
+  }
+  const nextStatus =
+    CONSTRUCTION_HANDOVER_STATUS_ORDER[CONSTRUCTION_HANDOVER_STATUS_ORDER.indexOf(status) + 1];
+  return (
+    canMoveForwardToConstructionHandoverStatus(status, permissions) ||
+    (nextStatus !== undefined &&
+      canMoveForwardToConstructionHandoverStatus(nextStatus, permissions))
+  );
+}
+
 export function isBackwardConstructionHandoverTransition(
   from: ConstructionHandoverStatus,
   to: ConstructionHandoverStatus,
