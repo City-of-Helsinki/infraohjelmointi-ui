@@ -175,24 +175,34 @@ describe('Search', () => {
     expect(store.getState().search.submittedForm.hkrIds).toEqual(['12345']);
   });
 
-  it('limits PW search text to five characters and submits the search', async () => {
+  it('validates PW search text and blocks searches until the length is corrected', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-    const { user, store, getByLabelText, getByTestId } = await render();
+    const { user, store, getByLabelText, getByTestId, getAllByText, queryByText } = await render();
     await act(async () => {
+      store.dispatch(setSearchForm({ ...initialSearchForm, hkrIds: ['99999'] }));
       store.dispatch(toggleSearch());
     });
     const input = getByLabelText('searchForm.hkrIdSearch');
-    expect(input).toHaveAttribute('maxlength', '5');
+    expect(input).not.toHaveAttribute('maxlength');
     await user.type(input, '123456');
-    expect(input).toHaveValue('12345');
-    expect(getByTestId('search-projects-button')).toBeDisabled();
+    expect(input).toHaveValue('123456');
+    expect(getAllByText('validation.maxLength').length).toBeGreaterThan(0);
     await user.keyboard('{Enter}');
-    expect(getByTestId('search-projects-button')).toBeEnabled();
+    expect(store.getState().search.form.hkrIds).toEqual(['99999']);
+    await user.click(getByTestId('search-projects-button'));
+    expect(mockedAxios.get).not.toHaveBeenCalled();
+    expect(getByTestId('project-search-form')).toBeInTheDocument();
+
+    await user.click(input);
+    await user.keyboard('{Backspace}');
+    expect(queryByText('validation.maxLength')).not.toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    expect(input).toHaveValue('');
     await user.click(getByTestId('search-projects-button'));
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      'localhost:4000/projects/search-results/?hkrId=12345&limit=10&order=new',
+      'localhost:4000/projects/search-results/?hkrId=99999&hkrId=12345&limit=10&order=new',
     );
-    expect(store.getState().search.submittedForm.hkrIds).toEqual(['12345']);
+    expect(store.getState().search.submittedForm.hkrIds).toEqual(['99999', '12345']);
   });
 
   it('submits the missing PW identifier checkbox as the only search criterion', async () => {

@@ -26,6 +26,8 @@ const HkrIdSearch = ({
   });
   const { searchWord } = searchState;
   const withoutHkrId = useWatch({ control, name: 'withoutHkrId' });
+  const errorText =
+    !withoutHkrId && searchWord.length > 5 ? t('validation.maxLength', { value: 5 }) : undefined;
 
   const validateHkrId = (id: string) => {
     return id && id.length < 6;
@@ -33,7 +35,7 @@ const HkrIdSearch = ({
 
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
-      if (getValues('withoutHkrId')) return;
+      if (getValues('withoutHkrId') || errorText) return;
       const formValue = getValues('hkrIds');
       if (!arrayHasValue(formValue, value) && validateHkrId(value)) {
         const nextChange = [...formValue, value];
@@ -47,7 +49,7 @@ const HkrIdSearch = ({
         });
       }
     },
-    [getValues],
+    [getValues, errorText],
   );
 
   const onSelectionDelete = useCallback(
@@ -81,13 +83,14 @@ const HkrIdSearch = ({
       <Controller
         name="hkrIds"
         control={control}
+        rules={{ validate: () => !errorText || errorText }}
         render={({ field: { onChange, value } }) => (
           <>
             <HdsSearchInput
               className="hkr-id-search-input"
               label={t('searchForm.hkrIdSearch')}
               disabled={withoutHkrId}
-              maxLength={5}
+              errorText={errorText}
               value={searchWord}
               onChange={handleSetSearchWord}
               onSubmit={(value) => handleSubmit(value.trim(), onChange)}

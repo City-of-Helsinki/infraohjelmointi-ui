@@ -1,4 +1,4 @@
-import { Search } from 'hds-react';
+import { IconError, Notification, NotificationSize, Search } from 'hds-react';
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,11 +13,11 @@ interface IHdsSearchInputProps {
   className?: string;
   label: string;
   helperText?: string;
+  errorText?: string;
   clearButtonAriaLabel?: string;
   searchButtonAriaLabel?: string;
   hideSearchButton?: boolean;
   disabled?: boolean;
-  maxLength?: number;
   value?: string;
   getSuggestions?: (inputValue: string) => Promise<ISearchOption[]>;
   onChange?: (value: string) => void;
@@ -30,11 +30,11 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   className,
   label,
   helperText,
+  errorText,
   clearButtonAriaLabel,
   searchButtonAriaLabel,
   hideSearchButton,
   disabled,
-  maxLength,
   value,
   getSuggestions,
   onChange,
@@ -46,6 +46,7 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
     () => ({
       label,
       assistive: helperText,
+      error: '',
       searchClearButtonAriaLabel,
       searchButtonAriaLabel,
     }),
@@ -56,16 +57,6 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   const onSubmitRef = useRef(onSubmit);
   const valueRef = useRef(value);
   const selectedOptionRef = useRef<string | undefined>(undefined);
-
-  const setInputMaxLength = useCallback(
-    (container: HTMLFieldSetElement | null) => {
-      const input = container?.querySelector('input');
-      if (!input) return;
-      if (maxLength === undefined) input.removeAttribute('maxlength');
-      else input.maxLength = maxLength;
-    },
-    [maxLength],
-  );
 
   useEffect(() => {
     getSuggestionsRef.current = getSuggestions;
@@ -89,37 +80,48 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   }, []);
 
   const searchInput = (
-    <Search
-      id={id}
-      data-testid={dataTestId}
-      className={className}
-      disabled={disabled}
-      value={value}
-      onChange={(event) => event.type && onChange?.(event.target.value)}
-      onSearch={getSuggestions ? handleSearch : undefined}
-      onClose={(selectedOptions) => {
-        const [selectedOption] = selectedOptions;
-        if (selectedOption && selectedOption.value !== selectedOptionRef.current) {
-          selectedOptionRef.current = selectedOption.value;
-          onChangeRef.current?.(selectedOption.label);
-          onSubmitRef.current?.(selectedOption.label);
-        }
-      }}
-      onSend={onSubmit}
-      hideSubmitButton={hideSearchButton}
-      texts={texts}
-    />
+    <>
+      <Search
+        id={id}
+        data-testid={dataTestId}
+        className={className}
+        disabled={disabled}
+        invalid={!!errorText}
+        value={value}
+        onChange={(event) => event.type && onChange?.(event.target.value)}
+        onSearch={getSuggestions ? handleSearch : undefined}
+        onClose={(selectedOptions) => {
+          const [selectedOption] = selectedOptions;
+          if (selectedOption && selectedOption.value !== selectedOptionRef.current) {
+            selectedOptionRef.current = selectedOption.value;
+            onChangeRef.current?.(selectedOption.label);
+            onSubmitRef.current?.(selectedOption.label);
+          }
+        }}
+        onSend={onSubmit}
+        hideSubmitButton={hideSearchButton}
+        texts={texts}
+      />
+      {errorText && (
+        <Notification
+          className="mt-2"
+          type="error"
+          size={NotificationSize.Small}
+          notificationAriaLabel={label}
+        >
+          <div role="alert" className="flex items-start gap-2">
+            <IconError aria-hidden className="shrink-0" />
+            {errorText}
+          </div>
+        </Notification>
+      )}
+    </>
   );
 
-  return disabled === undefined && maxLength === undefined ? (
+  return disabled === undefined ? (
     searchInput
   ) : (
-    <fieldset
-      ref={setInputMaxLength}
-      disabled={disabled}
-      inert={disabled}
-      className="m-0 min-w-0 border-0 p-0"
-    >
+    <fieldset disabled={disabled} inert={disabled} className="m-0 min-w-0 border-0 p-0">
       {searchInput}
     </fieldset>
   );

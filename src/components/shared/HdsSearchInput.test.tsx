@@ -51,15 +51,20 @@ const ControlledSearch = ({
 };
 
 describe('HdsSearchInput with real HDS', () => {
-  it('sets native maxlength without truncating an existing value', () => {
-    const { rerender } = render(<HdsSearchInput label="Projects" maxLength={5} value="123456" />);
+  it('shows validation errors without limiting or truncating the input', () => {
+    const { rerender } = render(
+      <HdsSearchInput label="Projects" errorText="Maximum length is 5 characters" value="123456" />,
+    );
     const input = screen.getByRole('searchbox', { name: 'Projects' });
-    expect(input).toHaveAttribute('maxlength', '5');
+    expect(input).not.toHaveAttribute('maxlength');
     expect(input).toHaveValue('123456');
+    const error = screen.getByRole('alert');
+    expect(error).toHaveTextContent('Maximum length is 5 characters');
+    expect(error.querySelector('svg')).toBeInTheDocument();
 
     rerender(<HdsSearchInput label="Projects" value="123456" />);
-    expect(screen.getByRole('searchbox', { name: 'Projects' })).not.toHaveAttribute('maxlength');
-    expect(screen.getByRole('searchbox', { name: 'Projects' })).toHaveValue('123456');
+    expect(screen.queryByText('Maximum length is 5 characters')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('disables the input and buttons explicitly and re-enables them when requested', async () => {
