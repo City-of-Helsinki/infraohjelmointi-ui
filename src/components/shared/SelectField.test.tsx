@@ -68,7 +68,12 @@ const TestForm = ({ readOnly = false, disabled }: { readOnly?: boolean; disabled
         disabled={disabled}
         tooltip={<Tooltip>Editable details</Tooltip>}
       />
-      <TextField name="text" control={control} label="Text label" tooltip="Existing helper text" />
+      <TextField
+        name="text"
+        control={control}
+        label="Text label"
+        helperText="Existing helper text"
+      />
       <button type="button" onClick={() => setCurrentValue(JSON.stringify(getValues('first')))}>
         read value
       </button>
@@ -166,8 +171,10 @@ describe('SelectField', () => {
     for (const name of ['first', 'second', 'third']) {
       const field = within(screen.getByTestId(name));
       expect(field.getByRole('textbox')).toBeDisabled();
-      expect(field.queryByRole('button')).not.toBeInTheDocument();
     }
+    expect(within(screen.getByTestId('first')).getByRole('button')).toBeVisible();
+    expect(within(screen.getByTestId('second')).getByRole('button')).toBeVisible();
+    expect(within(screen.getByTestId('third')).queryByRole('button')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'clear selection' })).not.toBeInTheDocument();
   });
 

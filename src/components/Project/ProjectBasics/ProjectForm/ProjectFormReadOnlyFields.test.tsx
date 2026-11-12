@@ -22,7 +22,7 @@ function Fields({ viewer = false }: { viewer?: boolean }) {
   return (
     <form className={viewer ? 'project-form viewer-only-project-form' : 'project-form'}>
       <FormProvider {...methods}>
-        <TextField name="text" label="Name" tooltip="Name helper" disabled={viewer} />
+        <TextField name="text" label="Name" helperText="Name helper" disabled={viewer} />
         <NumberField name="number" label="Cost" disabled={viewer} />
         <TextField name="editableText" label="Editable name" readOnly={false} />
         <NumberField name="editableNumber" label="Editable cost" disabled={false} />
@@ -72,9 +72,7 @@ describe('Viewer-only project basics fields', () => {
     expect(screen.getByRole('spinbutton', { name: 'Cost' })).toBeDisabled();
     expect(within(screen.getByTestId('date')).getByRole('button')).toBeDisabled();
     expect(screen.getByText('Name helper')).toBeVisible();
-    expect(within(screen.getByTestId('choice')).getByDisplayValue('Kyllä')).toHaveAttribute(
-      'readonly',
-    );
+    expect(within(screen.getByTestId('choice')).getByDisplayValue('Kyllä')).toBeDisabled();
     expect(screen.queryByTestId('choice-0')).not.toBeInTheDocument();
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'changed');
