@@ -1,31 +1,20 @@
+import { API_URL } from '@/config/env';
 import {
   IPersonalDataRetentionConfirmResponse,
   IPersonalDataRetentionProject,
 } from '@/interfaces/personalDataRetentionInterfaces';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
-
 export const getPersonalDataRetentionProjects = async (): Promise<
   Array<IPersonalDataRetentionProject>
 > => {
-  try {
-    const res = await axios.get(`${REACT_APP_API_URL}/personal-data-retention/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.get(`${API_URL}/personal-data-retention/`);
+  return res.data;
 };
 
 export const confirmPersonalDataRetention = async (
   projectId: string,
 ): Promise<IPersonalDataRetentionConfirmResponse> => {
-  try {
-    const res = await axios.post(
-      `${REACT_APP_API_URL}/personal-data-retention/${projectId}/confirm/`,
-    );
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.post(`${API_URL}/personal-data-retention/${projectId}/confirm/`);
+  return res.data;
 };
