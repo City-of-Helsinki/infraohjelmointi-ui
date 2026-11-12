@@ -3016,11 +3016,6 @@ hasown@^2.0.2, hasown@^2.0.4:
   dependencies:
     function-bind "^1.1.2"
 
-hds-core@6.0.7:
-  version "6.0.7"
-  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-6.0.7.tgz#bdf760884b975d5c71077181564c034fa0d74197"
-  integrity sha512-RTBTGWgq2nxnbf07UmMR9pDWCqaBJZ6jrV2ZDzn6ya5mH1+cYWa1N2JV4PBfHQWOPivDj0yEIHpQzWq3EwI+dg==
-
 hds-core@6.0.8:
   version "6.0.8"
   resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-6.0.8.tgz#196a00b2ffdac8d4986632583cd5d871ccfaf7ec"
