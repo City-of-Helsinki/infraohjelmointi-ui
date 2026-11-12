@@ -167,12 +167,7 @@
   dependencies:
     "@babel/types" "^7.29.8"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.20.13", "@babel/runtime@^7.29.2", "@babel/runtime@^7.29.7":
-  version "7.29.10"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.10.tgz#fe9920782f7ee34029165ac6f272984917a1641b"
-  integrity sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==
-
-"@babel/runtime@^7.21.0":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.20.13", "@babel/runtime@^7.21.0", "@babel/runtime@^7.29.2", "@babel/runtime@^7.29.7":
   version "7.29.13"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.13.tgz#6b33e456181ff15b5585d932f3aebfc0669b32dd"
   integrity sha512-v+oN26xP4YIlQsbQ/CbTH1WG5m/l/DjKKZNy/Kp3f/AFvbgt7Em/D0FeMM3O2hX0YzeN2M16W8lOpyhIkfCBcQ==
@@ -366,11 +361,6 @@
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.2.0.tgz#5f3d96ec6b2354ad6d8a28bf216a1d97b5426861"
   integrity sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==
-
-"@hookform/resolvers@^2.9.11":
-  version "2.9.11"
-  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-2.9.11.tgz#9ce96e7746625a89239f68ca57c4f654264c17ef"
-  integrity sha512-bA3aZ79UgcHj7tFV7RlgThzwSSHZgvfbt2wprldRkYBcMopdMvHyO17Wwp/twcJasNFischFfS7oz8Katz8DdQ==
 
 "@humanwhocodes/config-array@^0.13.0":
   version "0.13.0"
@@ -1053,11 +1043,6 @@
   dependencies:
     "@types/deep-eql" "*"
     assertion-error "^2.0.1"
-
-"@types/cookie@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.6.0.tgz#eac397f28bf1d6ae0ae081363eca2f425bedf0d5"
-  integrity sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==
 
 "@types/deep-eql@*":
   version "4.0.2"
@@ -3036,43 +3021,45 @@ hds-core@6.0.7:
   resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-6.0.7.tgz#bdf760884b975d5c71077181564c034fa0d74197"
   integrity sha512-RTBTGWgq2nxnbf07UmMR9pDWCqaBJZ6jrV2ZDzn6ya5mH1+cYWa1N2JV4PBfHQWOPivDj0yEIHpQzWq3EwI+dg==
 
-hds-design-tokens@6.0.7:
-  version "6.0.7"
-  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-6.0.7.tgz#cc4b7def5dfee070c34b0c2532db86ee1a243f7b"
-  integrity sha512-yYEoNitAJGjZa0AfCUjzytKygorAsqNJwSlb+y6T6KjkJxvoW1yva9SxAQptWpEADE7BlKwn6/MYgkWS2LGf5Q==
+hds-core@6.0.8:
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-6.0.8.tgz#196a00b2ffdac8d4986632583cd5d871ccfaf7ec"
+  integrity sha512-0a+nLB3WGhJUAj77fPxHnvPae5m//45w5PHZgR9fcMm/zeiqj5SOSbQfIK/lKeaWuklA6uH16EH1WN08pQsT5g==
+  dependencies:
+    hds-design-tokens "6.0.8"
 
-hds-react@6.0.7:
-  version "6.0.7"
-  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-6.0.7.tgz#0abdebe24fd91bd6fd9a40471b94cdb4686e8619"
-  integrity sha512-jlINoju5VhTsfWzQA8kOcilrtvx2agVAETTdj7BSKClxpYL8HzNrZRLch9XDpIZxziZ9oh7ZMWlM/iX1u0e6hA==
+hds-design-tokens@6.0.8:
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-6.0.8.tgz#f49d99912ff30eec835e45dc2bd60fb1ff3462da"
+  integrity sha512-9Dp7FLYYn0F6QOrVVOTL0N4CgTeAVm90XsP/eMnLKWnJVPILevwNDOTzZR0Unz2y4Y2yYOwKSZYwwo1X7glwYA==
+
+hds-react@6.0.8:
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-6.0.8.tgz#4d75056df88465669fb8abf6b468cd3e8e26b6d1"
+  integrity sha512-QQmeXOwO+BZCHjKOvtTYHFPJVdZ4meQn6O33tjQVvYBqs8evU8diAv7sAuVl7Z1ajRNOXuHeUndc6nsV4F3NwQ==
   dependencies:
     "@apollo/client" "^3.14.1"
     "@babel/runtime" "^7.29.7"
-    "@hookform/resolvers" "^2.9.11"
     "@juggle/resize-observer" "3.4.0"
     "@popperjs/core" "2.11.8"
     "@react-aria/visually-hidden" "3.9.1"
     "@react-spring/web" "9.7.5"
-    "@types/cookie" "^0.6.0"
     await-to-js "^3.0.0"
     cookie "^0.7.2"
     crc-32 "1.2.2"
     date-fns "2.30.0"
     graphql "^16.14.2"
-    hds-core "6.0.7"
-    hds-design-tokens "6.0.7"
+    hds-core "6.0.8"
     jwt-decode "^3.1.2"
     kashe "1.2.0"
     lodash "^4.18.1"
     oidc-client-ts "^2.5.0"
     postcss "8.5.23"
     postcss-nesting "^10.2.0"
-    react-hook-form "^7.81.0"
     react-merge-refs "1.1.0"
     react-popper "2.3.0"
     react-use-measure "2.1.7"
     uuid "^14.0.1"
-    yup "^1.7.1"
 
 hermes-estree@0.25.1:
   version "0.25.1"
@@ -4255,11 +4242,6 @@ prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
-property-expr@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-2.0.5.tgz#278bdb15308ae16af3e3b9640024524f4dc02cb4"
-  integrity sha512-IJUkICM5dP5znhCckHSv30Q4b5/JA5enCtkRHYaOVOAocnH/1BQEYTC5NMfT3AVl/iXKdr3aqQbQn9DxyWknwA==
-
 proxy-from-env@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-2.1.0.tgz#a7487568adad577cfaaa7e88c49cab3ab3081aba"
@@ -4314,7 +4296,7 @@ react-fast-compare@^3.0.1:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.2.tgz#929a97a532304ce9fee4bcae44234f1ce2c21d49"
   integrity sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==
 
-react-hook-form@^7.81.0, react-hook-form@^7.91.0:
+react-hook-form@^7.91.0:
   version "7.91.0"
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.91.0.tgz#751ffa4eef441562b7417727e247446ce7d2a002"
   integrity sha512-5BEBUnCBwa28AFXYTYmOaB/+CSpJ/+CWVASHEvIGUzFdHyUiPHeRhG7r5hOZ8nZi0yP7pbHdFNXO/p31EKTJFQ==
@@ -4883,11 +4865,6 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
 
-tiny-case@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/tiny-case/-/tiny-case-1.0.3.tgz#d980d66bc72b5d5a9ca86fb7c9ffdb9c898ddd03"
-  integrity sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==
-
 tiny-inflate@^1.0.0, tiny-inflate@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
@@ -4927,11 +4904,6 @@ tldts@^6.1.32:
   integrity sha512-WMi/OQ2axVTf/ykqCQgXiIct+mSQDFdH2fkwhPwgEwvJ1kSzZRiinb0zF2Xb8u4+OqPChmyI6MEu4EezNJz+FQ==
   dependencies:
     tldts-core "^6.1.86"
-
-toposort@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/toposort/-/toposort-2.0.2.tgz#ae21768175d1559d48bef35420b2f4962f09c330"
-  integrity sha512-0a5EOkAUp8D4moMi2W8ZF8jcga7BgZd91O/yabJCFY8az+XSzeGyTKs0Aoo897iV1Nj6guFq8orWDS96z91oGg==
 
 tough-cookie@^5.1.1:
   version "5.1.2"
@@ -5014,11 +4986,6 @@ type-fest@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
-
-type-fest@^2.19.0:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.19.0.tgz#88068015bb33036a598b952e55e9311a60fd3a9b"
-  integrity sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==
 
 typed-array-buffer@^1.0.3:
   version "1.0.3"
@@ -5393,16 +5360,6 @@ yoga-layout@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/yoga-layout/-/yoga-layout-3.2.1.tgz#d2d1ba06f0e81c2eb650c3e5ad8b0b4adde1e843"
   integrity sha512-0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==
-
-yup@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/yup/-/yup-1.7.1.tgz#4c47c6bb367df08d4bc597f8c4c4f5fc4277f6ab"
-  integrity sha512-GKHFX2nXul2/4Dtfxhozv701jLQHdf6J34YDh2cEkpqoo8le5Mg6/LrdseVLrFarmFygZTlfIhHx/QKfb/QWXw==
-  dependencies:
-    property-expr "^2.0.5"
-    tiny-case "^1.0.3"
-    toposort "^2.0.2"
-    type-fest "^2.19.0"
 
 zen-observable-ts@^1.2.5:
   version "1.2.5"
