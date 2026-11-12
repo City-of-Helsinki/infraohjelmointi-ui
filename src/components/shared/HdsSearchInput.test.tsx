@@ -58,13 +58,20 @@ describe('HdsSearchInput with real HDS', () => {
     const input = screen.getByRole('searchbox', { name: 'Projects' });
     expect(input).not.toHaveAttribute('maxlength');
     expect(input).toHaveValue('123456');
-    const error = screen.getByRole('alert');
-    expect(error).toHaveTextContent('Maximum length is 5 characters');
-    expect(error.querySelector('svg')).toBeInTheDocument();
+    expect(
+      screen.getByText('Maximum length is 5 characters', { selector: '.hds-search-error' }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <HdsSearchInput label="Projects" errorText="Updated validation error" value="123456" />,
+    );
+    expect(screen.queryByText('Maximum length is 5 characters')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Updated validation error', { selector: '.hds-search-error' }),
+    ).toBeInTheDocument();
 
     rerender(<HdsSearchInput label="Projects" value="123456" />);
-    expect(screen.queryByText('Maximum length is 5 characters')).not.toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByText('Updated validation error')).not.toBeInTheDocument();
   });
 
   it('disables the input and buttons explicitly and re-enables them when requested', async () => {

@@ -1,4 +1,4 @@
-import { IconError, Notification, NotificationSize, Search } from 'hds-react';
+import { Search } from 'hds-react';
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -46,11 +46,11 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
     () => ({
       label,
       assistive: helperText,
-      error: '',
+      error: errorText,
       searchClearButtonAriaLabel,
       searchButtonAriaLabel,
     }),
-    [label, helperText, searchClearButtonAriaLabel, searchButtonAriaLabel],
+    [label, helperText, errorText, searchClearButtonAriaLabel, searchButtonAriaLabel],
   );
   const getSuggestionsRef = useRef(getSuggestions);
   const onChangeRef = useRef(onChange);
@@ -80,42 +80,27 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   }, []);
 
   const searchInput = (
-    <>
-      <Search
-        id={id}
-        data-testid={dataTestId}
-        className={className}
-        disabled={disabled}
-        invalid={!!errorText}
-        value={value}
-        onChange={(event) => event.type && onChange?.(event.target.value)}
-        onSearch={getSuggestions ? handleSearch : undefined}
-        onClose={(selectedOptions) => {
-          const [selectedOption] = selectedOptions;
-          if (selectedOption && selectedOption.value !== selectedOptionRef.current) {
-            selectedOptionRef.current = selectedOption.value;
-            onChangeRef.current?.(selectedOption.label);
-            onSubmitRef.current?.(selectedOption.label);
-          }
-        }}
-        onSend={onSubmit}
-        hideSubmitButton={hideSearchButton}
-        texts={texts}
-      />
-      {errorText && (
-        <Notification
-          className="mt-2"
-          type="error"
-          size={NotificationSize.Small}
-          notificationAriaLabel={label}
-        >
-          <div role="alert" className="flex items-start gap-2">
-            <IconError aria-hidden className="shrink-0" />
-            {errorText}
-          </div>
-        </Notification>
-      )}
-    </>
+    <Search
+      id={id}
+      data-testid={dataTestId}
+      className={className}
+      disabled={disabled}
+      invalid={!!errorText}
+      value={value}
+      onChange={(event) => event.type && onChange?.(event.target.value)}
+      onSearch={getSuggestions ? handleSearch : undefined}
+      onClose={(selectedOptions) => {
+        const [selectedOption] = selectedOptions;
+        if (selectedOption && selectedOption.value !== selectedOptionRef.current) {
+          selectedOptionRef.current = selectedOption.value;
+          onChangeRef.current?.(selectedOption.label);
+          onSubmitRef.current?.(selectedOption.label);
+        }
+      }}
+      onSend={onSubmit}
+      hideSubmitButton={hideSearchButton}
+      texts={texts}
+    />
   );
 
   return disabled === undefined ? (
