@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest';
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
@@ -8,10 +9,10 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { IPersonalDataRetentionProject } from '@/interfaces/personalDataRetentionInterfaces';
 import AdminPersonalDataRetention from './AdminPersonalDataRetention';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', () => mockI18next());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const dueProject: IPersonalDataRetentionProject = {
   projectId: 'project-1',
@@ -52,7 +53,7 @@ const render = async () =>
 
 describe('AdminPersonalDataRetention', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('lists projects past retention with formatted dates and non-zero counts', async () => {
@@ -66,8 +67,12 @@ describe('AdminPersonalDataRetention', () => {
     expect(screen.getByText('31.5.2025')).toBeInTheDocument();
 
     const summary = screen.getByText(/summary\.projectPersons: 3/);
-    expect(summary).toHaveTextContent('adminFunctions.personaldataretention.summary.programmers: 1');
-    expect(summary).toHaveTextContent('adminFunctions.personaldataretention.summary.programmeNames: 1');
+    expect(summary).toHaveTextContent(
+      'adminFunctions.personaldataretention.summary.programmers: 1',
+    );
+    expect(summary).toHaveTextContent(
+      'adminFunctions.personaldataretention.summary.programmeNames: 1',
+    );
     expect(summary).not.toHaveTextContent('handovers');
     expect(summary).not.toHaveTextContent('taskPersons');
   });

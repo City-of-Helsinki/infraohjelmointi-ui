@@ -13,7 +13,7 @@ import {
 import { dateStringToMoment } from '@/utils/dates';
 import { Button, ButtonVariant, Table } from 'hds-react';
 import { TFunction } from 'i18next';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const TRANSLATION_PREFIX = 'adminFunctions.personaldataretention';
@@ -32,8 +32,64 @@ const formatSummary = (
 ) =>
   summaryKeys
     .filter((key) => summary[key] > 0)
-    .map((key) => `${translate(`${TRANSLATION_PREFIX}.summary.${key}`)}: ${summary[key]}`)
+    .map((key) => {
+      const label = translate(`${TRANSLATION_PREFIX}.summary.${key}`);
+      return `${label}: ${summary[key]}`;
+    })
     .join(', ');
+
+interface RemoveButtonProps {
+  project: IPersonalDataRetentionProject;
+  onRemove: (project: IPersonalDataRetentionProject) => void;
+  label: string;
+}
+
+const RemoveButton = ({ project, onRemove, label }: RemoveButtonProps) => (
+  <Button
+    type="button"
+    variant={ButtonVariant.Danger}
+    data-testid={`remove-personal-data-${project.projectId}`}
+    onClick={() => onRemove(project)}
+  >
+    {label}
+  </Button>
+);
+
+const getTableColumns = (
+  translate: TFunction<'translation', undefined>,
+  onRemove: (project: IPersonalDataRetentionProject) => void,
+) => [
+  { key: 'projectName', headerName: translate(`${TRANSLATION_PREFIX}.projectName`) },
+  {
+    key: 'warrantyPhaseEnd',
+    headerName: translate(`${TRANSLATION_PREFIX}.warrantyPhaseEnd`),
+    transform: ({ warrantyPhaseEnd }: IPersonalDataRetentionProject) =>
+      dateStringToMoment(warrantyPhaseEnd),
+  },
+  {
+    key: 'retentionDueDate',
+    headerName: translate(`${TRANSLATION_PREFIX}.retentionDueDate`),
+    transform: ({ retentionDueDate }: IPersonalDataRetentionProject) =>
+      dateStringToMoment(retentionDueDate),
+  },
+  {
+    key: 'personalData',
+    headerName: translate(`${TRANSLATION_PREFIX}.personalData`),
+    transform: ({ personalData }: IPersonalDataRetentionProject) =>
+      formatSummary(personalData, translate),
+  },
+  {
+    key: 'remove',
+    headerName: '',
+    transform: (project: IPersonalDataRetentionProject) => (
+      <RemoveButton
+        project={project}
+        onRemove={onRemove}
+        label={translate(`${TRANSLATION_PREFIX}.removeButton`)}
+      />
+    ),
+  },
+];
 
 const AdminPersonalDataRetention = () => {
   const { t } = useTranslation();
@@ -90,6 +146,8 @@ const AdminPersonalDataRetention = () => {
           }),
         );
       } catch (e) {
+        // Details stay out of the UI; the user gets a generic notification
+        console.error('Removing personal data failed', e);
         dispatch(
           notifyError({
             message: 'personalDataRemoveError',
@@ -103,41 +161,7 @@ const AdminPersonalDataRetention = () => {
     [dispatch, isConfirmed, t],
   );
 
-  const cols = [
-    { key: 'projectName', headerName: t(`${TRANSLATION_PREFIX}.projectName`) },
-    {
-      key: 'warrantyPhaseEnd',
-      headerName: t(`${TRANSLATION_PREFIX}.warrantyPhaseEnd`),
-      transform: ({ warrantyPhaseEnd }: IPersonalDataRetentionProject) =>
-        dateStringToMoment(warrantyPhaseEnd),
-    },
-    {
-      key: 'retentionDueDate',
-      headerName: t(`${TRANSLATION_PREFIX}.retentionDueDate`),
-      transform: ({ retentionDueDate }: IPersonalDataRetentionProject) =>
-        dateStringToMoment(retentionDueDate),
-    },
-    {
-      key: 'personalData',
-      headerName: t(`${TRANSLATION_PREFIX}.personalData`),
-      transform: ({ personalData }: IPersonalDataRetentionProject) =>
-        formatSummary(personalData, t),
-    },
-    {
-      key: 'remove',
-      headerName: '',
-      transform: (project: IPersonalDataRetentionProject) => (
-        <Button
-          type="button"
-          variant={ButtonVariant.Danger}
-          data-testid={`remove-personal-data-${project.projectId}`}
-          onClick={() => handleRemove(project)}
-        >
-          {t(`${TRANSLATION_PREFIX}.removeButton`)}
-        </Button>
-      ),
-    },
-  ];
+  const cols = useMemo(() => getTableColumns(t, handleRemove), [t, handleRemove]);
 
   return (
     <div data-testid="admin-personaldataretention">
