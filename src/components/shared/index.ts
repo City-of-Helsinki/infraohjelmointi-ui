@@ -11,3 +11,4 @@ export { default as ListField } from './ListField';
 export { default as Toolbar } from './Toolbar';
 export { default as BubbleIcon } from './BubbleIcon';
 export { default as CustomTag } from './CustomTag';
+export { default as FormBottomBar } from './FormBottomBar';

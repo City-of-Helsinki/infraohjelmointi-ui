@@ -8,6 +8,7 @@ import { selectStartYear } from '@/reducers/planningSlice';
 import { loadCoordinationData, loadPlanningData } from '@/App';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { useDeleteProjectMutation } from '@/api/projectApi';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 
 interface IProjectFormbannerProps {
   project: IProject | null;
@@ -58,27 +59,25 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({
   }, [isConfirmed, project, t, navigate, dispatch, startYear, deleteProject]);
 
   return (
-    <div className="project-form-banner">
-      <div className="project-form-banner-container">
-        <Button onClick={onSubmit()} disabled={!isDirty} data-testid="submit-project-button">
-          {t('saveChanges')}
-        </Button>
-        {project?.id && (
-          <>
-            {/** Add logic for disabling button later based on user type */}
-            <Button
-              data-testid={'open-delete-project-dialog-button'}
-              disabled={isInputDisabled}
-              iconStart={<IconTrash />}
-              variant={ButtonVariant.Supplementary}
-              onClick={handleProjectDelete}
-            >
-              {t(`deleteProject`)}
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
+    <FormBottomBar containerClassName="justify-between">
+      <Button onClick={onSubmit()} disabled={!isDirty} data-testid="submit-project-button">
+        {t('saveChanges')}
+      </Button>
+      {project?.id && (
+        <>
+          {/** Add logic for disabling button later based on user type */}
+          <Button
+            data-testid={'open-delete-project-dialog-button'}
+            disabled={isInputDisabled}
+            iconStart={<IconTrash />}
+            variant={ButtonVariant.Supplementary}
+            onClick={handleProjectDelete}
+          >
+            {t(`deleteProject`)}
+          </Button>
+        </>
+      )}
+    </FormBottomBar>
   );
 };
 

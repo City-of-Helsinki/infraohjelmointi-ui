@@ -688,14 +688,14 @@ describe('ProjectProgramme', () => {
   it('shows overview bottom-bar actions', async () => {
     await render();
 
-    const projectFormBanner = Array.from(
-      document.querySelectorAll<HTMLElement>('.project-form-banner'),
-    ).find((banner) => within(banner).queryByRole('button', { name: 'copyLink' }));
+    const projectFormBanner = Array.from(screen.queryAllByTestId('form-bottom-bar')).find(
+      (banner) => within(banner).queryByRole('button', { name: 'copyLink' }),
+    );
 
     expect(projectFormBanner).toBeInTheDocument();
 
     if (!projectFormBanner) {
-      throw new Error('Expected overview actions to be inside project-form-banner');
+      throw new Error('Expected overview actions to be inside form-bottom-bar');
     }
 
     expect(
