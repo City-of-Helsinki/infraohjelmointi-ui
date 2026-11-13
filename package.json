@@ -58,7 +58,7 @@
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.8",
+    "@testing-library/user-event": "^14.6.9",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
     "@typescript-eslint/parser": "^8.72.1",
     "@typescript/native": "npm:typescript@7.0.2",
