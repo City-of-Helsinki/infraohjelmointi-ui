@@ -141,6 +141,42 @@ describe('SearchResultsView', () => {
   });
 
   describe('SearchTerms', () => {
+    it('removes the missing PW identifier filter and refetches with remaining criteria', async () => {
+      const { user, store, findByText, queryByText } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          form: { ...filledSearchForm, withoutHkrId: true },
+          submittedForm: { ...filledSearchForm, withoutHkrId: true },
+        },
+      });
+      await user.click(await findByText('searchTag.withoutHkrId'));
+      await waitFor(() => expect(store.getState().search.submittedForm.withoutHkrId).toBe(false));
+      expect(queryByText('searchTag.withoutHkrId')).not.toBeInTheDocument();
+      expect(store.getState().search.form.withoutHkrId).toBe(false);
+      expect(store.getState().search.lastSearchParams).toContain('hashtag=');
+      expect(store.getState().search.lastSearchParams).not.toContain('withoutHkrId');
+      expect(mockedAxios.get).toHaveBeenCalled();
+    });
+
+    it('clears the missing PW identifier filter with clear all', async () => {
+      const { user, store, findByText, queryByText } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          form: { ...initialSearchForm, withoutHkrId: true },
+          submittedForm: { ...initialSearchForm, withoutHkrId: true },
+          lastSearchParams: 'withoutHkrId=true',
+        },
+      });
+      expect(await findByText('searchTag.withoutHkrId')).toBeInTheDocument();
+      await user.click(await findByText('emptyTerms'));
+      expect(store.getState().search.form).toEqual(initialSearchForm);
+      expect(store.getState().search.submittedForm).toEqual(initialSearchForm);
+      expect(store.getState().search.lastSearchParams).toBe('');
+      expect(queryByText('searchTag.withoutHkrId')).not.toBeInTheDocument();
+    });
+
     it('renders elements', async () => {
       const { container } = await render();
       expect(container.getElementsByClassName('search-terms-container').length).toBe(1);

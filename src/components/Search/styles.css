@@ -34,7 +34,16 @@
 }
 
 .search-form .hkr-id-search {
-  @apply col-span-2;
+  @apply col-span-2 w-full min-w-0;
+}
+
+.search-form .hkr-id-search .hkr-id-search-input {
+  --input-width: 100%;
+  @apply w-full max-w-full;
+}
+
+.search-form .hkr-id-search .without-hkr-id-search {
+  @apply w-full;
 }
 
 .free-search .search-selections {
@@ -43,11 +52,11 @@
 
 .search-form .search-form-content .input-wrapper#programmedYearMin {
   --input-width: calc(100% - 20px);
-  @apply col-span-1 row-start-6 mr-10 w-[var(--input-width)];
+  @apply col-span-1 col-start-1 mr-10 w-[var(--input-width)];
 }
 
 .search-form .search-form-content .input-wrapper#programmedYearMax {
-  @apply col-span-1 row-start-6;
+  @apply col-span-1 col-start-2;
 }
 
 .free-search div div div button {

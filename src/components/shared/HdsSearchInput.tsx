@@ -13,9 +13,11 @@ interface IHdsSearchInputProps {
   className?: string;
   label: string;
   helperText?: string;
+  errorText?: string;
   clearButtonAriaLabel?: string;
   searchButtonAriaLabel?: string;
   hideSearchButton?: boolean;
+  disabled?: boolean;
   value?: string;
   getSuggestions?: (inputValue: string) => Promise<ISearchOption[]>;
   onChange?: (value: string) => void;
@@ -28,9 +30,11 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
   className,
   label,
   helperText,
+  errorText,
   clearButtonAriaLabel,
   searchButtonAriaLabel,
   hideSearchButton,
+  disabled,
   value,
   getSuggestions,
   onChange,
@@ -42,10 +46,11 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
     () => ({
       label,
       assistive: helperText,
+      error: errorText,
       searchClearButtonAriaLabel,
       searchButtonAriaLabel,
     }),
-    [label, helperText, searchClearButtonAriaLabel, searchButtonAriaLabel],
+    [label, helperText, errorText, searchClearButtonAriaLabel, searchButtonAriaLabel],
   );
   const getSuggestionsRef = useRef(getSuggestions);
   const onChangeRef = useRef(onChange);
@@ -74,11 +79,13 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
     };
   }, []);
 
-  return (
+  const searchInput = (
     <Search
       id={id}
       data-testid={dataTestId}
       className={className}
+      disabled={disabled}
+      invalid={!!errorText}
       value={value}
       onChange={(event) => event.type && onChange?.(event.target.value)}
       onSearch={getSuggestions ? handleSearch : undefined}
@@ -94,6 +101,14 @@ const HdsSearchInput: FC<IHdsSearchInputProps> = ({
       hideSubmitButton={hideSearchButton}
       texts={texts}
     />
+  );
+
+  return disabled === undefined ? (
+    searchInput
+  ) : (
+    <fieldset disabled={disabled} inert={disabled} className="m-0 min-w-0 border-0 p-0">
+      {searchInput}
+    </fieldset>
   );
 };
 

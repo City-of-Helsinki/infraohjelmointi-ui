@@ -1,10 +1,10 @@
-import { Tag } from 'hds-react';
+import { Checkbox, Tag } from 'hds-react';
 import HdsSearchInput from '@/components/shared/HdsSearchInput';
-import { memo, useCallback, useState, MouseEvent } from 'react';
+import { memo, useCallback, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue } from '@/utils/common';
-import { HookFormControlType, ISearchForm } from '@/interfaces/formInterfaces';
-import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
+import { ISearchForm } from '@/interfaces/formInterfaces';
+import { Control, Controller, UseFormGetValues, UseFormSetValue, useWatch } from 'react-hook-form';
 import './styles.css';
 
 interface IHkrIdSearchState {
@@ -14,17 +14,20 @@ interface IHkrIdSearchState {
 const HkrIdSearch = ({
   control,
   getValues,
+  setValue,
 }: {
-  control: HookFormControlType;
+  control: Control<ISearchForm>;
   getValues: UseFormGetValues<ISearchForm>;
+  setValue: UseFormSetValue<ISearchForm>;
 }) => {
   const { t } = useTranslation();
-
   const [searchState, setSearchState] = useState<IHkrIdSearchState>({
     searchWord: '',
   });
-
   const { searchWord } = searchState;
+  const withoutHkrId = useWatch({ control, name: 'withoutHkrId' });
+  const errorText =
+    !withoutHkrId && searchWord.length > 5 ? t('validation.maxLength', { value: 5 }) : undefined;
 
   const validateHkrId = (id: string) => {
     return id && id.length < 6;
@@ -32,6 +35,7 @@ const HkrIdSearch = ({
 
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
+      if (getValues('withoutHkrId') || errorText) return;
       const formValue = getValues('hkrIds');
       if (!arrayHasValue(formValue, value) && validateHkrId(value)) {
         const nextChange = [...formValue, value];
@@ -45,7 +49,7 @@ const HkrIdSearch = ({
         });
       }
     },
-    [getValues],
+    [getValues, errorText],
   );
 
   const onSelectionDelete = useCallback(
@@ -78,14 +82,18 @@ const HkrIdSearch = ({
     <div className="hkr-id-search" data-testid="hkr-id-search">
       <Controller
         name="hkrIds"
-        control={control as Control<FieldValues>}
+        control={control}
+        rules={{ validate: () => !errorText || errorText }}
         render={({ field: { onChange, value } }) => (
           <>
             <HdsSearchInput
+              className="hkr-id-search-input"
               label={t('searchForm.hkrIdSearch')}
+              disabled={withoutHkrId}
+              errorText={errorText}
               value={searchWord}
               onChange={handleSetSearchWord}
-              onSubmit={(v) => handleSubmit(v, onChange)}
+              onSubmit={(value) => handleSubmit(value.trim(), onChange)}
             />
             <div className="hkr-id-search-selections">
               {(Array.isArray(value) ? value : []).map((s) => (
@@ -100,6 +108,32 @@ const HkrIdSearch = ({
               ))}
             </div>
           </>
+        )}
+      />
+      <Controller
+        name="withoutHkrId"
+        control={control}
+        render={({ field }) => (
+          <div className="input-wrapper without-hkr-id-search">
+            <Checkbox
+              id={field.name}
+              name={field.name}
+              label={t('searchForm.withoutHkrId')}
+              checked={field.value}
+              onBlur={field.onBlur}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  setValue('hkrIds', [], { shouldDirty: true });
+                  setSearchState((current) => ({
+                    ...current,
+                    searchWord: '',
+                    selections: [],
+                  }));
+                }
+                field.onChange(event.target.checked);
+              }}
+            />
+          </div>
         )}
       />
     </div>

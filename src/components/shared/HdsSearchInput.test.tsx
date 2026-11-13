@@ -51,6 +51,50 @@ const ControlledSearch = ({
 };
 
 describe('HdsSearchInput with real HDS', () => {
+  it('shows validation errors without limiting or truncating the input', () => {
+    const { rerender } = render(
+      <HdsSearchInput label="Projects" errorText="Maximum length is 5 characters" value="123456" />,
+    );
+    const input = screen.getByRole('searchbox', { name: 'Projects' });
+    expect(input).not.toHaveAttribute('maxlength');
+    expect(input).toHaveValue('123456');
+    expect(
+      screen.getByText('Maximum length is 5 characters', { selector: '.hds-search-error' }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <HdsSearchInput label="Projects" errorText="Updated validation error" value="123456" />,
+    );
+    expect(screen.queryByText('Maximum length is 5 characters')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Updated validation error', { selector: '.hds-search-error' }),
+    ).toBeInTheDocument();
+
+    rerender(<HdsSearchInput label="Projects" value="123456" />);
+    expect(screen.queryByText('Updated validation error')).not.toBeInTheDocument();
+  });
+
+  it('disables the input and buttons explicitly and re-enables them when requested', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <HdsSearchInput label="Projects" disabled onChange={onChange} onSubmit={vi.fn()} />,
+    );
+    const input = screen.getByRole('searchbox', { name: 'Projects' });
+    expect(input).toBeDisabled();
+    expect(input.closest('fieldset')).toHaveAttribute('inert');
+    screen.getAllByRole('button').forEach((button) => expect(button).toBeDisabled());
+    onChange.mockClear();
+    await user.type(input, '12345');
+    expect(onChange).not.toHaveBeenCalled();
+
+    rerender(<HdsSearchInput label="Projects" disabled={false} onChange={onChange} />);
+    expect(screen.getByRole('searchbox', { name: 'Projects' })).toBeEnabled();
+    expect(screen.getByRole('searchbox').closest('fieldset')).not.toHaveAttribute('inert');
+    await user.type(screen.getByRole('searchbox'), '12345');
+    expect(onChange).toHaveBeenCalled();
+  });
+
   it('preserves HDS metadata across ordinary parent renders', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
