@@ -12,7 +12,7 @@ interface ICheckboxFieldProps {
   readOnly?: boolean;
 }
 
-const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules }) => {
+const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules, readOnly }) => {
   const handleChange = useCallback((value: boolean, onChange: (...event: unknown[]) => void) => {
     onChange(!value);
   }, []);
@@ -34,6 +34,7 @@ const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules })
             checked={value}
             onChange={() => handleChange(value, onChange)}
             onBlur={onBlur}
+            disabled={readOnly}
           />
         </div>
       )}

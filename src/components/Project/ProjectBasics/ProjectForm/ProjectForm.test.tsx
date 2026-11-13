@@ -258,9 +258,7 @@ describe('projectForm', () => {
     expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
     expect(within(await findByTestId('hkrId')).getByRole('spinbutton')).toBeDisabled();
     expect(within(await findByTestId('estPlanningStart')).getByRole('button')).toBeDisabled();
-    expect(within(await findByTestId('programmed')).getByRole('textbox')).toHaveAttribute(
-      'readonly',
-    );
+    expect(within(await findByTestId('programmed')).getByRole('textbox')).toBeDisabled();
     expect(screen.queryByTestId('programmed-0')).not.toBeInTheDocument();
     expect(within(await findByTestId('realizedCostLabel')).queryByRole('spinbutton')).toBeNull();
   });

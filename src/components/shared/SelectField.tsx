@@ -46,6 +46,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   filter,
   wrapperClassName,
   multiSelect,
+  tooltip,
   ...rest
 }) => {
   const isRequired = required ?? !!rules?.required;
@@ -150,6 +151,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   control={control}
                   disabled={true}
                   readOnlyValue={readOnlyValue}
+                  tooltip={tooltip}
                 />
               ) : (
                 <HDSSelect
@@ -172,6 +174,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   }}
                   clearable={Boolean(clearable && hasValue)}
                   multiSelect={multiSelect}
+                  tooltip={tooltip}
                   {...rest}
                 />
               )}

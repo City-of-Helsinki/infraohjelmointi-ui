@@ -47,7 +47,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
               name={''}
               label={label ?? ''}
               control={control}
-              readOnly={true}
+              disabled={true}
               readOnlyValue={options.find((o) => o.value == valueToString(value))?.label}
             />
           ) : (
