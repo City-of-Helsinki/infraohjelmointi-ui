@@ -55,6 +55,7 @@ import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
 import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
+import AdminPersonalDataRetention from './components/Admin/AdminPersonalDataRetention';
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
@@ -186,6 +187,7 @@ const App: FC = () => {
                 <Route path="hashtags" element={<AdminHashtags />} />
                 <Route path="menus" element={<AdminMenus />} />
                 <Route path="forcedtoframestate" element={<AdminForcedToFrame />} />
+                <Route path="personaldataretention" element={<AdminPersonalDataRetention />} />
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>
