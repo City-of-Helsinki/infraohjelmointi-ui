@@ -456,6 +456,47 @@ describe('ProjectProgrammeForm save logic', () => {
     expect(links).toEqual(['https://one.fi', 'https://two.fi']);
   });
 
+  it('shows a newly entered programme link after blur and hides it on refocus', async () => {
+    const user = userEvent.setup();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/project/project-1/project-programme"
+          element={
+            <ProjectProgrammeForm
+              projectProgrammeId="programme-1"
+              activeSection="basicInfo"
+              effectiveProjectProgramme={baseFormData}
+              briefProgramme={false}
+              isProjectProgrammeComplete={false}
+              onClose={vi.fn()}
+            />
+          }
+        />,
+        {},
+        { route: '/project/project-1/project-programme' },
+      ),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'projectProgrammeForm.addNewLink' }));
+    const input = screen.getByRole('textbox', { name: 'projectProgrammeForm.linkLabel 2' });
+    await user.type(input, 'https://new-link.fi');
+
+    expect(screen.queryByRole('link', { name: /https:\/\/new-link\.fi/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getByDisplayValue('Initial project'));
+
+    expect(screen.getByRole('link', { name: /https:\/\/new-link\.fi/ })).toHaveAttribute(
+      'href',
+      'https://new-link.fi/',
+    );
+
+    await user.click(input);
+
+    expect(screen.queryByRole('link', { name: /https:\/\/new-link\.fi/ })).not.toBeInTheDocument();
+  });
+
   it('submits changed fields and links for basic info section', async () => {
     const onClose = vi.fn();
 

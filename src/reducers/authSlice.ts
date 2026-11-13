@@ -25,7 +25,7 @@ export const authSlice = createSlice({
         state.error = null;
       })
       .addMatcher(authApi.endpoints.getUser.matchFulfilled, (state, action) => {
-        const userWithRoles = {
+        const userWithRoles: IUser = {
           ...action.payload,
           // ad_groups: [
           //   {
