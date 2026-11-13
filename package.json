@@ -14,7 +14,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "buffer": "^6.0.3",
     "file-saver": "^2.0.5",
     "i18next": "^26.7.2",
