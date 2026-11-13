@@ -32,18 +32,18 @@ const render = async () =>
 
 describe('AuthGuard', () => {
   it.each([
-    { roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR], restricted: false, allowed: true },
+    { roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING], restricted: false, allowed: true },
     {
-      roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR, UserRole.VIEWER],
+      roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING, UserRole.VIEWER],
       restricted: false,
       allowed: true,
     },
     {
-      roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR, UserRole.PROJECT_MANAGER],
+      roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING, UserRole.PROJECT_MANAGER],
       restricted: false,
       allowed: true,
     },
-    { roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR], restricted: true, allowed: true },
+    { roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING], restricted: true, allowed: true },
     { roles: [UserRole.VIEWER], restricted: false, allowed: false },
   ])(
     'programme route access for $roles, restricted=$restricted',

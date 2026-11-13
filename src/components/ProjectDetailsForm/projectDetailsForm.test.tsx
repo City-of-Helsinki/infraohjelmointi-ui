@@ -32,18 +32,18 @@ describe('ProjectDetailsForm tabs', () => {
     );
 
   it.each([
-    { roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR], restricted: false, visible: true },
+    { roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING], restricted: false, visible: true },
     {
-      roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR, UserRole.VIEWER],
+      roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING, UserRole.VIEWER],
       restricted: false,
       visible: true,
     },
     {
-      roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR, UserRole.PROJECT_MANAGER],
+      roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING, UserRole.PROJECT_MANAGER],
       restricted: false,
       visible: true,
     },
-    { roles: [UserRole.PROJECT_PROGRAMME_CONTRIBUTOR], restricted: true, visible: true },
+    { roles: [UserRole.TRANSPORT_LANDSCAPE_PLANNING], restricted: true, visible: true },
     { roles: [UserRole.PROJECT_MANAGER], restricted: false, visible: true },
     { roles: [UserRole.VIEWER], restricted: false, visible: false },
   ])(
