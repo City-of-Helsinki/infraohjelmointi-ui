@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.14.0](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.13.1...infraohjelmointi-ui-v1.14.0) (2026-11-16)
+
+
+### Features
+
+* Add return to previous status for construction handover (IO-968) ([#677](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/677)) ([1618d51](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/1618d511ed99ffdaaf7cb143d15cee691e638dc1))
+* Enable search based on not having a pw id ([#679](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/679)) ([a3c5afa](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/a3c5afa6cd9214675952527f58bb3029cef14110))
+* **project-programme:** Add contributor access and link previews ([#682](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/682)) ([02f0c22](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/02f0c222999f00459b4a8d7a9f598493733760cd))
+
+
+### Bug Fixes
+
+* Fix text area resize and pw links in construction handover (IO-849) ([#661](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/661)) ([e2da9e1](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/e2da9e12ed002425d99caf3110e2b30a69ce58a8))
+* Fixed readonly field disabling and showing tooltips ([#686](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/686)) ([3d1f50f](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/3d1f50f53265e3512bec39dcb9a3b77bac2dedb4))
+* Offer restricted programmers classes by parent id instead of path (IO-961) ([c7bcb21](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/c7bcb21acc72b93f3ae82796afbf63ede46a6023))
+
+
+### Dependencies
+
+* Update minor and patch versions and tame dependabot ([#657](https://github.com/City-of-Helsinki/infraohjelmointi-ui/issues/657)) ([57d521c](https://github.com/City-of-Helsinki/infraohjelmointi-ui/commit/57d521cb1f398c0d73f1679b0da5d08d3e57dd75))
+
 ## [1.13.1](https://github.com/City-of-Helsinki/infraohjelmointi-ui/compare/infraohjelmointi-ui-v1.13.0...infraohjelmointi-ui-v1.13.1) (2026-10-28)
 
 
