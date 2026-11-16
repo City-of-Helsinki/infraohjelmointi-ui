@@ -14,7 +14,7 @@ import {
   setNotesModalOpen,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
-import { patchCoordinationClass } from '@/services/classServices';
+import { usePatchCoordinationClassMutation } from '@/api/classApi';
 import { IClass, IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import './styles.css';
@@ -49,6 +49,7 @@ interface IPlanningCellProps extends IPlanningRow {
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const dispatch = useAppDispatch();
+  const [patchCoordinationClass] = usePatchCoordinationClassMutation();
   const {
     plannedBudget,
     deviation,
@@ -187,11 +188,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
         });
     } else {
       patchCoordinationClass(request)
+        .unwrap()
         .then((updatedClass) => {
           if (updatedClass) {
             updateCellState(updatedClass);
           }
         })
+        .catch((e) => console.log('Error patching coordination class: ', e))
         .finally(() => {
           dispatch(clearLoading(UPDATE_CELL_DATA));
         });

@@ -65,6 +65,7 @@ export const infraohjelmointiApi = createApi({
     'ConstructionHandovers',
     'ProjectProgrammes',
     'ProjectTasks',
+    'Classes',
   ],
   // Endpoints are injected in other files in order to keep them modular
   endpoints: () => ({}),

@@ -7,7 +7,7 @@ import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectUser } from '@/reducers/authSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
-import { patchCoordinationClass } from '@/services/classServices';
+import { usePatchCoordinationClassMutation } from '@/api/classApi';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formatNumber, formattedNumberToNumber } from '@/utils/calculations';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   const user = useAppSelector(selectUser);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const dispatch = useAppDispatch();
+  const [patchCoordinationClass] = usePatchCoordinationClassMutation();
   const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
   const editBudgetChangeInputRef = useRef<HTMLInputElement>(null);
