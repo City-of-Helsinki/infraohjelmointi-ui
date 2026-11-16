@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
@@ -40,12 +39,14 @@ import { AppStore } from '@/store';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
+import * as userRoleHelpers from '@/utils/userRoleHelpers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(15000);
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.setConfig({ testTimeout: 15000 });
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const getFormField = (name: string) => {
   const normalizedName = name.replace(/\s\*$/, '');
@@ -233,17 +234,42 @@ const getPwLookupCalls = () =>
 
 describe('projectForm', () => {
   beforeEach(() => {
+    vi.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(false);
     mockGetResponseProvider();
     routeAxiosConfigCallsToMethodMocks(mockedAxios);
   });
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
     const { findByTestId } = await render();
 
     expect(await findByTestId('project-form')).toBeInTheDocument();
+  });
+
+  it('disables viewer-only fields while preserving their read-only values', async () => {
+    vi.spyOn(userRoleHelpers, 'isUserOnlyViewer').mockReturnValue(true);
+    const { findByTestId } = await render();
+
+    expect(await findByTestId('project-form')).toHaveClass('viewer-only-project-form');
+    expect(within(await findByTestId('phase')).getByRole('textbox')).toBeDisabled();
+    expect(within(await findByTestId('sapProject')).getByRole('textbox')).toBeDisabled();
+    expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
+    expect(within(await findByTestId('hkrId')).getByRole('spinbutton')).toBeDisabled();
+    expect(within(await findByTestId('estPlanningStart')).getByRole('button')).toBeDisabled();
+    expect(within(await findByTestId('programmed')).getByRole('textbox')).toBeDisabled();
+    expect(screen.queryByTestId('programmed-0')).not.toBeInTheDocument();
+    expect(within(await findByTestId('realizedCostLabel')).queryByRole('spinbutton')).toBeNull();
+  });
+
+  it('preserves normal controls when the user is not viewer-only', async () => {
+    const { findByTestId } = await render();
+
+    expect(await findByTestId('project-form')).not.toHaveClass('viewer-only-project-form');
+    expect(within(await findByTestId('phase')).queryByRole('textbox')).toBeNull();
+    expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
+    expect(await findByTestId('programmed-0')).toBeEnabled();
   });
 
   it('fills the fields with existing project data', async () => {
@@ -457,7 +483,7 @@ describe('projectForm', () => {
     // simulate event and setting selected project since it happens in projectview
     await act(() => sendProjectUpdateEventForProject(mockPatchProjectResponse.data));
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(expectedValues, h.id),
     );
@@ -526,7 +552,7 @@ describe('projectForm', () => {
     await user.click(await findByTestId('confirm-dialog-button'));
 
     await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProjectRequest;
     expect(formPatchRequest.hkrId).toEqual(expectedValue);
     expect(formPatchRequest.confirmedHkrId).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
@@ -553,7 +579,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.type).toEqual(expectedValue.id);
     expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
@@ -578,7 +604,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.estPlanningStart).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
@@ -630,7 +656,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
@@ -653,7 +679,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
 
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
@@ -810,7 +836,7 @@ describe('projectForm', () => {
     await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedDescription);
     expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
     expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
@@ -848,7 +874,7 @@ describe('projectForm', () => {
       );
       // setPhaseToProposalForSubmit also changed the phase, which is still saved
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
-      const patchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectRequest;
+      const patchRequest = mockedAxios.patch.mock.lastCall![1] as IProjectRequest;
       expect(patchRequest.phase).toBeDefined();
       expect(patchRequest).not.toHaveProperty('hkrId');
       expect(patchRequest).not.toHaveProperty('confirmedHkrId');
@@ -938,7 +964,7 @@ describe('projectForm', () => {
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
       expect(getPwLookupCalls()).toHaveLength(0);
       expect(
-        (mockedAxios.patch.mock.lastCall[1] as IProjectRequest).confirmedHkrId,
+        (mockedAxios.patch.mock.lastCall![1] as IProjectRequest).confirmedHkrId,
       ).toBeUndefined();
     });
 
@@ -959,7 +985,7 @@ describe('projectForm', () => {
       expect(notificationTitles(rendered.store)).toContain('pwLinkNotSaved');
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalledTimes(1));
-      expect(mockedAxios.patch.mock.lastCall[1]).not.toHaveProperty('hkrId');
+      expect(mockedAxios.patch.mock.lastCall![1]).not.toHaveProperty('hkrId');
 
       // The field shows the saved hkrId again; the toast explains the rest
       await waitFor(() =>
@@ -1060,7 +1086,7 @@ describe('projectForm', () => {
         await rendered.user.click(await rendered.findByTestId('confirm-dialog-button'));
 
         await waitFor(() => expect(mockedAxios.post).toHaveBeenCalled());
-        const postRequest = mockedAxios.post.mock.lastCall[1] as IProjectRequest;
+        const postRequest = mockedAxios.post.mock.lastCall![1] as IProjectRequest;
         expect(postRequest.hkrId).toBe('1234');
         expect(postRequest.confirmedHkrId).toBe('1234');
       }, 30000);
@@ -1115,7 +1141,7 @@ describe('projectForm', () => {
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
       expect(screen.queryByText('projectForm.pwLinkDialog.title')).not.toBeInTheDocument();
-      expect((mockedAxios.patch.mock.lastCall[1] as IProjectRequest).hkrId).toBe('1234');
+      expect((mockedAxios.patch.mock.lastCall![1] as IProjectRequest).hkrId).toBe('1234');
     });
 
     it('shows a PW error code from the API as text, not as the raw code', async () => {
@@ -1174,7 +1200,7 @@ describe('projectForm', () => {
       await user.type(planningStartYearField, expectedPlanningStartYear.toString());
       await user.click(formSubmitButton);
 
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
     });
 
@@ -1182,7 +1208,7 @@ describe('projectForm', () => {
       const project = getProjectWithShiftableFinances();
       const expectedPlanningEnd = '01.04.2027';
       const expectedFinances = moveBudgetBackwards(project.finances, 2028, 2027);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
       const responseProject: { data: IProject } = {
@@ -1207,7 +1233,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1219,7 +1245,7 @@ describe('projectForm', () => {
       });
       const expectedPlanningEnd = '01.04.2026';
       const expectedFinances = moveBudgetBackwards(project.finances, 2027, 2026);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
       const responseProject: { data: IProject } = {
@@ -1244,7 +1270,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1253,7 +1279,7 @@ describe('projectForm', () => {
       const project = getProjectWithShiftableFinances();
       const expectedConstructionStart = '10.04.2030';
       const expectedFinances = moveBudgetForwards(project.finances, 2029, 2030);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({
           estConstructionStart: expectedConstructionStart,
@@ -1280,7 +1306,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1292,7 +1318,7 @@ describe('projectForm', () => {
       });
       const expectedConstructionStart = '10.04.2031';
       const expectedFinances = moveBudgetForwards(project.finances, 2030, 2031);
-      const dirtyFieldsToRequestObjectSpy = jest
+      const dirtyFieldsToRequestObjectSpy = vi
         .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
         .mockReturnValueOnce({
           estConstructionStart: expectedConstructionStart,
@@ -1319,7 +1345,7 @@ describe('projectForm', () => {
       await user.click(formSubmitButton);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
       dirtyFieldsToRequestObjectSpy.mockRestore();
     });
@@ -1353,14 +1379,14 @@ describe('projectForm', () => {
       await user.type(constructionEndYearField, expectedConstructionEndYear.toString());
       await user.click(formSubmitButton);
 
-      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      const formPatchRequest = mockedAxios.patch.mock.lastCall![1] as IProject;
       expect(formPatchRequest.finances).toEqual(expectedFinances);
     });
   });
 
   it('can delete a project', async () => {
     const project = mockProject.data;
-    const deleteProjectInitiateSpy = jest.spyOn(
+    const deleteProjectInitiateSpy = vi.spyOn(
       projectApiHooks.projectApi.endpoints.deleteProject,
       'initiate',
     );

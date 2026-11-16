@@ -31,7 +31,7 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
   const { t } = useTranslation();
   const overlayRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [placement, setPlacement] = useState<'above' | 'below'>('above');

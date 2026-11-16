@@ -271,7 +271,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     }
   }, [clearErrors, getValues, phaseDetails, selectedPhaseId, setValue]);
 
-  const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement>) => {
+  const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement | null>) => {
     const button = containerRef.current?.querySelector('button');
     if (button) {
       button.click();
@@ -279,7 +279,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   }, []);
 
   const onDateInputClick = useCallback(
-    (containerRef: RefObject<HTMLDivElement>) => (event: MouseEvent<HTMLInputElement>) => {
+    (containerRef: RefObject<HTMLDivElement | null>) => (event: MouseEvent<HTMLInputElement>) => {
       event.stopPropagation();
       openDatePicker(containerRef);
     },
@@ -304,6 +304,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
       setHiddenValidationIssues([]);
       clearErrors();
     }
@@ -802,29 +803,27 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           )}
         </div>
       </Dialog.Content>
-      <Dialog.ActionButtons>
-        <div className={classes.editDialogActionButtonRow}>
-          <Button
-            className={classes.editDialogActionButton}
-            onClick={onSubmit}
-            disabled={isLoading || isProjectLoading}
-          >
-            {t('save')}
-          </Button>
-          <Button
-            className={classes.editDialogActionButton}
-            onClick={onDialogClose}
-            variant={ButtonVariant.Secondary}
-            disabled={isLoading || isProjectLoading}
-          >
-            {t('cancel')}
-          </Button>
-        </div>
-      </Dialog.ActionButtons>
+      <div className={classes.editDialogActionButtonRow}>
+        <Button
+          className={classes.editDialogActionButton}
+          onClick={onSubmit}
+          disabled={isLoading || isProjectLoading}
+        >
+          {t('save')}
+        </Button>
+        <Button
+          className={classes.editDialogActionButton}
+          onClick={onDialogClose}
+          variant={ButtonVariant.Secondary}
+          disabled={isLoading || isProjectLoading}
+        >
+          {t('cancel')}
+        </Button>
+      </div>
       <div className={classes.editDialogFooterActionContainer}>
         <Button
           variant={ButtonVariant.Secondary}
-          className={`${classes.editDialogActionButton} ${classes.editDialogFooterActionButton}`}
+          className={classes.editDialogActionButton}
           onClick={onGoToProjectCardClick}
           disabled={!project}
         >

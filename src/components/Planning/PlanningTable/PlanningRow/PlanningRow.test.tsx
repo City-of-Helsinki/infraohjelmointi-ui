@@ -7,7 +7,20 @@ import PlanningRow from './PlanningRow';
 import { setGroupsExpanded } from '@/reducers/planningSlice';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import mockProject from '@/mocks/mockProject';
-jest.mock('react-i18next', () => ({
+import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
+import { IUser, UserRole } from '@/interfaces/userInterfaces';
+import * as events from '@/utils/events';
+import ProjectPhaseMenu from '@/components/CustomContextMenu/ContextMenus/ProjectPhaseContextMenu/ProjectPhaseMenu';
+import ProjectRow from './ProjectRow/ProjectRow';
+
+const mockPatchProject = vi.fn(() => ({ unwrap: () => Promise.resolve() }));
+
+vi.mock('@/api/projectApi', async () => ({
+  ...(await vi.importActual<typeof import('@/api/projectApi')>('@/api/projectApi')),
+  usePatchProjectMutation: () => [mockPatchProject],
+}));
+
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
     i18n: {
@@ -20,7 +33,7 @@ jest.mock('react-i18next', () => ({
 // Mock scrollIntoView which is not available in test environment
 Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
   configurable: true,
-  value: jest.fn(),
+  value: vi.fn(),
 });
 
 const mockGroup: IPlanningRow = {
@@ -91,6 +104,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       ...initialState,
     },
   });
+  const { key, ...groupProps } = mockGroup;
 
   return {
     store,
@@ -100,7 +114,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
         <MemoryRouter initialEntries={[`/planning${search}`]}>
           <table>
             <tbody>
-              <PlanningRow {...mockGroup} sapCosts={{}} />
+              <PlanningRow key={key} {...groupProps} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>
@@ -233,13 +247,14 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
         changeHistoryEnabled: false,
       },
     });
+    const { key, ...groupProps } = groupWithProject;
 
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/planning?group=test-group-1']}>
           <table>
             <tbody>
-              <PlanningRow {...groupWithProject} sapCosts={{}} />
+              <PlanningRow key={key} {...groupProps} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>
@@ -278,4 +293,157 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
       expect(screen.getByTestId('row-test-group-1')).toBeInTheDocument();
     });
   });
+
+  it('should collapse and expand again when global groupsExpanded is toggled', async () => {
+    const groupWithProject = {
+      ...mockGroup,
+      projectRows: [{ ...mockProject.data, id: 'test-project-1', projectGroup: 'test-group-1' }],
+    };
+    const store = setupStore();
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/planning?class=test-class']}>
+          <table>
+            <tbody>
+              <PlanningRow {...groupWithProject} sapCosts={{}} />
+            </tbody>
+          </table>
+        </MemoryRouter>
+      </Provider>,
+    );
+    const projectRow = () => screen.queryByTestId('row-test-project-1-parent-test-group-1');
+
+    expect(projectRow()).not.toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(true));
+    });
+    expect(projectRow()).toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(false));
+    });
+    expect(projectRow()).not.toBeInTheDocument();
+
+    await act(async () => {
+      store.dispatch(setGroupsExpanded(true));
+    });
+    expect(projectRow()).toBeInTheDocument();
+  });
+});
+
+describe('Planning project phase permissions', () => {
+  const permissionCases: {
+    name: string;
+    roles: UserRole[];
+    userOverrides: Partial<IUser>;
+    isReadOnly: boolean;
+  }[] = [
+    { name: 'viewer-only user', roles: [UserRole.VIEWER], userOverrides: {}, isReadOnly: true },
+    { name: 'planner', roles: [UserRole.PLANNER], userOverrides: {}, isReadOnly: false },
+    {
+      name: 'planner with a viewer role',
+      roles: [UserRole.PLANNER, UserRole.VIEWER],
+      userOverrides: {},
+      isReadOnly: false,
+    },
+    {
+      name: 'restricted programmer inside an assigned class',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: ['allowed-class'] },
+      isReadOnly: false,
+    },
+    {
+      name: 'restricted programmer outside an assigned class',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: ['other-class'] },
+      isReadOnly: true,
+    },
+    {
+      name: 'restricted programmer without assigned classes',
+      roles: [UserRole.VIEWER],
+      userOverrides: { is_restricted_programmer: true, restricted_class_ids: [] },
+      isReadOnly: true,
+    },
+  ];
+
+  beforeEach(() => {
+    mockPatchProject.mockImplementation(() => ({ unwrap: () => Promise.resolve() }));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each(permissionCases)(
+    'preserves phase permissions for $name',
+    async ({ roles, userOverrides, isReadOnly }) => {
+      const initialState = setupStore().getState();
+      const store = setupStore({
+        auth: { user: createMockUserWithAdGroups(roles, userOverrides), error: null },
+        lists: {
+          ...initialState.lists,
+          phases: [
+            { id: 'proposal', value: 'proposal' },
+            { id: 'design', value: 'design' },
+          ],
+        },
+      });
+      const project = {
+        ...mockProject.data,
+        projectClass: 'allowed-class',
+        phase: { id: 'proposal', value: 'proposal' },
+        programmed: false,
+      };
+      const dispatchMenu = vi
+        .spyOn(events, 'dispatchContextMenuEvent')
+        .mockImplementation(() => undefined);
+      const user = userEvent.setup();
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <table>
+              <tbody>
+                <ProjectRow project={project} parentId="test-group" sapCosts={{}} />
+              </tbody>
+            </table>
+          </MemoryRouter>
+        </Provider>,
+      );
+
+      await user.click(screen.getByTestId(`edit-phase-${project.id}`));
+
+      expect(dispatchMenu).toHaveBeenCalledTimes(1);
+      const menuProps = dispatchMenu.mock.calls[0][1].phaseMenuProps;
+      expect(menuProps?.isReadOnly).toBe(isReadOnly);
+      if (!menuProps) {
+        throw new Error('Expected the project phase menu to open');
+      }
+
+      const onCloseMenu = vi.fn();
+      render(
+        <Provider store={store}>
+          <ProjectPhaseMenu {...menuProps} onCloseMenu={onCloseMenu} />
+        </Provider>,
+      );
+
+      if (isReadOnly) {
+        expect(screen.getByTestId('select-design')).toBeDisabled();
+        expect(screen.queryByTestId('patch-project-phase')).not.toBeInTheDocument();
+        await user.click(screen.getByTestId('select-design'));
+        menuProps.onSubmitPhase({ phase: 'design' });
+        expect(mockPatchProject).not.toHaveBeenCalled();
+      } else {
+        await user.click(screen.getByTestId('select-design'));
+        await user.click(screen.getByTestId('patch-project-phase'));
+        expect(mockPatchProject).toHaveBeenCalledTimes(1);
+        expect(mockPatchProject).toHaveBeenCalledWith({
+          id: project.id,
+          data: { phase: 'design' },
+        });
+        expect(onCloseMenu).toHaveBeenCalledTimes(1);
+      }
+    },
+  );
 });

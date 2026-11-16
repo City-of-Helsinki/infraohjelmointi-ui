@@ -1,6 +1,5 @@
 import { FormSectionTitle, TextField } from '@/components/shared';
-import { Button, ButtonVariant, IconPlus, Table } from 'hds-react';
-import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
+import { Button, ButtonVariant, IconPlus, Table, IconAngleDown, IconAngleUp } from 'hds-react';
 import { FocusEvent, memo, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

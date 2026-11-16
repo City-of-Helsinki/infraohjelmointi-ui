@@ -1,12 +1,11 @@
 import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
-import { IconAngleRight, IconScrollGroup, IconSize } from 'hds-react/icons';
+import { IconAngleRight, IconScrollGroup, IconSize, Button } from 'hds-react';
 import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
 import './styles.css';
 import optionIcon from '@/utils/optionIcon';
-import { Button } from 'hds-react';
 
 const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,

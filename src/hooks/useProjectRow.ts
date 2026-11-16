@@ -21,7 +21,7 @@ import {
   isSameYear,
 } from '@/utils/dates';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useAppSelector } from './common';
 import { selectForcedToFrame } from '@/reducers/planningSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
@@ -635,22 +635,21 @@ interface IProjectRowsState {
  */
 const useProjectRow = (project: IProject, sapCosts: IProjectSapCost) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
-    cells: [],
-    sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
-    projectFinances: null,
-  });
-
-  useEffect(() => {
-    if (project) {
-      setProjectRowsState((current) => ({
-        ...current,
-        cells: getProjectCells(project, forcedToFrame, sapCosts),
-        sums: calculateProjectRowSums(project),
-        projectFinances: project.finances,
-      }));
-    }
-  }, [project, forcedToFrame, sapCosts]);
+  const projectRowsState = useMemo<IProjectRowsState>(
+    () =>
+      project
+        ? {
+            cells: getProjectCells(project, forcedToFrame, sapCosts),
+            sums: calculateProjectRowSums(project),
+            projectFinances: project.finances,
+          }
+        : {
+            cells: [],
+            sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
+            projectFinances: null,
+          },
+    [project, forcedToFrame, sapCosts],
+  );
 
   return projectRowsState;
 };

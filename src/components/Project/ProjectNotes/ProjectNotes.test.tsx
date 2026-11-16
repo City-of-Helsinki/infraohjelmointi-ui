@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
@@ -7,25 +6,25 @@ import { INote } from '@/interfaces/noteInterfaces';
 import { act, waitFor, within } from '@testing-library/react';
 import { stringToDateTime } from '@/utils/dates';
 import { Route } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import mockNoteImages from '@/mocks/mockNoteImages';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockUseGetNotesByProjectQuery = jest.fn();
-const mockPostNoteTrigger = jest.fn();
-const mockDeleteNoteTrigger = jest.fn();
-const mockPatchNoteTrigger = jest.fn();
-const mockPostNoteImageTrigger = jest.fn();
-const mockDeleteNoteImageTrigger = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockUseGetNotesByProjectQuery = vi.fn();
+const mockPostNoteTrigger = vi.fn();
+const mockDeleteNoteTrigger = vi.fn();
+const mockPatchNoteTrigger = vi.fn();
+const mockPostNoteImageTrigger = vi.fn();
+const mockDeleteNoteImageTrigger = vi.fn();
+const mockIsConfirmed = vi.fn();
 
 let mockNotesState: INote[] = [];
-const mockNotesSubscribers = new Set<(notes: INote[]) => void>();
+const mockNotesSubscribers = new Set<() => void>();
 
 const setMockNotesState = (notes: INote[]) => {
   mockNotesState = notes;
-  mockNotesSubscribers.forEach((subscriber) => subscriber(mockNotesState));
+  mockNotesSubscribers.forEach((subscriber) => subscriber());
 };
 
 const appendMockNote = (note: INote) => setMockNotesState([...mockNotesState, note]);
@@ -42,25 +41,21 @@ const setMockNoteImages = (noteId: string, images: INote['images']) => {
   );
 };
 
+const subscribeMockNotes = (subscriber: () => void) => {
+  mockNotesSubscribers.add(subscriber);
+  return () => {
+    mockNotesSubscribers.delete(subscriber);
+  };
+};
+
 const useMockedNotesQuery = () => {
-  const [data, setData] = useState<INote[]>(mockNotesState);
-
-  useEffect(() => {
-    setData(mockNotesState);
-
-    const subscriber = (nextNotes: INote[]) => setData([...nextNotes]);
-    mockNotesSubscribers.add(subscriber);
-
-    return () => {
-      mockNotesSubscribers.delete(subscriber);
-    };
-  }, []);
+  const data = useSyncExternalStore(subscribeMockNotes, () => mockNotesState);
 
   return { data };
 };
 
-jest.mock('@/api/notesApi', () => {
-  const originalModule = jest.requireActual('@/api/notesApi');
+vi.mock('@/api/notesApi', async () => {
+  const originalModule = await vi.importActual<typeof import('@/api/notesApi')>('@/api/notesApi');
   return {
     ...originalModule,
     useGetNotesByProjectQuery: (...args: unknown[]) => mockUseGetNotesByProjectQuery(...args),
@@ -72,7 +67,7 @@ jest.mock('@/api/notesApi', () => {
   };
 });
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({
     isConfirmed: mockIsConfirmed,
@@ -146,7 +141,7 @@ describe('ProjectNotes', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNotesSubscribers.clear();
   });
 

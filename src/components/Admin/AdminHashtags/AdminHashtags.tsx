@@ -1,7 +1,6 @@
-import { memo, useCallback, useEffect, useState, MouseEvent } from 'react';
+import { memo, useCallback, useMemo, useState, MouseEvent } from 'react';
 import AdminHashtagsToolbar from './AdminHashtagsToolbar';
 import AdminHashtagsTable from './AdminHashtagsTable';
-import { IHashTag } from '@/interfaces/hashTagsInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectAllHashtags } from '@/reducers/hashTagsSlice';
 import AdminHashtagsPagination from './AdminHashtagsPagination';
@@ -10,10 +9,8 @@ import AddHashtagDialog from './AddHashtagDialog';
 const ITEMS_PER_PAGE = 10;
 
 interface IAdminHashtagsState {
-  hashtags: Array<IHashTag>;
   searchWord: string;
   page: number;
-  pageCount: number;
   startIndex: number;
   endIndex: number;
   isAddHashtagDialogOpen: boolean;
@@ -23,20 +20,24 @@ const AdminHashtags = () => {
   const allHashtags = useAppSelector(selectAllHashtags);
 
   const [state, setState] = useState<IAdminHashtagsState>({
-    hashtags: [],
     searchWord: '',
-    pageCount: 0,
     page: 0,
     startIndex: 0,
     endIndex: 10,
     isAddHashtagDialogOpen: false,
   });
 
-  const { hashtags, startIndex, endIndex, pageCount, searchWord, page, isAddHashtagDialogOpen } =
-    state;
+  const { startIndex, endIndex, searchWord, page, isAddHashtagDialogOpen } = state;
 
   const onSetSearchWord = useCallback(
-    (value: string) => setState((current) => ({ ...current, searchWord: value })),
+    (value: string) =>
+      setState((current) => ({
+        ...current,
+        searchWord: value,
+        page: value ? 0 : current.page,
+        startIndex: value ? 0 : current.startIndex,
+        endIndex: value ? ITEMS_PER_PAGE : current.endIndex,
+      })),
     [],
   );
 
@@ -62,27 +63,21 @@ const AdminHashtags = () => {
     }));
   }, []);
 
-  // Filter, slice and set hashtags and pagination variables based on the start and end indexes and search word
-  useEffect(() => {
+  // Filter and slice hashtags based on the start and end indexes and search word
+  const { hashtags, pageCount } = useMemo(() => {
     const hashtagsForSearchWord = searchWord
       ? allHashtags.filter((c) => c.value.toLowerCase().includes(searchWord.toLowerCase()))
       : allHashtags;
 
     const hashtagsAmount = hashtagsForSearchWord.length;
 
-    const filteredHashtags =
-      hashtagsAmount <= ITEMS_PER_PAGE
-        ? hashtagsForSearchWord
-        : hashtagsForSearchWord.slice(startIndex, endIndex);
-
-    setState((current) => ({
-      ...current,
-      hashtags: filteredHashtags,
+    return {
+      hashtags:
+        hashtagsAmount <= ITEMS_PER_PAGE
+          ? hashtagsForSearchWord
+          : hashtagsForSearchWord.slice(startIndex, endIndex),
       pageCount: Math.ceil(hashtagsAmount / ITEMS_PER_PAGE),
-      page: searchWord ? 0 : current.page,
-      startIndex: searchWord ? 0 : current.startIndex,
-      endIndex: searchWord ? ITEMS_PER_PAGE : current.endIndex,
-    }));
+    };
   }, [allHashtags, searchWord, startIndex, endIndex]);
 
   return (

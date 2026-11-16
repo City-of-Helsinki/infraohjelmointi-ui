@@ -1,14 +1,13 @@
-import mockI18next from '@/mocks/mockI18next';
 import Notification from './Notification';
 import { renderWithProviders } from '@/utils/testUtils';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import { mockUser } from '@/mocks/mockUsers';
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const render = async () =>
   await act(async () =>

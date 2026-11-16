@@ -2,8 +2,8 @@ import { IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { getLocationParent, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react';
-import { SearchInput } from 'hds-react';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
+import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
@@ -126,16 +126,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
   const year = useAppSelector(selectStartYear);
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
-  const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
   const [allProjectsUnderSelectedClass, setAllProjectsUnderSelectedClass] = useState<IProject[]>(
     [],
   );
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
-
-  const getSuggestions = useCallback(async () => {
-    return searchedProjects;
-  }, [searchedProjects]);
 
   const groupClass = getValues('class.value');
 
@@ -147,7 +142,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
     setProjectsForSearch();
   }, [groupClass, forcedToFrame, year]);
 
-  useEffect(() => {
+  const searchedProjects: Array<IOption> = useMemo(() => {
     const filters = getSearchFilters(getValues, searchWord);
     const projectSearchResult = filterProjectsForSearch({
       projects: allProjectsUnderSelectedClass,
@@ -156,11 +151,14 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
       projectDivisions,
     });
 
-    const searchProjectsItemList = projectSearchResult.map((project) =>
+    return projectSearchResult.map((project) =>
       listItemToOption({ id: project.id, value: project.name }),
     );
-    setSearchedProjects(searchProjectsItemList);
   }, [allProjectsUnderSelectedClass, getValues, projectDivisions, projectSubDivisions, searchWord]);
+
+  const getSuggestions = useCallback(async () => {
+    return searchedProjects;
+  }, [searchedProjects]);
 
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
@@ -192,12 +190,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
         control={control}
         render={({ field: { onChange } }) => (
           <>
-            <SearchInput
+            <HdsSearchInput
               label={t('groupForm.searchForProjects')}
               getSuggestions={getSuggestions}
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
-              suggestionLabelField="label"
               helperText={t('groupForm.suggestionHelperText') || ''}
               hideSearchButton={true}
               value={searchWord}

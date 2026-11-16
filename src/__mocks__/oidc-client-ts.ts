@@ -1,57 +1,57 @@
 import type { UserManager, UserManagerEvents } from 'oidc-client-ts';
 
-const MockUserManager: typeof UserManager = jest.fn(function (this: {
+const MockUserManager: typeof UserManager = vi.fn(function (this: {
   events: Partial<UserManagerEvents>;
 }) {
   this.events = {
-    load: jest.fn(),
-    unload: jest.fn(),
+    load: vi.fn(),
+    unload: vi.fn(),
 
-    addUserLoaded: jest.fn(),
-    removeUserLoaded: jest.fn(),
+    addUserLoaded: vi.fn(),
+    removeUserLoaded: vi.fn(),
 
-    addUserUnloaded: jest.fn(),
-    removeUserUnloaded: jest.fn(),
+    addUserUnloaded: vi.fn(),
+    removeUserUnloaded: vi.fn(),
 
-    addSilentRenewError: jest.fn(),
-    removeSilentRenewError: jest.fn(),
+    addSilentRenewError: vi.fn(),
+    removeSilentRenewError: vi.fn(),
 
-    addUserSignedIn: jest.fn(),
-    removeUserSignedIn: jest.fn(),
+    addUserSignedIn: vi.fn(),
+    removeUserSignedIn: vi.fn(),
 
-    addUserSignedOut: jest.fn(),
-    removeUserSignedOut: jest.fn(),
+    addUserSignedOut: vi.fn(),
+    removeUserSignedOut: vi.fn(),
 
-    addUserSessionChanged: jest.fn(),
-    removeUserSessionChanged: jest.fn(),
+    addUserSessionChanged: vi.fn(),
+    removeUserSessionChanged: vi.fn(),
 
-    addAccessTokenExpired: jest.fn(),
-    removeAccessTokenExpired: jest.fn(),
+    addAccessTokenExpired: vi.fn(),
+    removeAccessTokenExpired: vi.fn(),
   };
   return this as UserManager;
 });
 
-MockUserManager.prototype.clearStaleState = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.getUser = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.storeUser = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.removeUser = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinPopup = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinPopupCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinSilent = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinSilentCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinRedirect = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinRedirectCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutRedirect = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutRedirectCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutPopup = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutPopupCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutSilent = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutSilentCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signinCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.signoutCallback = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.querySessionStatus = jest.fn().mockResolvedValue(undefined);
-MockUserManager.prototype.revokeTokens = jest.fn();
-MockUserManager.prototype.startSilentRenew = jest.fn();
-MockUserManager.prototype.stopSilentRenew = jest.fn();
+MockUserManager.prototype.clearStaleState = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.getUser = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.storeUser = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.removeUser = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinPopup = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinPopupCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinSilent = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinSilentCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinRedirect = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinRedirectCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutRedirect = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutRedirectCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutPopup = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutPopupCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutSilent = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutSilentCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signinCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.signoutCallback = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.querySessionStatus = vi.fn().mockResolvedValue(undefined);
+MockUserManager.prototype.revokeTokens = vi.fn();
+MockUserManager.prototype.startSilentRenew = vi.fn();
+MockUserManager.prototype.stopSilentRenew = vi.fn();
 
 export { MockUserManager as UserManager };

@@ -12,7 +12,7 @@ import {
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
 import { TFunction } from 'i18next';
-import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ModifyMenuItemDialogProps {
@@ -39,14 +39,15 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { Header, Content, ActionButtons } = Dialog;
-  const [menuItemName, setMenuItemName] = useState<string>('');
-  const [editableItemId, setEditableItemId] = useState<string>('');
+  const [menuItemName, setMenuItemName] = useState<string>(dialogState.value);
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
+  const [prevDialogState, setPrevDialogState] = useState(dialogState);
+  const editableItemId = dialogState.menuItemId;
 
-  useEffect(() => {
+  if (prevDialogState !== dialogState) {
+    setPrevDialogState(dialogState);
     setMenuItemName(dialogState.value);
-    setEditableItemId(dialogState.menuItemId);
-  }, [dialogState]);
+  }
 
   const onSetMenuItemName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => setMenuItemName(e.target.value),
@@ -158,6 +159,19 @@ const emptyPersonTypeDialogValues = {
   title: '',
 };
 
+const getPersonTypeDialogValues = (
+  dialogState: DialogState,
+  isResponsiblePersonDialog: boolean,
+): PersonTypeDialogValues => ({
+  firstName: dialogState.personTypeDialogValues?.firstName ?? '',
+  lastName: dialogState.personTypeDialogValues?.lastName ?? '',
+  ...(isResponsiblePersonDialog && {
+    email: dialogState.personTypeDialogValues?.email ?? '',
+    phone: dialogState.personTypeDialogValues?.phone ?? '',
+    title: dialogState.personTypeDialogValues?.title ?? '',
+  }),
+});
+
 const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   handleClose,
   dialogState,
@@ -168,28 +182,16 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   const { Header, Content, ActionButtons } = Dialog;
   const isResponsiblePersonDialog = dialogState.listType === 'responsiblePersonsRaw';
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
-  const [editableItemId, setEditableItemId] = useState<string>('');
-  const [personTypeDialogValues, setPersonTypeDialogValues] = useState<PersonTypeDialogValues>(
-    emptyPersonTypeDialogValues,
+  const editableItemId = dialogState.menuItemId;
+  const [personTypeDialogValues, setPersonTypeDialogValues] = useState<PersonTypeDialogValues>(() =>
+    getPersonTypeDialogValues(dialogState, isResponsiblePersonDialog),
   );
+  const [prevDialogState, setPrevDialogState] = useState(dialogState);
 
-  useEffect(() => {
-    const baseValues = {
-      firstName: dialogState.personTypeDialogValues?.firstName ?? '',
-      lastName: dialogState.personTypeDialogValues?.lastName ?? '',
-    };
-
-    setPersonTypeDialogValues({
-      ...baseValues,
-      ...(isResponsiblePersonDialog && {
-        email: dialogState.personTypeDialogValues?.email ?? '',
-        phone: dialogState.personTypeDialogValues?.phone ?? '',
-        title: dialogState.personTypeDialogValues?.title ?? '',
-      }),
-    });
-
-    setEditableItemId(dialogState.menuItemId);
-  }, [dialogState, isResponsiblePersonDialog]);
+  if (prevDialogState !== dialogState) {
+    setPrevDialogState(dialogState);
+    setPersonTypeDialogValues(getPersonTypeDialogValues(dialogState, isResponsiblePersonDialog));
+  }
 
   const onSetMenuItemName = useCallback(
     (value: keyof PersonTypeDialogValues, e: ChangeEvent<HTMLInputElement>) =>
@@ -373,11 +375,7 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { Header, ActionButtons, Content } = Dialog;
-  const [deletableItemId, setDeletableItemId] = useState<string>('');
-
-  useEffect(() => {
-    setDeletableItemId(dialogState.menuItemId);
-  }, [dialogState]);
+  const deletableItemId = dialogState.menuItemId;
 
   const onDeleteMenuItem = useCallback(async () => {
     if (!deletableItemId || !dialogState.listType) return;

@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 import {
   ITalpaAssetClass,
@@ -192,7 +192,7 @@ export default function useTalpaForm(project: IProject | null) {
     disabled: formValues.isLocked,
   });
 
-  const { watch, setValue } = formMethods;
+  const { control, setValue } = formMethods;
 
   useEffect(() => {
     if (project) {
@@ -200,7 +200,7 @@ export default function useTalpaForm(project: IProject | null) {
     }
   }, [dispatch, project]);
 
-  const address = watch('streetAddress');
+  const address = useWatch({ control, name: 'streetAddress' });
   const { postalCode } = usePostalCode(address || '');
   useEffect(() => {
     if (postalCode) {

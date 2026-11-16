@@ -48,9 +48,14 @@ const buildSearchParams = (form: ISearchForm) => {
         }
         break;
       case 'hkrIds':
-        for (const hkrId of value) {
-          searchParams.push(`hkrId=${hkrId}`);
+        if (!form.withoutHkrId) {
+          for (const hkrId of value) {
+            searchParams.push(`hkrId=${hkrId}`);
+          }
         }
+        break;
+      case 'withoutHkrId':
+        value && searchParams.push('withoutHkrId=true');
         break;
       default:
         break;

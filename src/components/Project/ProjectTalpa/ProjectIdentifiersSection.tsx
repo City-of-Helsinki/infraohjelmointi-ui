@@ -13,7 +13,7 @@ import {
   preConstructionTemplateProjectOptions,
 } from './templateProjectOptions';
 import { uniqBy } from 'lodash';
-import { defaultFilter } from 'hds-react';
+import { defaultFilter } from '@/utils/select';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 
 const formatCategoryLabel = (category?: string | null) => {

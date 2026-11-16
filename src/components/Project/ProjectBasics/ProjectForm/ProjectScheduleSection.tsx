@@ -296,7 +296,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estPlanningStart')}
               rules={validateEstPlanningStart()}
               required={phasesThatNeedPlanning.includes(currentPhase)}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
           <div className="form-col-md">
@@ -304,7 +304,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estPlanningEnd')}
               rules={validateEstPlanningEnd()}
               required={phasesThatNeedPlanning.includes(currentPhase)}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
         </div>
@@ -313,14 +313,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             <DateField
               {...getFieldProps('presenceStart')}
               rules={validatePresenceStart()}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
           <div className="form-col-md">
             <DateField
               {...getFieldProps('presenceEnd')}
               rules={validatePresenceEnd()}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
         </div>
@@ -329,14 +329,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             <DateField
               {...getFieldProps('visibilityStart')}
               rules={validateVisibilityStart()}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
           <div className="form-col-md">
             <DateField
               {...getFieldProps('visibilityEnd')}
               rules={validateVisibilityEnd()}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
             />
           </div>
         </div>
@@ -346,7 +346,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estConstructionStart')}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
               rules={validateEstConstructionStart()}
               required={phasesThatNeedConstruction.includes(currentPhase)}
             />
@@ -354,7 +354,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estConstructionEnd')}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
               rules={validateEstConstructionEnd()}
               required={phasesThatNeedConstruction.includes(currentPhase)}
             />
@@ -366,14 +366,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estWarrantyPhaseStart')}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
               rules={validateWarrantyPhaseStart()}
             />
           </div>
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estWarrantyPhaseEnd')}
-              readOnly={isUserOnlyViewer}
+              disabled={isUserOnlyViewer}
               rules={validateWarrantyPhaseEnd()}
               required={currentPhase === warrantyPeriodPhase}
             />

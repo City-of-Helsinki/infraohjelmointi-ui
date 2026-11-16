@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
 import { getApiToken } from '@/services/userServices';
 import { useAppSelector } from '@/hooks/common';
@@ -9,6 +9,7 @@ import { IUser } from '@/interfaces/userInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { useTranslation } from 'react-i18next';
 import { useLazyGetUserQuery } from '@/api/authApi';
+import { MAINTENANCE_MODE } from '@/config/env';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -33,7 +34,7 @@ const PAGES = {
  */
 const AuthGuard: FC = () => {
   const auth = useAuth();
-  const [hasTriedSignin, setHasTriedSignin] = useState(false);
+  const hasTriedSigninRef = useRef(false);
   const user = useAppSelector(selectUser);
   const authError = useAppSelector(selectAuthError);
   const location = useLocation();
@@ -43,8 +44,6 @@ const AuthGuard: FC = () => {
   const { isConfirmed } = useConfirmDialog();
   const { t } = useTranslation();
   const [fetchUser] = useLazyGetUserQuery();
-
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
@@ -92,16 +91,22 @@ const AuthGuard: FC = () => {
 
   // Check if user exists and sign in
   useEffect(() => {
-    if (!hasAuthParams() && !isAuthenticated && !activeNavigator && !isLoading && !hasTriedSignin) {
+    if (
+      !hasAuthParams() &&
+      !isAuthenticated &&
+      !activeNavigator &&
+      !isLoading &&
+      !hasTriedSigninRef.current
+    ) {
       const { search, pathname } = location;
       const initialPath = search ? `${pathname}${search}` : pathname;
 
       localStorage.setItem(INITIAL_PATH, initialPath);
 
       auth.signinRedirect();
-      setHasTriedSignin(true);
+      hasTriedSigninRef.current = true;
     }
-  }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
+  }, [isAuthenticated, activeNavigator, isLoading, location, auth]);
 
   // Redirect user from forbidden paths
   // If user can log in (isAuthenticated) but does not have access rights (!user),
@@ -257,7 +262,7 @@ const AuthGuard: FC = () => {
         navigate(PAGES.PLANNING);
       }
     }
-  }, [location, navigate, user, isAuthenticated, authError, MAINTENANCE_MODE]);
+  }, [location, navigate, user, isAuthenticated, authError]);
 
   // Handle token expiration detection and user notification about expired token
   useEffect(() => {

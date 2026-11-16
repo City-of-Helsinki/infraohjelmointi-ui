@@ -84,15 +84,15 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('masterPlanAreaNumber')} readOnly={isUserOnlyViewer} />
+          <TextField {...getFieldProps('masterPlanAreaNumber')} disabled={isUserOnlyViewer} />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('trafficPlanNumber')} readOnly={isUserOnlyViewer} />
+          <TextField {...getFieldProps('trafficPlanNumber')} disabled={isUserOnlyViewer} />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('bridgeNumber')} readOnly={isUserOnlyViewer} />
+          <TextField {...getFieldProps('bridgeNumber')} disabled={isUserOnlyViewer} />
         </div>
       </div>
     </div>

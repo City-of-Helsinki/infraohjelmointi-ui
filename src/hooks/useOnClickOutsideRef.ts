@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
 
 /**
  * Executes a given callback function if a click event happens outside of the given ref
@@ -7,10 +7,16 @@ import { RefObject, useEffect } from 'react';
  * and is currently used in PlanningForecastSums.tsx and PlanningCell.tsx. Improvements are welcome.
  */
 const useOnClickOutsideRef = (
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   callback: () => unknown,
   elementRendered?: boolean,
 ) => {
+  // Keeps the listener stable while always calling the latest callback
+  const callbackRef = useRef(callback);
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
   useEffect(() => {
     if (!ref?.current) {
       return;
@@ -20,7 +26,7 @@ const useOnClickOutsideRef = (
 
     const executeCallbackIfClickoutsideRef = (e: Event) => {
       if (refElement && !refElement.contains(e.target as Node)) {
-        callback();
+        callbackRef.current();
       }
     };
 

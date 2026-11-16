@@ -23,6 +23,7 @@ export interface ICellMenuDetails {
 export interface IPhaseMenuDetails {
   title: string;
   phase?: string;
+  isReadOnly: boolean;
   onSubmitPhase: (req: IProjectRequest) => void;
 }
 
@@ -46,7 +47,7 @@ export interface IContextMenuData {
 }
 
 export interface ITooltipEventData {
-  text: string | JSX.Element;
+  text: string | React.JSX.Element;
 }
 
 export interface IFinancePlanningData {

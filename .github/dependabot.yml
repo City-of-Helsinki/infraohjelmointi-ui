@@ -3,7 +3,15 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
+      day: 'monday'
       timezone: 'Europe/Helsinki'
     target-branch: 'develop'
     open-pull-requests-limit: 10
+    groups:
+      # Group minor and patch bumps; major updates remain individual PRs
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+

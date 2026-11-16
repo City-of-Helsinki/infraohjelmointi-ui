@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState, useEffect } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -33,11 +33,10 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
   const { formMethods } = useProjectHeaderForm(project);
   const { canEditClass } = useRestrictedClassAccess();
 
+  const projectGroup = project?.projectGroup;
   const projectGroupName = useMemo(() => {
-    return project?.projectGroup
-      ? (groups.find((g) => g.id === project.projectGroup)?.name ?? '')
-      : '';
-  }, [groups, project?.projectGroup]);
+    return projectGroup ? (groups.find((g) => g.id === projectGroup)?.name ?? '') : '';
+  }, [groups, projectGroup]);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -47,8 +46,6 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
     getValues,
   } = formMethods;
 
-  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
-  const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
   const onSubmit: SubmitHandler<IProjectHeaderForm> = useCallback(
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
@@ -83,7 +80,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
         }
       }
     },
-    [isDirty, dispatch, dirtyFields, project?.id, project?.favPersons, user?.uuid, patchProject],
+    [isDirty, dispatch, dirtyFields, project, user?.uuid, patchProject],
   );
 
   const phase = watch('phase');
@@ -91,11 +88,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
     ? t(`option.${getValues('phase').label}`)
     : '';
 
-  useEffect(() => {
-    const newIconKey = mapIconKey(phase?.label);
-    setIconKey(newIconKey);
-    setIcon(optionIcon[newIconKey as keyof typeof optionIcon]);
-  }, [phase]);
+  const icon = optionIcon[mapIconKey(phase?.label) as keyof typeof optionIcon];
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>

@@ -1,5 +1,5 @@
 import { renderWithProviders } from '@/utils/testUtils';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import { setNotesModalData, setNotesModalOpen } from '@/reducers/planningSlice';

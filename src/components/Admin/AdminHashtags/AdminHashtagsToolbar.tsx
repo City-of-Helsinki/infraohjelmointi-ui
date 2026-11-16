@@ -1,4 +1,5 @@
-import { Button, SearchInput } from 'hds-react';
+import { Button } from 'hds-react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +22,7 @@ const AdminHashtagsToolbar: FC<IAdminHashtagsToolbar> = ({
       >
         {t('addHashTag')}
       </Button>
-      <SearchInput
+      <HdsSearchInput
         className="admin-hashtags-search"
         label={t('searchHashtag')}
         searchButtonAriaLabel={t('searchHashtag') ?? ''}

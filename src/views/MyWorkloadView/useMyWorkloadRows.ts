@@ -99,6 +99,7 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType, isEnabled = true) => {
   const [hasError, setHasError] = useState(false);
   const [hasLoadedForCurrentRequest, setHasLoadedForCurrentRequest] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565) */
   useEffect(() => {
     if (!isEnabled) {
       setHasLoadedForCurrentRequest(false);
@@ -126,6 +127,7 @@ const useMyWorkloadRows = (viewType: MyWorkloadViewType, isEnabled = true) => {
     let isActive = true;
     setIsLoading(true);
     setHasError(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const fetchProjects = async () => {
       try {

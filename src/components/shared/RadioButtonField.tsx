@@ -35,7 +35,7 @@ export default function RadioButtonField<T extends FieldValues>({
       onBlur={onBlur}
       ref={ref}
       checked={inputValue === value}
-      disabled={disabled ?? fieldDisabled}
+      disabled={readOnly || (disabled ?? fieldDisabled)}
       data-testid={id}
       {...rest}
     />

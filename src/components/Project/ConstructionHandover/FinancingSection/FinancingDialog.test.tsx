@@ -1,20 +1,19 @@
-import mockI18next from '@/mocks/mockI18next';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FinancingDialog from './FinancingDialog';
 
-const mockDispatch = jest.fn();
-const mockPostFinancingRow = jest.fn();
-const mockPatchFinancingRow = jest.fn();
-const mockDeleteFinancingRow = jest.fn();
+const mockDispatch = vi.fn();
+const mockPostFinancingRow = vi.fn();
+const mockPatchFinancingRow = vi.fn();
+const mockDeleteFinancingRow = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/common', () => ({
+vi.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: (name?: string) => {
     if (name === 'financingParties') {
       return [
@@ -31,12 +30,12 @@ jest.mock('@/hooks/useOptions', () => ({
   },
 }));
 
-jest.mock('@/hooks/useGetProject', () => ({
+vi.mock('@/hooks/useGetProject', () => ({
   __esModule: true,
   default: () => ({ data: { id: 'project-123' } }),
 }));
 
-jest.mock('@/api/constructionHandoverApi', () => ({
+vi.mock('@/api/constructionHandoverApi', () => ({
   usePostConstructionHandoverFinancingMutation: () => [
     (request: unknown) => ({ unwrap: () => mockPostFinancingRow(request) }),
   ],
@@ -60,8 +59,8 @@ describe('FinancingDialog', () => {
 
   it('uses dialog values for add flow and only reads id from save response', async () => {
     const user = userEvent.setup();
-    const onRowSaved = jest.fn();
-    const handleClose = jest.fn();
+    const onRowSaved = vi.fn();
+    const handleClose = vi.fn();
 
     mockPostFinancingRow.mockResolvedValue({
       id: 'created-42',
@@ -88,7 +87,7 @@ describe('FinancingDialog', () => {
           },
         }}
         onRowSaved={onRowSaved}
-        onRowDeleted={jest.fn()}
+        onRowDeleted={vi.fn()}
       />,
     );
 
@@ -127,7 +126,7 @@ describe('FinancingDialog', () => {
 
   it('uses local edited values in edit flow instead of remapping response payload', async () => {
     const user = userEvent.setup();
-    const onRowSaved = jest.fn();
+    const onRowSaved = vi.fn();
 
     mockPatchFinancingRow.mockResolvedValue({
       id: 'row-1',
@@ -138,7 +137,7 @@ describe('FinancingDialog', () => {
 
     render(
       <FinancingDialog
-        handleClose={jest.fn()}
+        handleClose={vi.fn()}
         dialogState={{
           open: true,
           mode: 'edit',
@@ -153,7 +152,7 @@ describe('FinancingDialog', () => {
           },
         }}
         onRowSaved={onRowSaved}
-        onRowDeleted={jest.fn()}
+        onRowDeleted={vi.fn()}
       />,
     );
 
@@ -198,7 +197,7 @@ describe('FinancingDialog', () => {
 
     render(
       <FinancingDialog
-        handleClose={jest.fn()}
+        handleClose={vi.fn()}
         dialogState={{
           open: true,
           mode: 'add',
@@ -212,8 +211,8 @@ describe('FinancingDialog', () => {
             id: '',
           },
         }}
-        onRowSaved={jest.fn()}
-        onRowDeleted={jest.fn()}
+        onRowSaved={vi.fn()}
+        onRowDeleted={vi.fn()}
       />,
     );
 
@@ -241,7 +240,7 @@ describe('FinancingDialog', () => {
 
     render(
       <FinancingDialog
-        handleClose={jest.fn()}
+        handleClose={vi.fn()}
         dialogState={{
           open: true,
           mode: 'edit',
@@ -255,8 +254,8 @@ describe('FinancingDialog', () => {
             id: 'row-2',
           },
         }}
-        onRowSaved={jest.fn()}
-        onRowDeleted={jest.fn()}
+        onRowSaved={vi.fn()}
+        onRowDeleted={vi.fn()}
       />,
     );
 

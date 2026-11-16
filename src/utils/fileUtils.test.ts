@@ -5,16 +5,17 @@ import {
   objectUrlCacheLifecycle,
   revokeObjectUrls,
 } from './fileUtils';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
+vi.mock('axios');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('fileUtils object urls', () => {
   const originalCreateObjectURL = URL.createObjectURL;
   const originalRevokeObjectURL = URL.revokeObjectURL;
-  const createObjectURL = jest.fn();
-  const revokeObjectURL = jest.fn();
+  const createObjectURL = vi.fn();
+  const revokeObjectURL = vi.fn();
 
   beforeEach(() => {
     URL.createObjectURL = createObjectURL;
@@ -175,7 +176,7 @@ describe('fileUtils object urls', () => {
     });
 
     it('does nothing when cache data fails to load', async () => {
-      const collectUrls = jest.fn();
+      const collectUrls = vi.fn();
       const { onCacheEntryAdded } = objectUrlCacheLifecycle<Data>(collectUrls);
       const { lifecycle } = createCache(undefined, Promise.reject(new Error('Failed')));
 

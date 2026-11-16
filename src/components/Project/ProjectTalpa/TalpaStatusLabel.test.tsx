@@ -1,12 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import mockI18next from '@/mocks/mockI18next';
 import { TalpaStatus } from '@/interfaces/talpaInterfaces';
 import { TalpaStatusLabel } from './TalpaStatusLabel';
 import type { ReactNode } from 'react';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('hds-react', () => ({
+vi.mock('hds-react', () => ({
   StatusLabel: ({
     children,
     iconStart,

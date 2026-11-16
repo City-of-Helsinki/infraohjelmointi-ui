@@ -1,10 +1,14 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
+import {
+  CustomRenderResult,
+  optionWithLabel,
+  renderWithProviders,
+  sendProjectUpdateEvent,
+} from '@/utils/testUtils';
 
 import { mockProjectPhases } from '@/mocks/mockLists';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
@@ -23,10 +27,11 @@ import { mockLocations, mockDistricts, mockDivisions } from '@/mocks/mockLocatio
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { mockUser } from '@/mocks/mockUsers';
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+import type { Mocked } from 'vitest';
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 const store = setupStore();
 
 const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
@@ -90,7 +95,7 @@ describe('ProjectProgrammedDialog', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
@@ -170,14 +175,16 @@ describe('ProjectProgrammedDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-
-    await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
+    const project = await dialog.findByRole(
+      'option',
+      optionWithLabel(mockSearchResults.data.results[0].name),
+    );
+    await user.click(project);
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
-    expect(getRequest.lastCall[0]).toBe(
+    expect(getRequest.lastCall![0]).toBe(
       'localhost:4000/projects/search-results/?projectName=Planning&programmed=false&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&class=test-class-1&limit=30&order=new',
     );
 
@@ -192,7 +199,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(store.getState().events.projectUpdate?.project).toStrictEqual(mockPatchResponse.data[0]);
 
     const formPatchRequest = mockedAxios.patch.mock
-      .lastCall[1] as Array<IProjectPatchRequestObject>;
+      .lastCall![1] as Array<IProjectPatchRequestObject>;
 
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);

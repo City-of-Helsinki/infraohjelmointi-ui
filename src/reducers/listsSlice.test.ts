@@ -10,10 +10,11 @@ import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockError } from '@/mocks/mockError';
 import { mockProjectTypes } from '@/mocks/mockLists';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
+vi.mock('axios');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const createState = () => listsReducer(undefined, { type: 'init' });
 
@@ -175,7 +176,7 @@ describe('listsSlice admin menu person list synchronization', () => {
 
 describe('getListsThunk', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('resolves with the remaining lists when a single list request fails', async () => {
@@ -184,9 +185,9 @@ describe('getListsThunk', () => {
     mockedAxios.get.mockImplementation((url, config) =>
       url.endsWith('/project-priority/') ? Promise.reject(mockError) : defaultGet!(url, config),
     );
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    const action = await getListsThunk()(jest.fn(), () => ({}), undefined);
+    const action = await getListsThunk()(vi.fn(), () => ({}), undefined);
 
     expect(action.meta.requestStatus).toBe('fulfilled');
     const payload = action.payload as Partial<IListState>;

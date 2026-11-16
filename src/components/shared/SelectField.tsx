@@ -1,14 +1,14 @@
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, FC, memo, useCallback, useMemo, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select as HDSSelect, SelectProps } from 'hds-react';
+import { Select as HDSSelect } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
 import TextField from './TextField';
 
 type Option = { value: string; label: string };
 
-interface ISelectFieldProps extends SelectProps {
+interface ISelectFieldProps extends ComponentProps<typeof HDSSelect> {
   name: string;
   control?: HookFormControlType;
   options?: Array<Option>;
@@ -46,6 +46,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   filter,
   wrapperClassName,
   multiSelect,
+  tooltip,
   ...rest
 }) => {
   const isRequired = required ?? !!rules?.required;
@@ -93,6 +94,12 @@ const SelectField: FC<ISelectFieldProps> = ({
   }, []);
 
   const [icon, setIcon] = useState(resolveIcon(iconKey));
+  const [prevIconKey, setPrevIconKey] = useState(iconKey);
+
+  if (prevIconKey !== iconKey) {
+    setPrevIconKey(iconKey);
+    setIcon(resolveIcon(iconKey));
+  }
 
   const updateIconBasedOnSelection = useCallback(
     (selectedValue: string) => {
@@ -103,10 +110,6 @@ const SelectField: FC<ISelectFieldProps> = ({
     },
     [options, resolveIcon],
   );
-
-  useEffect(() => {
-    setIcon(resolveIcon(iconKey));
-  }, [iconKey, resolveIcon]);
 
   return (
     <Controller
@@ -146,8 +149,9 @@ const SelectField: FC<ISelectFieldProps> = ({
                   name={''}
                   label={label ?? ''}
                   control={control}
-                  readOnly={true}
+                  disabled={true}
                   readOnlyValue={readOnlyValue}
+                  tooltip={tooltip}
                 />
               ) : (
                 <HDSSelect
@@ -170,6 +174,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   }}
                   clearable={Boolean(clearable && hasValue)}
                   multiSelect={multiSelect}
+                  tooltip={tooltip}
                   {...rest}
                 />
               )}

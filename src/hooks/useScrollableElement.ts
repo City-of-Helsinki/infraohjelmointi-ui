@@ -19,7 +19,7 @@ const useScrollableElement = (elementId: string) => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [element, elementId]);
 
   return { element };
 };

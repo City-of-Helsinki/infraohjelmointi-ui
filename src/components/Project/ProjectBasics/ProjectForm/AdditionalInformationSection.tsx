@@ -22,7 +22,7 @@ const AdditionalInformationSection: FC<IAdditionalInformationSectionProps> = ({
       <FormSectionTitle {...getFieldProps('additionalInformationTitle')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          <TextAreaField {...getFieldProps('additionalInformation')} readOnly={isUserOnlyViewer} />
+          <TextAreaField {...getFieldProps('additionalInformation')} disabled={isUserOnlyViewer} />
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { renderWithProviders } from '@/utils/testUtils';
 import MaintenanceView from './MaintenanceView';
 
 // Mock the 'i18next' module
-jest.mock('i18next', () => ({
+vi.mock('i18next', () => ({
   t: (key: string) => key,
 }));
 

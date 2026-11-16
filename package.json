@@ -2,50 +2,50 @@
   "name": "infraohjelmointi-ui",
   "version": "1.13.1",
   "private": true,
+  "engines": {
+    "node": "^24"
+  },
   "dependencies": {
-    "@react-pdf/renderer": "^3.1.16",
-    "@reduxjs/toolkit": "^2.0.0",
-    "@types/autosize": "^4.0.3",
+    "@react-pdf/renderer": "^4.9.0",
+    "@reduxjs/toolkit": "^2.14.0",
     "@types/file-saver": "^2.0.7",
-    "@types/jest": "^27.5.2",
     "@types/jwt-decode": "^3.1.0",
-    "@types/lodash": "^4.14.191",
-    "@types/node": "^16.18.3",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.8",
-    "autosize": "^6.0.1",
-    "axios": "^1.20.0",
-    "craco": "^0.0.3",
+    "@types/lodash": "^4.17.27",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "axios": "^1.21.0",
+    "buffer": "^6.0.3",
     "file-saver": "^2.0.5",
-    "hds-core": "^4.8.0",
-    "hds-react": "^4.8.0",
-    "i18next": "^26.4.2",
-    "i18next-browser-languagedetector": "^7.0.1",
-    "i18next-http-backend": "^4.0.4",
+    "i18next": "^26.7.2",
+    "hds-core": "6.0.8",
+    "hds-react": "6.0.8",
+    "i18next-browser-languagedetector": "^8.2.4",
+    "i18next-http-backend": "^4.0.10",
     "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "moment": "^2.31.0",
     "oidc-client-ts": "^2.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hook-form": "^7.90.0",
-    "react-i18next": "^17.0.15",
-    "react-intersection-observer": "^9.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-hook-form": "^7.91.0",
+    "react-i18next": "^17.1.13",
+    "react-intersection-observer": "^11.0.1",
     "react-oidc-context": "^2.4.0",
-    "react-redux": "^9.3.0",
-    "react-router": "7.18.4",
-    "react-router-dom": "7.18.4",
-    "react-scripts": "5.0.1",
+    "react-redux": "^9.3.1",
+    "react-router": "7.18.5",
+    "react-router-dom": "7.18.5",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "use-deep-compare-effect": "^1.8.1"
   },
   "scripts": {
-    "start": "PORT=4000 craco start",
-    "build": "yarn typecheck && craco build",
+    "start": "vite",
+    "build": "yarn typecheck && vite build",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "node ./scripts/run-tests.js --env=jsdom",
-    "test:coverage": "yarn test --coverage",
-    "test:ci": "CI=true yarn test:coverage --ci",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run --coverage",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "format": "prettier --write src",
@@ -53,55 +53,31 @@
     "prepare": "node -e \"if (require('fs').existsSync('.git')) { require('fs').chmodSync('.githooks/pre-commit', 0o755); require('child_process').execFileSync('git', ['config', '--local', 'core.hooksPath', '.githooks']); }\"",
     "create-env": "cp .env.template .env.development && cp .env.template .env.production"
   },
-  "resolutions": {
-    "css-loader": "^7.1.5"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!your-module-name)/\""
-    ],
-    "moduleNameMapper": {
-      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
-      "^@/(.*)$": "<rootDir>/src/$1"
-    }
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^15.0.7",
-    "@testing-library/user-event": "^14.4.3",
-    "@tailwindcss/postcss": "^4.3.3",
-    "@typescript-eslint/eslint-plugin": "^8.71.0",
-    "@typescript-eslint/parser": "^8.71.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
     "@typescript/native": "npm:typescript@7.0.2",
-    "css-loader": "^7.1.5",
+    "@vitejs/plugin-react": "^6.2.1",
+    "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-prettier": "5.5.7",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jsdom": "^26",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "tailwindcss": "^4.3.3",
-    "ts-node": "^10.9.2"
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.5",
+    "ts-node": "^10.9.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.0.5"
   }
 }

@@ -60,6 +60,7 @@ import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
 import MyWorkloadBaseView from './views/MyWorkloadView/MyWorkloadBaseView';
 import ProjectProgramme from './components/Project/ProjectProgramme/ProjectProgramme';
+import { MAINTENANCE_MODE } from './config/env';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -105,7 +106,6 @@ const App: FC = () => {
 
   const startYear = useAppSelector(selectStartYear);
 
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
   const yearNow: number = new Date().getFullYear();
 
   useUpdateEvents();
@@ -138,7 +138,7 @@ const App: FC = () => {
       }
     };
     initializeStates().catch(Promise.reject);
-  }, [MAINTENANCE_MODE, dispatch, user]);
+  }, [dispatch, user]);
 
   // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
   useEffect(() => {
@@ -156,7 +156,7 @@ const App: FC = () => {
       dispatch(getSapCostsThunk(yearNow));
       dispatch(getSapCurrentYearThunk(startYear));
     }
-  }, [user, startYear, MAINTENANCE_MODE, dispatch, yearNow]);
+  }, [user, startYear, dispatch, yearNow]);
 
   return (
     <div>

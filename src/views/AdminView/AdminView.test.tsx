@@ -1,5 +1,4 @@
 import axios from 'axios';
-import mockI18next from '@/mocks/mockI18next';
 import { RootState, setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
@@ -11,12 +10,13 @@ import AdminFunctions from '@/components/Admin/AdminFunctions';
 import AdminHashtags from '@/components/Admin/AdminHashtags';
 import { adminFunctions } from '@/interfaces/adminInterfaces';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const store = setupStore();
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const defaultState: RootState = {
   ...store.getState(),
@@ -58,7 +58,7 @@ describe('AdminView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the title and admin functions using the outlet and has all but hashtag and menus functions disabled', async () => {
@@ -128,11 +128,14 @@ describe('AdminView', () => {
 
     it('can search for hashtags in the table', async () => {
       const { findByTestId, user } = await render(null, '/admin/hashtags');
+      const toolbar = await findByTestId('admin-hashtags-toolbar');
+      const clearButton = within(toolbar).getByRole('button', { name: 'clearSearchField' });
 
-      await user.type(
-        (await findByTestId('admin-hashtags-toolbar')).getElementsByTagName('input')[0],
-        'testhashtag',
+      expect(clearButton).toBe(
+        toolbar.querySelector("button[class*='TextInput-module_clearButton']"),
       );
+
+      await user.type(toolbar.getElementsByTagName('input')[0], 'testhashtag');
 
       // displays the hashtags that contain the search word
       expect(await findByTestId('value-0')).toHaveTextContent('testhashtag1');

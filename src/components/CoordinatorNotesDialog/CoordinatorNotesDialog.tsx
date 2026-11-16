@@ -9,8 +9,7 @@ import {
   setNotesDialogOpen,
 } from '@/reducers/planningSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import { Button, ButtonVariant, IconCross } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, ButtonVariant, IconCross, Dialog } from 'hds-react';
 import './styles.css';
 import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
 import { selectUser } from '@/reducers/authSlice';
@@ -24,7 +23,7 @@ export const CoordinatorNotesDialog = () => {
   const noteId = 'add-coordinator-note-title';
   const descriptionId = 'add-coordinator-note-content';
 
-  const handleClose = useCallback(async () => {
+  const handleClose = useCallback(() => {
     dispatch(setNotesDialogOpen(false));
   }, [dispatch]);
 
@@ -71,7 +70,7 @@ export const CoordinatorNotesDialog = () => {
         } else {
           setErrorNotification();
         }
-      } catch (e) {
+      } catch {
         setErrorNotification();
       }
     }

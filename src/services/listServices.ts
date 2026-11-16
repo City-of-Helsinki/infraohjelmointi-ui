@@ -10,11 +10,11 @@ import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
 import { MenuItemRequest, PersonTypeMenuItemRequest } from '@/interfaces/menuItemsInterfaces';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const getProjectTypes = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-types/`);
+    const res = await axios.get(`${API_URL}/project-types/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -23,7 +23,7 @@ export const getProjectTypes = async () => {
 
 export const getProjectTypeQualifiers = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-type-qualifiers/`);
+    const res = await axios.get(`${API_URL}/project-type-qualifiers/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -32,7 +32,7 @@ export const getProjectTypeQualifiers = async () => {
 
 export const getProjectPhases = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-phases/`);
+    const res = await axios.get(`${API_URL}/project-phases/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -41,7 +41,7 @@ export const getProjectPhases = async () => {
 
 export const getProjectPhaseDetails = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-phase-details/`);
+    const res = await axios.get(`${API_URL}/project-phase-details/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -50,7 +50,7 @@ export const getProjectPhaseDetails = async () => {
 
 export const getConstructionProcurementMethods = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/construction-procurement-methods/`);
+    const res = await axios.get(`${API_URL}/construction-procurement-methods/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -59,7 +59,7 @@ export const getConstructionProcurementMethods = async () => {
 
 export const getStaraProcurementReasons = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/stara-procurement-reasons/`);
+    const res = await axios.get(`${API_URL}/stara-procurement-reasons/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -68,7 +68,7 @@ export const getStaraProcurementReasons = async () => {
 
 export const getProjectCategories = async (): Promise<IListItem[]> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-categories/`);
+    const res = await axios.get(`${API_URL}/project-categories/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -77,7 +77,7 @@ export const getProjectCategories = async (): Promise<IListItem[]> => {
 
 export const getProjectQualityLevels = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-quality-levels/`);
+    const res = await axios.get(`${API_URL}/project-quality-levels/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -86,7 +86,7 @@ export const getProjectQualityLevels = async () => {
 
 export const getPlanningPhases = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/planning-phases/`);
+    const res = await axios.get(`${API_URL}/planning-phases/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -95,7 +95,7 @@ export const getPlanningPhases = async () => {
 
 export const getConstructionPhases = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/construction-phases/`);
+    const res = await axios.get(`${API_URL}/construction-phases/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -104,7 +104,7 @@ export const getConstructionPhases = async () => {
 
 export const getResponsibleZones = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/responsible-zones/`);
+    const res = await axios.get(`${API_URL}/responsible-zones/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -113,7 +113,7 @@ export const getResponsibleZones = async () => {
 
 export const getPersons = async (): Promise<Array<IPerson>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/persons/`);
+    const res = await axios.get(`${API_URL}/persons/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -122,7 +122,7 @@ export const getPersons = async (): Promise<Array<IPerson>> => {
 
 export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-districts/`);
+    const res = await axios.get(`${API_URL}/project-districts/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -131,7 +131,7 @@ export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
 
 export const getBudgetOverrunReasons = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/budget-overrun-reasons/`);
+    const res = await axios.get(`${API_URL}/budget-overrun-reasons/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -140,7 +140,7 @@ export const getBudgetOverrunReasons = async () => {
 
 export const getFinancingParties = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/financing-parties/`);
+    const res = await axios.get(`${API_URL}/financing-parties/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -149,7 +149,7 @@ export const getFinancingParties = async () => {
 
 export const getPriorities = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-priority/`);
+    const res = await axios.get(`${API_URL}/project-priority/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -158,7 +158,7 @@ export const getPriorities = async () => {
 
 export const getRawProgrammers = async (): Promise<Array<IPerson>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-programmers/`);
+    const res = await axios.get(`${API_URL}/project-programmers/`);
     return res.data.filter(
       (programmer: { id: string; firstName: string; lastName: string }) =>
         // Filter out empty names and "Ei Valintaa" programmer
@@ -180,28 +180,28 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
 };
 
 export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
-  const res = await axios.get<ITalpaProjectRange[]>(`${REACT_APP_API_URL}/talpa-project-ranges/`);
+  const res = await axios.get<ITalpaProjectRange[]>(`${API_URL}/talpa-project-ranges/`);
   return res.data;
 };
 
 export const getTalpaProjectTypes = async (): Promise<ITalpaProjectType[]> => {
-  const res = await axios.get<ITalpaProjectType[]>(`${REACT_APP_API_URL}/talpa-project-types/`);
+  const res = await axios.get<ITalpaProjectType[]>(`${API_URL}/talpa-project-types/`);
   return res.data;
 };
 
 export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> => {
-  const res = await axios.get<ITalpaServiceClass[]>(`${REACT_APP_API_URL}/talpa-service-classes/`);
+  const res = await axios.get<ITalpaServiceClass[]>(`${API_URL}/talpa-service-classes/`);
   return res.data;
 };
 
 export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
-  const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
+  const res = await axios.get<ITalpaAssetClass[]>(`${API_URL}/talpa-asset-classes/`);
   return res.data;
 };
 
 export const putMenuListOrder = async (request: IListItem[], path: string) => {
   try {
-    const res = await axios.put(`${REACT_APP_API_URL}/${path}/reorder/`, request);
+    const res = await axios.put(`${API_URL}/${path}/reorder/`, request);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -213,7 +213,7 @@ export const postMenuListItem = async (
   path: string,
 ) => {
   try {
-    const res = await axios.post(`${REACT_APP_API_URL}/${path}/`, request);
+    const res = await axios.post(`${API_URL}/${path}/`, request);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -226,7 +226,7 @@ export const patchMenuListItem = async (
   itemId: string,
 ) => {
   try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${itemId}/`, request);
+    const res = await axios.patch(`${API_URL}/${path}/${itemId}/`, request);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -235,7 +235,7 @@ export const patchMenuListItem = async (
 
 export const deleteMenuListItem = async (path: string, itemId: string) => {
   try {
-    await axios.delete(`${REACT_APP_API_URL}/${path}/${itemId}/`);
+    await axios.delete(`${API_URL}/${path}/${itemId}/`);
   } catch (e) {
     return Promise.reject(e);
   }

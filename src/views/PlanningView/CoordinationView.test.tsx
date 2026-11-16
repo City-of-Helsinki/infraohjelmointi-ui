@@ -7,7 +7,6 @@ import {
   mockCoordinatorSubClasses,
   mockProjectCoordinatorClasses,
 } from '@/mocks/mockClasses';
-import mockI18next from '@/mocks/mockI18next';
 import { RootState, setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import PlanningView from './PlanningView';
@@ -19,9 +18,9 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { act, waitFor } from '@testing-library/react';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(7000);
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.setConfig({ testTimeout: 7000 });
 
 const store = setupStore();
 
@@ -103,7 +102,7 @@ describe('CoordinatorView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the container in coordination mode', async () => {

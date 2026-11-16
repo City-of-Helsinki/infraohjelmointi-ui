@@ -9,10 +9,11 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import useMyWorkloadRows from './useMyWorkloadRows';
 import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import type { MockedFunction } from 'vitest';
 
 const stableTranslate = (key: string) => key;
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: stableTranslate,
     i18n: {
@@ -21,11 +22,11 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-jest.mock('@/services/projectServices', () => ({
-  getProjectsWithParams: jest.fn(),
+vi.mock('@/services/projectServices', () => ({
+  getProjectsWithParams: vi.fn(),
 }));
 
-const mockedGetProjectsWithParams = getProjectsWithParams as jest.MockedFunction<
+const mockedGetProjectsWithParams = getProjectsWithParams as MockedFunction<
   typeof getProjectsWithParams
 >;
 

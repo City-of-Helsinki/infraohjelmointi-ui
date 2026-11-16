@@ -3,7 +3,7 @@
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "rootDir": "./src",
-    "types": ["jest", "node"],
+    "types": ["vite/client", "vitest/globals", "node"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,10 +15,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noUncheckedSideEffectImports": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "src/custom.d.ts"],
+  "include": ["src"],
   "extends": "./tsconfig.paths.json"
 }

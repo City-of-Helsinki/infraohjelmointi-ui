@@ -1,10 +1,8 @@
 import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
-import { Button, ButtonVariant } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, ButtonVariant, Dialog, IconAngleUp, IconAngleDown } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
-import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
 import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -67,6 +65,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
         setShowAdvanceFields(true);
       }
     }, [formValues.district.value, formValues.division.value]);

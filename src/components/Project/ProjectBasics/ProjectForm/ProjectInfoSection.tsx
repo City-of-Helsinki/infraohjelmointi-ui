@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
 import { validateMaxLength, validateRequired, validateRequiredSelect } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsProjectSaving, selectProjectMode } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
@@ -38,7 +38,6 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   const typeQualifiers = useOptions('typeQualifiers');
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
-  const isSaving = useAppSelector(selectIsProjectSaving);
 
   const address = watch('address');
   const postalCode = watch('postalCode');
@@ -54,6 +53,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           {projectMode === 'new' && (
             <TextField
               {...getFieldProps('name')}
+              disabled={isUserOnlyViewer}
               rules={{ ...validateMaxLength(200, t), ...validateRequired('name', t) }}
             />
           )}
@@ -70,8 +70,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <NumberField
             {...getFieldProps('hkrId')}
             rules={validateMaxLength(5, t)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isInputDisabled || isUserOnlyViewer}
           />
         </div>
       </div>
@@ -90,8 +89,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('sapProject')}
             control={control}
             rules={validateMaxLength(15, t)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+            disabled={isInputDisabled || isUserOnlyViewer}
           />
         </div>
       </div>
@@ -102,8 +100,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('description')}
             size="l"
             rules={{ ...validateMaxLength(1000, t), ...validateRequired('description', t) }}
-            formSaved={isSaving}
-            readOnly={isUserOnlyViewer}
+            disabled={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -113,6 +110,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('address')}
+                disabled={isUserOnlyViewer}
                 rules={{ ...validateRequired('address', t) }}
               />
             </div>
@@ -121,12 +119,14 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('postalCode')}
+                disabled={isUserOnlyViewer}
                 infoText={showPostalCodeInfo ? t('projectForm.noPostalCodeFound') : undefined}
               />
             </div>
             <div className="form-col-xl">
               <TextField
                 {...getFieldProps('city')}
+                disabled={isUserOnlyViewer}
                 infoText={showCityInfo ? t('projectForm.noCityFound') : undefined}
               />
             </div>

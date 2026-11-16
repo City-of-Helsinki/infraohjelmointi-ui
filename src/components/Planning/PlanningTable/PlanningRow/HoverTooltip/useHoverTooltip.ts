@@ -10,7 +10,7 @@ export function useHoverTooltip() {
   const changeHistoryEnabled = useAppSelector(selectChangeHistoryEnabled);
 
   const showTooltip = useCallback(
-    (event: React.SyntheticEvent<HTMLElement>, content?: string | JSX.Element) => {
+    (event: React.SyntheticEvent<HTMLElement>, content?: string | React.JSX.Element) => {
       if (!hoverTooltipsEnabled || changeHistoryEnabled) {
         return;
       }

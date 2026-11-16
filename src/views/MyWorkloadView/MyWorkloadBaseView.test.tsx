@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import mockProject from '@/mocks/mockProject';
 import { mockUser } from '@/mocks/mockUsers';
 import { waitFor } from '@testing-library/react';
@@ -8,14 +7,15 @@ import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import MyWorkloadBaseView from './MyWorkloadBaseView';
+import type { MockInstance, MockedFunction } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/services/projectServices', () => ({
-  getProjectsWithParams: jest.fn(),
+vi.mock('@/services/projectServices', () => ({
+  getProjectsWithParams: vi.fn(),
 }));
 
-const mockedGetProjectsWithParams = getProjectsWithParams as jest.MockedFunction<
+const mockedGetProjectsWithParams = getProjectsWithParams as MockedFunction<
   typeof getProjectsWithParams
 >;
 
@@ -94,11 +94,11 @@ const renderBaseView = (email = 'user@hel.fi') => {
   });
 };
 
-let consoleErrorSpy: jest.SpyInstance;
+let consoleErrorSpy: MockInstance;
 
 describe('MyWorkloadBaseView', () => {
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args) => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
       const firstArg = String(args[0] ?? '');
       if (firstArg.includes('Could not parse CSS stylesheet')) {
         return;

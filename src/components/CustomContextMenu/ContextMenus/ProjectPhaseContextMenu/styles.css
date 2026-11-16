@@ -38,6 +38,10 @@
   @apply flex items-center gap-1 overflow-hidden pl-3;
 }
 
+.phase-menu-list .list-item .selection-button:disabled {
+  @apply cursor-default;
+}
+
 .phase-menu-list .list-item .icon-width {
   @apply min-w-[1.5rem];
 }

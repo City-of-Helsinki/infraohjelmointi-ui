@@ -7,7 +7,7 @@ const cellStyles = {
   textAlign: 'left' as unknown as 'left',
   paddingRight: '6px',
   paddingLeft: '6px',
-  alignItems: 'center' as unknown as 'center',
+  alignItems: 'flex-start' as unknown as 'flex-start',
 };
 
 const styles = StyleSheet.create({
@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     paddingTop: '4px',
     paddingBottom: '4px',
     backgroundColor: '#0000bf',
+    width: '100%',
     fontSize: '8px',
     fontWeight: 500,
     color: 'white',
@@ -22,10 +23,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     flexDirection: 'row',
-  },
-  firstCellsWrapper: {
-    width: '328px',
-    paddingLeft: '21px',
+    width: '100%',
   },
   targetCell: {
     ...cellStyles,
@@ -43,7 +41,8 @@ const styles = StyleSheet.create({
   },
   costForecastCell: {
     ...cellStyles,
-    width: '83px',
+    width: '10%',
+    flexShrink: 0,
   },
   planAndConStartCell: {
     ...cellStyles,
@@ -61,28 +60,42 @@ const styles = StyleSheet.create({
 });
 
 const ConstructionProgramTableHeader = () => {
+  const [costForecastTitle, costForecastContinuation] = t('costForecast').split('\n');
+
   return (
     <View style={styles.tableHeader}>
-      {/* Row 1 */}
+      {/* Each column stacks its own lines so a wrapped title doesn't push other columns' second line down */}
       <View style={styles.tableHeaderRow}>
-        <Text style={styles.targetCell}>{t('target')}</Text>
-        <Text style={styles.divisionCell}>{t('division')}</Text>
-        <Text style={styles.costForecastCell}>{t('costForecast')}</Text>
-        <Text style={styles.planAndConStartCell}>{t('planningAnd')}</Text>
-        <Text style={styles.previouslyUsedCell}>{t('previouslyUsed')}</Text>
-        <Text style={styles.cell}>TA {new Date().getFullYear() + 1}</Text>
-        <Text style={styles.cell}>TS {new Date().getFullYear() + 2}</Text>
-        <Text style={styles.lastCell}>TS {new Date().getFullYear() + 3}</Text>
-      </View>
-      {/* Row 2 */}
-      <View style={styles.tableHeaderRow}>
-        <Text style={styles.firstCellsWrapper} />
-        <Text style={styles.costForecastCell}>{t('report.shared.millionEuro')}</Text>
-        <Text style={styles.planAndConStartCell}>{t('constructionTiming')}</Text>
-        <Text style={styles.previouslyUsedCell}>{t('report.shared.millionEuro')}</Text>
-        <Text style={styles.cell}>{t('report.shared.millionEuro')}</Text>
-        <Text style={styles.cell}>{t('report.shared.millionEuro')}</Text>
-        <Text style={styles.lastCell}>{t('report.shared.millionEuro')}</Text>
+        <View style={styles.targetCell}>
+          <Text>{t('target')}</Text>
+        </View>
+        <View style={styles.divisionCell}>
+          <Text>{t('division')}</Text>
+        </View>
+        <View style={styles.costForecastCell}>
+          <Text>{costForecastTitle}</Text>
+          <Text>{costForecastContinuation || t('report.shared.millionEuro')}</Text>
+        </View>
+        <View style={styles.planAndConStartCell}>
+          <Text>{t('planningAnd')}</Text>
+          <Text>{t('constructionTiming')}</Text>
+        </View>
+        <View style={styles.previouslyUsedCell}>
+          <Text>{t('previouslyUsed')}</Text>
+          <Text>{t('report.shared.millionEuro')}</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>TA {new Date().getFullYear() + 1}</Text>
+          <Text>{t('report.shared.millionEuro')}</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>TS {new Date().getFullYear() + 2}</Text>
+          <Text>{t('report.shared.millionEuro')}</Text>
+        </View>
+        <View style={styles.lastCell}>
+          <Text>TS {new Date().getFullYear() + 3}</Text>
+          <Text>{t('report.shared.millionEuro')}</Text>
+        </View>
       </View>
     </View>
   );

@@ -1,10 +1,9 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
-import { renderWithProviders } from '@/utils/testUtils';
+import { optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
@@ -29,9 +28,10 @@ import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const store = setupStore();
 
@@ -89,7 +89,7 @@ const render = async () =>
       },
     ),
   );
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('GroupDialog', () => {
   beforeEach(() => {
@@ -97,7 +97,7 @@ describe('GroupDialog', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
@@ -141,7 +141,7 @@ describe('GroupDialog', () => {
   });
 
   it('can create new group with the groups form', async () => {
-    jest.setTimeout(10000);
+    vi.setConfig({ testTimeout: 10000 });
     const renderResult = await render();
 
     const mockPostResponse = {
@@ -221,20 +221,16 @@ describe('GroupDialog', () => {
       'Vanha',
     );
 
-    await waitFor(async () => {
-      const project = await dialog.findByText('Vanha yrttimaantie');
-      expect(project).toBeInTheDocument();
-
-      await user.click(project);
-      expect((await findAllByTestId('project-selections')).length).toBe(1);
-    });
+    const project = await dialog.findByRole('option', optionWithLabel('Vanha yrttimaantie'));
+    await user.click(project);
+    expect(await findAllByTestId('project-selections')).toHaveLength(1);
 
     const getRequest = mockedAxios.get.mock;
 
     const year = new Date().getFullYear();
 
     // Check that the correct url was called
-    expect(getRequest.lastCall[0]).toBe(
+    expect(getRequest.lastCall![0]).toBe(
       `localhost:4000/projects/?class=c6294258-41b1-4ad6-afdf-0b10849ca000&inGroup=false&year=${year}&forcedToFrame=false&direct=false&programmed=true`,
     );
 
@@ -259,7 +255,7 @@ describe('GroupDialog', () => {
     });
 
     await act(async () => {
-      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroupRequest;
+      const formPostRequest = mockedAxios.post.mock.lastCall![1] as IGroupRequest;
 
       expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
       expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);

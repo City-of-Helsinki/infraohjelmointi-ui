@@ -3,7 +3,7 @@ import {
   getBestProgrammerForDistrict,
   programmerToListItem,
 } from './projectProgrammerUtils';
-import { IClass, IProgrammer } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances, IProgrammer } from '@/interfaces/classInterfaces';
 import { IProjectDistrictOption } from '@/interfaces/locationInterfaces';
 
 describe('projectProgrammerUtils', () => {
@@ -16,7 +16,7 @@ describe('projectProgrammerUtils', () => {
         forCoordinatorOnly: false,
         relatedTo: null,
         parent: null,
-        finances: {} as any,
+        finances: {} as IClassFinances,
         defaultProgrammer: {
           id: 'default-id',
           firstName: 'Default',
@@ -46,7 +46,7 @@ describe('projectProgrammerUtils', () => {
         forCoordinatorOnly: false,
         relatedTo: null,
         parent: null,
-        finances: {} as any,
+        finances: {} as IClassFinances,
         defaultProgrammer: {
           id: 'default-id',
           firstName: 'Default',
@@ -71,7 +71,7 @@ describe('projectProgrammerUtils', () => {
         forCoordinatorOnly: false,
         relatedTo: null,
         parent: null,
-        finances: {} as any,
+        finances: {} as IClassFinances,
       };
 
       const result = getBestProgrammerForClass(mockClass);

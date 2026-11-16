@@ -18,14 +18,17 @@
 
 ### Setup
 
+Use Node.js 24.x and Yarn Classic (1.x). HDS 6 requires Node.js 24.
+
 1. `yarn run create-env` to create your own development and production .env files
 2. `yarn install`
 3. `yarn start`
 
 ### Serving the application
 
-- To serve the application run `yarn run`
-- To build the application run `yarn run build`
+- To serve the application run `yarn start` (Vite dev server on port 4000)
+- To build the application run `yarn run build` (output in `build/`)
+- To preview the production build run `yarn run preview`
 
 ### Formatting and validation
 
@@ -55,8 +58,8 @@ If using VS Code, download the [Prettier - Code formatter](https://marketplace.v
 ### Ways of working
 ##### Commits
 
-To make our commits more informative those should be written in a format of Conventional Commits i.e. a suitable prefix should be added in the beginning
-of every commit e.g. **feat:** built a notification or **refactor**:... etc. The Conventional Commits could be properly configured to the project in the future.
+Commits are validated in CI using Conventional Commits. Add a suitable prefix at the beginning of every commit, e.g.
+**feat:** built a notification or **refactor:** simplify the component.
 
 ##### Hotfixes
 
@@ -83,7 +86,7 @@ We create the whole hierarchy-tree of routes in `index.tsx`, using the new `crea
 - Run all tests: `yarn test`
 - For running specific tests use the same command and specify a file i.e: `yarn test App.test.tsx`
 
-This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. There is also a `test-utils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
+This project uses [Vitest](https://vitest.dev/) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. Test environment variables are defined in `.env.test`. There is also a `testUtils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
 
 ### Localization
 

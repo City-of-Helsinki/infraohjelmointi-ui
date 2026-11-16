@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from 'react';
 
 const useDoubleClick = (
-  ref: RefObject<HTMLButtonElement>,
+  ref: RefObject<HTMLButtonElement | null>,
   onSingleClick: () => void,
   onDoubleClick: () => void,
 ) => {

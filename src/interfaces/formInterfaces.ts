@@ -106,6 +106,7 @@ export interface ISearchForm {
   programmedYes: boolean;
   programmedNo: boolean;
   hkrIds: Array<string>;
+  withoutHkrId: boolean;
   personPlanning: IOption;
   personConstruction: IOption;
   programmedYearMin: IOption;

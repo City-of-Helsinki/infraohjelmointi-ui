@@ -1,4 +1,4 @@
-import { IconAngleRight, IconCrossCircle, IconSize } from 'hds-react/icons';
+import { IconAngleRight, IconCrossCircle, IconSize } from 'hds-react';
 import { FC, memo } from 'react';
 
 import './styles.css';

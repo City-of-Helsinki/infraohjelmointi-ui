@@ -1,3 +1,4 @@
+import { IClass } from '@/interfaces/classInterfaces';
 import { IAdGroup, IUser, UserRole } from '@/interfaces/userInterfaces';
 
 export const isUserAdmin = (user: IUser | null) => {
@@ -101,29 +102,23 @@ export const isUserConstructionManagementLead = (user: IUser | null) => {
 export const isUserRestrictedProgrammer = (user: IUser | null) => !!user?.is_restricted_programmer;
 
 /**
- * True if the class path is one of the restricted programmer's assigned classes or below one.
+ * Ids of the classes a restricted programmer is offered in the class selects (IO-756): the
+ * classes they may edit and every class above them, so the assigned class can be reached.
+ *
+ * The classes above are found by following `parent` ids, not by `path` prefix (IO-961), since
+ * `path` can drift from the real hierarchy.
  */
-export const isClassPathInRestrictedScope = (user: IUser | null, classPath?: string | null) => {
-  if (!classPath) {
-    return false;
+export const getRestrictedVisibleClassIds = (user: IUser | null, allClasses: Array<IClass>) => {
+  const parentById = new Map(allClasses.map((c) => [c.id, c.parent]));
+  const visible = new Set<string>();
+
+  for (const classId of user?.restricted_class_ids ?? []) {
+    let current: string | null | undefined = classId;
+    while (current && !visible.has(current)) {
+      visible.add(current);
+      current = parentById.get(current);
+    }
   }
 
-  return (user?.restricted_class_paths ?? []).some(
-    (path) => classPath === path || classPath.startsWith(`${path}/`),
-  );
-};
-
-/**
- * True if the class path is in scope or is a parent of an assigned class, so it has to be
- * selectable to reach the assigned class in the class selects.
- */
-export const isClassPathOnRestrictedScopePath = (user: IUser | null, classPath?: string | null) => {
-  if (!classPath) {
-    return false;
-  }
-
-  return (
-    isClassPathInRestrictedScope(user, classPath) ||
-    (user?.restricted_class_paths ?? []).some((path) => path.startsWith(`${classPath}/`))
-  );
+  return visible;
 };

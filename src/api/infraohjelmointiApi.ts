@@ -1,5 +1,6 @@
 import { BaseQueryFn, createApi } from '@reduxjs/toolkit/query/react';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { API_URL } from '@/config/env';
 
 export const axiosBaseQuery =
   ({
@@ -56,7 +57,7 @@ export const axiosBaseQuery =
 
 export const infraohjelmointiApi = createApi({
   reducerPath: 'infraohjelmointiApi',
-  baseQuery: axiosBaseQuery({ baseUrl: process.env.REACT_APP_API_URL || '' }),
+  baseQuery: axiosBaseQuery({ baseUrl: API_URL || '' }),
   tagTypes: [
     'Notes',
     'User',

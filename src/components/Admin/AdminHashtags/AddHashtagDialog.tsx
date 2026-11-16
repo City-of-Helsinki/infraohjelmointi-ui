@@ -46,7 +46,7 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
           }),
         );
       }
-    } catch (e) {
+    } catch {
       dispatch(
         notifyError({
           message: 'hashtagPostError',

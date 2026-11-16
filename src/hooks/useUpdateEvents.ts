@@ -387,6 +387,7 @@ const useUpdateEvents = () => {
         console.log('Error updating project data: ', e),
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run only on new events; state deps would re-apply them on every store update
   }, [financeUpdate, projectUpdateEventData]);
 };
 

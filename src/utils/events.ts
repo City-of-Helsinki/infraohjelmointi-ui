@@ -8,7 +8,7 @@ import { setFinanceUpdate, setProjectUpdate } from '@/reducers/eventsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import { MouseEvent } from 'react';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 interface IDateIndicatorData {
   isVisible: boolean;
@@ -68,7 +68,7 @@ export const dispatchDateIndicatorEvent = (data: IDateIndicatorData) => {
   );
 };
 
-export const eventSource = new EventSource(`${REACT_APP_API_URL}/events/`);
+export const eventSource = new EventSource(`${API_URL}/events/`);
 
 export const addFinanceUpdateEventListener = (dispatch: Dispatch) => {
   const financeUpdate = (event: MessageEvent) => {

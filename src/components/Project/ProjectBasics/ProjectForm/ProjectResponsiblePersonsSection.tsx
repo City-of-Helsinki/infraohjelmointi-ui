@@ -5,7 +5,7 @@ import { Control, UseFormGetValues, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
-import { defaultFilter } from 'hds-react';
+import { defaultFilter } from '@/utils/select';
 import { createProjectPhaseResolver } from '@/utils/projectValidationRules';
 
 interface IProjectResponsiblePersonsSectionProps {

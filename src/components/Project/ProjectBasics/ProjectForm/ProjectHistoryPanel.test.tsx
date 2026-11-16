@@ -1,19 +1,19 @@
 import { renderWithProviders } from '@/utils/testUtils';
-import mockI18next from '@/mocks/mockI18next';
 import { screen } from '@testing-library/react';
 import { Route } from 'react-router';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
 import ProjectHistoryPanel from './ProjectHistoryPanel';
 import { useGetProjectHistoryQuery } from '@/api/projectApi';
+import type { Mock } from 'vitest';
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/api/projectApi', () => ({
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/api/projectApi', async () => ({
   __esModule: true,
-  ...jest.requireActual('@/api/projectApi'),
-  useGetProjectHistoryQuery: jest.fn(),
+  ...(await vi.importActual<typeof import('@/api/projectApi')>('@/api/projectApi')),
+  useGetProjectHistoryQuery: vi.fn(),
 }));
 
-const mockedUseGetProjectHistoryQuery = useGetProjectHistoryQuery as jest.Mock;
+const mockedUseGetProjectHistoryQuery = useGetProjectHistoryQuery as Mock;
 
 const phaseEntry: IProjectHistoryEntry = {
   id: 'entry-phase',
@@ -49,11 +49,11 @@ const financialEntry: IProjectHistoryEntry = {
 
 const renderPanel = () =>
   renderWithProviders(
-    <Route path="/" element={<ProjectHistoryPanel isOpen onClose={jest.fn()} projectId="p1" />} />,
+    <Route path="/" element={<ProjectHistoryPanel isOpen onClose={vi.fn()} projectId="p1" />} />,
   );
 
 describe('ProjectHistoryPanel (IO-883)', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders phase changes as before → after pills and ignores financial entries', async () => {
     mockedUseGetProjectHistoryQuery.mockReturnValue({
@@ -124,7 +124,7 @@ describe('ProjectHistoryPanel (IO-883)', () => {
     renderWithProviders(
       <Route
         path="/"
-        element={<ProjectHistoryPanel isOpen={false} onClose={jest.fn()} projectId="p1" />}
+        element={<ProjectHistoryPanel isOpen={false} onClose={vi.fn()} projectId="p1" />}
       />,
     );
 

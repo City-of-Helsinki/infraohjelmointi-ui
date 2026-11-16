@@ -1,7 +1,6 @@
 import useSearchForm from '@/forms/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { Button, ButtonVariant } from 'hds-react';
-import { Dialog } from 'hds-react';
+import { Button, ButtonVariant, Dialog, Fieldset } from 'hds-react';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -10,7 +9,6 @@ import FreeSearchForm from './FreeSearchForm';
 import { useNavigate } from 'react-router';
 import MultiSelectField from '../shared/MultiSelectField';
 import CheckboxField from '../shared/CheckboxField';
-import { Fieldset } from 'hds-react';
 import { useOptions } from '@/hooks/useOptions';
 import {
   getSearchResultsThunk,
@@ -33,7 +31,7 @@ const Search = () => {
 
   const { formMethods, submitDisabled, classOptions, locationOptions } = useSearchForm();
 
-  const { handleSubmit, getValues, control } = formMethods;
+  const { handleSubmit, getValues, setValue, control } = formMethods;
 
   const phases = useOptions('phases');
   const programmedYearMin = useOptions('programmedYears');
@@ -106,7 +104,7 @@ const Search = () => {
               <CheckboxField {...formProps('programmedYes')} />
               <CheckboxField {...formProps('programmedNo')} />
             </Fieldset>
-            <HkrIdSearch control={control} getValues={getValues} />
+            <HkrIdSearch control={control} getValues={getValues} setValue={setValue} />
             <SelectField
               {...formProps('programmedYearMin')}
               options={programmedYearMin}

@@ -1,5 +1,5 @@
 import { FC, memo, useCallback, useMemo } from 'react';
-import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
+import { IconAngleLeft, IconAngleRight } from 'hds-react';
 import { getDaysInMonthForYear, getMonthToday, getToday } from '@/utils/dates';
 import moment from 'moment';
 import './styles.css';

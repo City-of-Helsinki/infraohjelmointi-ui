@@ -5,7 +5,6 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
 import { RootState, setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
@@ -22,11 +21,12 @@ import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ProjectView from '../ProjectView';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const store = setupStore();
 
@@ -122,7 +122,7 @@ describe('SearchResultsView', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('SearchResultsHeader', () => {
@@ -141,6 +141,42 @@ describe('SearchResultsView', () => {
   });
 
   describe('SearchTerms', () => {
+    it('removes the missing PW identifier filter and refetches with remaining criteria', async () => {
+      const { user, store, findByText, queryByText } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          form: { ...filledSearchForm, withoutHkrId: true },
+          submittedForm: { ...filledSearchForm, withoutHkrId: true },
+        },
+      });
+      await user.click(await findByText('searchTag.withoutHkrId'));
+      await waitFor(() => expect(store.getState().search.submittedForm.withoutHkrId).toBe(false));
+      expect(queryByText('searchTag.withoutHkrId')).not.toBeInTheDocument();
+      expect(store.getState().search.form.withoutHkrId).toBe(false);
+      expect(store.getState().search.lastSearchParams).toContain('hashtag=');
+      expect(store.getState().search.lastSearchParams).not.toContain('withoutHkrId');
+      expect(mockedAxios.get).toHaveBeenCalled();
+    });
+
+    it('clears the missing PW identifier filter with clear all', async () => {
+      const { user, store, findByText, queryByText } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          form: { ...initialSearchForm, withoutHkrId: true },
+          submittedForm: { ...initialSearchForm, withoutHkrId: true },
+          lastSearchParams: 'withoutHkrId=true',
+        },
+      });
+      expect(await findByText('searchTag.withoutHkrId')).toBeInTheDocument();
+      await user.click(await findByText('emptyTerms'));
+      expect(store.getState().search.form).toEqual(initialSearchForm);
+      expect(store.getState().search.submittedForm).toEqual(initialSearchForm);
+      expect(store.getState().search.lastSearchParams).toBe('');
+      expect(queryByText('searchTag.withoutHkrId')).not.toBeInTheDocument();
+    });
+
     it('renders elements', async () => {
       const { container } = await render();
       expect(container.getElementsByClassName('search-terms-container').length).toBe(1);
@@ -199,7 +235,7 @@ describe('SearchResultsView', () => {
 
       await user.click(removeFirstTermButton);
 
-      expect(mockedAxios.get.mock.lastCall[0]).toBe(
+      expect(mockedAxios.get.mock.lastCall![0]).toBe(
         'localhost:4000/projects/search-results/?hashtag=hashtag-1&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
       );
 
@@ -271,7 +307,7 @@ describe('SearchResultsView', () => {
 
       await user.click(await findByText(limitOptions[2]));
 
-      expect(mockedAxios.get.mock.lastCall[0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
     });
   });
 
@@ -298,7 +334,7 @@ describe('SearchResultsView', () => {
 
       await user.click(await findByText('searchOrder.project'));
 
-      expect(mockedAxios.get.mock.lastCall[0].includes('&order=project')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('&order=project')).toBe(true);
     });
   });
 
@@ -396,7 +432,7 @@ describe('SearchResultsView', () => {
     it.skip('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
       const { container, user, findByTestId } = await render(searchActiveState);
 
-      const scrollIntoViewMock = jest.fn();
+      const scrollIntoViewMock = vi.fn();
 
       window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
 
@@ -553,17 +589,17 @@ describe('SearchResultsView', () => {
       // Next page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-next-button'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=2')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=2')).toBe(true);
 
       // Previous page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-previous-button'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=1')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=1')).toBe(true);
 
       // Page 4
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-page-4'));
-      expect(mockedAxios.get.mock.lastCall[0].includes('page=4')).toBe(true);
+      expect(mockedAxios.get.mock.lastCall![0].includes('page=4')).toBe(true);
     });
   });
 });

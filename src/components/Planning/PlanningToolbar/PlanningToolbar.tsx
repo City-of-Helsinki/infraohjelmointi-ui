@@ -7,11 +7,12 @@ import {
   IconMoneyBagFill,
   IconEyeCrossed,
   IconEye,
-} from 'hds-react/icons/';
+  Button,
+  ButtonVariant,
+} from 'hds-react';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent, hideTooltipImmediately } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
-import { Button, ButtonVariant } from 'hds-react';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -253,24 +254,26 @@ const PlanningToolbar = () => {
         <div
           className={`planning-toolbar-right ${selectedYears.length ? 'monthly-view-open' : ''}`}
         >
-          <div>
-            <button
-              aria-label="ideal budget view"
-              className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-              disabled={isPlanningModeButtonDisabled}
-              onClick={moveToIdealView}
-            >
-              <IconMoneyBag />
-            </button>
-            <button
-              aria-label="force framed budget view"
-              className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-              disabled={isForcedToFrameModeButtonDisabled}
-              onClick={moveToForcedToFrameView}
-            >
-              <IconMoneyBagFill />
-            </button>
-          </div>
+          {!isUserOnlyViewer(user) && (
+            <div>
+              <button
+                aria-label="ideal budget view"
+                className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+                disabled={isPlanningModeButtonDisabled}
+                onClick={moveToIdealView}
+              >
+                <IconMoneyBag />
+              </button>
+              <button
+                aria-label="force framed budget view"
+                className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+                disabled={isForcedToFrameModeButtonDisabled}
+                onClick={moveToForcedToFrameView}
+              >
+                <IconMoneyBagFill />
+              </button>
+            </div>
+          )}
           <YearSelector />
         </div>
       }

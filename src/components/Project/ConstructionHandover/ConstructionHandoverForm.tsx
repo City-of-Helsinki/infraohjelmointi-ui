@@ -33,11 +33,16 @@ import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/currencyUtils';
 import {
   canEditConstructionHandover,
+  canReturnToPreviousConstructionHandoverStatus,
+  getConstructionHandoverStatusLabelKey,
+  getPreviousConstructionHandoverStatus,
   isConstructionHandoverLocked,
 } from './constructionHandoverUtils';
 import useConstructionHandoverPermissions from './useConstructionHandoverPermissions';
 import AttachmentsAndLinksSection from './AttachmentsAndLinksSection';
 import usePostAttachments from '@/hooks/usePostAttachments';
+import useConfirmDialog from '@/hooks/useConfirmDialog';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -77,14 +82,17 @@ function ConstructionHandoverForm({
 }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { isConfirmed } = useConfirmDialog();
   const {
     isProjectManager,
     isPlanner,
     isConstructionManagementLead,
     isResponsiblePersonForProject,
+    isConstructionResponsiblePersonForProject,
   } = useConstructionHandoverPermissions(project);
 
   const isHandoverLocked = isConstructionHandoverLocked(constructionHandover);
+  const previousStatus = getPreviousConstructionHandoverStatus(constructionHandover.status);
   const canEditHandover = canEditConstructionHandover(constructionHandover, {
     isPlanner,
     isProjectManager,
@@ -114,10 +122,21 @@ function ConstructionHandoverForm({
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && isPlanner;
   const showSaveDraftButton = canEditHandover;
   const showReturnToDraftButton = isHandoverLocked && isPlanner;
+  const showReturnToPreviousStatusButton = canReturnToPreviousConstructionHandoverStatus(
+    constructionHandover.status,
+    {
+      isPlanner,
+      isProjectManager,
+      isConstructionManagementLead,
+      isResponsiblePersonForProject,
+      isConstructionResponsiblePersonForProject,
+    },
+  );
   const showNameProjectManagerNotification =
     constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION &&
     isConstructionManagementLead;
-  const showSubmitTooltip = showSubmitToProgrammerButton || showSubmitToConstructionButton;
+  const showSubmitToProgrammerOrConstructionButton =
+    showSubmitToProgrammerButton || showSubmitToConstructionButton;
 
   function handleDeleteAttachment(attachment: IConstructionHandoverAttachment) {
     deleteHandoverAttachment({
@@ -199,10 +218,46 @@ function ConstructionHandoverForm({
     });
   }
 
-  function returnToDraft() {
+  async function returnToStatus(
+    to: ConstructionHandoverStatus,
+    dialogProps: { title: string; description: string; confirmButtonText: string },
+  ) {
+    const confirmed = await isConfirmed(dialogProps);
+    if (!confirmed) {
+      return;
+    }
+
+    const error = await submitFormBeforeStatusTransition(getValues());
+    if (error) {
+      return;
+    }
+
     doStatusTransition({
       id: constructionHandover.id,
-      to: ConstructionHandoverStatus.DRAFT,
+      to,
+      from: constructionHandover.status,
+    });
+  }
+
+  function returnToDraft() {
+    return returnToStatus(ConstructionHandoverStatus.DRAFT, {
+      title: t('constructionHandoverForm.returnToDraftDialogTitle'),
+      description: t('constructionHandoverForm.returnToDraftDialogDescription'),
+      confirmButtonText: 'constructionHandoverForm.returnToDraftDialogConfirm',
+    });
+  }
+
+  function returnToPreviousStatus() {
+    if (!previousStatus) {
+      return;
+    }
+
+    return returnToStatus(previousStatus, {
+      title: t('constructionHandoverForm.returnToPreviousStatusDialogTitle'),
+      description: t('constructionHandoverForm.returnToPreviousStatusDialogDescription', {
+        status: t(getConstructionHandoverStatusLabelKey(previousStatus)),
+      }),
+      confirmButtonText: 'constructionHandoverForm.returnToPreviousStatusDialogConfirm',
     });
   }
 
@@ -226,59 +281,66 @@ function ConstructionHandoverForm({
           canEditHandover={canEditHandover}
         />
 
-        <div
-          className="project-form-banner"
-          style={{ height: showSubmitTooltip ? '110px' : undefined }}
+        <FormBottomBar
+          containerClassName={`${showSubmitToProgrammerOrConstructionButton || showReturnToDraftButton ? 'items-end' : 'items-center'}`}
         >
-          <div className="project-form-banner-container">
-            <div className={`flex gap-6 ${showSubmitTooltip ? 'items-end' : 'items-center'}`}>
-              <div className="flex flex-col items-end">
-                {showSubmitTooltip && (
-                  <Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>
-                )}
-                {showSubmitToProgrammerButton && (
-                  <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
-                    {t('constructionHandoverForm.submitToProgrammer')}
-                  </Button>
-                )}
-                {showSubmitToConstructionButton && (
-                  <Button type="button" onClick={handleSubmit(submitToConstruction)}>
-                    {t('constructionHandoverForm.submitToConstruction')}
-                  </Button>
-                )}
-              </div>
-              {showSaveDraftButton && (
-                <Button variant={ButtonVariant.Secondary} onClick={() => submitForm(getValues())}>
-                  {t('constructionHandoverForm.saveDraft')}
+          {showSubmitToProgrammerOrConstructionButton && (
+            <div>
+              {<Tooltip>{t('constructionHandoverForm.submitTooltip')}</Tooltip>}
+              {showSubmitToProgrammerButton && (
+                <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
+                  {t('constructionHandoverForm.submitToProgrammer')}
                 </Button>
               )}
-              {showReturnToDraftButton && (
-                <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
-                  {t('constructionHandoverForm.returnToDraft')}
+              {showSubmitToConstructionButton && (
+                <Button type="button" onClick={handleSubmit(submitToConstruction)}>
+                  {t('constructionHandoverForm.submitToConstruction')}
                 </Button>
-              )}
-              <Button
-                variant={ButtonVariant.Secondary}
-                iconStart={<IconLink />}
-                type="button"
-                onClick={onCopyLinkClick}
-              >
-                {t('copyLink')}
-              </Button>
-              {showNameProjectManagerNotification && (
-                <div>
-                  <Notification
-                    label={t('constructionHandoverForm.nameProjectManagerNotification')}
-                    type="error"
-                    size={NotificationSize.Small}
-                  >
-                    {t('constructionHandoverForm.nameProjectManagerNotification')}
-                  </Notification>
-                </div>
               )}
             </div>
-          </div>
-        </div>
+          )}
+          {showSaveDraftButton && (
+            <Button variant={ButtonVariant.Secondary} onClick={() => submitForm(getValues())}>
+              {t('constructionHandoverForm.saveDraft')}
+            </Button>
+          )}
+          {showReturnToDraftButton && (
+            <div>
+              <Tooltip>{t('constructionHandoverForm.returnToDraftTooltip')}</Tooltip>
+              <Button variant={ButtonVariant.Secondary} type="button" onClick={returnToDraft}>
+                {t('constructionHandoverForm.returnToDraft')}
+              </Button>
+            </div>
+          )}
+          {showReturnToPreviousStatusButton && (
+            <Button
+              variant={ButtonVariant.Secondary}
+              type="button"
+              onClick={returnToPreviousStatus}
+            >
+              {t('constructionHandoverForm.returnToPreviousStatus')}
+            </Button>
+          )}
+          <Button
+            variant={ButtonVariant.Secondary}
+            iconStart={<IconLink />}
+            type="button"
+            onClick={onCopyLinkClick}
+          >
+            {t('copyLink')}
+          </Button>
+          {showNameProjectManagerNotification && (
+            <div>
+              <Notification
+                label={t('constructionHandoverForm.nameProjectManagerNotification')}
+                type="error"
+                size={NotificationSize.Small}
+              >
+                {t('constructionHandoverForm.nameProjectManagerNotification')}
+              </Notification>
+            </div>
+          )}
+        </FormBottomBar>
       </form>
     </FormProvider>
   );

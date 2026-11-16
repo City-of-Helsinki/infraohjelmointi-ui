@@ -16,6 +16,7 @@ const useNumberInput = (value?: string) => {
 
   // Update frame budget when a new value is emitted
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
     setInputValue(formattedNumberToNumber(value) || '0');
   }, [value]);
 

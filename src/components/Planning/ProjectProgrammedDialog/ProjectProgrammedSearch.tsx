@@ -1,6 +1,6 @@
 import { getSearchResults } from '@/services/projectServices';
 import { arrayHasValue } from '@/utils/common';
-import { SearchInput } from 'hds-react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
@@ -160,13 +160,12 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   );
   return (
     <div className="project-search-input" data-testid="search-project-field-section">
-      <SearchInput
+      <HdsSearchInput
         label={t('projectProgrammedForm.searchForProjects')}
         data-testid="search-projects-input"
         getSuggestions={getSuggestions}
         clearButtonAriaLabel="Clear search field"
         searchButtonAriaLabel="Search"
-        suggestionLabelField="label"
         value={searchWord}
         onChange={handleValueChange}
         onSubmit={handleSubmit}

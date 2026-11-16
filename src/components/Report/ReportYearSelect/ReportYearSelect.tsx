@@ -1,12 +1,14 @@
-import { FC } from 'react';
-import { Option, Select, SelectData, SupportedLanguage } from 'hds-react';
+import { ComponentProps, FC } from 'react';
+import { Select, SupportedLanguage } from 'hds-react';
 import { useTranslation } from 'react-i18next';
+
+type SelectChangeHandler = NonNullable<ComponentProps<typeof Select>['onChange']>;
 
 const currentYear = new Date().getFullYear();
 
 interface IReportYearSelectProps {
   value: string;
-  onChange: (selectedOptions: Option[], clickedOption: Option, data: SelectData) => void;
+  onChange: SelectChangeHandler;
   className?: string;
 }
 

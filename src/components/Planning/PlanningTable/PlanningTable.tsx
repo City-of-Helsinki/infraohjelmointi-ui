@@ -37,8 +37,8 @@ const PlanningTable = () => {
         <table className={`planning-table ${mode}`} cellSpacing={0} data-testid="planning-table">
           <tbody>
             {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
-            {rows.map((row: IPlanningRow) => (
-              <PlanningRow {...row} sapCosts={projetSapCosts} />
+            {rows.map(({ key, ...row }: IPlanningRow) => (
+              <PlanningRow key={key} {...row} sapCosts={projetSapCosts} />
             ))}
           </tbody>
         </table>

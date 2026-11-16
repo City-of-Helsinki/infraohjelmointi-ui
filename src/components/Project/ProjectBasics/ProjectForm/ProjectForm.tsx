@@ -316,6 +316,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     if (!isDirty && newProjectId) {
       dispatch(setProjectMode('edit'));
       navigate(`/project/${newProjectId}/basics`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- render-phase setState breaks useSelector in React 18.2 (facebook/react#25565)
       setNewProjectId('');
     }
   }, [isDirty, newProjectId, navigate, projectMode, dispatch]);
@@ -587,7 +588,11 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isUserProjectManagerCheck = useMemo(() => isUserOnlyProjectManager(user), [user]);
 
   return (
-    <form ref={formRef} data-testid="project-form" className="project-form">
+    <form
+      ref={formRef}
+      data-testid="project-form"
+      className={isOnlyViewer ? 'project-form viewer-only-project-form' : 'project-form'}
+    >
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
         {...formProps}

@@ -1,3 +1,4 @@
+import './polyfills';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -6,6 +7,7 @@ import { AuthProvider } from 'react-oidc-context';
 import 'hds-core';
 import './index.css';
 import './i18n';
+import { AUTHORITY, CLIENT_ID, REDIRECT_URI } from '@/config/env';
 
 import App from '@/App';
 import { injectStore } from '@/utils/interceptors';
@@ -15,12 +17,10 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 
 const store = setupStore();
 
-const { REACT_APP_AUTHORITY, REACT_APP_CLIENT_ID, REACT_APP_REDIRECT_URI } = process.env;
-
 const oidcConfig = {
-  authority: REACT_APP_AUTHORITY ?? '',
-  client_id: REACT_APP_CLIENT_ID ?? '',
-  redirect_uri: REACT_APP_REDIRECT_URI ?? '',
+  authority: AUTHORITY ?? '',
+  client_id: CLIENT_ID ?? '',
+  redirect_uri: REDIRECT_URI ?? '',
   scope: 'openid profile',
 };
 

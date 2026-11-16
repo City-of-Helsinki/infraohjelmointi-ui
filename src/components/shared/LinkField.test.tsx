@@ -1,15 +1,23 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import { useEffect } from 'react';
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form';
-import mockI18next from '@/mocks/mockI18next';
 import LinkField from './LinkField';
+import mockProject from '@/mocks/mockProject';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-let formMethods: UseFormReturn<FieldValues>;
-
-const TestForm = ({ value }: { value: string }) => {
+const TestForm = ({
+  value,
+  onFormReady,
+}: {
+  value: string;
+  onFormReady?: (methods: UseFormReturn<FieldValues>) => void;
+}) => {
   const methods = useForm<FieldValues>({ defaultValues: { link: value } });
-  formMethods = methods;
+
+  useEffect(() => {
+    onFormReady?.(methods);
+  }, [methods, onFormReady]);
 
   return (
     <FormProvider {...methods}>
@@ -22,9 +30,21 @@ describe('LinkField', () => {
   it('renders a safe external link for a valid http(s) url', () => {
     render(<TestForm value="  https://example.com/path  " />);
 
-    const link = screen.getByRole('link', { name: 'https://example.com/path' });
+    const link = screen.getByRole('link', { name: /https:\/\/example.com\/path/ });
     expect(link).toHaveAttribute('href', 'https://example.com/path');
     expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders a safe external link for a valid pw: url', () => {
+    const pwLink = mockProject.data.pwFolderLink;
+
+    render(<TestForm value={`  ${pwLink}  `} />);
+
+    const escapedPwLink = (pwLink ?? '').replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const link = screen.getByRole('link', { name: new RegExp(escapedPwLink) });
+    expect(link).toHaveAttribute('href', pwLink);
+    expect(link).not.toHaveAttribute('target');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
@@ -49,9 +69,17 @@ describe('LinkField', () => {
   });
 
   it('hides the link when the field has an error', () => {
-    render(<TestForm value="https://example.com" />);
+    let formMethods: UseFormReturn<FieldValues> | undefined;
+    render(
+      <TestForm
+        value="https://example.com"
+        onFormReady={(methods) => {
+          formMethods = methods;
+        }}
+      />,
+    );
 
-    act(() => formMethods.setError('link', { message: 'error' }));
+    act(() => formMethods?.setError('link', { message: 'error' }));
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });

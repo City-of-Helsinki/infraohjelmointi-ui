@@ -38,7 +38,7 @@ function ProjectProgrammeActionButtons({
   }
 
   return (
-    <span style={{ display: 'flex', gap: '1.5rem' }}>
+    <span className="flex gap-4">
       <Button
         variant={buttonOverrides?.copyLink?.variant ?? ButtonVariant.Secondary}
         theme={buttonOverrides?.copyLink?.theme}

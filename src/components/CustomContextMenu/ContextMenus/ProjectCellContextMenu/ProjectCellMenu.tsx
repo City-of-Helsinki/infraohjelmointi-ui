@@ -1,7 +1,6 @@
 import { IOption } from '@/interfaces/common';
-import { Button, ButtonVariant } from 'hds-react';
-import { IconCheck, IconCross } from 'hds-react/icons';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { Button, ButtonVariant, IconCheck, IconCross } from 'hds-react';
+import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ICellMenuDetails } from '@/interfaces/eventInterfaces';
 import { CellType } from '@/interfaces/projectInterfaces';
@@ -21,10 +20,12 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   onUpdateCellType,
   canTypeUpdate,
 }) => {
-  const [selectedType, setSelectedType] = useState<CellType>('planning');
-  useEffect(() => {
+  const [selectedType, setSelectedType] = useState<CellType>(cellType);
+  const [prevCellType, setPrevCellType] = useState(cellType);
+  if (prevCellType !== cellType) {
+    setPrevCellType(cellType);
     setSelectedType(cellType);
-  }, [cellType]);
+  }
   const { t } = useTranslation();
   const options: Array<IOption> = [
     { value: 'planning', label: 'Suunnittelu' },

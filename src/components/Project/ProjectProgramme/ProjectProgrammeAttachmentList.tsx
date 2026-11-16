@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AttachmentListItem from '@/components/shared/AttachmentListItem';
@@ -61,7 +61,6 @@ function ProjectProgrammeAttachmentList({
 
   useEffect(() => {
     if (!projectProgrammeId || !selectedAttachment?.downloadUrl) {
-      setPreview(null);
       return;
     }
 
@@ -86,6 +85,7 @@ function ProjectProgrammeAttachmentList({
       } catch {
         if (active) {
           setSelectedAttachmentId(null);
+          setPreview(null);
           dispatch(
             notifyError({
               title: 'loadError',
@@ -104,26 +104,24 @@ function ProjectProgrammeAttachmentList({
     };
   }, [projectProgrammeId, selectedAttachment, dispatch]);
 
-  const closePreview = useCallback(() => setSelectedAttachmentId(null), []);
+  const closePreview = () => {
+    setSelectedAttachmentId(null);
+    setPreview(null);
+  };
 
-  const showAdjacentImage = useCallback(
-    (offset: number) => {
-      if (imageAttachments.length < 2) {
-        return;
-      }
-      setSelectedAttachmentId((currentId) => {
-        const currentIndex = imageAttachments.findIndex(
-          (attachment) => attachment.id === currentId,
-        );
-        return imageAttachments[
-          (currentIndex + offset + imageAttachments.length) % imageAttachments.length
-        ].id;
-      });
-    },
-    [imageAttachments],
-  );
-  const showPreviousImage = useCallback(() => showAdjacentImage(-1), [showAdjacentImage]);
-  const showNextImage = useCallback(() => showAdjacentImage(1), [showAdjacentImage]);
+  const showAdjacentImage = (offset: number) => {
+    if (imageAttachments.length < 2) {
+      return;
+    }
+    setSelectedAttachmentId((currentId) => {
+      const currentIndex = imageAttachments.findIndex((attachment) => attachment.id === currentId);
+      return imageAttachments[
+        (currentIndex + offset + imageAttachments.length) % imageAttachments.length
+      ].id;
+    });
+  };
+  const showPreviousImage = () => showAdjacentImage(-1);
+  const showNextImage = () => showAdjacentImage(1);
 
   async function handleDeleteAttachment(attachment: IProjectProgrammeAttachment) {
     const confirm = await isConfirmed({

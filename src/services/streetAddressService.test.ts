@@ -1,4 +1,5 @@
 import { fetchAddressData } from './streetAddressService';
+import type { Mock } from 'vitest';
 
 describe('fetchAddressData', () => {
   const baseUrl =
@@ -7,17 +8,17 @@ describe('fetchAddressData', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(() => {
-    globalThis.fetch = jest.fn() as unknown as typeof fetch;
+    globalThis.fetch = vi.fn() as unknown as typeof fetch;
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('calls the address service with the parsed street data', async () => {
-    const jsonMock = jest.fn().mockResolvedValue({ features: [] });
-    (globalThis.fetch as unknown as jest.Mock).mockResolvedValue({ json: jsonMock });
+    const jsonMock = vi.fn().mockResolvedValue({ features: [] });
+    (globalThis.fetch as unknown as Mock).mockResolvedValue({ json: jsonMock });
 
     const address = 'Mannerheimintie 10';
     const expectedUrl =
@@ -32,8 +33,8 @@ describe('fetchAddressData', () => {
   });
 
   it('does not return search param for street number when no trailing digits exist', async () => {
-    const jsonMock = jest.fn().mockResolvedValue({ features: [{ id: 1 }] });
-    (globalThis.fetch as unknown as jest.Mock).mockResolvedValue({ json: jsonMock });
+    const jsonMock = vi.fn().mockResolvedValue({ features: [{ id: 1 }] });
+    (globalThis.fetch as unknown as Mock).mockResolvedValue({ json: jsonMock });
 
     const address = 'Testikuja 5B';
     const expectedUrl = `${baseUrl}&CQL_FILTER=((katunimi%20ILIKE%20%27Testikuja%25%27%20OR%20gatan%20ILIKE%20%27Testikuja%25%27))`;

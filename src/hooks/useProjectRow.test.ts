@@ -3,9 +3,9 @@ import useProjectRow from './useProjectRow';
 import { createProject, createSapCost } from '@/mocks/createMocks';
 import { IProjectCell } from '@/interfaces/projectInterfaces';
 
-const mockUseAppSelector = jest.fn();
+const mockUseAppSelector = vi.fn();
 
-jest.mock('./common', () => ({
+vi.mock('./common', () => ({
   useAppSelector: (selector: (state: unknown) => unknown) => mockUseAppSelector(selector),
 }));
 

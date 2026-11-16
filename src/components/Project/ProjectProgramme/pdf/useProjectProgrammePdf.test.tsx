@@ -1,47 +1,47 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act, render, screen } from '@testing-library/react';
 import { saveAs } from 'file-saver';
 import ProjectProgrammeActionButtons from '../ProjectProgrammeActionButtons';
 import { createProjectProgrammePdfBlob } from './createProjectProgrammePdf';
 import { getDownloadUrl, revokeObjectUrls } from '@/utils/fileUtils';
+import type { MockedFunction } from 'vitest';
 
-const mockDispatch = jest.fn();
-const mockGetProjectProgrammeByProject = jest.fn();
+const mockDispatch = vi.fn();
+const mockGetProjectProgrammeByProject = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('i18next', () => ({ t: (key: string) => key }));
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('i18next', () => ({ t: (key: string) => key }));
 
-jest.mock('file-saver', () => ({ saveAs: jest.fn() }));
+vi.mock('file-saver', () => ({ saveAs: vi.fn() }));
 
-jest.mock('@/utils/fileUtils', () => ({
-  getDownloadUrl: jest.fn(),
-  revokeObjectUrls: jest.fn(),
+vi.mock('@/utils/fileUtils', () => ({
+  getDownloadUrl: vi.fn(),
+  revokeObjectUrls: vi.fn(),
 }));
 
-jest.mock('./createProjectProgrammePdf', () => ({
-  createProjectProgrammePdfBlob: jest.fn(),
+vi.mock('./createProjectProgrammePdf', () => ({
+  createProjectProgrammePdfBlob: vi.fn(),
 }));
 
-jest.mock('@/hooks/common', () => ({
+vi.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/hooks/useGetProject', () => ({
+vi.mock('@/hooks/useGetProject', () => ({
   __esModule: true,
   default: () => ({ data: { id: 'project-1', name: 'Project name' } }),
 }));
 
-jest.mock('@/api/projectProgrammeApi', () => ({
+vi.mock('@/api/projectProgrammeApi', () => ({
   useGetProjectProgrammeByProjectQuery: () => mockGetProjectProgrammeByProject(),
 }));
 
-const createBlobMock = createProjectProgrammePdfBlob as jest.MockedFunction<
+const createBlobMock = createProjectProgrammePdfBlob as MockedFunction<
   typeof createProjectProgrammePdfBlob
 >;
 
 describe('ProjectProgrammeActionButtons pdf generation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: {
         id: 'programme-1',
@@ -82,7 +82,7 @@ describe('ProjectProgrammeActionButtons pdf generation', () => {
         locationMap: { url: '/location-map.png' },
       },
     });
-    jest.mocked(getDownloadUrl).mockResolvedValue('blob:location-map');
+    vi.mocked(getDownloadUrl).mockResolvedValue('blob:location-map');
     createBlobMock.mockResolvedValue(new Blob(['pdf']));
 
     render(<ProjectProgrammeActionButtons />);
@@ -98,11 +98,11 @@ describe('ProjectProgrammeActionButtons pdf generation', () => {
   });
 
   it('reports a failed map download instead of saving a pdf without the map', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: { id: 'programme-1', locationMap: { url: '/location-map.png' } },
     });
-    jest.mocked(getDownloadUrl).mockResolvedValue(undefined);
+    vi.mocked(getDownloadUrl).mockResolvedValue(undefined);
 
     render(<ProjectProgrammeActionButtons />);
 
@@ -121,11 +121,11 @@ describe('ProjectProgrammeActionButtons pdf generation', () => {
   });
 
   it('releases the downloaded map when pdf generation fails', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mockGetProjectProgrammeByProject.mockReturnValue({
       data: { id: 'programme-1', locationMap: { url: '/location-map.png' } },
     });
-    jest.mocked(getDownloadUrl).mockResolvedValue('blob:location-map');
+    vi.mocked(getDownloadUrl).mockResolvedValue('blob:location-map');
     createBlobMock.mockRejectedValue(new Error('fail'));
 
     render(<ProjectProgrammeActionButtons />);
@@ -156,7 +156,7 @@ describe('ProjectProgrammeActionButtons pdf generation', () => {
   });
 
   it('shows an error notification when generation fails', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     createBlobMock.mockRejectedValue(new Error('fail'));
 
     render(<ProjectProgrammeActionButtons />);

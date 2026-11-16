@@ -12,6 +12,7 @@ import {
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserAdmin, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { MAINTENANCE_MODE } from '@/config/env';
 
 /**
  * Custom Sidebar, since the HDS sidebar wasn't suited for our needs
@@ -24,8 +25,6 @@ const SideBar = () => {
   const { t } = useTranslation();
 
   const iconStyles = { height: '1.5rem', width: '1.5rem' };
-
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   const navItems: Array<INavigationItem> = [
     {

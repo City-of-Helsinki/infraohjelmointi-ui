@@ -3,16 +3,16 @@ import { render, screen } from '@testing-library/react';
 import ProjectProgrammePdfDocument from './ProjectProgrammePdfDocument';
 import { IProjectProgramme } from '@/interfaces/projectProgrammeInterfaces';
 
-jest.mock('i18next', () => ({ t: (key: string) => key }));
+vi.mock('i18next', () => ({ t: (key: string) => key }));
 
-jest.mock('@/components/Report/PdfReports/reportHeaders/DocumentHeader', () => ({
+vi.mock('@/components/Report/PdfReports/reportHeaders/DocumentHeader', () => ({
   __esModule: true,
   default: ({ title, subtitleOne }: { title: string; subtitleOne?: string }) => (
     <div data-testid="pdf-header">{`${title}|${subtitleOne}`}</div>
   ),
 }));
 
-jest.mock('@react-pdf/renderer', () => {
+vi.mock('@react-pdf/renderer', () => {
   const passthrough = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
   return {
     StyleSheet: { create: (styles: unknown) => styles },

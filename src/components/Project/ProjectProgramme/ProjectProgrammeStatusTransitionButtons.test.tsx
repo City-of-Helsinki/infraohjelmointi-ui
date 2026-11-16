@@ -1,23 +1,22 @@
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
 
-const mockDispatch = jest.fn();
-const mockTransitionProjectProgrammeStatus = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockDispatch = vi.fn();
+const mockTransitionProjectProgrammeStatus = vi.fn();
+const mockIsConfirmed = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({ isConfirmed: mockIsConfirmed }),
 }));
 
-jest.mock('@/hooks/common', () => ({
+vi.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/api/projectProgrammeApi', () => ({
+vi.mock('@/api/projectProgrammeApi', () => ({
   useTransitionProjectProgrammeStatusMutation: () => [
     (...args: unknown[]) => ({
       unwrap: () => mockTransitionProjectProgrammeStatus(...args),
@@ -151,7 +150,7 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
   });
 
   it('blocks the API call and reports sections with missing required fields', () => {
-    const onMissingRequiredFields = jest.fn();
+    const onMissingRequiredFields = vi.fn();
     render(
       <ProjectProgrammeStatusTransitionButtons
         isProjectProgrammeComplete={false}
@@ -169,7 +168,7 @@ describe('ProjectProgrammeStatusTransitionButtons', () => {
   });
 
   it('does not revalidate completed sections when completing the programme', async () => {
-    const onMissingRequiredFields = jest.fn();
+    const onMissingRequiredFields = vi.fn();
     render(
       <ProjectProgrammeStatusTransitionButtons
         isProjectProgrammeComplete={false}

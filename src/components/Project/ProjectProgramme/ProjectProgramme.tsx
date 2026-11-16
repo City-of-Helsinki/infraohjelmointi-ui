@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, Notification } from 'hds-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useGetProject from '@/hooks/useGetProject';
@@ -55,17 +55,15 @@ function ProjectProgramme() {
   const [postProjectProgramme] = usePostProjectProgrammeMutation();
   const [switchType] = usePostSwitchProjectProgrammeTypeMutation();
   const [activeSection, setActiveSection] = useState<ProjectProgrammeSectionId | null>(null);
-  const [missingRequiredSections, setMissingRequiredSections] = useState<
-    ProjectProgrammeRequiredSectionId[]
-  >([]);
+  const [showMissingRequiredSections, setShowMissingRequiredSections] = useState(false);
   const missingFieldsNotificationRef = useRef<HTMLDivElement>(null);
 
   const effectiveProjectProgramme = projectProgrammeFromProject;
-  useEffect(() => {
-    setMissingRequiredSections((sections) =>
-      sections.length > 0 ? getMissingRequiredSections(effectiveProjectProgramme) : sections,
-    );
-  }, [effectiveProjectProgramme]);
+  const missingRequiredSections = useMemo<ProjectProgrammeRequiredSectionId[]>(
+    () =>
+      showMissingRequiredSections ? getMissingRequiredSections(effectiveProjectProgramme) : [],
+    [showMissingRequiredSections, effectiveProjectProgramme],
+  );
 
   const projectProgrammeId = effectiveProjectProgramme?.id ?? null;
 
@@ -212,8 +210,8 @@ function ProjectProgramme() {
     setActiveSection(null);
   }
 
-  function handleMissingRequiredFields(sections: ProjectProgrammeRequiredSectionId[]) {
-    setMissingRequiredSections(sections);
+  function handleMissingRequiredFields() {
+    setShowMissingRequiredSections(true);
     globalThis.requestAnimationFrame(() => {
       missingFieldsNotificationRef.current?.scrollIntoView?.({ block: 'center' });
       missingFieldsNotificationRef.current?.focus();

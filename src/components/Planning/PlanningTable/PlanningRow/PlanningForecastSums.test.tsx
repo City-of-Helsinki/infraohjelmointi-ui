@@ -5,7 +5,7 @@ import PlanningForecastSums from './PlanningForecastSums';
 import { IPlanningCell } from '@/interfaces/planningInterfaces';
 import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
   }),

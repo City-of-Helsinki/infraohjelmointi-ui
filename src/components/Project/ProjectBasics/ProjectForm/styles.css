@@ -8,6 +8,18 @@
   margin-bottom: var(--spacing-l);
 }
 
+.viewer-only-project-form :disabled {
+  --input-background-disabled: var(--color-white);
+  --input-border-color-disabled: var(--color-black-50);
+  --input-color-disabled: var(--color-black-90);
+}
+
+.project-form.viewer-only-project-form .input-wrapper input:disabled,
+.project-form.viewer-only-project-form .input-wrapper input[readonly] {
+  border: var(--border-width, 2px) solid var(--color-black-50);
+  padding-inline: var(--spacing-s);
+}
+
 .project-form .form-row {
   @apply flex w-full;
 }
@@ -67,20 +79,6 @@
   @apply text-bus font-medium underline;
 }
 
-.project-form-banner {
-  @apply fixed right-0 bottom-0 z-50 h-20 w-screen bg-white px-28;
-}
-
-.project-form-banner-container {
-  @apply relative flex h-full w-full items-center justify-between;
-}
-
-.project-form-banner-container::before {
-  content: '';
-  width: 200%;
-  @apply pointer-events-none absolute h-full w-[200%] -translate-x-[13rem] shadow-2xl;
-}
-
 .project-form-toolbar {
   @apply mb-6 flex w-full justify-end;
 }
@@ -129,8 +127,4 @@
 /* HDS FileInput's internal "select file" button is the only aria-hidden button */
 .project-programme-file-input button[aria-hidden='true'] {
   background-color: var(--color-white);
-}
-
-.project-programme-actions {
-  @apply flex items-center gap-6;
 }

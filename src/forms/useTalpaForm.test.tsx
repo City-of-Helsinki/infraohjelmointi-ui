@@ -6,16 +6,16 @@ import mockTalpaProject from '@/mocks/mockTalpaProject';
 import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
 import { IProject } from '@/interfaces/projectInterfaces';
 
-const mockUseAppSelector = jest.fn();
-const mockDispatch = jest.fn();
+const mockUseAppSelector = vi.fn();
+const mockDispatch = vi.fn();
 
-jest.mock('@/hooks/common', () => ({
+vi.mock('@/hooks/common', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useAppSelector: (selector: any) => mockUseAppSelector(selector),
   useAppDispatch: () => mockDispatch,
 }));
 
-jest.mock('@/hooks/usePostalCode', () => ({
+vi.mock('@/hooks/usePostalCode', () => ({
   usePostalCode: (address: string) => {
     if (address === 'Testitie 1') {
       return { postalCode: '00100', city: 'Helsinki' };

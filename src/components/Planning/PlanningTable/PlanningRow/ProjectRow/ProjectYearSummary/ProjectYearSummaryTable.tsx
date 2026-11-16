@@ -1,6 +1,6 @@
 import { CellType } from '@/interfaces/projectInterfaces';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { IconHammers, IconScrollContent, IconSize } from 'hds-react/icons';
+import { IconHammers, IconScrollContent, IconSize } from 'hds-react';
 import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

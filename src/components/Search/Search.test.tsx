@@ -1,13 +1,12 @@
 import axios from 'axios';
-import mockI18next from '@/mocks/mockI18next';
-import { renderWithProviders } from '@/utils/testUtils';
+import { optionWithLabel, renderWithProviders } from '@/utils/testUtils';
 import {
   mockProjectCategories,
   mockProjectPhases,
   mockProjectTypes,
   mockResponsiblePersons,
 } from '@/mocks/mockLists';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import Search from './Search';
 import {
   mockClasses,
@@ -17,7 +16,13 @@ import {
 } from '@/mocks/mockClasses';
 import { setupStore } from '@/store';
 import { waitFor } from '@testing-library/react';
-import { getSearchResultsThunk, toggleSearch } from '@/reducers/searchSlice';
+import {
+  getSearchResultsThunk,
+  initialSearchForm,
+  setSearchForm,
+  toggleSearch,
+} from '@/reducers/searchSlice';
+import buildSearchParams from '@/utils/buildSearchParams';
 import { setProgrammedYears } from '@/utils/common';
 import {
   mockDistricts,
@@ -31,11 +36,12 @@ import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { Route } from 'react-router';
 import SearchResultsView from '@/views/SearchResultsView/SearchResultsView';
 import { mockUser } from '@/mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 const store = setupStore();
 
 const render = async () =>
@@ -82,7 +88,7 @@ const render = async () =>
   );
 describe('Search', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be hidden by default', async () => {
@@ -148,6 +154,126 @@ describe('Search', () => {
     expect(lists.programmedYears).toStrictEqual(setProgrammedYears());
   });
 
+  it('enables Search only after submitting a typed PW identifier in its input', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+    const { user, store, getByLabelText, getByTestId } = await render();
+    await act(async () => {
+      store.dispatch(toggleSearch());
+    });
+    const input = getByLabelText('searchForm.hkrIdSearch');
+    const submitButton = getByTestId('search-projects-button');
+    expect(submitButton).toBeDisabled();
+    await user.type(input, '12345');
+    expect(submitButton).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(submitButton).toBeEnabled();
+    expect(store.getState().search.form.hkrIds).toEqual(['12345']);
+    await user.click(submitButton);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      'localhost:4000/projects/search-results/?hkrId=12345&limit=10&order=new',
+    );
+    expect(store.getState().search.submittedForm.hkrIds).toEqual(['12345']);
+  });
+
+  it('validates PW search text and blocks searches until the length is corrected', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+    const { user, store, getByLabelText, getByTestId, getAllByText, queryByText } = await render();
+    await act(async () => {
+      store.dispatch(setSearchForm({ ...initialSearchForm, hkrIds: ['99999'] }));
+      store.dispatch(toggleSearch());
+    });
+    const input = getByLabelText('searchForm.hkrIdSearch');
+    expect(input).not.toHaveAttribute('maxlength');
+    await user.type(input, '123456');
+    expect(input).toHaveValue('123456');
+    expect(getAllByText('validation.maxLength').length).toBeGreaterThan(0);
+    await user.keyboard('{Enter}');
+    expect(store.getState().search.form.hkrIds).toEqual(['99999']);
+    await user.click(getByTestId('search-projects-button'));
+    expect(mockedAxios.get).not.toHaveBeenCalled();
+    expect(getByTestId('project-search-form')).toBeInTheDocument();
+
+    await user.click(input);
+    await user.keyboard('{Backspace}');
+    expect(queryByText('validation.maxLength')).not.toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    expect(input).toHaveValue('');
+    await user.click(getByTestId('search-projects-button'));
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      'localhost:4000/projects/search-results/?hkrId=99999&hkrId=12345&limit=10&order=new',
+    );
+    expect(store.getState().search.submittedForm.hkrIds).toEqual(['99999', '12345']);
+  });
+
+  it('submits the missing PW identifier checkbox as the only search criterion', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+    const { user, store, getByLabelText, getByTestId, findByText } = await render();
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    const checkbox = getByLabelText('searchForm.withoutHkrId');
+    expect(checkbox).not.toBeChecked();
+    expect(getByTestId('search-projects-button')).toBeDisabled();
+    await user.click(checkbox);
+    expect(getByTestId('search-projects-button')).toBeEnabled();
+    expect(store.getState().search.form.withoutHkrId).toBe(true);
+    expect(getByLabelText('searchForm.hkrIdSearch')).toBeDisabled();
+
+    await user.click(getByTestId('search-projects-button'));
+    await findByText('searchTag.withoutHkrId');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      'localhost:4000/projects/search-results/?withoutHkrId=true&limit=10&order=new',
+    );
+    expect(store.getState().search.submittedForm.withoutHkrId).toBe(true);
+  });
+
+  it('clears PW selections and search text, persists the checkbox and re-enables the input', async () => {
+    const { user, store, getByRole, getByTestId, queryByText } = await render();
+    await act(async () => {
+      store.dispatch(setSearchForm({ ...initialSearchForm, hkrIds: ['12345'] }));
+      store.dispatch(toggleSearch());
+    });
+    const input = getByRole('searchbox', { name: 'searchForm.hkrIdSearch' });
+    await user.type(input, '999');
+    await user.click(getByRole('checkbox', { name: 'searchForm.withoutHkrId' }));
+
+    expect(input).toHaveValue('');
+    expect(store.getState().search.form.withoutHkrId).toBe(true);
+    expect(getByRole('searchbox', { name: 'searchForm.hkrIdSearch' })).toBeDisabled();
+    expect(queryByText('12345')).not.toBeInTheDocument();
+    expect(store.getState().search.form.hkrIds).toEqual([]);
+
+    await user.click(getByTestId('cancel-search'));
+    await act(async () => {
+      store.dispatch(toggleSearch());
+    });
+    const checkbox = getByRole('checkbox', { name: 'searchForm.withoutHkrId' });
+    expect(checkbox).toBeChecked();
+    expect(getByRole('searchbox', { name: 'searchForm.hkrIdSearch' })).toBeDisabled();
+    await user.click(checkbox);
+    expect(getByRole('searchbox', { name: 'searchForm.hkrIdSearch' })).toBeEnabled();
+    expect(getByTestId('search-projects-button')).toBeDisabled();
+  });
+
+  it('keeps existing PW identifier searches unchanged when the checkbox is unchecked', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+    const { user, store, getByTestId } = await render();
+    await act(async () => {
+      store.dispatch(setSearchForm({ ...initialSearchForm, hkrIds: ['12345'] }));
+      store.dispatch(toggleSearch());
+    });
+    await user.click(getByTestId('search-projects-button'));
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      'localhost:4000/projects/search-results/?hkrId=12345&limit=10&order=new',
+    );
+  });
+
+  it('omits stale PW identifiers from queries when the missing identifier filter is active', () => {
+    expect(buildSearchParams({ ...initialSearchForm, hkrIds: ['12345'], withoutHkrId: true })).toBe(
+      'withoutHkrId=true',
+    );
+    expect(buildSearchParams(initialSearchForm)).toBe('');
+  });
+
   it('cancel button should close the search form and keep changes in redux', async () => {
     const { user, store, getByText, getByTestId, queryByTestId } = await render();
 
@@ -183,7 +309,7 @@ describe('Search', () => {
   it('can use the free search field to get suggestions and add selections to search params', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResults);
 
-    const { user, store, getByText, queryByText, getByTestId } = await render();
+    const { user, store, getByText, queryByText, getByTestId, getByRole } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -193,16 +319,16 @@ describe('Search', () => {
     // check that the full search response is rendered
     await waitFor(async () => {
       mockFreeSearchResults.data.projects?.forEach((p) => {
-        expect(getByText(p.value)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(p.value))).toBeInTheDocument();
       });
       mockFreeSearchResults.data.hashtags?.forEach((h) => {
-        expect(getByText(`#${h.value}`)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(`#${h.value}`))).toBeInTheDocument();
       });
       mockFreeSearchResults.data.groups?.forEach((g) => {
-        expect(getByText(g.value)).toBeInTheDocument();
+        expect(getByRole('option', optionWithLabel(g.value))).toBeInTheDocument();
       });
-      await user.click(getByText('#leikkipuisto'));
     });
+    await user.click(getByRole('option', optionWithLabel('#leikkipuisto')));
 
     const getRequest = mockedAxios.get.mock;
 
@@ -215,7 +341,7 @@ describe('Search', () => {
       expect(res.data).toStrictEqual(mockFreeSearchResults.data);
       expect(getByText('#leikkipuisto')).toBeInTheDocument();
       expect(queryByText('#leikkipaikka')).toBeNull();
-    } catch (e) {
+    } catch {
       console.log('Error getting free search results');
     }
 
@@ -241,13 +367,13 @@ describe('Search', () => {
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-    const { user, store, getByText, getByTestId } = await render();
+    const { user, store, getByText, getByTestId, findByRole } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
     await user.type(getByText('searchForm.searchWord'), specialFreeSearch);
 
-    await waitFor(() => expect(getByText(specialProjectName)).toBeInTheDocument());
+    const projectOption = await findByRole('option', optionWithLabel(specialProjectName));
 
     // Test that the free search request is encoded correctly
     const freeSearchRequestCall = mockedAxios.get.mock.calls.find(([url]) =>
@@ -260,7 +386,7 @@ describe('Search', () => {
 
     expect(freeSearchRequestUrl).toContain(`freeSearch=${encodeURIComponent(specialFreeSearch)}`);
 
-    await user.click(getByText(specialProjectName));
+    await user.click(projectOption);
     await user.click(getByTestId('search-projects-button'));
 
     await waitFor(() => expect(getByTestId('search-results-view')).toBeInTheDocument());

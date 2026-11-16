@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import type { Mocked, MockedFunction } from 'vitest';
 
-export const routeAxiosConfigCallsToMethodMocks = (mockedAxios: jest.Mocked<typeof axios>) => {
-  const mockedAxiosFn = mockedAxios as unknown as jest.MockedFunction<typeof axios>;
+export const routeAxiosConfigCallsToMethodMocks = (mockedAxios: Mocked<typeof axios>) => {
+  const mockedAxiosFn = mockedAxios as unknown as MockedFunction<typeof axios>;
 
   mockedAxiosFn.mockImplementation(async (...args: unknown[]) => {
     const config = (

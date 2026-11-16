@@ -1,4 +1,5 @@
 import { Button, ButtonVariant } from 'hds-react';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 import { useTranslation } from 'react-i18next';
 import ProjectProgrammeActionButtons from './ProjectProgrammeActionButtons';
 import ProjectProgrammeStatusTransitionButtons from './ProjectProgrammeStatusTransitionButtons';
@@ -27,24 +28,20 @@ function ProjectProgrammeBottomBar({
   const { t } = useTranslation();
 
   return (
-    <div className="project-form-banner">
-      <div className="project-form-banner-container">
-        <div className="project-programme-actions">
-          <ProjectProgrammeStatusTransitionButtons
-            isProjectProgrammeComplete={isProjectProgrammeComplete}
-            effectiveProjectProgrammeId={effectiveProjectProgrammeId}
-            effectiveProjectProgramme={effectiveProjectProgramme}
-            onMissingRequiredFields={onMissingRequiredFields}
-          />
-          <ProjectProgrammeActionButtons />
-          {!isBriefProgramme && !hasSavedExtendedSection && (
-            <Button variant={ButtonVariant.Secondary} type="button" onClick={handleSwitchType}>
-              {t('projectProgrammeForm.switchToBriefProgramme')}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    <FormBottomBar>
+      <ProjectProgrammeStatusTransitionButtons
+        isProjectProgrammeComplete={isProjectProgrammeComplete}
+        effectiveProjectProgrammeId={effectiveProjectProgrammeId}
+        effectiveProjectProgramme={effectiveProjectProgramme}
+        onMissingRequiredFields={onMissingRequiredFields}
+      />
+      <ProjectProgrammeActionButtons />
+      {!isBriefProgramme && !hasSavedExtendedSection && (
+        <Button variant={ButtonVariant.Secondary} type="button" onClick={handleSwitchType}>
+          {t('projectProgrammeForm.switchToBriefProgramme')}
+        </Button>
+      )}
+    </FormBottomBar>
   );
 }
 

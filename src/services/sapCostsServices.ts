@@ -1,11 +1,11 @@
 import { ISapCost } from '@/interfaces/sapCostsInterfaces';
 import axios from 'axios';
 
-const { REACT_APP_API_URL } = process.env;
+import { API_URL } from '@/config/env';
 
 export const getSapCosts = async (year: number): Promise<Array<ISapCost>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/sap-costs/${year}/`);
+    const res = await axios.get(`${API_URL}/sap-costs/${year}/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -14,7 +14,7 @@ export const getSapCosts = async (year: number): Promise<Array<ISapCost>> => {
 
 export const getSapCurrentYear = async (year: number): Promise<Array<ISapCost>> => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/sap-current-year-costs/${year}`);
+    const res = await axios.get(`${API_URL}/sap-current-year-costs/${year}`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

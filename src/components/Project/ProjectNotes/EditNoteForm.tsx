@@ -1,10 +1,7 @@
-import { Button, ButtonVariant } from 'hds-react';
-import { IconPenLine } from 'hds-react/icons';
+import { Button, ButtonVariant, IconPenLine, Dialog, TextArea } from 'hds-react';
 import { FC, memo, useCallback, useState } from 'react';
-import { Dialog } from 'hds-react';
 import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
-import { TextArea } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import useProjectNoteForm from '@/forms/useNoteForm';
 import DialogWrapper from '@/components/shared/DialogWrapper';

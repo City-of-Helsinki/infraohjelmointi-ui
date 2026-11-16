@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Control, Controller, FormProvider, useForm } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { fireEvent } from '@testing-library/react';
 
@@ -12,37 +12,60 @@ const PHASES = {
   completed: 'phase-id-completed',
 };
 
-const latestSelectProps: Record<string, any> = {};
+interface IMockOption {
+  value: string;
+  label: string;
+}
+
+interface IMockSelectFieldProps {
+  name: string;
+  options: IMockOption[];
+  control?: unknown;
+  rules?: { validate?: Record<string, (_value?: IMockOption) => true | string> };
+  required?: boolean;
+  [key: string]: unknown;
+}
+
+const latestSelectProps: Record<string, IMockSelectFieldProps> = {};
 
 // Mock the hooks
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 // Mock the SelectField component
-jest.mock('@/components/shared/SelectField', () => {
-  return function MockSelectField({ name, options, control, rules, required, ...props }: any) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { Controller } = require('react-hook-form');
+vi.mock('@/components/shared/SelectField', () => ({
+  default: function MockSelectField({
+    name,
+    options,
+    control,
+    rules,
+    required,
+    ...props
+  }: IMockSelectFieldProps) {
     latestSelectProps[name] = { name, options, control, rules, required, ...props };
     return (
       <Controller
         name={name}
-        control={control}
+        control={control as Control}
         rules={rules}
-        render={({ field }: { field: { value: any; onChange: (value: any) => void } }) => (
+        render={({
+          field,
+        }: {
+          field: { value: IMockOption | null; onChange: (value: IMockOption | null) => void };
+        }) => (
           <div>
             <select
               data-testid={name}
               required={Boolean(required)}
               value={field.value?.value || ''}
               onChange={(e) => {
-                const option = options.find((o: any) => o.value === e.target.value);
+                const option = options.find((o) => o.value === e.target.value);
                 field.onChange(option || null);
               }}
             >
               <option value="">Select...</option>
-              {options.map((option: any) => (
+              {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -53,10 +76,10 @@ jest.mock('@/components/shared/SelectField', () => {
         )}
       />
     );
-  };
-});
+  },
+}));
 
-jest.mock('@/hooks/useOptions', () => ({
+vi.mock('@/hooks/useOptions', () => ({
   useOptions: (key: string) => {
     if (key === 'responsiblePersons') {
       return [
@@ -104,33 +127,33 @@ const mockClassData: {
   subClasses: [],
 };
 
-jest.mock('@/hooks/useClassOptions', () => ({
+vi.mock('@/hooks/useClassOptions', () => ({
   __esModule: true,
   default: () => mockClassData,
 }));
 
 // Mock all the Redux selectors
-jest.mock('@/reducers/classSlice', () => ({
+vi.mock('@/reducers/classSlice', () => ({
   selectAllPlanningClasses: () => mockClassData.masterClasses,
   selectPlanningClasses: () => mockClassData.classes,
   selectPlanningSubClasses: () => mockClassData.subClasses,
 }));
 
-jest.mock('@/reducers/projectSlice', () => ({
+vi.mock('@/reducers/projectSlice', () => ({
   selectProject: () => null,
   selectProjectMode: () => 'new',
 }));
 
-jest.mock('@/reducers/eventsSlice', () => ({
+vi.mock('@/reducers/eventsSlice', () => ({
   selectProjectUpdate: () => null,
 }));
 
-jest.mock('@/reducers/loaderSlice', () => ({
+vi.mock('@/reducers/loaderSlice', () => ({
   selectIsLoading: () => false,
   selectIsProjectCardLoading: () => false,
 }));
 
-jest.mock('@/reducers/listsSlice', () => ({
+vi.mock('@/reducers/listsSlice', () => ({
   selectProjectDistricts: () => [],
   selectProjectDivisions: () => [],
   selectProjectSubDivisions: () => [],

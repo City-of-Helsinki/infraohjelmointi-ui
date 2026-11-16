@@ -1,10 +1,9 @@
-import mockI18next from '@/mocks/mockI18next';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NoteAttachmentList from './NoteAttachmentList';
 import mockNoteImages from '@/mocks/mockNoteImages';
 
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const attachments = mockNoteImages;
 

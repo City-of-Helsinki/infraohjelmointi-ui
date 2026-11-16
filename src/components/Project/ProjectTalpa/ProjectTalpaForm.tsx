@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ProjectIdentifiersSection from './ProjectIdentifiersSection';
 import ProjectBudgetItemSection from './ProjectBudgetItemSection';
 import { Button, ButtonVariant, LoadingSpinner, Notification } from 'hds-react';
+import FormBottomBar from '@/components/shared/FormBottomBar';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectContactsSection from './ProjectContactsSection';
@@ -161,19 +162,17 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
         {/* SECTION 5 - Project Classes (hankkeen luokat) */}
         <ProjectClassesSection />
 
-        <div className="project-form-banner">
-          <div className="project-form-banner-container">
-            <Button
-              type="submit"
-              variant={saveButtonVariant}
-              disabled={saveButtonDisabled}
-              iconStart={saveButtonIconStart}
-              onMouseDown={blurFocusedField}
-            >
-              {t('saveInformation')}
-            </Button>
-          </div>
-        </div>
+        <FormBottomBar>
+          <Button
+            type="submit"
+            variant={saveButtonVariant}
+            disabled={saveButtonDisabled}
+            iconStart={saveButtonIconStart}
+            onMouseDown={blurFocusedField}
+          >
+            {t('saveInformation')}
+          </Button>
+        </FormBottomBar>
       </form>
     </FormProvider>
   );

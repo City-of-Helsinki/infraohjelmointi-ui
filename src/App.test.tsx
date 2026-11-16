@@ -1,5 +1,4 @@
 import axios from 'axios';
-import mockI18next from '@/mocks/mockI18next';
 import { act, waitFor } from '@testing-library/react';
 
 import {
@@ -55,11 +54,12 @@ import { getListsThunk, sortOptions } from './reducers/listsSlice';
 import { getPlanningGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
+import type { Mocked } from 'vitest';
 
-jest.mock('axios');
-jest.mock('react-i18next', () => mockI18next());
+vi.mock('axios');
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios>;
 
 const render = async () =>
   await act(async () =>
@@ -76,7 +76,7 @@ describe('App', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('adds all needed data to store', async () => {
@@ -241,7 +241,7 @@ describe('App', () => {
 
   it('catches a failed lists fetch', async () => {
     const { store } = await render();
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
     try {
       // getListsThunk only rejects when every list request fails.

@@ -1,4 +1,3 @@
-import mockI18next from '@/mocks/mockI18next';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -11,18 +10,18 @@ import { notifyError } from '@/reducers/notificationSlice';
 import ProjectProgrammeAttachmentList from './ProjectProgrammeAttachmentList';
 import { ProjectProgrammeSectionId } from './sections/projectProgrammeSections';
 
-const mockDispatch = jest.fn();
-const mockGetDownloadUrl = jest.fn();
-const mockIsConfirmed = jest.fn();
+const mockDispatch = vi.fn();
+const mockGetDownloadUrl = vi.fn();
+const mockIsConfirmed = vi.fn();
 
-jest.mock('react-i18next', () => mockI18next());
-jest.mock('@/hooks/common', () => ({ useAppDispatch: () => mockDispatch }));
-jest.mock('@/hooks/useConfirmDialog', () => ({
+vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/hooks/common', () => ({ useAppDispatch: () => mockDispatch }));
+vi.mock('@/hooks/useConfirmDialog', () => ({
   __esModule: true,
   default: () => ({ isConfirmed: mockIsConfirmed }),
 }));
-jest.mock('@/utils/fileUtils', () => ({
-  ...jest.requireActual('@/utils/fileUtils'),
+vi.mock('@/utils/fileUtils', async () => ({
+  ...(await vi.importActual<typeof import('@/utils/fileUtils')>('@/utils/fileUtils')),
   getDownloadUrl: (...args: unknown[]) => mockGetDownloadUrl(...args),
 }));
 
@@ -109,12 +108,12 @@ async function closePreview(user: ReturnType<typeof userEvent.setup>) {
 
 describe('ProjectProgrammeAttachmentList preview', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetDownloadUrl.mockReset();
     let urlIndex = 0;
     mockGetDownloadUrl.mockImplementation(async () => `blob:preview-${++urlIndex}`);
     mockIsConfirmed.mockResolvedValue(true);
-    URL.revokeObjectURL = jest.fn();
+    URL.revokeObjectURL = vi.fn();
   });
 
   it.each<ProjectProgrammeSectionId>(['otherAttachments', 'designCriteria'])(

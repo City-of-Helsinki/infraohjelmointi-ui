@@ -1,5 +1,5 @@
 import { Tag } from 'hds-react';
-import { SearchInput } from 'hds-react';
+import HdsSearchInput from '@/components/shared/HdsSearchInput';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { useTranslation } from 'react-i18next';
@@ -175,11 +175,10 @@ const FreeSearchForm = ({
         control={control as Control<FieldValues>}
         render={({ field: { onChange, value } }) => (
           <>
-            <SearchInput
+            <HdsSearchInput
               label={t('searchForm.searchWord')}
               helperText={t('searchForm.freeSearchDescription') ?? ''}
               searchButtonAriaLabel="Search"
-              suggestionLabelField="label"
               getSuggestions={getSuggestions}
               value={searchWord}
               onChange={handleSetSearchWord}
