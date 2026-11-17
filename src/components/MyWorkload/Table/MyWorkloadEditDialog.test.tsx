@@ -691,6 +691,7 @@ describe('MyWorkloadEditDialog', () => {
       'aria-describedby',
       getByText(`myWorkloadView.table.${reason}`).id,
     );
+    expect(getByRole('status').tagName).toBe('OUTPUT');
     await user.click(button);
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();

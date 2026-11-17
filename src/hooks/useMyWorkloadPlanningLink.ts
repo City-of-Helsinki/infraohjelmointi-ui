@@ -18,6 +18,63 @@ const containsProject = (rows: IPlanningRow[], projectId: string): boolean =>
       containsProject(row.children, projectId),
   );
 
+const selectClassHierarchy = (
+  classId: string | null | undefined,
+  planningClasses: IClassHierarchy,
+  selections: IPlanningRowSelections,
+  params: URLSearchParams,
+): boolean => {
+  let currentClassId = classId;
+  const visitedClasses = new Set<string>();
+  while (currentClassId) {
+    if (visitedClasses.has(currentClassId)) return false;
+    visitedClasses.add(currentClassId);
+    const masterClass = planningClasses.masterClasses.find(({ id }) => id === currentClassId);
+    const projectClass = planningClasses.classes.find(({ id }) => id === currentClassId);
+    const subClass = planningClasses.subClasses.find(({ id }) => id === currentClassId);
+    if (masterClass) {
+      selections.selectedMasterClass = masterClass;
+      params.set('masterClass', masterClass.id);
+    } else if (projectClass) {
+      selections.selectedClass = projectClass;
+      params.set('class', projectClass.id);
+    } else if (subClass) {
+      selections.selectedSubClass = subClass;
+      params.set('subClass', subClass.id);
+    } else {
+      return false;
+    }
+    currentClassId = (masterClass ?? projectClass ?? subClass)?.parent;
+  }
+  return true;
+};
+
+const selectLocationHierarchy = (
+  locationId: string | null | undefined,
+  locations: ILocationHierarchy,
+  selections: IPlanningRowSelections,
+  params: URLSearchParams,
+): boolean => {
+  let currentLocationId = locationId;
+  const visitedLocations = new Set<string>();
+  while (currentLocationId) {
+    if (visitedLocations.has(currentLocationId)) return false;
+    visitedLocations.add(currentLocationId);
+    const location = [
+      ...locations.districts,
+      ...locations.divisions,
+      ...locations.subDivisions,
+    ].find(({ id }) => id === currentLocationId);
+    if (!location) return false;
+    if (locations.districts.some(({ id }) => id === location.id)) {
+      selections.selectedDistrict = location;
+      params.set('district', location.id);
+    }
+    currentLocationId = location.parent;
+  }
+  return true;
+};
+
 const getPlanningTarget = (
   project: IProject | undefined,
   isLoading: boolean,
@@ -45,47 +102,11 @@ const getPlanningTarget = (
     selectedSubLevelDistrict: null,
     selectedOtherClassification: null,
   };
-  let currentClassId: string | null | undefined = classId;
-  const visitedClasses = new Set<string>();
-  while (currentClassId) {
-    if (visitedClasses.has(currentClassId)) return { reason: 'planningLinkHierarchyUnavailable' };
-    visitedClasses.add(currentClassId);
-    const masterClass = planningClasses.masterClasses.find(({ id }) => id === currentClassId);
-    const projectClass = planningClasses.classes.find(({ id }) => id === currentClassId);
-    const subClass = planningClasses.subClasses.find(({ id }) => id === currentClassId);
-    if (masterClass) {
-      selections.selectedMasterClass = masterClass;
-      params.set('masterClass', masterClass.id);
-    } else if (projectClass) {
-      selections.selectedClass = projectClass;
-      params.set('class', projectClass.id);
-    } else if (subClass) {
-      selections.selectedSubClass = subClass;
-      params.set('subClass', subClass.id);
-    } else {
-      return { reason: 'planningLinkHierarchyUnavailable' };
-    }
-    currentClassId = (masterClass ?? projectClass ?? subClass)?.parent;
-  }
+  if (!selectClassHierarchy(classId, planningClasses, selections, params))
+    return { reason: 'planningLinkHierarchyUnavailable' };
 
-  let currentLocationId: string | null | undefined = locationId;
-  const visitedLocations = new Set<string>();
-  while (currentLocationId) {
-    if (visitedLocations.has(currentLocationId))
-      return { reason: 'planningLinkHierarchyUnavailable' };
-    visitedLocations.add(currentLocationId);
-    const location = [
-      ...locations.districts,
-      ...locations.divisions,
-      ...locations.subDivisions,
-    ].find(({ id }) => id === currentLocationId);
-    if (!location) return { reason: 'planningLinkHierarchyUnavailable' };
-    if (locations.districts.some(({ id }) => id === location.id)) {
-      selections.selectedDistrict = location;
-      params.set('district', location.id);
-    }
-    currentLocationId = location.parent;
-  }
+  if (!selectLocationHierarchy(locationId, locations, selections, params))
+    return { reason: 'planningLinkHierarchyUnavailable' };
 
   const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
   if (!type || !id || params.get(type) !== id)

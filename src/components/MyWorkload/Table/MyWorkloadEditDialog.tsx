@@ -630,15 +630,11 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           {t('myWorkloadView.table.goToPlanning')}
         </Button>
         {(!planningLink.url || isLoading) && (
-          <p
-            id="planning-link-disabled-reason"
-            className={classes.editDialogNavigationInfo}
-            role="status"
-          >
+          <output id="planning-link-disabled-reason" className={classes.editDialogNavigationInfo}>
             {t(`myWorkloadView.table.${isLoading ? 'planningLinkSaving' : planningLink.reason}`, {
               year: planningLink.year,
             })}
-          </p>
+          </output>
         )}
       </div>
     </Dialog>

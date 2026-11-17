@@ -66,7 +66,8 @@ export const createMyWorkloadDateCompare =
     const timeB =
       (typeof valueB === 'string' ? dateSortValues.get(valueB) : undefined) ??
       Number.NEGATIVE_INFINITY;
-    return timeA < timeB ? -1 : timeA > timeB ? 1 : 0;
+    if (timeA < timeB) return -1;
+    return timeA > timeB ? 1 : 0;
   };
 
 export const createMyWorkloadPhaseCompare =
