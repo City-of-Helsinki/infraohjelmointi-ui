@@ -29,6 +29,11 @@ export const axiosBaseQuery =
       });
       return { data: result.data };
     } catch (axiosError) {
+      // The axios interceptor rejects canceled requests with undefined
+      if (!axiosError) {
+        return { error: { status: undefined, data: 'Request canceled' } };
+      }
+
       const parsedError = axiosError as AxiosError & {
         data?: unknown;
         status?: number;
