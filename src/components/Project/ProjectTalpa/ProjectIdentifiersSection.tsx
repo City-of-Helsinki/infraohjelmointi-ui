@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
 import { useFormContext } from 'react-hook-form';
 import { BudgetItemNumber } from './budgetItemNumber';
-import { selectTalpaProjectRanges, selectTalpaProjectTypes } from '@/reducers/listsSlice';
-import { useSelector } from 'react-redux';
+import { useGetTalpaProjectRangesQuery, useGetTalpaProjectTypesQuery } from '@/api/talpaApi';
 import { groupOptions } from '@/utils/common';
 import { useEffect, useMemo } from 'react';
 import {
@@ -15,6 +14,10 @@ import {
 import { uniqBy } from 'lodash';
 import { defaultFilter } from '@/utils/select';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
+import { ITalpaProjectRange, ITalpaProjectType } from '@/interfaces/talpaInterfaces';
+
+const EMPTY_PROJECT_RANGES: ITalpaProjectRange[] = [];
+const EMPTY_PROJECT_TYPES: ITalpaProjectType[] = [];
 
 const formatCategoryLabel = (category?: string | null) => {
   if (!category) {
@@ -33,8 +36,8 @@ export default function ProjectIdentifiersSection() {
     formState: { dirtyFields, touchedFields },
   } = useFormContext<IProjectTalpaForm>();
   const [budgetItemNumber, projectType] = watch(['budgetItemNumber', 'projectType']);
-  const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
-  const talpaProjectTypes = useSelector(selectTalpaProjectTypes);
+  const { data: talpaProjectRanges = EMPTY_PROJECT_RANGES } = useGetTalpaProjectRangesQuery();
+  const { data: talpaProjectTypes = EMPTY_PROJECT_TYPES } = useGetTalpaProjectTypesQuery();
   const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
   const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
   const projectTypeDirty = Boolean(dirtyFields?.projectType);

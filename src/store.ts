@@ -13,7 +13,6 @@ import eventsReducer from './reducers/eventsSlice';
 import planningReducer from './reducers/planningSlice';
 import sapCostReducer from './reducers/sapCostSlice';
 import appStateValuesReducer from './reducers/appStateValueSlice';
-import talpaReducer from './reducers/talpaSlice';
 import { infraohjelmointiApi } from './api/infraohjelmointiApi';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
@@ -32,7 +31,6 @@ export const storeItems = {
   planning: planningReducer,
   sapCosts: sapCostReducer,
   appStateValues: appStateValuesReducer,
-  talpa: talpaReducer,
   [infraohjelmointiApi.reducerPath]: infraohjelmointiApi.reducer,
 };
 

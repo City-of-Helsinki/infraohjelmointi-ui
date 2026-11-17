@@ -7,11 +7,6 @@ import { IUser, UserRole } from '@/interfaces/userInterfaces';
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-vi.mock('@/hooks/useTalpaLists', () => ({
-  __esModule: true,
-  default: () => undefined,
-}));
-
 describe('ProjectDetailsForm tabs', () => {
   const render = async (user: IUser = mockUser.data) =>
     await act(async () =>

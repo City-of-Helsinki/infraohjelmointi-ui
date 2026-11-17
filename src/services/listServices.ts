@@ -1,10 +1,4 @@
 import { IListItem } from '@/interfaces/common';
-import {
-  ITalpaAssetClass,
-  ITalpaProjectRange,
-  ITalpaProjectType,
-  ITalpaServiceClass,
-} from '@/interfaces/talpaInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
@@ -177,26 +171,6 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
     id: programmer.id,
     value: `${programmer.firstName} ${programmer.lastName}`.trim(),
   }));
-};
-
-export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
-  const res = await axios.get<ITalpaProjectRange[]>(`${API_URL}/talpa-project-ranges/`);
-  return res.data;
-};
-
-export const getTalpaProjectTypes = async (): Promise<ITalpaProjectType[]> => {
-  const res = await axios.get<ITalpaProjectType[]>(`${API_URL}/talpa-project-types/`);
-  return res.data;
-};
-
-export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> => {
-  const res = await axios.get<ITalpaServiceClass[]>(`${API_URL}/talpa-service-classes/`);
-  return res.data;
-};
-
-export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
-  const res = await axios.get<ITalpaAssetClass[]>(`${API_URL}/talpa-asset-classes/`);
-  return res.data;
 };
 
 export const putMenuListOrder = async (request: IListItem[], path: string) => {

@@ -4,7 +4,6 @@ import './style.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import useTalpaLists from '@/hooks/useTalpaLists';
 import Link from '../shared/Link';
 import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 
@@ -18,7 +17,6 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   const isOnlyViewer = isUserOnlyViewer(user);
   // Restricted programmers (IO-756) can't use Talpa or construction handovers
   const { isRestricted } = useRestrictedClassAccess();
-  useTalpaLists();
 
   const onBasicsPage = location.includes('basics');
   const onNotesPage = location.includes('notes');

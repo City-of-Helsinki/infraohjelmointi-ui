@@ -14,12 +14,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
 import { saveAs } from 'file-saver';
-import {
-  downloadExcel,
-  getTalpaProjectOpeningByProject,
-  patchTalpaProjectOpening,
-  postTalpaProjectOpening,
-} from '@/services/talpaServices';
+import { downloadExcel } from '@/services/talpaServices';
 import type { MockedFunction } from 'vitest';
 
 vi.mock('file-saver', () => ({
@@ -28,36 +23,38 @@ vi.mock('file-saver', () => ({
 
 vi.mock('@/services/talpaServices', () => ({
   downloadExcel: vi.fn(),
-  getTalpaProjectOpeningByProject: vi.fn(),
-  patchTalpaProjectOpening: vi.fn(),
-  postTalpaProjectOpening: vi.fn(),
-  markTalpaProjectAsSent: vi.fn(),
 }));
+
+const mockPostTalpaProjectOpening = vi.fn();
+const mockPatchTalpaProjectOpening = vi.fn();
+let mockTalpaProjectData: ITalpaProjectOpening | null = null;
+
+vi.mock('@/api/talpaApi', () => {
+  const emptyList: never[] = [];
+  return {
+    useGetTalpaProjectOpeningByProjectQuery: () => ({ data: mockTalpaProjectData }),
+    usePostTalpaProjectOpeningMutation: () => [mockPostTalpaProjectOpening, { isLoading: false }],
+    usePatchTalpaProjectOpeningMutation: () => [mockPatchTalpaProjectOpening, { isLoading: false }],
+    useGetTalpaProjectRangesQuery: () => ({ data: emptyList }),
+    useGetTalpaProjectTypesQuery: () => ({ data: emptyList }),
+    useGetTalpaServiceClassesQuery: () => ({ data: emptyList }),
+    useGetTalpaAssetClassesQuery: () => ({ data: emptyList }),
+  };
+});
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
 const downloadExcelMock = downloadExcel as MockedFunction<typeof downloadExcel>;
-const patchTalpaProjectOpeningMock = patchTalpaProjectOpening as MockedFunction<
-  typeof patchTalpaProjectOpening
->;
-const postTalpaProjectOpeningMock = postTalpaProjectOpening as MockedFunction<
-  typeof postTalpaProjectOpening
->;
-const getTalpaProjectOpeningByProjectMock = getTalpaProjectOpeningByProject as MockedFunction<
-  typeof getTalpaProjectOpeningByProject
->;
 const saveAsMock = saveAs as MockedFunction<typeof saveAs>;
 
+const resolvedMutation = (data: ITalpaProjectOpening) => ({
+  unwrap: () => Promise.resolve(data),
+});
+
 async function render(talpaProjectOverrides: Partial<ITalpaProjectOpening> = {}) {
+  mockTalpaProjectData = { ...mockTalpaProject, ...talpaProjectOverrides };
   return await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectTalpaForm project={null} />} />, {
-      preloadedState: {
-        talpa: {
-          talpaProject: { ...mockTalpaProject, ...talpaProjectOverrides },
-          error: null,
-        },
-      },
-    }),
+    renderWithProviders(<Route path="/" element={<ProjectTalpaForm project={null} />} />),
   );
 }
 
@@ -218,9 +215,8 @@ describe('talpa form', () => {
   describe('submit form', () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      getTalpaProjectOpeningByProjectMock.mockResolvedValue(mockTalpaProject);
-      patchTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);
-      postTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);
+      mockPatchTalpaProjectOpening.mockReturnValue(resolvedMutation(mockTalpaProject));
+      mockPostTalpaProjectOpening.mockReturnValue(resolvedMutation(mockTalpaProject));
     });
 
     it('downloads talpa excel after updating an existing talpa project', async () => {
@@ -245,7 +241,7 @@ describe('talpa form', () => {
       await user.click(screen.getByRole('button', { name: 'saveInformation' }));
 
       await waitFor(() => {
-        expect(patchTalpaProjectOpeningMock).toHaveBeenCalledWith(
+        expect(mockPatchTalpaProjectOpening).toHaveBeenCalledWith(
           expect.objectContaining({
             data: expect.objectContaining({ projectStartDate: '2026-03-01' }),
           }),

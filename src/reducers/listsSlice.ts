@@ -16,10 +16,6 @@ import {
   getBudgetOverrunReasons,
   getFinancingParties,
   getProgrammers,
-  getTalpaProjectRanges,
-  getTalpaAssetClasses,
-  getTalpaProjectTypes,
-  getTalpaServiceClasses,
   getProjectTypeQualifiers,
   getPriorities,
   getStaraProcurementReasons,
@@ -33,12 +29,6 @@ import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { toSerializableError } from '@/utils/reduxErrorUtils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  ITalpaAssetClass,
-  ITalpaProjectRange,
-  ITalpaProjectType,
-  ITalpaServiceClass,
-} from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import {
   DeleteRowPayload,
@@ -75,10 +65,6 @@ export interface IListState {
   programmers: Array<IListItem>;
   programmersRaw: Array<IPerson>;
   priorities: Array<IListItem>;
-  talpaProjectRanges: Array<ITalpaProjectRange>;
-  talpaProjectTypes: Array<ITalpaProjectType>;
-  talpaServiceClasses: Array<ITalpaServiceClass>;
-  talpaAssetClasses: Array<ITalpaAssetClass>;
   error: unknown;
 }
 
@@ -106,10 +92,6 @@ const initialState: IListState = {
   programmers: [],
   programmersRaw: [],
   priorities: [],
-  talpaProjectRanges: [],
-  talpaProjectTypes: [],
-  talpaServiceClasses: [],
-  talpaAssetClasses: [],
   error: null,
 };
 
@@ -238,10 +220,6 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       programmers: await requests.programmers,
       programmersRaw: await requests.programmersRaw,
       priorities: await requests.priorities,
-      talpaProjectRanges: [],
-      talpaProjectTypes: [],
-      talpaServiceClasses: [],
-      talpaAssetClasses: [],
       projectClasses: [],
     };
 
@@ -250,19 +228,6 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
     }
 
     return lists;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(toSerializableError(err));
-  }
-});
-
-export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, thunkAPI) => {
-  try {
-    return {
-      talpaProjectRanges: await getTalpaProjectRanges(),
-      talpaProjectTypes: await getTalpaProjectTypes(),
-      talpaServiceClasses: await getTalpaServiceClasses(),
-      talpaAssetClasses: await getTalpaAssetClasses(),
-    };
   } catch (err) {
     return thunkAPI.rejectWithValue(toSerializableError(err));
   }
@@ -422,16 +387,6 @@ export const listsSlice = createSlice({
         syncDerivedPersonLists(state, listType);
       }
     });
-    // GET TALPA LISTS
-    builder.addCase(
-      getTalpaListsThunk.fulfilled,
-      (state, action: PayloadAction<Pick<IListState, 'talpaProjectRanges'>>) => {
-        return { ...state, ...action.payload };
-      },
-    );
-    builder.addCase(getTalpaListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
-    });
   },
 });
 
@@ -444,10 +399,6 @@ export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budg
 export const selectProjectClasses = (state: RootState) => state.lists.projectClasses;
 export const selectProgrammers = (state: RootState) => state.lists.programmers;
 export const selectResponsiblePersonsRaw = (state: RootState) => state.lists.responsiblePersonsRaw;
-export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaProjectRanges;
-export const selectTalpaProjectTypes = (state: RootState) => state.lists.talpaProjectTypes;
-export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpaServiceClasses;
-export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
 export const selectLists = (state: RootState) => state.lists;
 
 export const { deleteRow, moveRow, revertRowOrder } = listsSlice.actions;

@@ -8,12 +8,13 @@ import {
   TalpaReadiness,
 } from '@/interfaces/talpaInterfaces';
 import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNumber';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { selectPlanningClasses, selectPlanningSubClasses } from '@/reducers/classSlice';
 import { useEffect } from 'react';
+import { skipToken } from '@reduxjs/toolkit/query';
 import { infraInvestmentTemplateProject } from '@/components/Project/ProjectTalpa/templateProjectOptions';
 import { InvestmentProfile } from '@/components/Project/ProjectTalpa/investmentProfile';
-import { getTalpaProjectOpeningByProjectThunk, selectTalpaProject } from '@/reducers/talpaSlice';
+import { useGetTalpaProjectOpeningByProjectQuery } from '@/api/talpaApi';
 import { addYears, formatDateToHds } from '@/utils/dates';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
@@ -96,7 +97,7 @@ function useResponsiblePerson(project: IProject | null): {
 }
 
 const useTalpaProjectOpeningToFormValues = (project: IProject | null): IProjectTalpaForm => {
-  const talpaProject = useAppSelector(selectTalpaProject);
+  const { data: talpaProject } = useGetTalpaProjectOpeningByProjectQuery(project?.id ?? skipToken);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
   const { responsiblePersonName, responsiblePersonEmail } = useResponsiblePerson(project);
@@ -179,8 +180,6 @@ const useTalpaProjectOpeningToFormValues = (project: IProject | null): IProjectT
 };
 
 export default function useTalpaForm(project: IProject | null) {
-  const dispatch = useAppDispatch();
-
   const formValues = useTalpaProjectOpeningToFormValues(project);
 
   const formMethods = useForm<IProjectTalpaForm>({
@@ -193,12 +192,6 @@ export default function useTalpaForm(project: IProject | null) {
   });
 
   const { control, setValue } = formMethods;
-
-  useEffect(() => {
-    if (project) {
-      dispatch(getTalpaProjectOpeningByProjectThunk(project.id));
-    }
-  }, [dispatch, project]);
 
   const address = useWatch({ control, name: 'streetAddress' });
   const { postalCode } = usePostalCode(address || '');

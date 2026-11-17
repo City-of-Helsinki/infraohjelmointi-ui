@@ -7,12 +7,17 @@ import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName'
 import { IProject } from '@/interfaces/projectInterfaces';
 
 const mockUseAppSelector = vi.fn();
-const mockDispatch = vi.fn();
+const mockUseGetTalpaProjectOpeningByProjectQuery = vi.fn();
+let mockTalpaProjectData: ITalpaProjectOpening | null = null;
 
 vi.mock('@/hooks/common', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useAppSelector: (selector: any) => mockUseAppSelector(selector),
-  useAppDispatch: () => mockDispatch,
+}));
+
+vi.mock('@/api/talpaApi', () => ({
+  useGetTalpaProjectOpeningByProjectQuery: (arg: unknown) =>
+    mockUseGetTalpaProjectOpeningByProjectQuery(arg),
 }));
 
 vi.mock('@/hooks/usePostalCode', () => ({
@@ -25,10 +30,7 @@ vi.mock('@/hooks/usePostalCode', () => ({
 }));
 
 type SelectorName =
-  | 'selectTalpaProject'
-  | 'selectPlanningClasses'
-  | 'selectPlanningSubClasses'
-  | 'selectResponsiblePersonsRaw';
+  'selectPlanningClasses' | 'selectPlanningSubClasses' | 'selectResponsiblePersonsRaw';
 
 function buildTalpaProject(overrides: Partial<ITalpaProjectOpening> = {}): ITalpaProjectOpening {
   return {
@@ -40,7 +42,11 @@ function buildTalpaProject(overrides: Partial<ITalpaProjectOpening> = {}): ITalp
 describe('useTalpaForm', () => {
   beforeEach(() => {
     mockUseAppSelector.mockReset();
-    mockDispatch.mockReset();
+    mockTalpaProjectData = null;
+    mockUseGetTalpaProjectOpeningByProjectQuery.mockReset();
+    mockUseGetTalpaProjectOpeningByProjectQuery.mockImplementation(() => ({
+      data: mockTalpaProjectData,
+    }));
   });
 
   it('returns default form values when no talpa project data is loaded', () => {
@@ -66,7 +72,6 @@ describe('useTalpaForm', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectTalpaProject: null,
       selectPlanningClasses: [planningClass],
       selectPlanningSubClasses: [],
       selectResponsiblePersonsRaw: [
@@ -85,7 +90,7 @@ describe('useTalpaForm', () => {
 
     const { result } = renderHook(() => useTalpaForm(project));
 
-    expect(mockDispatch).toHaveBeenCalledTimes(1);
+    expect(mockUseGetTalpaProjectOpeningByProjectQuery).toHaveBeenCalledWith('project-1');
 
     const values = result.current.getValues();
 
@@ -162,7 +167,6 @@ describe('useTalpaForm', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const selectors: Record<SelectorName, any> = {
-        selectTalpaProject: null,
         selectPlanningClasses: [planningClass],
         selectPlanningSubClasses: [planningSubClass],
         selectResponsiblePersonsRaw: [],
@@ -182,7 +186,6 @@ describe('useTalpaForm', () => {
   it('populates form values when talpa project data is loaded', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectTalpaProject: null,
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
       selectResponsiblePersonsRaw: [],
@@ -198,9 +201,9 @@ describe('useTalpaForm', () => {
 
     const { result, rerender } = renderHook(() => useTalpaForm(project));
 
-    expect(mockDispatch).toHaveBeenCalledTimes(1);
+    expect(mockUseGetTalpaProjectOpeningByProjectQuery).toHaveBeenCalledWith(project.id);
 
-    selectors.selectTalpaProject = talpaProject;
+    mockTalpaProjectData = talpaProject;
     rerender();
 
     const values = result.current.getValues();
@@ -239,7 +242,6 @@ describe('useTalpaForm', () => {
 
   it('keeps edited values when external form values are updated', () => {
     const selectors: Record<SelectorName, unknown> = {
-      selectTalpaProject: null,
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
       selectResponsiblePersonsRaw: [],
@@ -253,7 +255,7 @@ describe('useTalpaForm', () => {
     const { result, rerender } = renderHook(() => useTalpaForm(project));
 
     result.current.setValue('projectName', 'Edited by user', { shouldDirty: true });
-    selectors.selectTalpaProject = buildTalpaProject({ projectName: 'Loaded from server' });
+    mockTalpaProjectData = buildTalpaProject({ projectName: 'Loaded from server' });
 
     rerender();
 
@@ -261,64 +263,65 @@ describe('useTalpaForm', () => {
   });
 
   it('wraps template project label to option when budget item number is not infra investment', () => {
+    mockTalpaProjectData = buildTalpaProject({
+      id: 'a5566bf7-a6fc-49bc-99b9-65341a684a33',
+      budgetAccount: '8 01 03 01 Muu esirakentaminen',
+      projectNumberRange: {
+        id: '09868124-3ea1-495e-8486-970fcac28877',
+        projectTypePrefix: BudgetItemNumber.PreConstruction,
+        budgetAccount: '8 01 03 01 Muu esirakentaminen (MuuEsir.)',
+        budgetAccountNumber: '8 01 03 01',
+        rangeStart: '2814E01600',
+        rangeEnd: '2814E03999',
+        majorDistrict: '',
+        majorDistrictName: '',
+        area: '',
+        unit: 'Mao',
+        contactPerson: '',
+        contactEmail: '',
+        transferNote: '',
+        notes: '',
+        isActive: true,
+        updatedDate: '2025-01-01',
+      },
+      templateProject: '2814E00012',
+      projectType: {
+        id: '7c81a524-906d-478d-be10-be708ccffa41',
+        code: '8010301',
+        name: 'Muu esirakentaminen',
+        category: '',
+        priority: 'B',
+        description: '',
+        isActive: true,
+        notes: '',
+      },
+      projectName: 'Toinen projekti',
+      projectStartDate: '2025-03-15',
+      projectEndDate: '2025-04-15',
+      streetAddress: 'Testitie 2',
+      postalCode: '00200',
+      responsiblePerson: 'John Doe',
+      responsiblePersonEmail: 'john@example.com',
+      serviceClass: null,
+      assetClass: {
+        id: '95d58127-342e-4649-bed6-d8430a0a06ca',
+        componentClass: '8103000',
+        account: '103000',
+        name: 'Maa- ja vesialueet',
+        hasHoldingPeriod: false,
+        holdingPeriodYears: null,
+        category: 'Aineelliset hyodykkeet',
+        isActive: true,
+      },
+      holdingTime: undefined,
+      profileName: 'Profiili B',
+      investmentProfile: 'Z12525',
+      readiness: TalpaReadiness.Kesken,
+      project: 'f0edf54d-4367-49c7-bb42-1420cacebb3e',
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectTalpaProject: buildTalpaProject({
-        id: 'a5566bf7-a6fc-49bc-99b9-65341a684a33',
-        budgetAccount: '8 01 03 01 Muu esirakentaminen',
-        projectNumberRange: {
-          id: '09868124-3ea1-495e-8486-970fcac28877',
-          projectTypePrefix: BudgetItemNumber.PreConstruction,
-          budgetAccount: '8 01 03 01 Muu esirakentaminen (MuuEsir.)',
-          budgetAccountNumber: '8 01 03 01',
-          rangeStart: '2814E01600',
-          rangeEnd: '2814E03999',
-          majorDistrict: '',
-          majorDistrictName: '',
-          area: '',
-          unit: 'Mao',
-          contactPerson: '',
-          contactEmail: '',
-          transferNote: '',
-          notes: '',
-          isActive: true,
-          updatedDate: '2025-01-01',
-        },
-        templateProject: '2814E00012',
-        projectType: {
-          id: '7c81a524-906d-478d-be10-be708ccffa41',
-          code: '8010301',
-          name: 'Muu esirakentaminen',
-          category: '',
-          priority: 'B',
-          description: '',
-          isActive: true,
-          notes: '',
-        },
-        projectName: 'Toinen projekti',
-        projectStartDate: '2025-03-15',
-        projectEndDate: '2025-04-15',
-        streetAddress: 'Testitie 2',
-        postalCode: '00200',
-        responsiblePerson: 'John Doe',
-        responsiblePersonEmail: 'john@example.com',
-        serviceClass: null,
-        assetClass: {
-          id: '95d58127-342e-4649-bed6-d8430a0a06ca',
-          componentClass: '8103000',
-          account: '103000',
-          name: 'Maa- ja vesialueet',
-          hasHoldingPeriod: false,
-          holdingPeriodYears: null,
-          category: 'Aineelliset hyodykkeet',
-          isActive: true,
-        },
-        holdingTime: undefined,
-        profileName: 'Profiili B',
-        investmentProfile: 'Z12525',
-        readiness: TalpaReadiness.Kesken,
-        project: 'f0edf54d-4367-49c7-bb42-1420cacebb3e',
-      }),
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
       selectResponsiblePersonsRaw: [],
