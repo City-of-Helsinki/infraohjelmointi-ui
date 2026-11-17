@@ -1,13 +1,8 @@
-import { Dispatch, FC, SetStateAction } from 'react';
-import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import { FC } from 'react';
+import { MyWorkloadViewTypeButtonsProps } from '@/interfaces/myWorkloadInterfaces';
 import { useTranslation } from 'react-i18next';
 import { IconHammers, IconScrollContent } from 'hds-react';
 import classes from './styles.module.css';
-
-interface MyWorkloadViewTypeButtonsProps {
-  viewType: MyWorkloadViewType;
-  setViewType: Dispatch<SetStateAction<MyWorkloadViewType>>;
-}
 
 const MyWorkloadViewTypeButtons: FC<MyWorkloadViewTypeButtonsProps> = ({
   viewType,

@@ -2,7 +2,7 @@ import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-for
 import { FreeSearchFormObject, IOption } from './common';
 import { FinancingRowValues } from './constructionHandoverInterfaces';
 import { IProjectSapCost } from './sapCostsInterfaces';
-import type { IMyWorkloadEditFormValues } from '@/components/MyWorkload/Table/useMyWorkloadEditForm';
+import type { IMyWorkloadEditFormValues } from './myWorkloadInterfaces';
 
 export enum FormField {
   Select,

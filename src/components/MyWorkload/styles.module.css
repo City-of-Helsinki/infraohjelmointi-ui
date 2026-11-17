@@ -5,6 +5,24 @@
 
 .tableContainer {
   width: 100%;
+  min-width: 0;
+}
+
+.fitTableControl {
+  margin-bottom: var(--spacing-s);
+}
+
+.fitTableViewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.fitTableContent {
+  transform-origin: top left;
+}
+
+.resetSort {
+  margin-bottom: var(--spacing-s);
 }
 
 .tableContainer :global(th) {
@@ -197,7 +215,17 @@
 }
 
 .editDialogFooterActionContainer {
+  display: grid;
+  gap: var(--spacing-s);
   padding: 0 var(--spacing-l) var(--spacing-l);
+}
+
+.editDialogNavigationInfo {
+  margin: 0;
+  color: var(--color-black-70);
+  font-size: var(--fontsize-body-s);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .editDialogActionButtonRow {

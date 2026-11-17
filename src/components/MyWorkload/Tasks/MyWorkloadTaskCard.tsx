@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import classes from '../styles.module.css';
 
-import type { MyWorkloadTaskItem } from '@/interfaces/myWorkloadInterfaces';
+import type { MyWorkloadTaskCardProps } from '@/interfaces/myWorkloadInterfaces';
 import {
   Button,
   ButtonPresetTheme,
@@ -17,10 +17,6 @@ import {
 } from 'hds-react';
 import { formatBudgetEuro } from '@/utils/currencyUtils';
 import { ProjectTaskType } from '@/interfaces/projectInterfaces';
-
-interface MyWorkloadTaskCardProps {
-  task: MyWorkloadTaskItem;
-}
 
 const MyWorkloadTaskCard: FC<MyWorkloadTaskCardProps> = ({ task }) => {
   const { t } = useTranslation();

@@ -1,4 +1,4 @@
-import type { IMyWorkloadEditFormValues } from '@/components/MyWorkload/Table/useMyWorkloadEditForm';
+import type { IMyWorkloadEditFormValues } from '@/interfaces/myWorkloadInterfaces';
 import type { IOption } from '@/interfaces/common';
 import type { FormValueType } from '@/interfaces/formInterfaces';
 import type { IProjectRequest } from '@/interfaces/projectInterfaces';
