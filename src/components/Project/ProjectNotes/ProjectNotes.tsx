@@ -5,7 +5,7 @@ import './styles.css';
 import { t } from 'i18next';
 import { sortArrayByDates } from '@/utils/dates';
 import { useGetNotesByProjectQuery } from '@/api/notesApi';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { skipToken } from '@reduxjs/toolkit/query';
 
 const ProjectNotes = () => {

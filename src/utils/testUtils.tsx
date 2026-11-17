@@ -5,7 +5,7 @@ import { setupStore } from '../store';
 import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { AuthProvider } from 'react-oidc-context';

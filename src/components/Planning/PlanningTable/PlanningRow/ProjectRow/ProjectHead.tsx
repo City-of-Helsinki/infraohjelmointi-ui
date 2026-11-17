@@ -4,7 +4,7 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { IconMenuDots, IconSize } from 'hds-react';
 import optionIcon from '@/utils/optionIcon';
 import { useAppDispatch } from '@/hooks/common';

@@ -2,7 +2,7 @@ import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
 import { IconAngleRight, IconScrollGroup, IconSize, Button } from 'hds-react';
 import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { CustomTag } from '../shared';
 import './styles.css';
 import optionIcon from '@/utils/optionIcon';

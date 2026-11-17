@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { setupStore } from '@/store';
 import PlanningRow from './PlanningRow';
 import { setGroupsExpanded } from '@/reducers/planningSlice';

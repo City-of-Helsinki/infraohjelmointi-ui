@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { selectUser } from '@/reducers/authSlice';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 const useNoteValues = (note?: INote) => {
   const userId = useAppSelector(selectUser)?.uuid;

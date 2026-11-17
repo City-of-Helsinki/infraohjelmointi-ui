@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useHref, useLinkClickHandler } from 'react-router-dom';
+import { useHref, useLinkClickHandler } from 'react-router';
 import { Link as HDSLink, LinkProps } from 'hds-react';
 
 /*

@@ -37,7 +37,7 @@ export default defineConfig({
     testTimeout: 15000,
     server: {
       deps: {
-        inline: ['react-router', 'react-router-dom'],
+        inline: ['react-router'],
       },
     },
     css: {
@@ -48,10 +48,6 @@ export default defineConfig({
     },
     alias: {
       '@react-pdf/renderer': `${src}/testUtils/reactPdfRendererMock.tsx`,
-      // Its "node" export is CJS only, which would load a second react-router copy next to the ESM one.
-      'react-router-dom': fileURLToPath(
-        new URL('./node_modules/react-router-dom/dist/index.mjs', import.meta.url),
-      ),
     },
     coverage: {
       provider: 'v8',

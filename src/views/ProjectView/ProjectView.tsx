@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import ProjectDetailsForm from '@/components/ProjectDetailsForm';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import {

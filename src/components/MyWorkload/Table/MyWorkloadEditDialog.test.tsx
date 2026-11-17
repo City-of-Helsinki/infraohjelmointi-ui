@@ -19,8 +19,8 @@ let consoleErrorSpy: MockInstance;
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-vi.mock('react-router-dom', async () => {
-  const actualModule = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+vi.mock('react-router', async () => {
+  const actualModule = await vi.importActual<typeof import('react-router')>('react-router');
   return {
     ...actualModule,
     useNavigate: () => mockNavigate,
