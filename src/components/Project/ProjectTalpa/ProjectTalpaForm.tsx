@@ -11,14 +11,15 @@ import ProjectContactsSection from './ProjectContactsSection';
 import ProjectClassesSection from './ProjectClasses';
 import moment from 'moment';
 import {
-  ITalpaProjectOpening,
   ITalpaProjectOpeningRequest,
   TalpaPriority,
   TalpaReadiness,
   TalpaSubject,
 } from '@/interfaces/talpaInterfaces';
-import { useAppDispatch } from '@/hooks/common';
-import { patchTalpaProjectOpeningThunk, postTalpaProjectOpeningThunk } from '@/reducers/talpaSlice';
+import {
+  usePatchTalpaProjectOpeningMutation,
+  usePostTalpaProjectOpeningMutation,
+} from '@/api/talpaApi';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { IOption } from '@/interfaces/common';
 import { downloadExcel } from '@/services/talpaServices';
@@ -96,7 +97,8 @@ function blurFocusedField() {
 
 export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaFormProps>) {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const [postTalpaProjectOpening] = usePostTalpaProjectOpeningMutation();
+  const [patchTalpaProjectOpening] = usePatchTalpaProjectOpeningMutation();
   const formMethods = useTalpaForm(project);
   const { isSubmitting } = formMethods.formState;
   const { handleSubmit, getValues, reset } = formMethods;
@@ -109,21 +111,16 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
 
   async function submitForm(data: IProjectTalpaForm) {
     const requestData = mapTalpaFormToRequest(data, data.id ? 'update' : 'create', project?.id);
-    let result;
+    let savedTalpaProjectId: string;
 
-    if (data.id) {
-      // Update existing talpa project
-      result = await dispatch(patchTalpaProjectOpeningThunk({ id: data.id, data: requestData }));
-    } else {
-      // Create new talpa project
-      result = await dispatch(postTalpaProjectOpeningThunk({ data: requestData }));
-    }
-
-    if (result.meta.requestStatus === 'rejected') {
+    try {
+      const savedTalpaProject = data.id
+        ? await patchTalpaProjectOpening({ id: data.id, data: requestData }).unwrap()
+        : await postTalpaProjectOpening({ data: requestData }).unwrap();
+      savedTalpaProjectId = savedTalpaProject.id;
+    } catch {
       return;
     }
-
-    const savedTalpaProjectId = (result.payload as ITalpaProjectOpening).id;
 
     // Clears the dirty state so that the saved values from the store can be applied again,
     // as dirty fields are preserved when the form is re-synced with external data.

@@ -2,8 +2,7 @@ import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import { getFieldProps } from './ProjectTalpaForm';
 import styles from './styles.module.css';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { selectTalpaAssetClasses, selectTalpaServiceClasses } from '@/reducers/listsSlice';
+import { useGetTalpaAssetClassesQuery, useGetTalpaServiceClassesQuery } from '@/api/talpaApi';
 import { useFormContext } from 'react-hook-form';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
@@ -11,8 +10,11 @@ import { groupOptions } from '@/utils/common';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { InvestmentProfile } from './investmentProfile';
 import { validateRequired } from '@/utils/validation';
-import { TalpaReadiness } from '@/interfaces/talpaInterfaces';
+import { ITalpaAssetClass, ITalpaServiceClass, TalpaReadiness } from '@/interfaces/talpaInterfaces';
 import { TalpaProfileName } from './profileName';
+
+const EMPTY_SERVICE_CLASSES: ITalpaServiceClass[] = [];
+const EMPTY_ASSET_CLASSES: ITalpaAssetClass[] = [];
 
 export default function ProjectClassesSection() {
   const { t } = useTranslation();
@@ -22,8 +24,8 @@ export default function ProjectClassesSection() {
     formState: { touchedFields },
   } = useFormContext<IProjectTalpaForm>();
 
-  const talpaServiceClasses = useSelector(selectTalpaServiceClasses);
-  const talpaAssetClasses = useSelector(selectTalpaAssetClasses);
+  const { data: talpaServiceClasses = EMPTY_SERVICE_CLASSES } = useGetTalpaServiceClassesQuery();
+  const { data: talpaAssetClasses = EMPTY_ASSET_CLASSES } = useGetTalpaAssetClassesQuery();
 
   const [budgetItemNumber, assetClass] = watch(['budgetItemNumber', 'assetClass']);
   const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);

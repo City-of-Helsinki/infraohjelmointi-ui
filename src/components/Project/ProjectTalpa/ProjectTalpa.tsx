@@ -1,16 +1,19 @@
 import { useTranslation } from 'react-i18next';
+import { skipToken } from '@reduxjs/toolkit/query';
 import { ProjectFormSidePanel } from '../ProjectBasics/ProjectFormSidePanel';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import ProjectTalpaForm from './ProjectTalpaForm';
-import { markTalpaProjectAsSentThunk, selectTalpaProject } from '@/reducers/talpaSlice';
+import {
+  useGetTalpaProjectOpeningByProjectQuery,
+  useMarkTalpaProjectAsSentMutation,
+} from '@/api/talpaApi';
 import TalpaStatusSection from './TalpaStatusSection';
 import useGetProject from '@/hooks/useGetProject';
 
 export default function ProjectTalpa() {
   const { t } = useTranslation();
   const { data: project } = useGetProject();
-  const talpaProject = useAppSelector(selectTalpaProject);
-  const dispatch = useAppDispatch();
+  const { data: talpaProject } = useGetTalpaProjectOpeningByProjectQuery(project?.id ?? skipToken);
+  const [markTalpaProjectAsSent] = useMarkTalpaProjectAsSentMutation();
 
   const navItems = [
     { route: '#budgetItemNumber', label: t('nav.budgetItemNumber') },
@@ -22,7 +25,7 @@ export default function ProjectTalpa() {
 
   function handleMarkAsSent() {
     if (talpaProject?.id) {
-      dispatch(markTalpaProjectAsSentThunk(talpaProject.id));
+      markTalpaProjectAsSent(talpaProject.id);
     }
   }
 

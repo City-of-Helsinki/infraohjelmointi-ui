@@ -120,10 +120,6 @@ const render = async (
             programmersRaw: [],
             projectClasses: mockProjectClasses.data,
             priorities: [],
-            talpaProjectRanges: [],
-            talpaProjectTypes: [],
-            talpaServiceClasses: [],
-            talpaAssetClasses: [],
             error: {},
           },
           hashTags: {
