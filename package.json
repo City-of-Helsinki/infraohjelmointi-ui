@@ -28,7 +28,7 @@
     "oidc-client-ts": "^2.5.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-hook-form": "^7.91.0",
+    "react-hook-form": "^7.92.0",
     "react-i18next": "^17.1.13",
     "react-intersection-observer": "^11.0.1",
     "react-oidc-context": "^2.4.0",
@@ -62,8 +62,8 @@
     "@typescript-eslint/eslint-plugin": "^8.72.2",
     "@typescript-eslint/parser": "^8.72.2",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@vitejs/plugin-react": "^6.2.1",
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
@@ -72,12 +72,12 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^26",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "postcss": "^8.5.28",
+    "postcss": "^8.5.33",
     "tailwindcss": "^4.3.5",
     "ts-node": "^10.9.2",
-    "vite": "^8.3.7",
-    "vitest": "^5.0.5"
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }
