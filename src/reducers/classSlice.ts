@@ -1,7 +1,8 @@
+import { classApi } from '@/api/classApi';
 import { IClass } from '@/interfaces/classInterfaces';
-import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
 import { RootState } from '@/store';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getErrorFromRejectedAction } from '@/utils/reduxErrorUtils';
+import { createSlice, isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IClassHierarchy {
   allClasses: Array<IClass>;
@@ -56,42 +57,6 @@ const initialState: IClassState = {
   error: null,
 };
 
-export const getPlanningClassesThunk = createAsyncThunk(
-  'class/getAllPlanning',
-  async (year: number, thunkAPI) => {
-    try {
-      const classes = await getPlanningClasses(year);
-      return classes;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const getCoordinationClassesThunk = createAsyncThunk(
-  'class/getAllCoordination',
-  async (year: number, thunkAPI) => {
-    try {
-      const classes = await getCoordinationClasses({ forcedToFrame: false, year });
-      return classes;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const getForcedToFrameClassesThunk = createAsyncThunk(
-  'class/getAllForcedToFrame',
-  async (year: number, thunkAPI) => {
-    try {
-      const classes = await getCoordinationClasses({ forcedToFrame: true, year });
-      return classes;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
@@ -138,6 +103,27 @@ export const classSlice = createSlice({
   name: 'class',
   initialState,
   reducers: {
+    setPlanningClasses(state, action: PayloadAction<Array<IClass>>) {
+      return { ...state, planning: separateClassesIntoHierarchy(action.payload, false) };
+    },
+    setCoordinationClasses(state, action: PayloadAction<Array<IClass>>) {
+      return {
+        ...state,
+        coordination: separateClassesIntoHierarchy(
+          action.payload,
+          true,
+        ) as ICoordinatorClassHierarchy,
+      };
+    },
+    setForcedToFrameClasses(state, action: PayloadAction<Array<IClass>>) {
+      return {
+        ...state,
+        forcedToFrame: separateClassesIntoHierarchy(
+          action.payload,
+          true,
+        ) as ICoordinatorClassHierarchy,
+      };
+    },
     updateMasterClass(state, action: PayloadAction<IClassUpdatePayload>) {
       const { data, type } = action.payload;
 
@@ -209,62 +195,24 @@ export const classSlice = createSlice({
       }
     },
   },
+  // Fulfilled results are not synced here: ReportRow fetches other years via the same endpoints.
   extraReducers: (builder) => {
-    // GET ALL PLANNING
-    builder.addCase(
-      getPlanningClassesThunk.fulfilled,
-      (state, action: PayloadAction<Array<IClass>>) => {
-        return {
-          ...state,
-          planning: separateClassesIntoHierarchy(action.payload, false),
-        };
-      },
-    );
-    builder.addCase(getPlanningClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // GET ALL COORDINATION
-    builder.addCase(
-      getCoordinationClassesThunk.fulfilled,
-      (state, action: PayloadAction<Array<IClass>>) => {
-        return {
-          ...state,
-          coordination: separateClassesIntoHierarchy(
-            action.payload,
-            true,
-          ) as ICoordinatorClassHierarchy,
-        };
-      },
-    );
-    builder.addCase(
-      getCoordinationClassesThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
-    // GET ALL FORCED TO FRAME
-    builder.addCase(
-      getForcedToFrameClassesThunk.fulfilled,
-      (state, action: PayloadAction<Array<IClass>>) => {
-        return {
-          ...state,
-          forcedToFrame: separateClassesIntoHierarchy(
-            action.payload,
-            true,
-          ) as ICoordinatorClassHierarchy,
-        };
-      },
-    );
-    builder.addCase(
-      getForcedToFrameClassesThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
+    builder.addMatcher(
+      isAnyOf(
+        classApi.endpoints.getPlanningClasses.matchRejected,
+        classApi.endpoints.getCoordinationClasses.matchRejected,
+      ),
+      (state, action) => {
+        state.error = getErrorFromRejectedAction(action);
       },
     );
   },
 });
 
 export const {
+  setPlanningClasses,
+  setCoordinationClasses,
+  setForcedToFrameClasses,
   updateMasterClass,
   updateClass,
   updateSubClass,

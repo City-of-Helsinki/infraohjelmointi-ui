@@ -7,18 +7,17 @@ import { setupStore } from '@/store';
 import PlanningCell from './PlanningCell';
 import { formatNumber } from '@/utils/calculations';
 import { mockUser } from '@/mocks/mockUsers';
-import { patchCoordinationClass } from '@/services/classServices';
 import { updateMasterClass } from '@/reducers/classSlice';
-import type { Mock } from 'vitest';
+import axios from 'axios';
+import type { Mocked, MockedFunction } from 'vitest';
+
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios> & MockedFunction<typeof axios>;
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
   }),
-}));
-
-vi.mock('@/services/classServices', () => ({
-  patchCoordinationClass: vi.fn(),
 }));
 
 vi.mock('@/services/locationServices', () => ({
@@ -98,7 +97,7 @@ describe('PlanningCell', () => {
       },
     };
 
-    (patchCoordinationClass as Mock).mockResolvedValueOnce(updatedClass);
+    mockedAxios.mockResolvedValueOnce({ data: updatedClass });
 
     const planningCellProps: React.ComponentProps<typeof PlanningCell> = {
       type: 'masterClass',
@@ -147,7 +146,12 @@ describe('PlanningCell', () => {
     fireEvent.blur(input);
 
     await waitFor(() => {
-      expect(patchCoordinationClass).toHaveBeenCalled();
+      expect(mockedAxios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining(`/project-classes/coordinator/${id}/`),
+          method: 'PATCH',
+        }),
+      );
       expect(dispatchSpy).toHaveBeenCalledWith(
         updateMasterClass({ data: updatedClass, type: 'forcedToFrame' }),
       );

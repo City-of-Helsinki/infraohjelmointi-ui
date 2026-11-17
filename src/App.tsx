@@ -8,10 +8,11 @@ import { useAppDispatch, useAppSelector } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
-  getCoordinationClassesThunk,
-  getForcedToFrameClassesThunk,
-  getPlanningClassesThunk,
+  setCoordinationClasses,
+  setForcedToFrameClasses,
+  setPlanningClasses,
 } from './reducers/classSlice';
+import { classApi } from './api/classApi';
 import {
   getCoordinationLocationsThunk,
   getForcedToFrameLocationsThunk,
@@ -64,12 +65,19 @@ import { MAINTENANCE_MODE } from './config/env';
 
 const LOADING_APP_ID = 'loading-app-data';
 
+const FRESH_FETCH = { subscribe: false, forceRefetch: true } as const;
+
 export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
   dispatch(setLoading({ text: 'Loading app data', id: 'planning' }));
   try {
     await dispatch(getPlanningGroupsThunk(year));
-    await dispatch(getPlanningClassesThunk(year));
+    const planningClasses = await dispatch(
+      classApi.endpoints.getPlanningClasses.initiate(year, FRESH_FETCH),
+    );
+    if (planningClasses.isSuccess) {
+      dispatch(setPlanningClasses(planningClasses.data));
+    }
     await dispatch(getPlanningLocationsThunk(year));
   } catch (e) {
     console.log('Error loading planning data: ', e);
@@ -85,10 +93,26 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
   dispatch(setLoading({ text: 'Loading app data', id: 'coordination' }));
   try {
     await dispatch(getCoordinationGroupsThunk(year));
-    await dispatch(getCoordinationClassesThunk(year));
+    const coordinationClasses = await dispatch(
+      classApi.endpoints.getCoordinationClasses.initiate(
+        { forcedToFrame: false, year },
+        FRESH_FETCH,
+      ),
+    );
+    if (coordinationClasses.isSuccess) {
+      dispatch(setCoordinationClasses(coordinationClasses.data));
+    }
     await dispatch(getCoordinationLocationsThunk(year));
     await dispatch(getForcedToFrameGroupsThunk(year));
-    await dispatch(getForcedToFrameClassesThunk(year));
+    const forcedToFrameClasses = await dispatch(
+      classApi.endpoints.getCoordinationClasses.initiate(
+        { forcedToFrame: true, year },
+        FRESH_FETCH,
+      ),
+    );
+    if (forcedToFrameClasses.isSuccess) {
+      dispatch(setForcedToFrameClasses(forcedToFrameClasses.data));
+    }
     await dispatch(getForcedToFrameLocationsThunk(year));
   } catch (e) {
     console.log('Error loading coordination data: ', e);

@@ -45,7 +45,7 @@ import {
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
-import { getPlanningClassesThunk } from './reducers/classSlice';
+import { classApi } from './api/classApi';
 import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
@@ -54,12 +54,12 @@ import { getListsThunk, sortOptions } from './reducers/listsSlice';
 import { getPlanningGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
-import type { Mocked } from 'vitest';
+import type { Mocked, MockedFunction } from 'vitest';
 
 vi.mock('axios');
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
 
-const mockedAxios = axios as Mocked<typeof axios>;
+const mockedAxios = axios as Mocked<typeof axios> & MockedFunction<typeof axios>;
 
 const render = async () =>
   await act(async () =>
@@ -206,9 +206,14 @@ describe('App', () => {
   it('catches a failed planning classes fetch', async () => {
     const { store } = await render();
 
-    mockedAxios.get.mockRejectedValueOnce(mockError);
+    mockedAxios.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getPlanningClassesThunk(new Date().getFullYear()));
+    await store.dispatch(
+      classApi.endpoints.getPlanningClasses.initiate(new Date().getFullYear(), {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    );
 
     const storeError = store.getState().class.error as IError;
     expect(storeError.message).toBe(mockError.message);

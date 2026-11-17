@@ -12,7 +12,8 @@ import './styles.css';
 import './pdfFonts';
 import { separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
 import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
-import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
+import { classApi } from '@/api/classApi';
+import { useAppDispatch } from '@/hooks/common';
 import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupServices';
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
@@ -28,6 +29,7 @@ interface IReportRowProps {
 
 const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const isStrategyReport = type === Reports.Strategy;
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear + 1);
@@ -72,10 +74,12 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     const projectsInWarrantyPhase = res.results.filter((p) => p.phase?.value === 'warrantyPeriod');
 
     // classes
-    const classRes = await getCoordinationClasses({
-      forcedToFrame: forcedToFrame,
-      year: year,
-    });
+    const classRes = await dispatch(
+      classApi.endpoints.getCoordinationClasses.initiate(
+        { forcedToFrame, year },
+        { subscribe: false, forceRefetch: true },
+      ),
+    ).unwrap();
     const classHierarchy = separateClassesIntoHierarchy(
       classRes,
       true,
@@ -132,7 +136,12 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     });
 
     // classes
-    const classRes = await getPlanningClasses(year);
+    const classRes = await dispatch(
+      classApi.endpoints.getPlanningClasses.initiate(year, {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    ).unwrap();
     const classHierarchy = separateClassesIntoHierarchy(classRes, false) as IClassHierarchy;
 
     // districts
