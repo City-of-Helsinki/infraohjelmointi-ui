@@ -220,14 +220,6 @@
   padding: 0 var(--spacing-l) var(--spacing-l);
 }
 
-.editDialogNavigationInfo {
-  margin: 0;
-  color: var(--color-black-70);
-  font-size: var(--fontsize-body-s);
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
 .editDialogActionButtonRow {
   display: flex;
   gap: var(--spacing-s);

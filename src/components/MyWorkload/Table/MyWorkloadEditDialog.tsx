@@ -63,11 +63,10 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const { data: fullProject, isFetching: isProjectLoading } = useGetProjectByIdQuery(
     isOpen && project?.id ? project.id : skipToken,
   );
-  const planningLink = useMyWorkloadPlanningLink(
-    fullProject?.id === project?.id ? fullProject : undefined,
-    isProjectLoading,
-    isOpen,
-  );
+  const matchingProject = fullProject?.id === project?.id ? fullProject : undefined;
+  const planningLink = useMyWorkloadPlanningLink(matchingProject);
+  const showLinkToPlanningView = matchingProject?.programmed === true;
+
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
   const planningStartFieldRef = useRef<HTMLDivElement | null>(null);
   const planningEndFieldRef = useRef<HTMLDivElement | null>(null);
@@ -185,9 +184,9 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   }, [clearErrors, onClose]);
 
   const onGoToPlanningClick = () => {
-    if (!planningLink.url) return;
+    if (!planningLink) return;
     onDialogClose();
-    navigate(planningLink.url);
+    navigate(planningLink);
   };
 
   useEffect(() => {
@@ -618,23 +617,15 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         >
           {t('myWorkloadView.table.goToProjectCardEdit')}
         </Button>
-        <Button
-          variant={ButtonVariant.Secondary}
-          className={classes.editDialogActionButton}
-          onClick={onGoToPlanningClick}
-          disabled={!planningLink.url || isLoading}
-          aria-describedby={
-            !planningLink.url || isLoading ? 'planning-link-disabled-reason' : undefined
-          }
-        >
-          {t('myWorkloadView.table.goToPlanning')}
-        </Button>
-        {(!planningLink.url || isLoading) && (
-          <output id="planning-link-disabled-reason" className={classes.editDialogNavigationInfo}>
-            {t(`myWorkloadView.table.${isLoading ? 'planningLinkSaving' : planningLink.reason}`, {
-              year: planningLink.year,
-            })}
-          </output>
+        {showLinkToPlanningView && (
+          <Button
+            variant={ButtonVariant.Secondary}
+            className={classes.editDialogActionButton}
+            onClick={onGoToPlanningClick}
+            disabled={isLoading}
+          >
+            {t('myWorkloadView.table.goToPlanning')}
+          </Button>
         )}
       </div>
     </Dialog>

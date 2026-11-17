@@ -15,17 +15,10 @@ import mockProject from '@/mocks/mockProject';
 import { mockProjectClasses } from '@/mocks/mockClasses';
 import { mockLocations } from '@/mocks/mockLocations';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getProjectsWithParams } from '@/services/projectServices';
-
-vi.mock('@/services/projectServices', async () => {
-  const actualModule = await vi.importActual<typeof import('@/services/projectServices')>(
-    '@/services/projectServices',
-  );
-  return { ...actualModule, getProjectsWithParams: vi.fn() };
-});
 
 const mockNavigate = vi.fn();
 const mockPatchProject = vi.fn();
+const mockPatchProjectState = vi.fn();
 const mockGetProjectById = vi.fn();
 let consoleErrorSpy: MockInstance;
 
@@ -44,7 +37,7 @@ vi.mock('@/api/projectApi', async () => {
   return {
     ...actualModule,
     useGetProjectByIdQuery: () => mockGetProjectById(),
-    usePatchProjectMutation: () => [mockPatchProject, { isLoading: false }],
+    usePatchProjectMutation: () => [mockPatchProject, mockPatchProjectState()],
   };
 });
 
@@ -84,6 +77,7 @@ const baseProject: MyWorkloadTableRow = {
 const planningProject: IProject = {
   ...mockProject.data,
   id: baseProject.id,
+  programmed: true,
   projectClass: 'test-class-1',
   projectLocation: undefined,
   projectGroup: null,
@@ -142,7 +136,7 @@ const renderDialog = (
                 name: 'Test group',
                 location: null,
                 classRelation: 'test-class-1',
-                locationRelation: null,
+                locationRelation: 'test-division-1',
                 finances: mockProjectClasses.data[0].finances,
               },
             ],
@@ -180,11 +174,7 @@ describe('MyWorkloadEditDialog', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getProjectsWithParams).mockResolvedValue({
-      results: [planningProject],
-      next: null,
-      count: 1,
-    });
+    mockPatchProjectState.mockReturnValue({ isLoading: false });
     mockGetProjectById.mockReturnValue({ data: undefined, isFetching: false });
   });
 
@@ -580,7 +570,7 @@ describe('MyWorkloadEditDialog', () => {
         viewType === 'planning' ? 'planning' : 'construction',
       );
       const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
-      await waitFor(() => expect(button).toBeEnabled());
+      expect(button).toBeEnabled();
       fireEvent.change(getByLabelText(/^myWorkloadView\.table\.workQuantity/), {
         target: { value: '999' },
       });
@@ -595,130 +585,100 @@ describe('MyWorkloadEditDialog', () => {
         class: 'test-class-1',
         project: baseProject.id,
       });
-      expect(getProjectsWithParams).toHaveBeenCalledWith(
-        expect.objectContaining({
-          params: 'class=test-class-1',
-          programmed: true,
-          forcedToFrame: false,
-          direct: false,
-          year: new Date().getFullYear(),
-        }),
-        false,
-        expect.objectContaining({ signal: expect.any(AbortSignal) }),
-      );
     },
   );
 
   it.each([
     {
+      projectClass: 'test-master-class-1',
+      projectLocation: undefined,
+      projectGroup: null,
+      district: null,
+      expectedClass: null,
+      expectedSubClass: null,
+    },
+    {
       projectClass: 'test-sub-class-1',
       projectLocation: undefined,
       projectGroup: null,
       district: null,
+      expectedClass: 'test-class-1',
+      expectedSubClass: 'test-sub-class-1',
     },
     {
       projectClass: 'test-sub-class-1',
       projectLocation: 'test-district-1',
       projectGroup: null,
       district: 'test-district-1',
+      expectedClass: 'test-class-1',
+      expectedSubClass: 'test-sub-class-1',
     },
     {
       projectClass: 'test-sub-class-1',
       projectLocation: 'test-division-1',
       projectGroup: null,
       district: 'test-district-1',
+      expectedClass: 'test-class-1',
+      expectedSubClass: 'test-sub-class-1',
     },
     {
-      projectClass: 'test-class-1',
+      projectClass: 'test-sub-class-1',
       projectLocation: undefined,
       projectGroup: 'test-group-1',
-      district: null,
+      district: 'test-district-1',
+      expectedClass: 'test-class-1',
+      expectedSubClass: null,
     },
   ])(
     'resolves hierarchy for $projectClass / $projectLocation / $projectGroup',
-    async ({ district, ...relations }) => {
+    async ({ district, expectedClass, expectedSubClass, ...relations }) => {
       const targetProject: IProject = { ...planningProject, ...relations };
       mockGetProjectById.mockReturnValue({ data: targetProject, isFetching: false });
-      vi.mocked(getProjectsWithParams).mockResolvedValue({
-        results: [targetProject],
-        next: null,
-        count: 1,
-      });
       const { user, getByRole } = renderDialog('planning');
       const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
-      await waitFor(() => expect(button).toBeEnabled());
+      expect(button).toBeEnabled();
       await user.click(button);
       const url = new URL(mockNavigate.mock.calls[0][0], 'http://localhost');
-      expect(url.searchParams.get('project')).toBe(baseProject.id);
-      expect(url.searchParams.get('district')).toBe(district);
+      expect(url.pathname).toBe('/planning/');
+      expect(Object.fromEntries(url.searchParams)).toEqual({
+        masterClass: 'test-master-class-1',
+        ...(expectedClass ? { class: expectedClass } : {}),
+        ...(expectedSubClass ? { subClass: expectedSubClass } : {}),
+        ...(district ? { district } : {}),
+        project: baseProject.id,
+      });
     },
   );
 
   it.each([
-    { data: undefined, isFetching: true, reason: 'planningLinkLoading' },
-    { data: undefined, isFetching: false, reason: 'planningLinkProjectUnavailable' },
+    { data: undefined, isFetching: true, scenario: 'loading' },
+    { data: undefined, isFetching: false, scenario: 'unavailable' },
     {
       data: { ...planningProject, programmed: false },
       isFetching: false,
-      reason: 'planningLinkNotProgrammed',
+      scenario: 'not programmed',
     },
     {
       data: { ...planningProject, id: 'another-project' },
       isFetching: false,
-      reason: 'planningLinkProjectUnavailable',
+      scenario: 'a different project',
     },
-    {
-      data: { ...planningProject, projectClass: 'missing-class' },
-      isFetching: false,
-      reason: 'planningLinkHierarchyUnavailable',
-    },
-    {
-      data: { ...planningProject, projectLocation: 'missing-location' },
-      isFetching: false,
-      reason: 'planningLinkHierarchyUnavailable',
-    },
-    {
-      data: { ...planningProject, projectGroup: 'missing-group' },
-      isFetching: false,
-      reason: 'planningLinkHierarchyUnavailable',
-    },
-  ])('disables navigation with $reason', async ({ data, isFetching, reason }) => {
+  ])('hides planning navigation when project is $scenario', ({ data, isFetching }) => {
     mockGetProjectById.mockReturnValue({ data, isFetching });
-    const { user, getByRole, getByText, onClose } = renderDialog('planning');
+    const { queryByRole } = renderDialog('planning');
+    expect(
+      queryByRole('button', { name: 'myWorkloadView.table.goToPlanning' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('disables planning navigation while saving', async () => {
+    mockGetProjectById.mockReturnValue({ data: planningProject, isFetching: false });
+    mockPatchProjectState.mockReturnValue({ isLoading: true });
+    const { user, getByRole, onClose } = renderDialog('planning');
     const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
     expect(button).toBeDisabled();
-    expect(button).toHaveAttribute(
-      'aria-describedby',
-      getByText(`myWorkloadView.table.${reason}`).id,
-    );
-    expect(getByRole('status').tagName).toBe('OUTPUT');
     await user.click(button);
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
-    expect(getProjectsWithParams).not.toHaveBeenCalled();
   });
-
-  it.each(['excluded', 'error'])(
-    'keeps navigation disabled when availability check returns %s',
-    async (result) => {
-      mockGetProjectById.mockReturnValue({ data: planningProject, isFetching: false });
-      if (result === 'error') {
-        vi.mocked(getProjectsWithParams).mockRejectedValueOnce(new Error('network error'));
-      } else {
-        vi.mocked(getProjectsWithParams).mockResolvedValueOnce({
-          results: [],
-          next: null,
-          count: 0,
-        });
-      }
-      const { user, getByRole, findByText } = renderDialog('planning');
-      await findByText(
-        `myWorkloadView.table.${result === 'error' ? 'planningLinkCheckFailed' : 'planningLinkNotVisible'}`,
-      );
-      const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
-      expect(button).toBeDisabled();
-      await user.click(button);
-      expect(mockNavigate).not.toHaveBeenCalled();
-    },
-  );
 });

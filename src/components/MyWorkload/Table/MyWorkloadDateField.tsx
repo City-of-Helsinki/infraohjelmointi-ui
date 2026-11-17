@@ -48,10 +48,6 @@ const MyWorkloadDateField: FC<MyWorkloadDateFieldProps> = ({
             label={label}
             value={field.value ?? ''}
             onChange={field.onChange}
-            onClick={(event) => {
-              event.stopPropagation();
-              containerRef.current?.querySelector('button')?.click();
-            }}
             placeholder=""
             language="fi"
             required={required}
