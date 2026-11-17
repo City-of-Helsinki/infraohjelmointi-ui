@@ -25,6 +25,7 @@ const dueProject: IPersonalDataRetentionProject = {
     handovers: 0,
     taskPersons: 0,
     programmeNames: 1,
+    talpaContacts: 1,
   },
 };
 
@@ -73,6 +74,9 @@ describe('AdminPersonalDataRetention', () => {
     expect(summary).toHaveTextContent(
       'adminFunctions.personaldataretention.summary.programmeNames: 1',
     );
+    expect(summary).toHaveTextContent(
+      'adminFunctions.personaldataretention.summary.talpaContacts: 1',
+    );
     expect(summary).not.toHaveTextContent('handovers');
     expect(summary).not.toHaveTextContent('taskPersons');
   });
@@ -83,6 +87,25 @@ describe('AdminPersonalDataRetention', () => {
     await render();
 
     expect(await screen.findByTestId('personal-data-retention-empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('personal-data-retention-load-error')).toBeNull();
+  });
+
+  it('shows an error instead of the empty state when loading fails', async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error('Request failed with status code 500'));
+
+    await render();
+
+    expect(await screen.findByTestId('personal-data-retention-load-error')).toBeInTheDocument();
+    expect(screen.queryByTestId('personal-data-retention-empty')).toBeNull();
+  });
+
+  it('shows neither the empty state nor the list while loading', async () => {
+    mockedAxios.get.mockReturnValueOnce(new Promise(() => {}));
+
+    await render();
+
+    expect(screen.queryByTestId('personal-data-retention-empty')).toBeNull();
+    expect(screen.queryByTestId('personal-data-retention-load-error')).toBeNull();
   });
 
   it('removes the project from the list after the admin confirms', async () => {

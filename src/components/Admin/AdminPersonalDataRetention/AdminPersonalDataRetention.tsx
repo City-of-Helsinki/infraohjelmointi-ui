@@ -18,12 +18,15 @@ import { useTranslation } from 'react-i18next';
 
 const TRANSLATION_PREFIX = 'adminFunctions.personaldataretention';
 
+type LoadState = 'loading' | 'loaded' | 'error';
+
 const summaryKeys: Array<keyof IPersonalDataSummary> = [
   'projectPersons',
   'programmers',
   'handovers',
   'taskPersons',
   'programmeNames',
+  'talpaContacts',
 ];
 
 const formatSummary = (
@@ -96,15 +99,19 @@ const AdminPersonalDataRetention = () => {
   const dispatch = useAppDispatch();
   const { isConfirmed } = useConfirmDialog();
   const [projects, setProjects] = useState<Array<IPersonalDataRetentionProject>>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [loadState, setLoadState] = useState<LoadState>('loading');
 
   useEffect(() => {
     let cancelled = false;
     getPersonalDataRetentionProjects()
       .then((res) => {
-        if (!cancelled) setProjects(res);
+        if (cancelled) return;
+        setProjects(res);
+        setLoadState('loaded');
       })
       .catch(() => {
+        if (cancelled) return;
+        setLoadState('error');
         dispatch(
           notifyError({
             message: 'personalDataRetentionLoadError',
@@ -112,9 +119,6 @@ const AdminPersonalDataRetention = () => {
             title: 'undefined',
           }),
         );
-      })
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
       });
     return () => {
       cancelled = true;
@@ -166,9 +170,15 @@ const AdminPersonalDataRetention = () => {
   return (
     <div data-testid="admin-personaldataretention">
       <p>{t(`${TRANSLATION_PREFIX}.info`)}</p>
-      {loaded && projects.length === 0 ? (
+      {loadState === 'error' && (
+        <p data-testid="personal-data-retention-load-error">
+          {t(`${TRANSLATION_PREFIX}.loadError`)}
+        </p>
+      )}
+      {loadState === 'loaded' && projects.length === 0 && (
         <p data-testid="personal-data-retention-empty">{t(`${TRANSLATION_PREFIX}.empty`)}</p>
-      ) : (
+      )}
+      {loadState === 'loaded' && projects.length > 0 && (
         <Table
           cols={cols}
           rows={projects}

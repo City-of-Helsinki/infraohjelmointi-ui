@@ -1257,11 +1257,12 @@
       "name": "Henkilötietojen poisto",
       "description": "Poista henkilöiden nimet, sähköpostiosoitteet ja puhelinnumerot hankkeista, joiden takuuajan päättymisestä on kulunut viisi vuotta.",
       "button": "Siirry henkilötietojen poistoon",
-      "info": "Alla ovat hankkeet, joiden takuuajan päättymisestä on kulunut vähintään viisi vuotta ja joissa on vielä henkilötietoja. Tietoja ei poisteta automaattisesti, vaan poisto vahvistetaan hankekohtaisesti.",
+      "info": "Alla ovat takuuaika- tai valmis-vaiheessa olevat hankkeet, joiden takuuajan päättymisestä on kulunut vähintään viisi vuotta ja joissa on vielä henkilötietoja. Tietoja ei poisteta automaattisesti, vaan poisto vahvistetaan hankekohtaisesti. Ohjelmoijaluettelon nimet säilyvät, vain hankkeen ohjelmoijavalinta poistetaan.",
       "empty": "Poistettavia henkilötietoja ei ole.",
+      "loadError": "Poistettavien henkilötietojen haku epäonnistui. Lataa sivu uudelleen.",
       "projectName": "Hanke",
       "warrantyPhaseEnd": "Takuuaika päättyi",
-      "retentionDueDate": "Poistettava viimeistään",
+      "retentionDueDate": "Säilytysaika päättyi",
       "personalData": "Henkilötiedot",
       "removeButton": "Poista henkilötiedot",
       "confirmButton": "Poista henkilötiedot",
@@ -1269,10 +1270,11 @@
       "confirmDescription": "Hankkeen {{projectName}} henkilötiedot poistetaan. Poistoa ei voi peruuttaa.",
       "summary": {
         "projectPersons": "Hankkeen henkilöt",
-        "programmers": "Ohjelmoija",
+        "programmers": "Ohjelmoijavalinta",
         "handovers": "Rakennuttamiseen siirrot",
         "taskPersons": "Tehtävien henkilöt",
-        "programmeNames": "Hankeohjelman nimet"
+        "programmeNames": "Hankeohjelman nimet",
+        "talpaContacts": "Talpa-avauksen vastuuhenkilö"
       }
     }
   },

@@ -4,6 +4,7 @@ export interface IPersonalDataSummary {
   handovers: number;
   taskPersons: number;
   programmeNames: number;
+  talpaContacts: number;
 }
 
 export interface IPersonalDataRetentionProject {
