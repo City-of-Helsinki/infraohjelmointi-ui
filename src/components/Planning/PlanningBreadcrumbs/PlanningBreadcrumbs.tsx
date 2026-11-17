@@ -1,7 +1,7 @@
 import { IconAngleRight } from 'hds-react';
 import { t } from 'i18next';
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
 import { selectPlanningMode, selectSelections } from '@/reducers/planningSlice';
 import './styles.css';

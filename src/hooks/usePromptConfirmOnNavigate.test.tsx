@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import ConfirmDialogContextProvider, {
   ConfirmDialogContext,
 } from '@/components/context/ConfirmDialogContext';

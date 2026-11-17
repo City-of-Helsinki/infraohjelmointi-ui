@@ -5,7 +5,7 @@ import PlanningCell from './PlanningCell';
 import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import ProjectRow from './ProjectRow/ProjectRow';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded } from '@/reducers/planningSlice';
 import './styles.css';

@@ -2,7 +2,7 @@
  * Prompts a user when they exit the page
  */
 import { useContext, useEffect } from 'react';
-import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 import useConfirmDialog from './useConfirmDialog';
 
 interface IArgs {

@@ -32,7 +32,7 @@ import {
 import { t } from 'i18next';
 import './styles.css';
 import { setProjectMode } from '@/reducers/projectSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import {
   selectBatchedCoordinationClasses,
   selectBatchedPlanningClasses,

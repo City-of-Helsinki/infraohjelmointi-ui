@@ -9,7 +9,7 @@ import {
   selectPlanningMode,
   selectSelections,
 } from '@/reducers/planningSlice';
-import { createSearchParams } from 'react-router-dom';
+import { createSearchParams } from 'react-router';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();

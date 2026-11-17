@@ -5,7 +5,7 @@ import Notification from '@/components/Notification';
 import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
 import { useAppDispatch, useAppSelector } from './hooks/common';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
 import {
   setCoordinationClasses,

@@ -10,7 +10,7 @@ import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlice';
-import { createSearchParams } from 'react-router-dom';
+import { createSearchParams } from 'react-router';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
 import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';

@@ -31,7 +31,7 @@ import {
 } from 'react';
 import { Controller, SubmitErrorHandler, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import classes from '../styles.module.css';
 import { normalizeMyWorkloadDate, toPhaseInfo } from '@/utils/myWorkloadUtils';
 import {

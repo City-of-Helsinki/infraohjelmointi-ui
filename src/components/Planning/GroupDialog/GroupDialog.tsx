@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router';
 import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
-import { createSearchParams } from 'react-router-dom';
+import { createSearchParams } from 'react-router';
 import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { getLocationRelationId } from '@/utils/common';
