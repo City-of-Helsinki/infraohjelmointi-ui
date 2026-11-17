@@ -939,10 +939,11 @@ describe('projectForm', () => {
     });
 
     it('treats the current hkrId with a leading zero as unchanged', async () => {
-      mockedAxios.patch.mockResolvedValueOnce({ data: mockProject.data });
-      const rendered = await render();
+      const project = { ...mockProject.data, hkrId: '7895' };
+      mockedAxios.patch.mockResolvedValueOnce({ data: project });
+      const rendered = await render({ project });
 
-      await changeHkrIdAndSubmit(rendered, `0${mockProject.data.hkrId}`);
+      await changeHkrIdAndSubmit(rendered, `0${project.hkrId}`);
 
       await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
       expect(getPwLookupCalls()).toHaveLength(0);
