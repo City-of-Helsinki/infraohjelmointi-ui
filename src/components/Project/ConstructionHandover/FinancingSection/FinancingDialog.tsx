@@ -27,6 +27,7 @@ import { ChangeEvent, FC, FocusEvent, memo, useCallback, useEffect, useState } f
 import { useTranslation } from 'react-i18next';
 import styles from '../styles.module.css';
 import { formatBudgetEuro, parseCurrency, currencyToRequestValue } from '@/utils/currencyUtils';
+import { translateOption } from '@/utils/optionTranslation';
 
 const getFieldError = (
   t: TFunction<'translation'>,
@@ -106,7 +107,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
   const financingPartyOptions = useOptions('financingParties');
   const budgetItemOptions = useOptions('typeQualifiers').map((option) => ({
     ...option,
-    label: t(`option.${option.label}`, { defaultValue: option.label }),
+    label: translateOption(t, option.label),
   }));
   const { Header, Content, ActionButtons } = Dialog;
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);

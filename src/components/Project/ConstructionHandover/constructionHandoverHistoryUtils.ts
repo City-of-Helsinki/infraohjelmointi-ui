@@ -3,6 +3,7 @@ import { IConstructionHandoverHistoryEntry } from '@/interfaces/constructionHand
 import { formatBudgetEuro } from '@/utils/currencyUtils';
 import { formatDateToHds } from '@/utils/dates';
 import { normalizeHistoryValue } from '@/utils/historyPanelUtils';
+import { translateOption } from '@/utils/optionTranslation';
 
 const I18N_PREFIX = 'constructionHandoverForm.changeHistory';
 
@@ -51,7 +52,7 @@ export const resolveHistoryValue = (field: string, value: unknown, t: TFunction)
     return formatBudgetEuro(raw) || raw;
   }
   if (OPTION_FIELDS.has(field)) {
-    return t(`option.${raw}`, { defaultValue: raw });
+    return translateOption(t, raw);
   }
   return raw;
 };

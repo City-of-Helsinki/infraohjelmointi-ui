@@ -1,9 +1,11 @@
 import moment from 'moment';
+import { TFunction } from 'i18next';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { MyWorkloadViewType, PhaseInfo } from '@/interfaces/myWorkloadInterfaces';
 import { IListItem } from '@/interfaces/common';
+import { translateOption } from './optionTranslation';
 
 const MY_WORKLOAD_DATE_FORMATS = ['DD.MM.YYYY', 'D.M.YYYY', 'YYYY-MM-DD'];
 
@@ -32,12 +34,9 @@ export const getMyWorkloadDateTimeValue = (date?: string | null): number => {
   return parsed ? parsed.valueOf() : Number.NEGATIVE_INFINITY;
 };
 
-export const toPhaseInfo = (
-  listItem: IListItem | undefined,
-  translate: (key: string) => string,
-): PhaseInfo => ({
+export const toPhaseInfo = (listItem: IListItem | undefined, translate: TFunction): PhaseInfo => ({
   id: listItem?.id ?? '',
-  label: listItem?.value ? translate(`option.${listItem.value}`) : '',
+  label: listItem?.value ? translateOption(translate, listItem.value) : '',
   value: listItem?.value ?? '',
 });
 

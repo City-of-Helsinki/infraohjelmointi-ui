@@ -13,6 +13,8 @@ import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
 import { PatchProjectTrigger } from './ProjectCell';
+import { useTranslation } from 'react-i18next';
+import { translateOption } from '@/utils/optionTranslation';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -40,6 +42,7 @@ interface IProjectHeadProps {
 }
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchProject }) => {
+  const { t } = useTranslation();
   const { costEstimateBudget, availableFrameBudget } = sums;
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
@@ -137,7 +140,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums, isReadOnly, patchPr
           <div>
             {project.category && (
               <CustomTag
-                text={project.category.value}
+                text={translateOption(t, project.category.value)}
                 weight={'light'}
                 id={`category-${project.id}`}
               />

@@ -7,7 +7,21 @@ import { useState } from 'react';
 import SelectField from './SelectField';
 import TextField from './TextField';
 
-vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('react-i18next', async () => {
+  const { createInstance } = await import('i18next');
+  const instance = createInstance();
+  await instance.init({
+    lng: 'fi',
+    resources: {
+      fi: {
+        translation: {
+          option: { design: 'Translated design', literal: 'Keep option.label text' },
+        },
+      },
+    },
+  });
+  return { useTranslation: () => ({ t: instance.t, i18n: instance }) };
+});
 
 vi.mock('hds-react', async () => {
   const actual = await vi.importActual<typeof import('hds-react')>('hds-react');
@@ -20,11 +34,12 @@ vi.mock('hds-react', async () => {
       tooltip,
       texts,
       disabled,
+      options,
       ...props
     }: {
       onChange?: (selectedOptions: unknown[], clickedOption?: unknown) => void;
       clearable?: boolean;
-    } & Pick<ComponentProps<typeof Select>, 'tooltip' | 'texts' | 'disabled'>) =>
+    } & Pick<ComponentProps<typeof Select>, 'tooltip' | 'texts' | 'disabled' | 'options'>) =>
       disabled ? (
         <actual.Select
           {...props}
@@ -33,6 +48,7 @@ vi.mock('hds-react', async () => {
           clearable={clearable}
           tooltip={tooltip}
           texts={texts}
+          options={options}
         />
       ) : (
         <div>
@@ -42,15 +58,30 @@ vi.mock('hds-react', async () => {
             clear selection
           </button>
           <span data-testid="clearable-flag">{String(clearable)}</span>
+          <span data-testid="option-labels">
+            {options
+              ?.map((option) => (typeof option === 'string' ? option : option.label))
+              .join('|')}
+          </span>
         </div>
       ),
   };
 });
 
-const TestForm = ({ readOnly = false, disabled }: { readOnly?: boolean; disabled?: boolean }) => {
+const TestForm = ({
+  readOnly = false,
+  disabled,
+  optionLabel = 'Test',
+  shouldTranslate = true,
+}: {
+  readOnly?: boolean;
+  disabled?: boolean;
+  optionLabel?: string;
+  shouldTranslate?: boolean;
+}) => {
   const { control, getValues } = useForm<FieldValues>({
     defaultValues: {
-      first: { value: 'test', label: 'Test' },
+      first: { value: 'test', label: optionLabel },
     },
   });
   const [currentValue, setCurrentValue] = useState('');
@@ -60,11 +91,12 @@ const TestForm = ({ readOnly = false, disabled }: { readOnly?: boolean; disabled
       <SelectField
         name="first"
         control={control}
-        options={[{ value: 'test', label: 'Test' }]}
+        options={[{ value: 'test', label: optionLabel }]}
         label="first"
         iconKey="location"
         clearable
         readOnly={readOnly}
+        shouldTranslate={shouldTranslate}
         disabled={disabled}
         tooltip={<Tooltip>Editable details</Tooltip>}
       />
@@ -114,6 +146,29 @@ const ReadOnlyForm = () => {
 };
 
 describe('SelectField', () => {
+  it.each([
+    ['design', 'Translated design'],
+    ['literal', 'Keep option.label text'],
+    ['Custom category', 'Custom category'],
+    ['Custom.category', 'Custom.category'],
+    ['de.sign', 'de.sign'],
+    ['A {{name}} $t(option.design)', 'A {{name}} $t(option.design)'],
+    ['new option', 'new option'],
+    ['option.newValue', 'option.newValue'],
+  ])('displays %s as %s in dropdown options and readonly values', (optionLabel, expected) => {
+    const { unmount } = render(<TestForm optionLabel={optionLabel} />);
+    expect(screen.getByTestId('option-labels')).toHaveTextContent(expected);
+    unmount();
+
+    render(<TestForm optionLabel={optionLabel} readOnly />);
+    expect(within(screen.getByTestId('first')).getByRole('textbox')).toHaveValue(expected);
+  });
+
+  it('keeps labels unchanged when translation is disabled', () => {
+    render(<TestForm optionLabel="design" shouldTranslate={false} readOnly />);
+    expect(within(screen.getByTestId('first')).getByRole('textbox')).toHaveValue('design');
+  });
+
   it('renders readonly select values as disabled text fields', () => {
     render(<TestForm readOnly />);
 
