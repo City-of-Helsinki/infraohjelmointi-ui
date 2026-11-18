@@ -168,7 +168,9 @@ describe('ProjectProgrammeAttachmentList preview', () => {
     await user.click(showButtons()[0]);
 
     const dialog = await screen.findByRole('dialog', { name: firstImage.originalName });
-    expect(dialog).toHaveStyle({ maxWidth: '1200px', width: '80vw' });
+    // Inline style is checked directly since jsdom resolves vw units in computed styles.
+    expect(dialog.style.maxWidth).toBe('1200px');
+    expect(dialog.style.width).toBe('80vw');
     const image = within(dialog).getByRole('img', { name: firstImage.originalName });
     expect(image).toHaveClass('max-h-[70vh]', 'w-full', 'rounded-sm', 'object-contain');
     const content = screen.getByTestId('attachment-preview-content');
