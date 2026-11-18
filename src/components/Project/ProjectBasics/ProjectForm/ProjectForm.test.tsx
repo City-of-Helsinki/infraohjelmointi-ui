@@ -43,7 +43,16 @@ import * as userRoleHelpers from '@/utils/userRoleHelpers';
 import type { Mocked } from 'vitest';
 
 vi.mock('axios');
-vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('react-i18next', async () => {
+  const mock = (await import('@/mocks/mockI18next')).default();
+  return {
+    ...mock,
+    useTranslation: () => ({
+      ...mock.useTranslation(),
+      t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
+    }),
+  };
+});
 vi.setConfig({ testTimeout: 15000 });
 
 const mockedAxios = axios as Mocked<typeof axios>;

@@ -1,6 +1,7 @@
 import { IListItem } from '@/interfaces/common';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { TFunction } from 'i18next';
+import { translateOption } from './optionTranslation';
 
 // A function to turn IPerson or IListItem from backend to correct display name in admin menus tables
 const getAdminMenuItemDisplayValue = (
@@ -9,9 +10,7 @@ const getAdminMenuItemDisplayValue = (
   useUntranslatedValues?: boolean,
 ) => {
   if ('value' in item) {
-    return useUntranslatedValues
-      ? item.value
-      : t(`option.${item.value}`, { defaultValue: item.value });
+    return useUntranslatedValues ? item.value : translateOption(t, item.value);
   }
 
   return `${item.firstName} ${item.lastName}`;

@@ -4,6 +4,7 @@ import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfa
 import { Select as HDSSelect } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
+import { translateOption as translateOptionLabel } from '@/utils/optionTranslation';
 import TextField from './TextField';
 
 type Option = { value: string; label: string };
@@ -54,14 +55,11 @@ const SelectField: FC<ISelectFieldProps> = ({
 
   const translateOption = useCallback(
     (option: Option) => {
-      if (!shouldTranslate || !option?.label || option.label.includes('option')) {
+      if (!shouldTranslate || !option?.label) {
         return option;
       }
 
-      const translatedLabel = t(`option.${option.label.replace('.', '')}`);
-      if (translatedLabel.includes('option.')) {
-        return option;
-      }
+      const translatedLabel = translateOptionLabel(t, option.label);
 
       return { value: option.value, label: translatedLabel };
     },

@@ -39,6 +39,7 @@ import {
 } from '@/components/Report/common';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import { parseCurrency } from './currencyUtils';
+import { translateCategoryDescription, translateOption } from './optionTranslation';
 
 interface IYearCheck {
   planningStart: number;
@@ -423,7 +424,7 @@ const getBudgetOverrunReason = (
     if (budgetOverrunReason === 'otherReason') {
       return otherReason ?? '';
     } else {
-      return t(`option.${budgetOverrunReason}`);
+      return translateOption(t, budgetOverrunReason);
     }
   }
   return '';
@@ -880,8 +881,8 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
         frameBudgets: [],
         plannedBudgets: {},
         plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, key.value),
-        id: `category-${key.value.replace('.', '')}-${project.id}`,
-        name: t(`option.${key.value.replace('.', '')}`),
+        id: `category-${key.id}-${project.id}`,
+        name: translateOption(t, key.value),
         projects: [],
         type: 'category',
       });
@@ -2660,7 +2661,7 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
     };
 
     classRow.categories.forEach((category) => {
-      const categoryName = t(`projectData.category.${category.name.replace(/\./g, '')}`);
+      const categoryName = translateCategoryDescription(t, category.name);
 
       const tempRow = {
         name: category.name,

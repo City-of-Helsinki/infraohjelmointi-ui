@@ -3,8 +3,15 @@ import {
   formatMyWorkloadDateForDisplay,
   getMyWorkloadDateTimeValue,
   getMyWorkloadViewType,
+  toPhaseInfo,
 } from './myWorkloadUtils';
-import { IProject, IProjectsResponse } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectsResponse, ProjectTaskType } from '@/interfaces/projectInterfaces';
+import { createInstance } from 'i18next';
+import { createListItem, createProject } from '@/mocks/createMocks';
+import {
+  mapProjectToMyWorkloadTableRow,
+  mapProjectToMyWorkloadTask,
+} from './myWorkloadMappingUtils';
 import mockProject from '@/mocks/mockProject';
 import { getProjectsWithParams } from '@/services/projectServices';
 import type { MockedFunction } from 'vitest';
@@ -43,6 +50,52 @@ const makeResponse = (
   count,
   next,
   results,
+});
+
+describe('workload option translations', () => {
+  const instance = createInstance();
+
+  beforeAll(async () => {
+    await instance.init({
+      lng: 'fi',
+      resources: { fi: { translation: { option: { design: 'Translated design' } } } },
+    });
+  });
+
+  it.each([
+    ['design', 'Translated design'],
+    ['Custom.value', 'Custom.value'],
+    ['de.sign', 'de.sign'],
+    ['A {{name}} $t(option.design)', 'A {{name}} $t(option.design)'],
+  ])('displays %s as %s in phases, table rows, and task cards', (value, label) => {
+    const option = createListItem(value);
+    expect(toPhaseInfo(option, instance.t)).toEqual({ id: option.id, value, label });
+    expect(
+      mapProjectToMyWorkloadTableRow(
+        createProject({ phase: option, phaseDetail: option }),
+        instance.t,
+      ),
+    ).toMatchObject({ phase: { label }, phaseDetail: { label } });
+    expect(
+      mapProjectToMyWorkloadTask(
+        {
+          id: 'task-project',
+          name: 'Test project',
+          estPlanningStart: null,
+          estPlanningEnd: null,
+          estConstructionStart: null,
+          estConstructionEnd: null,
+          constructionProcurementMethod: option,
+          taskType: ProjectTaskType.NAME_CONSTRUCTION_PROJECT_MANAGER,
+        },
+        instance.t,
+      ),
+    ).toMatchObject({ constructionProcurementMethod: label });
+  });
+
+  it('keeps absent phases empty', () => {
+    expect(toPhaseInfo(undefined, instance.t)).toEqual({ id: '', value: '', label: '' });
+  });
 });
 
 describe('myWorkloadDateUtils', () => {

@@ -20,15 +20,13 @@ vi.mock('@/api/projectApi', async () => ({
   usePatchProjectMutation: () => [mockPatchProject],
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (str: string) => str,
-    i18n: {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      changeLanguage: () => new Promise(() => {}),
-    },
-  }),
-}));
+vi.mock('react-i18next', async () => {
+  const { createInstance } = await import('i18next');
+  const { default: fi } = await import('@/i18n/fi.json');
+  const instance = createInstance();
+  await instance.init({ lng: 'fi', resources: { fi: { translation: fi } } });
+  return { useTranslation: () => ({ t: instance.t, i18n: instance }) };
+});
 
 // Mock scrollIntoView which is not available in test environment
 Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
@@ -373,6 +371,31 @@ describe('Planning project phase permissions', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it.each([
+    ['K51', 'K5.1'],
+    ['K.1', 'K.1'],
+    ['A {{name}} $t(option.design)', 'A {{name}} $t(option.design)'],
+  ])('displays the category %s as %s', (value, label) => {
+    const store = setupStore({
+      auth: { user: createMockUserWithAdGroups([UserRole.VIEWER]), error: null },
+    });
+    const project = { ...mockProject.data, category: { id: 'category-id', value } };
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <table>
+            <tbody>
+              <ProjectRow project={project} parentId="test-group" sapCosts={{}} />
+            </tbody>
+          </table>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    expect(screen.getByTestId(`category-${project.id}`)).toHaveTextContent(label);
   });
 
   it.each(permissionCases)(

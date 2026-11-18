@@ -2,6 +2,7 @@ import { TFunction } from 'i18next';
 import { IListItem } from '@/interfaces/common';
 import { MyWorkloadTableRow, MyWorkloadTaskItem } from '@/interfaces/myWorkloadInterfaces';
 import { IProject, IProjectTask } from '@/interfaces/projectInterfaces';
+import { translateOption } from './optionTranslation';
 import {
   formatMyWorkloadDateForDisplay,
   normalizeMyWorkloadDate,
@@ -10,7 +11,7 @@ import {
 
 export const mapProjectToMyWorkloadTableRow = (
   project: IProject,
-  translate: (key: string) => string,
+  translate: TFunction,
 ): MyWorkloadTableRow => ({
   id: project.id,
   budget: project.budget ?? '',
@@ -57,7 +58,7 @@ export const mapProjectToMyWorkloadTask = (
     planningPeriod: formatPeriod(project.estPlanningStart, project.estPlanningEnd),
     constructionPeriod: formatPeriod(project.estConstructionStart, project.estConstructionEnd),
     constructionProcurementMethod: project.constructionProcurementMethod?.value
-      ? t(`option.${project.constructionProcurementMethod.value}`)
+      ? translateOption(t, project.constructionProcurementMethod.value)
       : unavailableText,
     taskDescription: t(`myWorkloadView.tasks.taskDescription.${project.taskType}`),
     taskType: project.taskType,
