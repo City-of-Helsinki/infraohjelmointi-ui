@@ -1335,6 +1335,8 @@
     "viewTypePlanning": "Suunnitteluttamisen projektit",
     "table": {
       "loading": "Hankkeita ladataan...",
+      "resetSort": "Palauta oletusjärjestys",
+      "fitToWidth": "Sovita taulukko näytön leveyteen",
       "projectName": "Hanke",
       "description": "Hankkeen kuvaus",
       "planningStart": "Suunnittelu alkaa",
@@ -1354,6 +1356,7 @@
       "modifyInformation": "Muokkaa tietoja",
       "editDialogTitle": "Muokkaa hankkeen tietoja",
       "goToProjectCardEdit": "Siirry hankekortille muokkaamaan",
+      "goToPlanning": "Siirry ohjelmointinäkymään",
       "projectBasicsValidationNotificationTitle": "Täydennä hankkeen perustiedot",
       "projectBasicsValidationNotificationText": "Tietoja ei voi tallentaa tässä näkymässä. Tarkista tai täydennä hankkeen perustiedoista seuraavat kentät: {{fields}}.",
       "goToProjectBasicsToFixValidation": "Siirry hankkeen perustietoihin",

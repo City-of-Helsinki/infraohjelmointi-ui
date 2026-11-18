@@ -1,4 +1,4 @@
-import { IMyWorkloadEditFormValues } from '@/components/MyWorkload/Table/useMyWorkloadEditForm';
+import { IMyWorkloadEditFormValues } from '@/interfaces/myWorkloadInterfaces';
 import {
   getMyWorkloadProjectRequestFields,
   myWorkloadValuesToProjectRequest,

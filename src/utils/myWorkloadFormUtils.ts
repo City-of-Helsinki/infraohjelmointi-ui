@@ -1,37 +1,11 @@
-import { useEffect } from 'react';
 import { TFunction } from 'i18next';
-import { useForm, UseFormGetValues } from 'react-hook-form';
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
-import { IScheduleDates, validateScheduleDateOrder } from '@/utils/validation';
-
-export interface IMyWorkloadEditFormValues {
-  planningStart: string;
-  planningEnd: string;
-  presenceStart: string;
-  presenceEnd: string;
-  visibilityStart: string;
-  visibilityEnd: string;
-  constructionStart: string;
-  constructionEnd: string;
-  planningCostForecast: string;
-  planningPhaseId: string;
-  planningWorkQuantity: string;
-  constructionCostForecast: string;
-  constructionPhaseId: string;
-  constructionWorkQuantity: string;
-  phaseId: string;
-  phaseDetailId: string;
-}
-
-export type MyWorkloadDateFieldName =
-  | 'planningStart'
-  | 'planningEnd'
-  | 'presenceStart'
-  | 'presenceEnd'
-  | 'visibilityStart'
-  | 'visibilityEnd'
-  | 'constructionStart'
-  | 'constructionEnd';
+import { UseFormGetValues } from 'react-hook-form';
+import {
+  IMyWorkloadEditFormValues,
+  MyWorkloadDateFieldName,
+  MyWorkloadTableRow,
+} from '@/interfaces/myWorkloadInterfaces';
+import { IScheduleDates, validateScheduleDateOrder } from './validation';
 
 export const emptyMyWorkloadEditFormValues: IMyWorkloadEditFormValues = {
   planningStart: '',
@@ -79,10 +53,6 @@ export const mapProjectToFormValues = (
   };
 };
 
-/**
- * Date order validation for the MyWorkload edit dialog. The actual order rules are validated in
- * validateScheduleDateOrder, shared with ProjectForm's schedule section.
- */
 export const validateMyWorkloadDateOrder = (
   field: MyWorkloadDateFieldName,
   value: string,
@@ -102,18 +72,3 @@ export const validateMyWorkloadDateOrder = (
 
   return validateScheduleDateOrder(field, value, dates, t);
 };
-
-const useMyWorkloadEditForm = (project: MyWorkloadTableRow | null) => {
-  const formMethods = useForm<IMyWorkloadEditFormValues>({
-    defaultValues: emptyMyWorkloadEditFormValues,
-    mode: 'onSubmit',
-  });
-
-  useEffect(() => {
-    formMethods.reset(mapProjectToFormValues(project));
-  }, [formMethods, project]);
-
-  return formMethods;
-};
-
-export default useMyWorkloadEditForm;

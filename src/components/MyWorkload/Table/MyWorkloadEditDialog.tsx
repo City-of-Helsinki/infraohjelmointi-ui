@@ -1,5 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
+import {
+  IMyWorkloadEditFormValues,
+  MyWorkloadEditDialogProps,
+} from '@/interfaces/myWorkloadInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import {
@@ -10,148 +13,37 @@ import {
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useGetProjectByIdQuery, usePatchProjectMutation } from '@/api/projectApi';
 import TextField from '@/components/shared/TextField';
-import {
-  Button,
-  ButtonVariant,
-  DateInput as HDSDateInput,
-  Dialog,
-  Notification,
-  Option,
-  Select,
-} from 'hds-react';
-import {
-  FC,
-  MouseEvent,
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Button, ButtonVariant, Dialog, Notification, Option, Select } from 'hds-react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, SubmitErrorHandler, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import classes from '../styles.module.css';
-import { normalizeMyWorkloadDate, toPhaseInfo } from '@/utils/myWorkloadUtils';
+import { mergeMyWorkloadProjectResponse } from '@/utils/myWorkloadMappingUtils';
 import {
   getMyWorkloadProjectRequestFields,
   myWorkloadValuesToProjectRequest,
 } from '@/utils/myWorkloadProjectRequest';
 import { collectErrorFieldNames, scrollToFirstField } from '@/utils/formErrorHelpers';
-import useMyWorkloadEditForm, {
-  IMyWorkloadEditFormValues,
-  MyWorkloadDateFieldName,
-  mapProjectToFormValues,
-  validateMyWorkloadDateOrder,
-} from './useMyWorkloadEditForm';
-import { IProject } from '@/interfaces/projectInterfaces';
+import useMyWorkloadEditForm from '@/forms/useMyWorkloadEditForm';
+import { mapProjectToFormValues } from '@/utils/myWorkloadFormUtils';
+import MyWorkloadDateField from './MyWorkloadDateField';
+import {
+  constructionVisibleValidationFields,
+  mapDialogValuesToValidationState,
+  mapProjectToValidationState,
+  planningVisibleValidationFields,
+  validationFieldToFormFieldMap,
+} from '@/utils/myWorkloadValidationUtils';
 import {
   createProjectPhaseResolver,
   getNewProjectValidationIssues,
-  ProjectValidationField,
   ProjectValidationIssue,
-  ProjectValidationState,
   translateProjectValidationField,
   translateProjectValidationIssue,
 } from '@/utils/projectValidationRules';
 import { skipToken } from '@reduxjs/toolkit/query';
-
-interface MyWorkloadEditDialogProps {
-  isOpen: boolean;
-  project: MyWorkloadTableRow | null;
-  viewType: MyWorkloadViewType;
-  onClose: () => void;
-  onSave: (row: MyWorkloadTableRow) => void;
-}
-
-// Fields the dialog exposes per view; anything else in the project's validation state is
-// "hidden" here, so failures on those fields are surfaced via a notification instead of inline.
-const planningVisibleValidationFields: ProjectValidationField[] = [
-  'phase',
-  'phaseDetail',
-  'estPlanningStart',
-  'estPlanningEnd',
-  'presenceStart',
-  'presenceEnd',
-  'visibilityStart',
-  'visibilityEnd',
-];
-
-const constructionVisibleValidationFields: ProjectValidationField[] = [
-  'phase',
-  'phaseDetail',
-  'estConstructionStart',
-  'estConstructionEnd',
-];
-
-const validationFieldToFormFieldMap: Partial<
-  Record<ProjectValidationField, keyof IMyWorkloadEditFormValues>
-> = {
-  phase: 'phaseId',
-  phaseDetail: 'phaseDetailId',
-  estPlanningStart: 'planningStart',
-  estPlanningEnd: 'planningEnd',
-  presenceStart: 'presenceStart',
-  presenceEnd: 'presenceEnd',
-  visibilityStart: 'visibilityStart',
-  visibilityEnd: 'visibilityEnd',
-  estConstructionStart: 'constructionStart',
-  estConstructionEnd: 'constructionEnd',
-};
-
-const mapProjectToValidationState = (projectData: IProject): ProjectValidationState => ({
-  phaseId: projectData.phase?.id ?? '',
-  phaseDetailId: projectData.phaseDetail?.id ?? '',
-  programmed: projectData.programmed,
-  planningStartYear: projectData.planningStartYear,
-  constructionEndYear: projectData.constructionEndYear,
-  estPlanningStart: normalizeMyWorkloadDate(projectData.estPlanningStart),
-  estPlanningEnd: normalizeMyWorkloadDate(projectData.estPlanningEnd),
-  presenceStart: normalizeMyWorkloadDate(projectData.presenceStart),
-  presenceEnd: normalizeMyWorkloadDate(projectData.presenceEnd),
-  visibilityStart: normalizeMyWorkloadDate(projectData.visibilityStart),
-  visibilityEnd: normalizeMyWorkloadDate(projectData.visibilityEnd),
-  estConstructionStart: normalizeMyWorkloadDate(projectData.estConstructionStart),
-  estConstructionEnd: normalizeMyWorkloadDate(projectData.estConstructionEnd),
-  estWarrantyPhaseStart: normalizeMyWorkloadDate(projectData.estWarrantyPhaseStart),
-  estWarrantyPhaseEnd: normalizeMyWorkloadDate(projectData.estWarrantyPhaseEnd),
-  personPlanningId: projectData.personPlanning?.id ?? '',
-  personConstructionId: projectData.personConstruction?.id ?? '',
-  categoryId: projectData.category?.id ?? '',
-  priorityId: projectData.priority?.id ?? '',
-  masterClassId: projectData.projectClass ?? '',
-  classId: projectData.projectClass ?? '',
-  address: projectData.address ?? '',
-  projectMode: 'edit',
-});
-
-// Applies the dialog's dirty values on top of the fetched project, so fields the dialog
-// doesn't expose (e.g. category, responsible persons) still validate against their real values.
-const mapDialogValuesToValidationState = (
-  projectData: IProject,
-  values: IMyWorkloadEditFormValues,
-): ProjectValidationState => {
-  const base = mapProjectToValidationState(projectData);
-  const resolveDate = (value: string, fallback: string | null | undefined) => {
-    const trimmed = value.trim();
-    return trimmed ? normalizeMyWorkloadDate(trimmed) : (fallback ?? '');
-  };
-
-  return {
-    ...base,
-    phaseId: values.phaseId.trim(),
-    phaseDetailId: values.phaseDetailId.trim(),
-    estPlanningStart: resolveDate(values.planningStart, base.estPlanningStart),
-    estPlanningEnd: resolveDate(values.planningEnd, base.estPlanningEnd),
-    presenceStart: resolveDate(values.presenceStart, base.presenceStart),
-    presenceEnd: resolveDate(values.presenceEnd, base.presenceEnd),
-    visibilityStart: resolveDate(values.visibilityStart, base.visibilityStart),
-    visibilityEnd: resolveDate(values.visibilityEnd, base.visibilityEnd),
-    estConstructionStart: resolveDate(values.constructionStart, base.estConstructionStart),
-    estConstructionEnd: resolveDate(values.constructionEnd, base.estConstructionEnd),
-  };
-};
+import useMyWorkloadPlanningLink from '@/hooks/useMyWorkloadPlanningLink';
 
 const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   isOpen,
@@ -171,6 +63,10 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const { data: fullProject, isFetching: isProjectLoading } = useGetProjectByIdQuery(
     isOpen && project?.id ? project.id : skipToken,
   );
+  const matchingProject = fullProject?.id === project?.id ? fullProject : undefined;
+  const planningLink = useMyWorkloadPlanningLink(matchingProject);
+  const showLinkToPlanningView = matchingProject?.programmed === true;
+
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
   const planningStartFieldRef = useRef<HTMLDivElement | null>(null);
   const planningEndFieldRef = useRef<HTMLDivElement | null>(null);
@@ -271,21 +167,6 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     }
   }, [clearErrors, getValues, phaseDetails, selectedPhaseId, setValue]);
 
-  const openDatePicker = useCallback((containerRef: RefObject<HTMLDivElement | null>) => {
-    const button = containerRef.current?.querySelector('button');
-    if (button) {
-      button.click();
-    }
-  }, []);
-
-  const onDateInputClick = useCallback(
-    (containerRef: RefObject<HTMLDivElement | null>) => (event: MouseEvent<HTMLInputElement>) => {
-      event.stopPropagation();
-      openDatePicker(containerRef);
-    },
-    [openDatePicker],
-  );
-
   const onGoToProjectCardClick = useCallback(() => {
     if (!project) {
       return;
@@ -301,6 +182,12 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     clearErrors();
     onClose();
   }, [clearErrors, onClose]);
+
+  const onGoToPlanningClick = () => {
+    if (!planningLink) return;
+    onDialogClose();
+    navigate(planningLink);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -370,68 +257,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           data: payload,
         }).unwrap();
 
-        const resolveDateValue = (patchedValue: string | null | undefined, fallback: string) =>
-          patchedValue === undefined ? fallback : normalizeMyWorkloadDate(patchedValue);
-
-        const resolveTextValue = (patchedValue: string | null | undefined, fallback: string) =>
-          patchedValue === undefined ? fallback : (patchedValue ?? '');
-
-        const resolveOptionIdValue = (
-          patchedValue: IListItem | null | undefined,
-          fallback: string,
-        ) => (patchedValue === undefined ? fallback : (patchedValue?.id ?? ''));
-
-        const resolvePhaseInfo = (
-          patchedValue: IListItem | null | undefined,
-          fallback: MyWorkloadTableRow['phase'],
-        ) => (patchedValue === undefined ? fallback : toPhaseInfo(patchedValue ?? undefined, t));
-
-        onSave({
-          ...project,
-          planningStart: resolveDateValue(patchedProject.estPlanningStart, project.planningStart),
-          planningEnd: resolveDateValue(patchedProject.estPlanningEnd, project.planningEnd),
-          presenceStart: resolveDateValue(patchedProject.presenceStart, project.presenceStart),
-          presenceEnd: resolveDateValue(patchedProject.presenceEnd, project.presenceEnd),
-          visibilityStart: resolveDateValue(
-            patchedProject.visibilityStart,
-            project.visibilityStart,
-          ),
-          visibilityEnd: resolveDateValue(patchedProject.visibilityEnd, project.visibilityEnd),
-          constructionStart: resolveDateValue(
-            patchedProject.estConstructionStart,
-            project.constructionStart,
-          ),
-          constructionEnd: resolveDateValue(
-            patchedProject.estConstructionEnd,
-            project.constructionEnd,
-          ),
-          planningCostForecast: resolveTextValue(
-            patchedProject.planningCostForecast,
-            project.planningCostForecast,
-          ),
-          planningPhaseId: resolveOptionIdValue(
-            patchedProject.planningPhase,
-            project.planningPhaseId,
-          ),
-          planningWorkQuantity: resolveTextValue(
-            patchedProject.planningWorkQuantity,
-            project.planningWorkQuantity,
-          ),
-          constructionCostForecast: resolveTextValue(
-            patchedProject.constructionCostForecast,
-            project.constructionCostForecast,
-          ),
-          constructionPhaseId: resolveOptionIdValue(
-            patchedProject.constructionPhase,
-            project.constructionPhaseId,
-          ),
-          constructionWorkQuantity: resolveTextValue(
-            patchedProject.constructionWorkQuantity,
-            project.constructionWorkQuantity,
-          ),
-          phase: resolvePhaseInfo(patchedProject.phase, project.phase),
-          phaseDetail: resolvePhaseInfo(patchedProject.phaseDetail, project.phaseDetail),
-        });
+        onSave(mergeMyWorkloadProjectResponse(project, patchedProject, t));
 
         dispatch(
           notifySuccess({
@@ -499,64 +325,6 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     [hiddenValidationIssues, t],
   );
 
-  const renderDateField = (field: {
-    id: string;
-    label: string;
-    key: MyWorkloadDateFieldName;
-    required?: boolean;
-  }) => {
-    const requiredMessage = t('myWorkloadView.table.requiredField');
-    const invalidDateMessage = t('myWorkloadView.table.invalidDate');
-
-    return (
-      <Controller
-        key={field.id}
-        name={field.key}
-        control={control}
-        rules={{
-          validate: (value) => {
-            const trimmedValue = value?.trim?.() ?? '';
-
-            if (field.required && !trimmedValue) {
-              return requiredMessage;
-            }
-
-            if (!trimmedValue) {
-              return true;
-            }
-
-            if (!normalizeMyWorkloadDate(trimmedValue)) {
-              return invalidDateMessage;
-            }
-
-            return validateMyWorkloadDateOrder(field.key, trimmedValue, getValues, t);
-          },
-        }}
-        render={({ field: controllerField, fieldState: { error } }) => (
-          <div
-            ref={dateFieldRefs[field.key]}
-            className={`input-wrapper date-field-wrapper ${classes.editDialogDateField}`}
-          >
-            <HDSDateInput
-              className="input-xl date-input"
-              id={field.id}
-              label={field.label}
-              value={controllerField.value ?? ''}
-              onChange={controllerField.onChange}
-              onClick={onDateInputClick(dateFieldRefs[field.key])}
-              placeholder=""
-              language="fi"
-              required={field.required}
-              invalid={Boolean(error)}
-              errorText={error?.message}
-              initialMonth={new Date()}
-            />
-          </div>
-        )}
-      />
-    );
-  };
-
   return (
     <Dialog
       isOpen={isOpen}
@@ -566,17 +334,13 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       aria-describedby="my-workload-edit-dialog-content"
       closeButtonLabelText={t('closeDialog')}
     >
-      <Dialog.Header
-        id="my-workload-edit-dialog-title"
-        title={t('myWorkloadView.table.editDialogTitle')}
-      />
+      <Dialog.Header id="my-workload-edit-dialog-title" title={project?.projectName ?? ''} />
       <Dialog.Content>
         <div
           className={classes.editDialogFields}
           id="my-workload-edit-dialog-content"
           ref={dialogContentRef}
         >
-          <p className={classes.editDialogProjectSubtitle}>{project?.projectName ?? ''}</p>
           {isPlanningView && (
             <>
               <h3 className={classes.editDialogSectionTitle}>
@@ -584,44 +348,62 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
               </h3>
 
               <div className={classes.editDialogDateRow}>
-                {renderDateField({
-                  id: 'my-workload-edit-planning-start',
-                  key: 'planningStart',
-                  label: t('myWorkloadView.table.planningStart'),
-                  required: true,
-                })}
-                {renderDateField({
-                  id: 'my-workload-edit-planning-end',
-                  key: 'planningEnd',
-                  label: t('myWorkloadView.table.planningEnd'),
-                  required: true,
-                })}
+                <MyWorkloadDateField
+                  id="my-workload-edit-planning-start"
+                  name="planningStart"
+                  label={t('myWorkloadView.table.planningStart')}
+                  required
+                  control={control}
+                  getValues={getValues}
+                  containerRef={planningStartFieldRef}
+                />
+                <MyWorkloadDateField
+                  id="my-workload-edit-planning-end"
+                  name="planningEnd"
+                  label={t('myWorkloadView.table.planningEnd')}
+                  required
+                  control={control}
+                  getValues={getValues}
+                  containerRef={planningEndFieldRef}
+                />
               </div>
 
               <div className={classes.editDialogDateRow}>
-                {renderDateField({
-                  id: 'my-workload-edit-presence-start',
-                  key: 'presenceStart',
-                  label: t('projectForm.presenceStart'),
-                })}
-                {renderDateField({
-                  id: 'my-workload-edit-presence-end',
-                  key: 'presenceEnd',
-                  label: t('projectForm.presenceEnd'),
-                })}
+                <MyWorkloadDateField
+                  id="my-workload-edit-presence-start"
+                  name="presenceStart"
+                  label={t('projectForm.presenceStart')}
+                  control={control}
+                  getValues={getValues}
+                  containerRef={presenceStartFieldRef}
+                />
+                <MyWorkloadDateField
+                  id="my-workload-edit-presence-end"
+                  name="presenceEnd"
+                  label={t('projectForm.presenceEnd')}
+                  control={control}
+                  getValues={getValues}
+                  containerRef={presenceEndFieldRef}
+                />
               </div>
 
               <div className={classes.editDialogDateRow}>
-                {renderDateField({
-                  id: 'my-workload-edit-visibility-start',
-                  key: 'visibilityStart',
-                  label: t('projectForm.visibilityStart'),
-                })}
-                {renderDateField({
-                  id: 'my-workload-edit-visibility-end',
-                  key: 'visibilityEnd',
-                  label: t('projectForm.visibilityEnd'),
-                })}
+                <MyWorkloadDateField
+                  id="my-workload-edit-visibility-start"
+                  name="visibilityStart"
+                  label={t('projectForm.visibilityStart')}
+                  control={control}
+                  getValues={getValues}
+                  containerRef={visibilityStartFieldRef}
+                />
+                <MyWorkloadDateField
+                  id="my-workload-edit-visibility-end"
+                  name="visibilityEnd"
+                  label={t('projectForm.visibilityEnd')}
+                  control={control}
+                  getValues={getValues}
+                  containerRef={visibilityEndFieldRef}
+                />
               </div>
 
               <hr className={classes.editDialogDivider} />
@@ -630,18 +412,24 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           {!isPlanningView && (
             <>
               <div className={classes.editDialogDateRow}>
-                {renderDateField({
-                  id: 'my-workload-edit-construction-start',
-                  key: 'constructionStart',
-                  label: t('validation.estConstructionStart'),
-                  required: true,
-                })}
-                {renderDateField({
-                  id: 'my-workload-edit-construction-end',
-                  key: 'constructionEnd',
-                  label: t('validation.estConstructionEnd'),
-                  required: true,
-                })}
+                <MyWorkloadDateField
+                  id="my-workload-edit-construction-start"
+                  name="constructionStart"
+                  label={t('validation.estConstructionStart')}
+                  required
+                  control={control}
+                  getValues={getValues}
+                  containerRef={constructionStartFieldRef}
+                />
+                <MyWorkloadDateField
+                  id="my-workload-edit-construction-end"
+                  name="constructionEnd"
+                  label={t('validation.estConstructionEnd')}
+                  required
+                  control={control}
+                  getValues={getValues}
+                  containerRef={constructionEndFieldRef}
+                />
               </div>
 
               <hr className={classes.editDialogDivider} />
@@ -829,6 +617,16 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
         >
           {t('myWorkloadView.table.goToProjectCardEdit')}
         </Button>
+        {showLinkToPlanningView && (
+          <Button
+            variant={ButtonVariant.Secondary}
+            className={classes.editDialogActionButton}
+            onClick={onGoToPlanningClick}
+            disabled={isLoading}
+          >
+            {t('myWorkloadView.table.goToPlanning')}
+          </Button>
+        )}
       </div>
     </Dialog>
   );

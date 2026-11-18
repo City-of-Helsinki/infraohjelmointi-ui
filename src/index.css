@@ -57,7 +57,7 @@ the sidebar has a fixed position and is 3rem wide when collapsed and that's why
 we give the container a 3rem margin left
 */
 .app-container {
-  @apply ml-12 w-full;
+  @apply ml-12 w-full min-w-0;
 }
 
 #radio-checkbox label,

@@ -3,12 +3,8 @@ import { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 import MyWorkloadTaskCard from './MyWorkloadTaskCard';
 import { useTranslation } from 'react-i18next';
 import classes from '../styles.module.css';
-import type { IProjectTask } from '@/interfaces/projectInterfaces';
-import { formatMyWorkloadDateForDisplay } from '@/utils/myWorkloadUtils';
-
-interface MyWorkloadTasksProps {
-  listOfTasks: IProjectTask[];
-}
+import type { MyWorkloadTasksProps } from '@/interfaces/myWorkloadInterfaces';
+import { mapProjectToMyWorkloadTask } from '@/utils/myWorkloadMappingUtils';
 
 const TASKS_PER_PAGE = 10;
 const pageHref = () => '#';
@@ -21,43 +17,7 @@ const MyWorkloadTasks: FC<MyWorkloadTasksProps> = ({ listOfTasks }) => {
     setPage(0);
   }
 
-  const dateTextFormatter = (startDate: string | null, endDate: string | null): string => {
-    if (!startDate && !endDate) {
-      return t('myWorkloadView.tasks.infoNotAvailable');
-    } else {
-      return `${startDate || t('myWorkloadView.tasks.infoNotAvailable')} - ${
-        endDate || t('myWorkloadView.tasks.infoNotAvailable')
-      }`;
-    }
-  };
-
-  const constructionProcurementMethodTextFormatter = (method?: string): string => {
-    if (!method) {
-      return t('myWorkloadView.tasks.infoNotAvailable');
-    } else {
-      return t(`option.${method}`);
-    }
-  };
-
-  const tasks = listOfTasks.map((project) => ({
-    id: project.id,
-    budget: project.budget?.toString() ?? project.costForecast?.toString() ?? '',
-    totalCost: project.totalCost?.toString() ?? '',
-    projectName: project.name,
-    planningPeriod: dateTextFormatter(
-      formatMyWorkloadDateForDisplay(project.estPlanningStart),
-      formatMyWorkloadDateForDisplay(project.estPlanningEnd),
-    ),
-    constructionPeriod: dateTextFormatter(
-      formatMyWorkloadDateForDisplay(project.estConstructionStart),
-      formatMyWorkloadDateForDisplay(project.estConstructionEnd),
-    ),
-    constructionProcurementMethod: constructionProcurementMethodTextFormatter(
-      project.constructionProcurementMethod?.value,
-    ),
-    taskDescription: t(`myWorkloadView.tasks.taskDescription.${project.taskType}`),
-    taskType: project.taskType,
-  }));
+  const tasks = listOfTasks.map((project) => mapProjectToMyWorkloadTask(project, t));
 
   const pageCount = useMemo(() => Math.ceil(tasks.length / TASKS_PER_PAGE), [tasks.length]);
   const currentPage = Math.max(0, Math.min(page, pageCount - 1));

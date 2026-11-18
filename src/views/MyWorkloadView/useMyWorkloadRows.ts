@@ -10,11 +10,8 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { isRequestCanceled } from '@/utils/http';
-import {
-  getUniqueResponsiblePersonId,
-  normalizeMyWorkloadDate,
-  toPhaseInfo,
-} from '@/utils/myWorkloadUtils';
+import { getUniqueResponsiblePersonId } from '@/utils/myWorkloadUtils';
+import { mapProjectToMyWorkloadTableRow } from '@/utils/myWorkloadMappingUtils';
 
 const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewType) => {
   if (viewType === 'construction') {
@@ -23,34 +20,6 @@ const getResponsiblePersonEmail = (project: IProject, viewType: MyWorkloadViewTy
 
   return project.personPlanning?.email ?? null;
 };
-
-const mapProjectToMyWorkloadTableRow = (
-  project: IProject,
-  translate: (key: string) => string,
-): MyWorkloadTableRow => ({
-  id: project.id,
-  budget: project.budget ?? '',
-  projectName: project.name,
-  description: project.description,
-  planningStart: normalizeMyWorkloadDate(project.estPlanningStart),
-  planningEnd: normalizeMyWorkloadDate(project.estPlanningEnd),
-  presenceStart: normalizeMyWorkloadDate(project.presenceStart),
-  presenceEnd: normalizeMyWorkloadDate(project.presenceEnd),
-  visibilityStart: normalizeMyWorkloadDate(project.visibilityStart),
-  visibilityEnd: normalizeMyWorkloadDate(project.visibilityEnd),
-  constructionStart: normalizeMyWorkloadDate(project.estConstructionStart),
-  constructionEnd: normalizeMyWorkloadDate(project.estConstructionEnd),
-  planningCostForecast: project.planningCostForecast ?? '',
-  planningPhaseId: project.planningPhase?.id ?? '',
-  planningWorkQuantity: project.planningWorkQuantity ?? '',
-  constructionCostForecast: project.constructionCostForecast ?? '',
-  constructionPhaseId: project.constructionPhase?.id ?? '',
-  constructionWorkQuantity: project.constructionWorkQuantity ?? '',
-  phase: toPhaseInfo(project.phase, translate),
-  phaseDetail: toPhaseInfo(project.phaseDetail, translate),
-  constructionProcurementMethod: project.constructionProcurementMethod?.value,
-  functions: translate('myWorkloadView.table.modifyInformation'),
-});
 
 const fetchAllProjects = async (year: number, signal: AbortSignal, params = '') => {
   const firstResponse = await getProjectsWithParams(
