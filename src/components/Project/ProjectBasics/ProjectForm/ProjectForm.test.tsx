@@ -50,7 +50,7 @@ const mockedAxios = axios as Mocked<typeof axios>;
 
 const getFormField = (name: string) => {
   const normalizedName = name.replace(/\s\*$/, '');
-  return new RegExp(`^projectForm\\.${normalizedName}( \\*)?$`);
+  return new RegExp(`^projectForm\\.${normalizedName}( ?\\*)?$`);
 };
 
 const render = async (
