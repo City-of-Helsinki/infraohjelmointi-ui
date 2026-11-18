@@ -4,6 +4,7 @@ export const adminFunctions = [
   'auditlog',
   'financialstatements',
   'forcedtoframestate',
+  'personaldataretention',
 ] as const;
 
 export type AdminFunctionType = (typeof adminFunctions)[number];
