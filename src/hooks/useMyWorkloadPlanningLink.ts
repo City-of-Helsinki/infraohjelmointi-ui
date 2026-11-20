@@ -1,7 +1,7 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 
 const useMyWorkloadPlanningLink = (project: IProject | undefined): string | undefined => {
-  if (!project || project.planningPath == null) return;
+  if (project?.planningPath == null) return;
 
   const params = new URLSearchParams(project.planningPath);
   params.set('project', project.id);
