@@ -4,6 +4,7 @@ import { ISapCost } from './sapCostsInterfaces';
 
 export interface IProject {
   id: string;
+  planningPath?: string | null;
   projectReadiness: number;
   hkrId: string | null;
   sapProject?: string;

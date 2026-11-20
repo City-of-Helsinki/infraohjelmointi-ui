@@ -62,10 +62,11 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   const [patchProject, { isLoading }] = usePatchProjectMutation();
   const { data: fullProject, isFetching: isProjectLoading } = useGetProjectByIdQuery(
     isOpen && project?.id ? project.id : skipToken,
+    { refetchOnMountOrArgChange: true },
   );
   const matchingProject = fullProject?.id === project?.id ? fullProject : undefined;
   const planningLink = useMyWorkloadPlanningLink(matchingProject);
-  const showLinkToPlanningView = matchingProject?.programmed === true;
+  const showLinkToPlanningView = matchingProject?.programmed === true && Boolean(planningLink);
 
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
   const planningStartFieldRef = useRef<HTMLDivElement | null>(null);
@@ -622,7 +623,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
             variant={ButtonVariant.Secondary}
             className={classes.editDialogActionButton}
             onClick={onGoToPlanningClick}
-            disabled={isLoading}
+            disabled={isLoading || isProjectLoading}
           >
             {t('myWorkloadView.table.goToPlanning')}
           </Button>
