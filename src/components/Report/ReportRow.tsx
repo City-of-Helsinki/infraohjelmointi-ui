@@ -18,7 +18,7 @@ import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupService
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
-import { getProjectCategories } from '@/services/listServices';
+import { FRESH_FETCH, listsApi } from '@/api/listsApi';
 import { IListItem } from '@/interfaces/common';
 import { Option } from 'hds-react';
 import ReportYearSelect from './ReportYearSelect/ReportYearSelect';
@@ -118,7 +118,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   };
 
   const getCategories = async (): Promise<IListItem[]> => {
-    const categories = await getProjectCategories();
+    const categories = await dispatch(
+      listsApi.endpoints.getProjectCategories.initiate(undefined, FRESH_FETCH),
+    ).unwrap();
     return categories;
   };
 

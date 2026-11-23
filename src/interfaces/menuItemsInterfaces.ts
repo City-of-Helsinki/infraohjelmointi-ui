@@ -1,5 +1,6 @@
 import { IListState } from '@/reducers/listsSlice';
-import { DialogMode } from './common';
+import { DialogMode, IListItem } from './common';
+import { IPerson } from './personsInterfaces';
 
 const ADMIN_MENUS_MENU_TYPE = [
   'categories',
@@ -94,25 +95,6 @@ interface MenuItemRequest {
   value: string;
 }
 
-interface MenuItemPatchThunkContent {
-  request: MenuItemRequest;
-  path: string;
-  id: string;
-  listType: ReorderableListType;
-}
-
-interface MenuItemPostThunkContent {
-  request: MenuItemRequest;
-  path: string;
-  listType: ReorderableListType;
-}
-
-interface MenuItemDeleteThunkContent {
-  path: string;
-  id: string;
-  listType: ReorderableListType;
-}
-
 interface PersonTypeMenuItemRequest {
   firstName?: string;
   lastName?: string;
@@ -121,17 +103,26 @@ interface PersonTypeMenuItemRequest {
   title?: string;
 }
 
-interface PersonTypeMenuItemPatchThunkContent {
-  request: PersonTypeMenuItemRequest;
+// listType is not sent to the backend; listsSlice uses it to sync the matching list.
+interface MenuItemPostArgs {
+  request: MenuItemRequest | PersonTypeMenuItemRequest;
+  path: string;
+  listType: ReorderableListType;
+}
+
+interface MenuItemPatchArgs extends MenuItemPostArgs {
+  id: string;
+}
+
+interface MenuItemDeleteArgs {
   path: string;
   id: string;
   listType: ReorderableListType;
 }
 
-interface PersonTypeMenuItemPostThunkContent {
-  request: PersonTypeMenuItemRequest;
+interface MenuItemOrderArgs {
+  request: IListItem[] | IPerson[];
   path: string;
-  listType: ReorderableListType;
 }
 
 interface MoveRowPayload {
@@ -155,12 +146,11 @@ export type {
   DialogState,
   IAdminMenuOrderCellProps,
   MenuItemRequest,
-  MenuItemDeleteThunkContent,
+  MenuItemDeleteArgs,
+  MenuItemOrderArgs,
   PersonTypeMenuItemRequest,
-  PersonTypeMenuItemPatchThunkContent,
-  PersonTypeMenuItemPostThunkContent,
-  MenuItemPatchThunkContent,
-  MenuItemPostThunkContent,
+  MenuItemPatchArgs,
+  MenuItemPostArgs,
   MoveRowPayload,
   ReorderableListType,
   PersonTypeDialogValues,

@@ -11,7 +11,7 @@ import {
   IOperationalEnvironmentAnalysisCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { getCoordinationTableRows } from './useCoordinationRows';
-import { getDistricts } from '@/services/listServices';
+import { FRESH_FETCH, listsApi } from '@/api/listsApi';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import {
   getCoordinatorAndForcedToFrameRows,
@@ -36,6 +36,9 @@ export const useCsvData = ({
     >
   >([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
+
+  const getDistricts = () =>
+    dispatch(listsApi.endpoints.getDistricts.initiate(undefined, FRESH_FETCH)).unwrap();
 
   const getCsvData = async () => {
     try {
