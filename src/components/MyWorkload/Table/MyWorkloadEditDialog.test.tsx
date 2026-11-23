@@ -552,7 +552,9 @@ describe('MyWorkloadEditDialog', () => {
   );
 
   it.each([
+    '',
     'masterClass=backend-master',
+    'masterClass=backend-master&class=backend-class',
     'masterClass=backend-master&class=backend-class&subClass=backend-sub&district=backend-district',
     'masterClass=backend-master&project=old-project',
   ])('uses the canonical backend path %s without client hierarchy data', async (planningPath) => {
@@ -609,19 +611,6 @@ describe('MyWorkloadEditDialog', () => {
     await user.click(button);
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
-  });
-
-  it('navigates with only the project when the API path has no hierarchy', async () => {
-    mockGetProjectById.mockReturnValue({
-      data: { ...planningProject, planningPath: '' },
-      isFetching: false,
-    });
-    const { user, getByRole } = renderDialog('planning');
-    await user.click(getByRole('button', { name: 'myWorkloadView.table.goToPlanning' }));
-
-    const url = new URL(mockNavigate.mock.calls[0][0], 'http://localhost');
-    expect(url.pathname).toBe('/planning/');
-    expect(Object.fromEntries(url.searchParams)).toEqual({ project: baseProject.id });
   });
 
   it('disables planning navigation while refreshing project details', () => {
