@@ -9,8 +9,6 @@ import {
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 
-export const FRESH_FETCH = { subscribe: false, forceRefetch: true } as const;
-
 export const isValidProgrammer = ({
   firstName,
   lastName,

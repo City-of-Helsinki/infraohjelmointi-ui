@@ -13,6 +13,7 @@ import {
   setPlanningClasses,
 } from './reducers/classSlice';
 import { classApi } from './api/classApi';
+import { FRESH_FETCH } from './api/infraohjelmointiApi';
 import {
   getCoordinationLocationsThunk,
   getForcedToFrameLocationsThunk,
@@ -64,8 +65,6 @@ import ProjectProgramme from './components/Project/ProjectProgramme/ProjectProgr
 import { MAINTENANCE_MODE } from './config/env';
 
 const LOADING_APP_ID = 'loading-app-data';
-
-const FRESH_FETCH = { subscribe: false, forceRefetch: true } as const;
 
 export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));

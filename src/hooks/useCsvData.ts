@@ -11,7 +11,8 @@ import {
   IOperationalEnvironmentAnalysisCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { getCoordinationTableRows } from './useCoordinationRows';
-import { FRESH_FETCH, listsApi } from '@/api/listsApi';
+import { listsApi } from '@/api/listsApi';
+import { FRESH_FETCH } from '@/api/infraohjelmointiApi';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import {
   getCoordinatorAndForcedToFrameRows,

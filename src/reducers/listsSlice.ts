@@ -1,7 +1,8 @@
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict, IProjectDistrictOption } from '@/interfaces/locationInterfaces';
-import { FRESH_FETCH, isValidProgrammer, listsApi } from '@/api/listsApi';
+import { isValidProgrammer, listsApi } from '@/api/listsApi';
+import { FRESH_FETCH } from '@/api/infraohjelmointiApi';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { toSerializableError } from '@/utils/reduxErrorUtils';

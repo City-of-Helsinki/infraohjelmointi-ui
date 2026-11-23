@@ -18,7 +18,8 @@ import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupService
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
-import { FRESH_FETCH, listsApi } from '@/api/listsApi';
+import { listsApi } from '@/api/listsApi';
+import { FRESH_FETCH } from '@/api/infraohjelmointiApi';
 import { IListItem } from '@/interfaces/common';
 import { Option } from 'hds-react';
 import ReportYearSelect from './ReportYearSelect/ReportYearSelect';
@@ -75,10 +76,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
 
     // classes
     const classRes = await dispatch(
-      classApi.endpoints.getCoordinationClasses.initiate(
-        { forcedToFrame, year },
-        { subscribe: false, forceRefetch: true },
-      ),
+      classApi.endpoints.getCoordinationClasses.initiate({ forcedToFrame, year }, FRESH_FETCH),
     ).unwrap();
     const classHierarchy = separateClassesIntoHierarchy(
       classRes,
@@ -139,10 +137,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
 
     // classes
     const classRes = await dispatch(
-      classApi.endpoints.getPlanningClasses.initiate(year, {
-        subscribe: false,
-        forceRefetch: true,
-      }),
+      classApi.endpoints.getPlanningClasses.initiate(year, FRESH_FETCH),
     ).unwrap();
     const classHierarchy = separateClassesIntoHierarchy(classRes, false) as IClassHierarchy;
 
