@@ -334,7 +334,11 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
       aria-describedby="my-workload-edit-dialog-content"
       closeButtonLabelText={t('closeDialog')}
     >
-      <Dialog.Header id="my-workload-edit-dialog-title" title={project?.projectName ?? ''} />
+      <Dialog.Header
+        id="my-workload-edit-dialog-title"
+        title={project?.projectName ?? ''}
+        className={classes.editDialogTitle}
+      />
       <Dialog.Content>
         <div
           className={classes.editDialogFields}
