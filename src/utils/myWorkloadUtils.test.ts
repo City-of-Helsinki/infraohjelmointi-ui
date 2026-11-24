@@ -96,6 +96,15 @@ describe('workload option translations', () => {
   it('keeps absent phases empty', () => {
     expect(toPhaseInfo(undefined, instance.t)).toEqual({ id: '', value: '', label: '' });
   });
+
+  it('retains the project group ID in workload rows', () => {
+    expect(
+      mapProjectToMyWorkloadTableRow(createProject({ projectGroup: 'group-1' }), instance.t),
+    ).toMatchObject({ projectGroup: 'group-1' });
+    expect(
+      mapProjectToMyWorkloadTableRow(createProject({ projectGroup: null }), instance.t),
+    ).toMatchObject({ projectGroup: null });
+  });
 });
 
 describe('myWorkloadDateUtils', () => {

@@ -6,7 +6,7 @@ import {
 } from '@/mocks/mockLists';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
-import { MyWorkloadTableRow } from '@/interfaces/myWorkloadInterfaces';
+import { MyWorkloadTableRow, MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
@@ -41,6 +41,8 @@ vi.mock('@/api/projectApi', async () => {
 
 const baseProject: MyWorkloadTableRow = {
   id: 'project-1',
+  projectGroup: null,
+  groupName: '',
   projectName: 'My test project',
   description: 'Desc',
   planningStart: '01.01.2026',
@@ -85,6 +87,7 @@ const planningProject: IProject = {
 const renderDialog = (
   viewType: 'planning' | 'construction',
   project: MyWorkloadTableRow | null = baseProject,
+  groupName?: string,
 ) => {
   const store = setupStore();
   const onClose = vi.fn();
@@ -97,6 +100,7 @@ const renderDialog = (
         <MyWorkloadEditDialog
           isOpen={true}
           project={project}
+          groupName={groupName}
           viewType={viewType}
           onClose={onClose}
           onSave={onSave}
@@ -139,6 +143,34 @@ describe('MyWorkloadEditDialog', () => {
     vi.clearAllMocks();
     mockPatchProjectState.mockReturnValue({ isLoading: false });
     mockGetProjectById.mockReturnValue({ data: undefined, isFetching: false });
+  });
+
+  it.each<MyWorkloadViewType>(['planning', 'construction'])(
+    'shows group membership in the %s dialog',
+    (viewType) => {
+      const { getByText, queryByText } = renderDialog(
+        viewType,
+        { ...baseProject, projectGroup: 'group-1' },
+        'Test group',
+      );
+      expect(getByText('inGroup')).toBeInTheDocument();
+      expect(getByText('Test group')).toBeInTheDocument();
+      expect(queryByText('myWorkloadView.table.notInGroup')).not.toBeInTheDocument();
+    },
+  );
+
+  it('shows no-group text only when the project has no group ID', () => {
+    const { getByText } = renderDialog('planning');
+    expect(getByText('myWorkloadView.table.notInGroup')).toBeInTheDocument();
+  });
+
+  it('does not claim the project is ungrouped while its group name is unavailable', () => {
+    const { getByText, queryByText } = renderDialog('planning', {
+      ...baseProject,
+      projectGroup: 'missing-group',
+    });
+    expect(getByText('inGroup')).toBeInTheDocument();
+    expect(queryByText('myWorkloadView.table.notInGroup')).not.toBeInTheDocument();
   });
 
   it('blocks submit when required planning dates are missing', async () => {

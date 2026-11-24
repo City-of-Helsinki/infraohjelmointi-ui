@@ -20,9 +20,11 @@ import WidthFittedTable from './WidthFittedTable';
 import { createTableColumns } from './myWorkloadTableColumns';
 
 const ITEMS_PER_PAGE = 10;
+const EMPTY_GROUP_NAMES: ReadonlyMap<string, string> = new Map();
 
 const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   listOfProjects,
+  groupNames = EMPTY_GROUP_NAMES,
   isLoading,
   hasError,
   viewType,
@@ -49,12 +51,27 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   const hasRows = !hasError && tableRows.length > 0;
   const shouldRenderTable = !isLoading && !hasError && hasRows;
 
+  const rowsWithGroupNames = useMemo(
+    () =>
+      tableRows.map((row) => ({
+        ...row,
+        groupName: row.projectGroup ? (groupNames.get(row.projectGroup) ?? '') : '',
+      })),
+    [tableRows, groupNames],
+  );
   const dateSortValues = useMemo(() => getMyWorkloadDateSortValues(tableRows), [tableRows]);
   const compareDates = useMemo(() => createMyWorkloadDateCompare(dateSortValues), [dateSortValues]);
   const comparePhases = useMemo(() => createMyWorkloadPhaseCompare(compareDates), [compareDates]);
   const sortedRows = useMemo(
-    () => sortMyWorkloadRows(tableRows, sortState, dateSortValues, compareDates, comparePhases),
-    [tableRows, sortState, dateSortValues, compareDates, comparePhases],
+    () =>
+      sortMyWorkloadRows(
+        rowsWithGroupNames,
+        sortState,
+        dateSortValues,
+        compareDates,
+        comparePhases,
+      ),
+    [rowsWithGroupNames, sortState, dateSortValues, compareDates, comparePhases],
   );
 
   const pageCount = useMemo(() => Math.ceil(sortedRows.length / ITEMS_PER_PAGE), [sortedRows]);
@@ -81,14 +98,17 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
 
   const handleSort = useCallback<NonNullable<TableProps['onSort']>>(
     (order, colKey, applyHdsSortState) => {
-      if (!isSortableColumnKey(colKey) || !hasSortableValues(tableRows, colKey, dateSortValues)) {
+      if (
+        !isSortableColumnKey(colKey) ||
+        !hasSortableValues(rowsWithGroupNames, colKey, dateSortValues)
+      ) {
         return;
       }
 
       applyHdsSortState();
       setSortState({ colKey, order });
     },
-    [tableRows, dateSortValues],
+    [rowsWithGroupNames, dateSortValues],
   );
 
   const handleResetSort = () => {
@@ -160,6 +180,9 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
       <MyWorkloadEditDialog
         isOpen={editedProject !== null}
         project={editedProject}
+        groupName={
+          editedProject?.projectGroup ? groupNames.get(editedProject.projectGroup) : undefined
+        }
         viewType={viewType}
         onClose={() => setEditedProject(null)}
         onSave={handleProjectSaved}

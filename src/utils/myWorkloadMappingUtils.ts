@@ -15,6 +15,8 @@ export const mapProjectToMyWorkloadTableRow = (
 ): MyWorkloadTableRow => ({
   id: project.id,
   budget: project.budget ?? '',
+  projectGroup: project.projectGroup,
+  groupName: '',
   projectName: project.name,
   description: project.description,
   planningStart: normalizeMyWorkloadDate(project.estPlanningStart),

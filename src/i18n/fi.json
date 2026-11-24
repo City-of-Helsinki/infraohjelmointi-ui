@@ -1337,6 +1337,8 @@
       "loading": "Hankkeita ladataan...",
       "resetSort": "Palauta oletusjärjestys",
       "fitToWidth": "Sovita taulukko näytön leveyteen",
+      "group": "Ryhmä",
+      "notInGroup": "Ei kuulu ryhmään",
       "projectName": "Hanke",
       "description": "Hankkeen kuvaus",
       "planningStart": "Suunnittelu alkaa",

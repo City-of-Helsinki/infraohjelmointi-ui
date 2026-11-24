@@ -39,6 +39,7 @@ export interface MyWorkloadViewTypeButtonsProps {
 export interface MyWorkloadEditDialogProps {
   isOpen: boolean;
   project: MyWorkloadTableRow | null;
+  groupName?: string;
   viewType: MyWorkloadViewType;
   onClose: () => void;
   onSave: (row: MyWorkloadTableRow) => void;
@@ -91,6 +92,7 @@ export type MyWorkloadDateFieldName =
 
 export interface MyWorkloadTableProps {
   listOfProjects: MyWorkloadTableRow[];
+  groupNames?: ReadonlyMap<string, string>;
   isLoading: boolean;
   hasError: boolean;
   viewType: MyWorkloadViewType;
@@ -110,6 +112,8 @@ export interface PhaseInfo {
 export interface MyWorkloadTableRow {
   id: string;
   budget: string;
+  projectGroup: string | null;
+  groupName: string;
   projectName: string;
   description: string;
   planningStart: string;

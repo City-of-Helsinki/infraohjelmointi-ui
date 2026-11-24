@@ -1,6 +1,6 @@
 import mockProject from '@/mocks/mockProject';
 import { mockUser } from '@/mocks/mockUsers';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { IProject, IProjectsResponse } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { Route } from 'react-router';
@@ -8,8 +8,14 @@ import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import MyWorkloadBaseView from './MyWorkloadBaseView';
 import type { MockInstance, MockedFunction } from 'vitest';
+import { mockGroups } from '@/mocks/mockGroups';
+import { getPlanningGroupsThunk } from '@/reducers/groupSlice';
 
-vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('react-i18next', async () => {
+  const mock = (await import('@/mocks/mockI18next')).default();
+  const translation = mock.useTranslation();
+  return { ...mock, useTranslation: () => translation };
+});
 
 vi.mock('@/services/projectServices', () => ({
   getProjectsWithParams: vi.fn(),
@@ -114,6 +120,26 @@ describe('MyWorkloadBaseView', () => {
 
   beforeEach(() => {
     mockedGetProjectsWithParams.mockReset();
+  });
+
+  it('updates group names without refetching workload projects', async () => {
+    mockedGetProjectsWithParams.mockImplementation(async ({ params }) => {
+      if (params === 'personPlanning=responsible-person-id') {
+        return makeResponse([makeProject('project-1', 'user@hel.fi', 'someoneelse@hel.fi')]);
+      }
+      return makeResponse([]);
+    });
+
+    const { findByText, getByText, store } = renderBaseView();
+    await findByText('Project project-1');
+    const callsBeforeGroupUpdate = mockedGetProjectsWithParams.mock.calls.length;
+
+    act(() => {
+      store.dispatch(getPlanningGroupsThunk.fulfilled(mockGroups.data, 'request-id', 2026));
+    });
+
+    expect(getByText('Test Group 1')).toBeInTheDocument();
+    expect(mockedGetProjectsWithParams).toHaveBeenCalledTimes(callsBeforeGroupUpdate);
   });
 
   it('shows construction button selected when user email is found only in personConstruction', async () => {

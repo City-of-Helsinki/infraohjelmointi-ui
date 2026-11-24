@@ -24,6 +24,7 @@ const PHASE_ORDER = [
   'completed',
 ];
 const SORTABLE_COLUMN_KEYS = new Set<string>([
+  'groupName',
   'projectName',
   'description',
   ...DATE_COLUMNS,
