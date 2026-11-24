@@ -156,6 +156,10 @@
   color: var(--color-black-70);
 }
 
+h2.editDialogTitle {
+  font-size: var(--fontsize-heading-m);
+}
+
 .editDialogSectionTitle {
   margin: 0;
   font-size: var(--fontsize-heading-s);
