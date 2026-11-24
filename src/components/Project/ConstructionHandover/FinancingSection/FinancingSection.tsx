@@ -15,6 +15,7 @@ import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
 import { formatBudgetEuro, parseCurrency } from '@/utils/currencyUtils';
+import { translateOption } from '@/utils/optionTranslation';
 
 interface IFinancingSectionProps {
   canEditHandover: boolean;
@@ -105,12 +106,9 @@ const FinancingSection = ({ canEditHandover }: IFinancingSectionProps) => {
 
   const getBudgetItemLabel = useCallback(
     (id: string) =>
-      t(
-        `option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`,
-        {
-          defaultValue:
-            projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
-        },
+      translateOption(
+        t,
+        projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
       ),
     [t, projectTypeQualifierOptions],
   );

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
 import { IPhaseMenuDetails } from '@/interfaces/eventInterfaces';
 import optionIcon from '@/utils/optionIcon';
+import { translateOption } from '@/utils/optionTranslation';
 import './styles.css';
 
 interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
@@ -65,7 +66,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
                 className={`item-text ${selectedPhase === value ? 'selected' : ''}`}
                 data-testid={`project-phase-menu-option-${value}`}
               >
-                {t(`option.${label}`)}
+                {translateOption(t, label)}
               </p>
             </button>
             {selectedPhase === value && <IconCheck className="icon-width check-icon" />}

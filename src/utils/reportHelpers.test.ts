@@ -8,6 +8,7 @@ import {
   getCoordinationViewReportPdfRows,
   getIsGroupOnSchedule,
   getIsProjectOnSchedule,
+  getReportData,
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
@@ -15,11 +16,93 @@ import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterf
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { t } from 'i18next';
 
-vi.mock('i18next', () => ({
-  t: (key: string) => key,
-}));
+vi.mock('i18next', async (importOriginal) => {
+  const { createInstance } = await importOriginal<typeof import('i18next')>();
+  const instance = createInstance();
+  await instance.init({
+    lng: 'fi',
+    resources: {
+      fi: {
+        translation: {
+          option: {
+            true: 'option.true',
+            false: 'option.false',
+            K1: 'K1',
+            earlierSchedule: 'Earlier schedule',
+          },
+          projectData: { category: { K1: 'Known category' } },
+        },
+      },
+    },
+  });
+  return { t: instance.t };
+});
 
 describe('reportHelpers', () => {
+  describe.each([
+    Reports.OperationalEnvironmentAnalysis,
+    Reports.OperationalEnvironmentAnalysisForcedToFrame,
+  ])('%s category labels', (type) => {
+    const categories = [createListItem('K1'), createListItem('Custom.category')];
+    const cells: IPlanningCell[] = Array.from({ length: 11 }, (_, index) => ({
+      key: `cell-${index}`,
+      year: 2026 + index,
+      plannedBudget: '1000',
+      frameBudget: '1000',
+      isCurrentOrPastYear: false,
+      isFrameBudgetOverlap: false,
+    }));
+    const child: IPlanningRow = {
+      id: 'category-test-class',
+      key: 'category-test-class',
+      name: '8 01 01 Test class',
+      path: '8 01 01 Test class',
+      type: 'class',
+      children: [],
+      defaultExpanded: false,
+      urlSearchParam: null,
+      cells,
+      projectRows: [],
+    };
+    const rows: IPlanningRow[] = [
+      {
+        ...child,
+        id: 'category-test-master-class',
+        key: 'category-test-master-class',
+        type: 'masterClass',
+        children: [child],
+      },
+    ];
+
+    it('uses the original custom category name in report rows', () => {
+      expect(convertToReportRows(rows, type, categories, t)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            children: expect.arrayContaining([
+              expect.objectContaining({ type: 'category', name: 'Custom.category' }),
+            ]),
+          }),
+        ]),
+      );
+    });
+
+    it('translates known CSV descriptions and preserves custom category names', async () => {
+      const csvRows = await getReportData(t, type, rows, undefined, undefined, categories);
+      expect(csvRows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            'report.operationalEnvironmentAnalysis.code': 'K1',
+            'report.operationalEnvironmentAnalysis.codeDescription': 'Known category',
+          }),
+          expect.objectContaining({
+            'report.operationalEnvironmentAnalysis.code': 'Custom.category',
+            'report.operationalEnvironmentAnalysis.codeDescription': 'Custom.category',
+          }),
+        ]),
+      );
+    });
+  });
+
   describe.each([Reports.Strategy, Reports.StrategyForcedToFrame])('%s project budgets', (type) => {
     const year = new Date().getFullYear() + 1;
     const buildRow = (
@@ -421,6 +504,19 @@ describe('reportHelpers', () => {
   });
 
   describe('convertToGroupValues', () => {
+    it.each([
+      ['earlierSchedule', 'Earlier schedule'],
+      ['Custom.reason', 'Custom.reason'],
+    ])('displays the budget reason %s as %s', (value, label) => {
+      const project = createProject({
+        name: 'Test project',
+        budgetOverrunReason: createListItem(value),
+      });
+      expect(convertToGroupValues([project], '0')).toMatchObject({
+        budgetOverrunReason: `Test project: ${label}`,
+      });
+    });
+
     it('should aggregate project and SAP cost data for groups while formatting results', () => {
       const forcedToFrameBudget = '8000';
       const currentYear = new Date().getFullYear();
@@ -483,7 +579,7 @@ describe('reportHelpers', () => {
         costForecastDeviationPercent: '13%',
         currentYearSapCost: '0,8',
         beforeCurrentYearSapCosts: '2,3',
-        budgetOverrunReason: 'Project One: Custom reason\nProject Two: option.delayed',
+        budgetOverrunReason: 'Project One: Custom reason\nProject Two: delayed',
       });
     });
 

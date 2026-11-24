@@ -9,6 +9,7 @@ import {
 import { calculateOperationalEnvironmentAnalysisCategorySums } from '../common';
 import { updateCategoryFiveTotals } from '@/utils/reportHelpers';
 import { keurToMillion } from '@/utils/calculations';
+import { translateCategoryDescription } from '@/utils/optionTranslation';
 
 const categorySummaryView = {
   width: '100%',
@@ -149,7 +150,7 @@ const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({ categories }) 
 };
 
 const CategorySummaryRow: FC<ICategorySummaryRowProps> = ({ category }) => {
-  const categoryName = t(`projectData.category.${category.name.replace(/\./g, '')}`);
+  const categoryName = translateCategoryDescription(t, category.name);
 
   const categoryCodeStyles = category.name.includes('K5')
     ? [tableStyles.firstCell, tableStyles.cellK5]

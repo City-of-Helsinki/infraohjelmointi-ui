@@ -15,6 +15,7 @@ import optionIcon from '@/utils/optionIcon';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
 import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
+import { translateOption } from '@/utils/optionTranslation';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -85,7 +86,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
 
   const phase = watch('phase');
   const projectHeaderPhaseString = getValues('phase')?.label
-    ? t(`option.${getValues('phase').label}`)
+    ? translateOption(t, getValues('phase').label)
     : '';
 
   const icon = optionIcon[mapIconKey(phase?.label) as keyof typeof optionIcon];
@@ -114,7 +115,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
             {project?.phaseDetail?.value === 'suspended' && project?.suspendedDate && (
               <div className="project-header-suspended-message">
                 {t('projectHeader.suspendedMessage', {
-                  phase: project?.phase ? t(`option.${project.phase.value}`) : '-',
+                  phase: project?.phase ? translateOption(t, project.phase.value) : '-',
                   date: new Date(project.suspendedDate + 'T00:00:00').toLocaleDateString('fi-FI'),
                 })}
               </div>

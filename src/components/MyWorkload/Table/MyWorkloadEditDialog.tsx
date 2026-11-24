@@ -44,6 +44,7 @@ import {
 } from '@/utils/projectValidationRules';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useMyWorkloadPlanningLink from '@/hooks/useMyWorkloadPlanningLink';
+import { translateOption } from '@/utils/optionTranslation';
 
 const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   isOpen,
@@ -127,7 +128,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     () =>
       phases.map((phase) => ({
         value: phase.id,
-        label: t(`option.${phase.value}`),
+        label: translateOption(t, phase.value),
       })),
     [phases, t],
   );
@@ -136,7 +137,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     () =>
       planningPhases.map((phase: IListItem) => ({
         value: phase.id,
-        label: t(`option.${phase.value}`),
+        label: translateOption(t, phase.value),
       })),
     [planningPhases, t],
   );
@@ -145,7 +146,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     () =>
       constructionPhases.map((phase: IListItem) => ({
         value: phase.id,
-        label: t(`option.${phase.value}`),
+        label: translateOption(t, phase.value),
       })),
     [constructionPhases, t],
   );
@@ -154,7 +155,7 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
     () =>
       getProjectPhaseDetailOptions(phaseDetails, selectedPhaseId).map((detail) => ({
         ...detail,
-        label: t(`option.${detail.label}`),
+        label: translateOption(t, detail.label),
       })),
     [phaseDetails, selectedPhaseId, t],
   );

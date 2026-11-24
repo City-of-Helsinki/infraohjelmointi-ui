@@ -4,6 +4,7 @@ import { IListItem } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
 import { normalizeHistoryValue } from '@/utils/historyPanelUtils';
+import { translateOption } from '@/utils/optionTranslation';
 
 // Financial figures are stored keyed by calendar year ("2026"); form-field
 // changes are keyed by field name. The form-level panel only shows the latter —
@@ -67,7 +68,7 @@ export const resolveHistoryValue = (
     const list = lists[listKey] as Array<IListItem> | undefined;
     const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
     const optionValue = match?.value ?? raw;
-    return t(`option.${optionValue}`, { defaultValue: optionValue });
+    return translateOption(t, optionValue);
   }
 
   return raw;

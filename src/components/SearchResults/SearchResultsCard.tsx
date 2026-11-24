@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { CustomTag } from '../shared';
 import './styles.css';
 import optionIcon from '@/utils/optionIcon';
+import { translateOption } from '@/utils/optionTranslation';
 
 const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,
@@ -50,7 +51,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
           {phase && (
             <CustomTag
               icon={optionIcon[phase as keyof typeof optionIcon]}
-              text={t(`option.${phase}`)}
+              text={translateOption(t, phase)}
               color={'var(--color-suomenlinna-medium-light)'}
             />
           )}
