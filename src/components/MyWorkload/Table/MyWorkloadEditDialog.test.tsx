@@ -12,8 +12,6 @@ import { Route } from 'react-router';
 import MyWorkloadEditDialog from './MyWorkloadEditDialog';
 import type { MockInstance } from 'vitest';
 import mockProject from '@/mocks/mockProject';
-import { mockProjectClasses } from '@/mocks/mockClasses';
-import { mockLocations } from '@/mocks/mockLocations';
 import { IProject } from '@/interfaces/projectInterfaces';
 
 const mockNavigate = vi.fn();
@@ -78,6 +76,7 @@ const planningProject: IProject = {
   ...mockProject.data,
   id: baseProject.id,
   programmed: true,
+  planningPath: 'masterClass=test-master-class-1&class=test-class-1',
   projectClass: 'test-class-1',
   projectLocation: undefined,
   projectGroup: null,
@@ -106,42 +105,6 @@ const renderDialog = (
     />,
     {
       preloadedState: {
-        class: {
-          ...store.getState().class,
-          planning: {
-            ...store.getState().class.planning,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockProjectClasses.data.filter(({ parent }) => !parent),
-            classes: mockProjectClasses.data.filter(
-              ({ parent }) => parent === 'test-master-class-1',
-            ),
-            subClasses: mockProjectClasses.data.filter(({ parent }) => parent === 'test-class-1'),
-          },
-        },
-        location: {
-          ...store.getState().location,
-          planning: {
-            ...store.getState().location.planning,
-            districts: mockLocations.data.filter(({ id }) => id === 'test-district-1'),
-            divisions: mockLocations.data.filter(({ id }) => id === 'test-division-1'),
-          },
-        },
-        group: {
-          ...store.getState().group,
-          planning: {
-            ...store.getState().group.planning,
-            groups: [
-              {
-                id: 'test-group-1',
-                name: 'Test group',
-                location: null,
-                classRelation: 'test-class-1',
-                locationRelation: 'test-division-1',
-                finances: mockProjectClasses.data[0].finances,
-              },
-            ],
-          },
-        },
         lists: {
           ...store.getState().lists,
           phases: mockProjectPhases.data,
@@ -589,66 +552,24 @@ describe('MyWorkloadEditDialog', () => {
   );
 
   it.each([
-    {
-      projectClass: 'test-master-class-1',
-      projectLocation: undefined,
-      projectGroup: null,
-      district: null,
-      expectedClass: null,
-      expectedSubClass: null,
-    },
-    {
-      projectClass: 'test-sub-class-1',
-      projectLocation: undefined,
-      projectGroup: null,
-      district: null,
-      expectedClass: 'test-class-1',
-      expectedSubClass: 'test-sub-class-1',
-    },
-    {
-      projectClass: 'test-sub-class-1',
-      projectLocation: 'test-district-1',
-      projectGroup: null,
-      district: 'test-district-1',
-      expectedClass: 'test-class-1',
-      expectedSubClass: 'test-sub-class-1',
-    },
-    {
-      projectClass: 'test-sub-class-1',
-      projectLocation: 'test-division-1',
-      projectGroup: null,
-      district: 'test-district-1',
-      expectedClass: 'test-class-1',
-      expectedSubClass: 'test-sub-class-1',
-    },
-    {
-      projectClass: 'test-sub-class-1',
-      projectLocation: undefined,
-      projectGroup: 'test-group-1',
-      district: 'test-district-1',
-      expectedClass: 'test-class-1',
-      expectedSubClass: null,
-    },
-  ])(
-    'resolves hierarchy for $projectClass / $projectLocation / $projectGroup',
-    async ({ district, expectedClass, expectedSubClass, ...relations }) => {
-      const targetProject: IProject = { ...planningProject, ...relations };
-      mockGetProjectById.mockReturnValue({ data: targetProject, isFetching: false });
-      const { user, getByRole } = renderDialog('planning');
-      const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
-      expect(button).toBeEnabled();
-      await user.click(button);
-      const url = new URL(mockNavigate.mock.calls[0][0], 'http://localhost');
-      expect(url.pathname).toBe('/planning/');
-      expect(Object.fromEntries(url.searchParams)).toEqual({
-        masterClass: 'test-master-class-1',
-        ...(expectedClass ? { class: expectedClass } : {}),
-        ...(expectedSubClass ? { subClass: expectedSubClass } : {}),
-        ...(district ? { district } : {}),
-        project: baseProject.id,
-      });
-    },
-  );
+    '',
+    'masterClass=backend-master',
+    'masterClass=backend-master&class=backend-class',
+    'masterClass=backend-master&class=backend-class&subClass=backend-sub&district=backend-district',
+    'masterClass=backend-master&project=old-project',
+  ])('uses the canonical backend path %s without client hierarchy data', async (planningPath) => {
+    const targetProject: IProject = { ...planningProject, planningPath };
+    mockGetProjectById.mockReturnValue({ data: targetProject, isFetching: false });
+    const { user, getByRole } = renderDialog('planning');
+    const button = getByRole('button', { name: 'myWorkloadView.table.goToPlanning' });
+    expect(button).toBeEnabled();
+    await user.click(button);
+    const url = new URL(mockNavigate.mock.calls[0][0], 'http://localhost');
+    expect(url.pathname).toBe('/planning/');
+    const expectedParams = new URLSearchParams(planningPath);
+    expectedParams.set('project', baseProject.id);
+    expect(Object.fromEntries(url.searchParams)).toEqual(Object.fromEntries(expectedParams));
+  });
 
   it.each([
     { data: undefined, isFetching: true, scenario: 'loading' },
@@ -662,6 +583,16 @@ describe('MyWorkloadEditDialog', () => {
       data: { ...planningProject, id: 'another-project' },
       isFetching: false,
       scenario: 'a different project',
+    },
+    {
+      data: { ...planningProject, planningPath: undefined },
+      isFetching: false,
+      scenario: 'missing a planning path',
+    },
+    {
+      data: { ...planningProject, planningPath: null },
+      isFetching: false,
+      scenario: 'without a planning hierarchy',
     },
   ])('hides planning navigation when project is $scenario', ({ data, isFetching }) => {
     mockGetProjectById.mockReturnValue({ data, isFetching });
@@ -680,5 +611,11 @@ describe('MyWorkloadEditDialog', () => {
     await user.click(button);
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('disables planning navigation while refreshing project details', () => {
+    mockGetProjectById.mockReturnValue({ data: planningProject, isFetching: true });
+    const { getByRole } = renderDialog('planning');
+    expect(getByRole('button', { name: 'myWorkloadView.table.goToPlanning' })).toBeDisabled();
   });
 });
