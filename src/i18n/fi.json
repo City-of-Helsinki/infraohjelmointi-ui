@@ -1335,7 +1335,7 @@
     "viewTypePlanning": "Suunnitteluttamisen projektit",
     "table": {
       "loading": "Hankkeita ladataan...",
-      "resetSort": "Palauta oletusjärjestys",
+      "resetSort": "Poista sarakejärjestys",
       "fitToWidth": "Sovita taulukko näytön leveyteen",
       "group": "Ryhmä",
       "notInGroup": "Ei kuulu ryhmään",
