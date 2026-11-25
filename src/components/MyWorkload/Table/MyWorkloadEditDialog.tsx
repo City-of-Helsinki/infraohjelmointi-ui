@@ -49,6 +49,7 @@ import { translateOption } from '@/utils/optionTranslation';
 const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
   isOpen,
   project,
+  groupName,
   viewType,
   onClose,
   onSave,
@@ -347,6 +348,18 @@ const MyWorkloadEditDialog: FC<MyWorkloadEditDialogProps> = ({
           id="my-workload-edit-dialog-content"
           ref={dialogContentRef}
         >
+          {project && (
+            <div className={classes.editDialogGroup}>
+              {project.projectGroup ? (
+                <>
+                  <p>{t('inGroup')}</p>
+                  {groupName && <p className={classes.editDialogGroupName}>{groupName}</p>}
+                </>
+              ) : (
+                <p>{t('myWorkloadView.table.notInGroup')}</p>
+              )}
+            </div>
+          )}
           {isPlanningView && (
             <>
               <h3 className={classes.editDialogSectionTitle}>

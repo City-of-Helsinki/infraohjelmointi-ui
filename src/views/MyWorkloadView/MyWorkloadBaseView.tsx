@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
@@ -13,6 +13,7 @@ import MyWorkloadViewTypeButtons from './MyWorkloadViewTypeButtons';
 import { MyWorkloadViewType } from '@/interfaces/myWorkloadInterfaces';
 import { getMyWorkloadViewType } from '@/utils/myWorkloadUtils';
 import { useGetProjectTasksQuery } from '@/api/projectTasksApi';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 
 const MyWorkloadBaseView: FC = () => {
   const [viewType, setViewType] = useState<MyWorkloadViewType>('planning');
@@ -21,6 +22,11 @@ const MyWorkloadBaseView: FC = () => {
   const user = useAppSelector(selectUser);
   const responsiblePersons = useAppSelector(selectResponsiblePersonsRaw);
   const startYear = useAppSelector(selectStartYear);
+  const groups = useAppSelector(selectPlanningGroups);
+  const groupNames = useMemo(
+    () => new Map(groups.map((group) => [group.id, group.name])),
+    [groups],
+  );
   const {
     rows: listOfProjects,
     isLoading,
@@ -80,6 +86,7 @@ const MyWorkloadBaseView: FC = () => {
       {showConstructionTasks && <MyWorkloadTasks listOfTasks={tasks} />}
       <MyWorkloadTable
         listOfProjects={listOfProjects}
+        groupNames={groupNames}
         isLoading={isTableLoading}
         hasError={hasError}
         viewType={viewType}

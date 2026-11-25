@@ -6,6 +6,7 @@ import {
   MyWorkloadViewType,
 } from '@/interfaces/myWorkloadInterfaces';
 import { formatMyWorkloadDateForDisplay } from '@/utils/myWorkloadUtils';
+import classes from '../styles.module.css';
 import MyWorkloadPhaseCell from './MyWorkloadPhaseCell';
 import MyWorkloadFunctionsCell from './MyWorkloadFunctionsCell';
 
@@ -31,6 +32,12 @@ export const createTableColumns = (
 
   return [
     {
+      key: 'groupName',
+      headerName: t('myWorkloadView.table.group'),
+      isSortable: true,
+      sortIconType: 'other',
+    },
+    {
       key: 'projectName',
       headerName: t('myWorkloadView.table.projectName'),
       isSortable: true,
@@ -41,6 +48,11 @@ export const createTableColumns = (
       headerName: t('myWorkloadView.table.description'),
       isSortable: true,
       sortIconType: 'other',
+      transform: ({ description }: MyWorkloadTableRow) => (
+        <div className={classes.descriptionCell} title={description}>
+          {description}
+        </div>
+      ),
     },
     ...dateColumns,
     {

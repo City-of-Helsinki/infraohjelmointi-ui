@@ -14,9 +14,10 @@ let consoleErrorSpy: MockInstance;
 
 vi.mock('./MyWorkloadEditDialog', () => ({
   __esModule: true,
-  default: ({ isOpen, project, onSave }: MyWorkloadEditDialogProps) => (
+  default: ({ isOpen, project, groupName, onSave }: MyWorkloadEditDialogProps) => (
     <div data-testid="mock-edit-dialog">
       {isOpen ? `open:${project?.projectName}` : 'closed'}
+      {isOpen && <span data-testid="mock-dialog-group">{groupName}</span>}
       <button
         type="button"
         onClick={() =>
@@ -35,6 +36,8 @@ vi.mock('./MyWorkloadEditDialog', () => ({
 
 const makeRow = (index: number): MyWorkloadTableRow => ({
   id: `project-${index}`,
+  projectGroup: null,
+  groupName: '',
   projectName: `Project ${index}`,
   description: `Description ${index}`,
   planningStart: '01.01.2026',
@@ -119,6 +122,116 @@ describe('MyWorkloadTable', () => {
 
   afterAll(() => {
     consoleErrorSpy.mockRestore();
+  });
+
+  it.each<MyWorkloadViewType>(['planning', 'construction'])(
+    'shows and sorts group names in the first column in the %s view',
+    async (viewType) => {
+      const user = userEvent.setup();
+      const rows = [
+        { ...makeRow(1), projectGroup: 'group-z' },
+        { ...makeRow(2), projectGroup: 'group-a' },
+        makeRow(3),
+      ];
+      const { getAllByRole, getByTestId } = render(
+        <MyWorkloadTable
+          listOfProjects={rows}
+          groupNames={
+            new Map([
+              ['group-z', 'Zeta'],
+              ['group-a', 'Alpha'],
+            ])
+          }
+          isLoading={false}
+          hasError={false}
+          viewType={viewType}
+        />,
+      );
+
+      expect(getAllByRole('columnheader')[0]).toHaveTextContent('myWorkloadView.table.group');
+      const values = () =>
+        getAllByRole('row')
+          .slice(1)
+          .map((row) =>
+            within(row)
+              .getAllByRole('cell')
+              .slice(0, 2)
+              .map((cell) => cell.textContent),
+          );
+      expect(values()).toEqual([
+        ['Zeta', 'Project 1'],
+        ['Alpha', 'Project 2'],
+        ['', 'Project 3'],
+      ]);
+      await user.click(getByTestId('hds-table-sorting-header-groupName'));
+      expect(values()).toEqual([
+        ['', 'Project 3'],
+        ['Alpha', 'Project 2'],
+        ['Zeta', 'Project 1'],
+      ]);
+      await user.click(getByTestId('hds-table-sorting-header-groupName'));
+      expect(values()).toEqual([
+        ['Zeta', 'Project 1'],
+        ['Alpha', 'Project 2'],
+        ['', 'Project 3'],
+      ]);
+    },
+  );
+
+  it('updates group names in the table and open dialog without losing saved changes', async () => {
+    const user = userEvent.setup();
+    const rows = [{ ...makeRow(1), projectGroup: 'group-1' }];
+    const { getByRole, getByTestId, getByText, rerender } = render(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    await user.click(getByRole('button', { name: /myWorkloadView.table.modifyInformation/i }));
+    expect(getByTestId('mock-dialog-group')).toBeEmptyDOMElement();
+    await user.click(getByRole('button', { name: 'trigger-save' }));
+    rerender(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        groupNames={new Map([['group-1', 'Updated group']])}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    expect(getByText('Project 1 (saved)')).toBeInTheDocument();
+    expect(getByTestId('mock-dialog-group')).toHaveTextContent('Updated group');
+    expect(
+      within(getByRole('row', { name: /Project 1 \(saved\)/ })).getAllByRole('cell')[0],
+    ).toHaveTextContent('Updated group');
+  });
+
+  it('keeps long descriptions available and sorts by their full values', async () => {
+    const user = userEvent.setup();
+    const description = 'A very long description '.repeat(10).trim();
+    const { getAllByRole, getByTestId, getByTitle } = render(
+      <MyWorkloadTable
+        listOfProjects={[
+          { ...makeRow(1), description: `Z ${description}` },
+          { ...makeRow(2), description },
+        ]}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+
+    expect(getByTitle(description)).toHaveTextContent(description);
+    await user.click(getByTestId('hds-table-sorting-header-description'));
+    expect(
+      getAllByRole('row')
+        .slice(1)
+        .map((row) => within(row).getAllByRole('cell')[1].textContent),
+    ).toEqual(['Project 2', 'Project 1']);
   });
 
   it.each<MyWorkloadViewType>(['planning', 'construction'])(
@@ -207,7 +320,7 @@ describe('MyWorkloadTable', () => {
     const projectOrder = () =>
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent);
+        .map((row) => within(row).getAllByRole('cell')[1].textContent);
 
     expect(resetButton).not.toBeVisible();
     await user.click(getByTestId('hds-table-sorting-header-projectName'));
@@ -255,7 +368,7 @@ describe('MyWorkloadTable', () => {
     await user.click(getByText('myWorkloadView.table.resetSort'));
     const projectOrder = getAllByRole('row')
       .slice(1)
-      .map((row) => within(row).getAllByRole('cell')[0].textContent);
+      .map((row) => within(row).getAllByRole('cell')[1].textContent);
     expect(projectOrder).toEqual([
       'Project 11 (saved)',
       ...Array.from({ length: 9 }, (_, index) => `Project ${10 - index}`),
@@ -422,7 +535,7 @@ describe('MyWorkloadTable', () => {
       const projectOrder = () =>
         getAllByRole('row')
           .slice(1)
-          .map((row) => within(row).getAllByRole('cell')[0].textContent);
+          .map((row) => within(row).getAllByRole('cell')[1].textContent);
       const sortButton = getByTestId(`hds-table-sorting-header-${colKey}`);
 
       await user.click(sortButton);
@@ -466,7 +579,7 @@ describe('MyWorkloadTable', () => {
     const displayedDates = () =>
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[2].textContent);
+        .map((row) => within(row).getAllByRole('cell')[3].textContent);
     const sortButton = getByTestId('hds-table-sorting-header-planningStart');
 
     await user.click(sortButton);
@@ -497,7 +610,7 @@ describe('MyWorkloadTable', () => {
     expect(
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent),
+        .map((row) => within(row).getAllByRole('cell')[1].textContent),
     ).toEqual(['Project 1', 'Project 2', 'Project 3']);
   });
 
@@ -574,7 +687,7 @@ describe('MyWorkloadTable', () => {
     const projectOrder = () =>
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent);
+        .map((row) => within(row).getAllByRole('cell')[1].textContent);
     await user.click(planningStartSortButton);
     expect(projectOrder()).toEqual(
       Array.from({ length: 10 }, (_, index) => `Project ${index + 1}`),
@@ -641,7 +754,7 @@ describe('MyWorkloadTable', () => {
       const projectOrder = () =>
         getAllByRole('row')
           .slice(1)
-          .map((row) => within(row).getAllByRole('cell')[0].textContent);
+          .map((row) => within(row).getAllByRole('cell')[1].textContent);
       const expectedOrder = [1, 2, 3, 10, 4, 5, 6, 7, 8, 9].map((index) => `Project ${index}`);
       const sortButton = getByTestId('hds-table-sorting-header-phase');
 
@@ -683,7 +796,7 @@ describe('MyWorkloadTable', () => {
     const projectOrder = () =>
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent);
+        .map((row) => within(row).getAllByRole('cell')[1].textContent);
     const sortButton = getByTestId('hds-table-sorting-header-phase');
 
     await user.click(sortButton);
@@ -722,7 +835,7 @@ describe('MyWorkloadTable', () => {
     const projectOrder = () =>
       getAllByRole('row')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent);
+        .map((row) => within(row).getAllByRole('cell')[1].textContent);
     const sortButton = getByTestId('hds-table-sorting-header-phase');
     const pageLink = (pageNumber: number) =>
       within(getByTestId('my-workload-pagination-container')).getByRole('link', {

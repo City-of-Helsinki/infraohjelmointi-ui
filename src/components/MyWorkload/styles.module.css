@@ -30,6 +30,13 @@
   white-space: normal;
 }
 
+.descriptionCell {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .emptyStateText {
   margin-top: var(--spacing-m);
   margin-bottom: 0;
@@ -146,6 +153,14 @@
 .editDialogFields {
   display: grid;
   gap: var(--spacing-m);
+}
+
+.editDialogGroup p {
+  margin: 0;
+}
+
+.editDialogGroupName {
+  font-weight: 600;
 }
 
 .editDialogProjectSubtitle {
