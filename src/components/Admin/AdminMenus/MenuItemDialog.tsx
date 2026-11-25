@@ -5,10 +5,10 @@ import {
   PersonTypeDialogValues,
 } from '@/interfaces/menuItemsInterfaces';
 import {
-  deleteMenuItemsThunk,
-  patchMenuItemsThunk,
-  postMenuItemsThunk,
-} from '@/reducers/listsSlice';
+  useDeleteMenuListItemMutation,
+  usePatchMenuListItemMutation,
+  usePostMenuListItemMutation,
+} from '@/api/listsApi';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
 import { TFunction } from 'i18next';
@@ -38,6 +38,8 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const [patchMenuListItem] = usePatchMenuListItemMutation();
+  const [postMenuListItem] = usePostMenuListItemMutation();
   const { Header, Content, ActionButtons } = Dialog;
   const [menuItemName, setMenuItemName] = useState<string>(dialogState.value);
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
@@ -59,22 +61,18 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     if (!menuItemName || !dialogState.listType) return;
     try {
       if (dialogState.mode === 'edit') {
-        await dispatch(
-          patchMenuItemsThunk({
-            request: { value: menuItemName },
-            path: dialogState.path,
-            id: editableItemId,
-            listType: dialogState.listType,
-          }),
-        ).unwrap();
+        await patchMenuListItem({
+          request: { value: menuItemName },
+          path: dialogState.path,
+          id: editableItemId,
+          listType: dialogState.listType,
+        }).unwrap();
       } else {
-        await dispatch(
-          postMenuItemsThunk({
-            request: { value: menuItemName },
-            path: dialogState.path,
-            listType: dialogState.listType,
-          }),
-        ).unwrap();
+        await postMenuListItem({
+          request: { value: menuItemName },
+          path: dialogState.path,
+          listType: dialogState.listType,
+        }).unwrap();
       }
       setMenuItemName('');
       setSubmitAttempted(false);
@@ -102,6 +100,8 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     menuItemName,
     dialogState.path,
     dispatch,
+    patchMenuListItem,
+    postMenuListItem,
     handleClose,
     dialogMessages.submitError,
     dialogMessages.submitSuccessTitle,
@@ -179,6 +179,8 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const [patchMenuListItem] = usePatchMenuListItemMutation();
+  const [postMenuListItem] = usePostMenuListItemMutation();
   const { Header, Content, ActionButtons } = Dialog;
   const isResponsiblePersonDialog = dialogState.listType === 'responsiblePersonsRaw';
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
@@ -222,22 +224,18 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
 
     try {
       if (dialogState.mode === 'edit') {
-        await dispatch(
-          patchMenuItemsThunk({
-            request: fullRequest,
-            id: editableItemId,
-            path: dialogState.path,
-            listType: dialogState.listType,
-          }),
-        ).unwrap();
+        await patchMenuListItem({
+          request: fullRequest,
+          id: editableItemId,
+          path: dialogState.path,
+          listType: dialogState.listType,
+        }).unwrap();
       } else {
-        await dispatch(
-          postMenuItemsThunk({
-            request: fullRequest,
-            path: dialogState.path,
-            listType: dialogState.listType,
-          }),
-        ).unwrap();
+        await postMenuListItem({
+          request: fullRequest,
+          path: dialogState.path,
+          listType: dialogState.listType,
+        }).unwrap();
       }
       setPersonTypeDialogValues(emptyPersonTypeDialogValues);
       setSubmitAttempted(false);
@@ -269,6 +267,8 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     isResponsiblePersonDialog,
     handleClose,
     dispatch,
+    patchMenuListItem,
+    postMenuListItem,
     dialogMessages.submitSuccessMessage,
     dialogMessages.submitSuccessTitle,
     dialogMessages.submitError,
@@ -374,19 +374,18 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const [deleteMenuListItem] = useDeleteMenuListItemMutation();
   const { Header, ActionButtons, Content } = Dialog;
   const deletableItemId = dialogState.menuItemId;
 
   const onDeleteMenuItem = useCallback(async () => {
     if (!deletableItemId || !dialogState.listType) return;
     try {
-      await dispatch(
-        deleteMenuItemsThunk({
-          path: dialogState.path,
-          id: deletableItemId,
-          listType: dialogState.listType,
-        }),
-      ).unwrap();
+      await deleteMenuListItem({
+        path: dialogState.path,
+        id: deletableItemId,
+        listType: dialogState.listType,
+      }).unwrap();
       handleClose();
 
       dispatch(
@@ -412,6 +411,7 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     dialogState.listType,
     dialogState.path,
     dispatch,
+    deleteMenuListItem,
     handleClose,
     dialogMessages.submitSuccessMessage,
     dialogMessages.submitSuccessTitle,

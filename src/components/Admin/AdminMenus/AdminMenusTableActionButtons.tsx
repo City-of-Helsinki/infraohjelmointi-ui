@@ -5,7 +5,8 @@ import {
   PersonTypeDialogValues,
   ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
-import { moveRow, saveTableOrderThunk, revertRowOrder } from '@/reducers/listsSlice';
+import { moveRow, revertRowOrder } from '@/reducers/listsSlice';
+import { usePutMenuListOrderMutation } from '@/api/listsApi';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +17,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const store = useStore();
+  const [putMenuListOrder] = usePutMenuListOrderMutation();
   const isFirstRow = rowIndex === 0;
   const isLastRow = rowIndex === rowLength - 1;
 
@@ -26,7 +28,8 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
       dispatch(moveRow({ listType, rowId, direction }));
 
       try {
-        await dispatch(saveTableOrderThunk({ listType, path })).unwrap();
+        const reorderedRows = (store.getState() as RootState).lists[listType];
+        await putMenuListOrder({ request: reorderedRows, path }).unwrap();
         dispatch(
           notifySuccess({
             message: t('reorderSuccess'),
@@ -47,7 +50,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
         );
       }
     },
-    [dispatch, store, listType, path, t],
+    [dispatch, store, listType, path, t, putMenuListOrder],
   );
 
   return (

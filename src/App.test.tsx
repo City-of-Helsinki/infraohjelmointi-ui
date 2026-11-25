@@ -250,7 +250,7 @@ describe('App', () => {
 
     try {
       // getListsThunk only rejects when every list request fails.
-      mockedAxios.get.mockRejectedValue(mockError);
+      mockedAxios.mockRejectedValue(mockError);
 
       await waitFor(() => store.dispatch(getListsThunk()));
 
@@ -258,7 +258,10 @@ describe('App', () => {
 
       expect(storeError.message).toBe(mockError.message);
       expect(storeError.status).toBe(mockError.status);
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', mockError);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', {
+        status: mockError.status,
+        data: mockError.message,
+      });
     } finally {
       consoleErrorSpy.mockRestore();
     }

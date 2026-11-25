@@ -1,30 +1,8 @@
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict, IProjectDistrictOption } from '@/interfaces/locationInterfaces';
-import {
-  getConstructionPhases,
-  getPlanningPhases,
-  getProjectPhases,
-  getProjectQualityLevels,
-  getProjectTypes,
-  getProjectPhaseDetails,
-  getConstructionProcurementMethods,
-  getProjectCategories,
-  getResponsibleZones,
-  getPersons,
-  getDistricts,
-  getBudgetOverrunReasons,
-  getFinancingParties,
-  getProgrammers,
-  getProjectTypeQualifiers,
-  getPriorities,
-  getStaraProcurementReasons,
-  patchMenuListItem,
-  postMenuListItem,
-  putMenuListOrder,
-  getRawProgrammers,
-  deleteMenuListItem,
-} from '@/services/listServices';
+import { isValidProgrammer, listsApi } from '@/api/listsApi';
+import { FRESH_FETCH } from '@/api/infraohjelmointiApi';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { toSerializableError } from '@/utils/reduxErrorUtils';
@@ -32,12 +10,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import {
   DeleteRowPayload,
-  MenuItemDeleteThunkContent,
-  MenuItemPatchThunkContent,
-  MenuItemPostThunkContent,
   MoveRowPayload,
-  PersonTypeMenuItemPatchThunkContent,
-  PersonTypeMenuItemPostThunkContent,
   ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
 
@@ -109,15 +82,10 @@ const toResponsiblePersonsListItems = (persons: Array<IPerson>): Array<IListItem
   );
 
 const toProgrammersListItems = (programmers: Array<IPerson>): Array<IListItem> =>
-  programmers
-    .filter(
-      ({ firstName, lastName }) =>
-        firstName?.trim() && lastName?.trim() && !(firstName === 'Ei' && lastName === 'Valintaa'),
-    )
-    .map(({ id, firstName, lastName }) => ({
-      id,
-      value: `${firstName} ${lastName}`.trim(),
-    }));
+  programmers.filter(isValidProgrammer).map(({ id, firstName, lastName }) => ({
+    id,
+    value: `${firstName} ${lastName}`.trim(),
+  }));
 
 const syncDerivedPersonLists = (state: IListState, listType: ReorderableListType) => {
   if (listType === 'responsiblePersonsRaw') {
@@ -150,52 +118,85 @@ export const getProjectDistricts = (
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
   const failedRequests: Array<{ name: string; error: unknown }> = [];
   let requestCount = 0;
+  const { dispatch } = thunkAPI;
+  const { endpoints } = listsApi;
 
   // Run a request and fall back to an empty list on failure so one failing list doesn't block the rest.
-  const safely = async <T extends unknown[]>(
-    name: string,
-    request: () => Promise<T>,
-  ): Promise<T> => {
+  const safely = async <T>(name: string, request: () => Promise<T[]>): Promise<T[]> => {
     requestCount++;
     try {
       return await request();
     } catch (error) {
-      // The axios interceptor rejects canceled requests (e.g. user not loaded yet) with undefined.
-      if (error !== undefined) {
+      // The axios interceptor cancels requests e.g. when the user is not loaded yet.
+      const isCanceled = (error as { data?: unknown } | undefined)?.data === 'Request canceled';
+      if (!isCanceled) {
         console.error(`Error getting ${name}: `, error);
       }
       failedRequests.push({ name, error });
-      return [] as unknown as T;
+      return [];
     }
   };
 
   try {
     const requests = {
-      districts: safely('districts', getDistricts),
-      persons: safely('responsible persons', getPersons),
-      types: safely('project types', getProjectTypes),
-      typeQualifiers: safely('project type qualifiers', getProjectTypeQualifiers),
-      phases: safely('project phases', getProjectPhases),
-      projectPhaseDetails: safely('project phase details', getProjectPhaseDetails),
-      constructionProcurementMethods: safely(
-        'construction procurement methods',
-        getConstructionProcurementMethods,
+      districts: safely('districts', () =>
+        dispatch(endpoints.getDistricts.initiate(undefined, FRESH_FETCH)).unwrap(),
       ),
-      staraProcurementReasons: safely('stara procurement reasons', getStaraProcurementReasons),
-      categories: safely('project categories', getProjectCategories),
-      projectQualityLevels: safely('project quality levels', getProjectQualityLevels),
-      planningPhases: safely('planning phases', getPlanningPhases),
-      constructionPhases: safely('construction phases', getConstructionPhases),
-      responsibleZones: safely('responsible zones', getResponsibleZones),
-      budgetOverrunReasons: safely('budget overrun reasons', getBudgetOverrunReasons),
-      financingParties: safely('financing parties', getFinancingParties),
-      programmers: safely('programmers', getProgrammers),
-      programmersRaw: safely('raw programmers', getRawProgrammers),
-      priorities: safely('priorities', getPriorities),
+      persons: safely('responsible persons', () =>
+        dispatch(endpoints.getPersons.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      types: safely('project types', () =>
+        dispatch(endpoints.getProjectTypes.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      typeQualifiers: safely('project type qualifiers', () =>
+        dispatch(endpoints.getProjectTypeQualifiers.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      phases: safely('project phases', () =>
+        dispatch(endpoints.getProjectPhases.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      projectPhaseDetails: safely('project phase details', () =>
+        dispatch(endpoints.getProjectPhaseDetails.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      constructionProcurementMethods: safely('construction procurement methods', () =>
+        dispatch(
+          endpoints.getConstructionProcurementMethods.initiate(undefined, FRESH_FETCH),
+        ).unwrap(),
+      ),
+      staraProcurementReasons: safely('stara procurement reasons', () =>
+        dispatch(endpoints.getStaraProcurementReasons.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      categories: safely('project categories', () =>
+        dispatch(endpoints.getProjectCategories.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      projectQualityLevels: safely('project quality levels', () =>
+        dispatch(endpoints.getProjectQualityLevels.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      planningPhases: safely('planning phases', () =>
+        dispatch(endpoints.getPlanningPhases.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      constructionPhases: safely('construction phases', () =>
+        dispatch(endpoints.getConstructionPhases.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      responsibleZones: safely('responsible zones', () =>
+        dispatch(endpoints.getResponsibleZones.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      budgetOverrunReasons: safely('budget overrun reasons', () =>
+        dispatch(endpoints.getBudgetOverrunReasons.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      financingParties: safely('financing parties', () =>
+        dispatch(endpoints.getFinancingParties.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      programmersRaw: safely('programmers', () =>
+        dispatch(endpoints.getProgrammers.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
+      priorities: safely('priorities', () =>
+        dispatch(endpoints.getPriorities.initiate(undefined, FRESH_FETCH)).unwrap(),
+      ),
     };
 
     const districts = await requests.districts;
     const persons = await requests.persons;
+    const programmersRaw = await requests.programmersRaw;
 
     const lists = {
       types: await requests.types,
@@ -217,8 +218,8 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await requests.budgetOverrunReasons,
       financingParties: await requests.financingParties,
-      programmers: await requests.programmers,
-      programmersRaw: await requests.programmersRaw,
+      programmers: toProgrammersListItems(programmersRaw),
+      programmersRaw,
       priorities: await requests.priorities,
       projectClasses: [],
     };
@@ -232,76 +233,6 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
     return thunkAPI.rejectWithValue(toSerializableError(err));
   }
 });
-
-export const patchMenuItemsThunk = createAsyncThunk(
-  'listItem/patch',
-  async (
-    thunkContent: MenuItemPatchThunkContent | PersonTypeMenuItemPatchThunkContent,
-    thunkAPI,
-  ) => {
-    try {
-      const listItem = await patchMenuListItem(
-        thunkContent.request,
-        thunkContent.path,
-        thunkContent.id,
-      );
-      return listItem;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
-
-export const postMenuItemsThunk = createAsyncThunk(
-  'listItem/post',
-  async (thunkContent: MenuItemPostThunkContent | PersonTypeMenuItemPostThunkContent, thunkAPI) => {
-    try {
-      const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
-      return listItem;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
-
-export const deleteMenuItemsThunk = createAsyncThunk(
-  'listItem/delete',
-  async (thunkContent: MenuItemDeleteThunkContent, thunkAPI) => {
-    try {
-      await deleteMenuListItem(thunkContent.path, thunkContent.id);
-      return {
-        listType: thunkContent.listType,
-        rowId: thunkContent.id,
-      };
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
-
-export const saveTableOrderThunk = createAsyncThunk(
-  'listItem/saveOrder',
-  async (
-    {
-      listType,
-      path,
-    }: {
-      listType: keyof Omit<IListState, 'error'>;
-      path: string;
-    },
-    thunkAPI,
-  ) => {
-    try {
-      const state = thunkAPI.getState() as RootState;
-      const listData = state.lists[listType] as IListItem[];
-
-      const savedTable = await putMenuListOrder(listData, path);
-      return savedTable;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
 
 export const listsSlice = createSlice({
   name: 'lists',
@@ -351,36 +282,35 @@ export const listsSlice = createSlice({
     builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
-    builder.addCase(postMenuItemsThunk.fulfilled, (state, action) => {
-      const { listType } = action.meta.arg;
-      const newItem = action.payload;
-
-      const list = state[listType];
+    builder.addMatcher(listsApi.endpoints.postMenuListItem.matchFulfilled, (state, action) => {
+      const { listType } = action.meta.arg.originalArgs;
+      const list = state[listType] as Array<IListItem | IPerson>;
       if (!list) return;
 
       list.push({
-        ...newItem,
+        ...action.payload,
         order: list.length,
       });
 
       syncDerivedPersonLists(state, listType);
     });
-    builder.addCase(patchMenuItemsThunk.fulfilled, (state, action) => {
-      const { listType } = action.meta.arg;
+    builder.addMatcher(listsApi.endpoints.patchMenuListItem.matchFulfilled, (state, action) => {
+      const { listType } = action.meta.arg.originalArgs;
       const updatedItem = action.payload;
+      const list = state[listType] as Array<IListItem | IPerson>;
 
-      const index = state[listType].findIndex((item) => item.id === updatedItem.id);
+      const index = list.findIndex((item) => item.id === updatedItem.id);
 
       if (index !== -1) {
-        state[listType][index] = updatedItem;
+        list[index] = updatedItem;
         syncDerivedPersonLists(state, listType);
       }
     });
-    builder.addCase(deleteMenuItemsThunk.fulfilled, (state, action) => {
-      const { listType, rowId } = action.payload;
+    builder.addMatcher(listsApi.endpoints.deleteMenuListItem.matchFulfilled, (state, action) => {
+      const { listType, id } = action.meta.arg.originalArgs;
 
       const list = state[listType];
-      const index = list.findIndex((row: { id: string }) => row.id === rowId);
+      const index = list.findIndex((row: { id: string }) => row.id === id);
 
       if (index !== -1) {
         list.splice(index, 1);

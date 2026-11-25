@@ -1,22 +1,31 @@
-import axios from 'axios';
-import listsReducer, {
-  deleteMenuItemsThunk,
-  getListsThunk,
-  IListState,
-  patchMenuItemsThunk,
-  postMenuItemsThunk,
-} from './listsSlice';
+import axios, { AxiosRequestConfig } from 'axios';
+import listsReducer, { getListsThunk, IListState } from './listsSlice';
+import { listsApi } from '@/api/listsApi';
+import { setupStore } from '@/store';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockError } from '@/mocks/mockError';
 import { mockProjectTypes } from '@/mocks/mockLists';
-import type { Mocked } from 'vitest';
+import type { MockedFunction } from 'vitest';
 
 vi.mock('axios');
 
-const mockedAxios = axios as Mocked<typeof axios>;
+const mockedAxios = axios as MockedFunction<typeof axios>;
 
 const createState = () => listsReducer(undefined, { type: 'init' });
+
+type Store = ReturnType<typeof setupStore>;
+
+const runMutation = async (
+  lists: IListState,
+  response: unknown,
+  mutate: (dispatch: Store['dispatch']) => { unwrap: () => Promise<unknown> },
+) => {
+  const store = setupStore({ lists });
+  mockedAxios.mockResolvedValueOnce({ data: response });
+  await mutate(store.dispatch).unwrap();
+  return store.getState().lists;
+};
 
 const createPerson = (id: string, firstName: string, lastName: string): IPerson => ({
   id,
@@ -28,7 +37,7 @@ const createPerson = (id: string, firstName: string, lastName: string): IPerson 
 });
 
 describe('listsSlice admin menu person list synchronization', () => {
-  it('updates responsiblePersons when a responsiblePersonsRaw row is added', () => {
+  it('updates responsiblePersons when a responsiblePersonsRaw row is added', async () => {
     const state = {
       ...createState(),
       responsiblePersonsRaw: [createPerson('1', 'Alice', 'Zephyr')],
@@ -37,13 +46,14 @@ describe('listsSlice admin menu person list synchronization', () => {
 
     const addedPerson = createPerson('2', 'Bob', 'Anders');
 
-    const nextState = listsReducer(
-      state,
-      postMenuItemsThunk.fulfilled(addedPerson, 'req-1', {
-        path: 'persons',
-        listType: 'responsiblePersonsRaw',
-        request: { firstName: 'Bob', lastName: 'Anders', email: 'bob@example.com' },
-      }),
+    const nextState = await runMutation(state, addedPerson, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.postMenuListItem.initiate({
+          path: 'persons',
+          listType: 'responsiblePersonsRaw',
+          request: { firstName: 'Bob', lastName: 'Anders', email: 'bob@example.com' },
+        }),
+      ),
     );
 
     expect(nextState.responsiblePersonsRaw).toHaveLength(2);
@@ -53,7 +63,7 @@ describe('listsSlice admin menu person list synchronization', () => {
     ]);
   });
 
-  it('updates responsiblePersons when a responsiblePersonsRaw row is edited', () => {
+  it('updates responsiblePersons when a responsiblePersonsRaw row is edited', async () => {
     const state = {
       ...createState(),
       responsiblePersonsRaw: [createPerson('1', 'Alice', 'Zephyr')],
@@ -62,21 +72,22 @@ describe('listsSlice admin menu person list synchronization', () => {
 
     const updatedPerson = createPerson('1', 'Alice', 'Aalto');
 
-    const nextState = listsReducer(
-      state,
-      patchMenuItemsThunk.fulfilled(updatedPerson, 'req-2', {
-        path: 'persons',
-        id: '1',
-        listType: 'responsiblePersonsRaw',
-        request: { firstName: 'Alice', lastName: 'Aalto', email: 'alice@example.com' },
-      }),
+    const nextState = await runMutation(state, updatedPerson, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.patchMenuListItem.initiate({
+          path: 'persons',
+          id: '1',
+          listType: 'responsiblePersonsRaw',
+          request: { firstName: 'Alice', lastName: 'Aalto', email: 'alice@example.com' },
+        }),
+      ),
     );
 
     expect(nextState.responsiblePersonsRaw[0].lastName).toBe('Aalto');
     expect(nextState.responsiblePersons).toEqual([{ id: '1', value: 'Aalto Alice' }]);
   });
 
-  it('updates responsiblePersons when a responsiblePersonsRaw row is deleted', () => {
+  it('updates responsiblePersons when a responsiblePersonsRaw row is deleted', async () => {
     const state = {
       ...createState(),
       responsiblePersonsRaw: [
@@ -89,20 +100,21 @@ describe('listsSlice admin menu person list synchronization', () => {
       ],
     };
 
-    const nextState = listsReducer(
-      state,
-      deleteMenuItemsThunk.fulfilled({ listType: 'responsiblePersonsRaw', rowId: '1' }, 'req-3', {
-        path: 'persons',
-        id: '1',
-        listType: 'responsiblePersonsRaw',
-      }),
+    const nextState = await runMutation(state, undefined, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.deleteMenuListItem.initiate({
+          path: 'persons',
+          id: '1',
+          listType: 'responsiblePersonsRaw',
+        }),
+      ),
     );
 
     expect(nextState.responsiblePersonsRaw).toHaveLength(1);
     expect(nextState.responsiblePersons).toEqual([{ id: '2', value: 'Aalto Bob' }]);
   });
 
-  it('updates programmers when a programmersRaw row is added', () => {
+  it('updates programmers when a programmersRaw row is added', async () => {
     const state = {
       ...createState(),
       programmersRaw: [createPerson('1', 'Alice', 'Coder')],
@@ -111,13 +123,14 @@ describe('listsSlice admin menu person list synchronization', () => {
 
     const addedProgrammer = createPerson('2', 'Bob', 'Builder');
 
-    const nextState = listsReducer(
-      state,
-      postMenuItemsThunk.fulfilled(addedProgrammer, 'req-4', {
-        path: 'project-programmers',
-        listType: 'programmersRaw',
-        request: { firstName: 'Bob', lastName: 'Builder' },
-      }),
+    const nextState = await runMutation(state, addedProgrammer, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.postMenuListItem.initiate({
+          path: 'project-programmers',
+          listType: 'programmersRaw',
+          request: { firstName: 'Bob', lastName: 'Builder' },
+        }),
+      ),
     );
 
     expect(nextState.programmersRaw).toHaveLength(2);
@@ -127,7 +140,7 @@ describe('listsSlice admin menu person list synchronization', () => {
     ]);
   });
 
-  it('updates programmers when a programmersRaw row is edited', () => {
+  it('updates programmers when a programmersRaw row is edited', async () => {
     const state = {
       ...createState(),
       programmersRaw: [createPerson('1', 'Alice', 'Coder')],
@@ -136,21 +149,22 @@ describe('listsSlice admin menu person list synchronization', () => {
 
     const updatedProgrammer = createPerson('1', 'Aino', 'Coder');
 
-    const nextState = listsReducer(
-      state,
-      patchMenuItemsThunk.fulfilled(updatedProgrammer, 'req-5', {
-        path: 'project-programmers',
-        id: '1',
-        listType: 'programmersRaw',
-        request: { firstName: 'Aino', lastName: 'Coder' },
-      }),
+    const nextState = await runMutation(state, updatedProgrammer, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.patchMenuListItem.initiate({
+          path: 'project-programmers',
+          id: '1',
+          listType: 'programmersRaw',
+          request: { firstName: 'Aino', lastName: 'Coder' },
+        }),
+      ),
     );
 
     expect(nextState.programmersRaw[0].firstName).toBe('Aino');
     expect(nextState.programmers).toEqual([{ id: '1', value: 'Aino Coder' }]);
   });
 
-  it('updates programmers when a programmersRaw row is deleted', () => {
+  it('updates programmers when a programmersRaw row is deleted', async () => {
     const state = {
       ...createState(),
       programmersRaw: [createPerson('1', 'Alice', 'Coder'), createPerson('2', 'Bob', 'Builder')],
@@ -160,13 +174,14 @@ describe('listsSlice admin menu person list synchronization', () => {
       ],
     };
 
-    const nextState = listsReducer(
-      state,
-      deleteMenuItemsThunk.fulfilled({ listType: 'programmersRaw', rowId: '1' }, 'req-6', {
-        path: 'project-programmers',
-        id: '1',
-        listType: 'programmersRaw',
-      }),
+    const nextState = await runMutation(state, undefined, (dispatch) =>
+      dispatch(
+        listsApi.endpoints.deleteMenuListItem.initiate({
+          path: 'project-programmers',
+          id: '1',
+          listType: 'programmersRaw',
+        }),
+      ),
     );
 
     expect(nextState.programmersRaw).toHaveLength(1);
@@ -181,19 +196,26 @@ describe('getListsThunk', () => {
 
   it('resolves with the remaining lists when a single list request fails', async () => {
     mockGetResponseProvider();
-    const defaultGet = mockedAxios.get.getMockImplementation();
-    mockedAxios.get.mockImplementation((url, config) =>
-      url.endsWith('/project-priority/') ? Promise.reject(mockError) : defaultGet!(url, config),
+    const defaultRequest = mockedAxios.getMockImplementation() as (
+      config?: AxiosRequestConfig | string,
+    ) => Promise<unknown>;
+    mockedAxios.mockImplementation((config?: AxiosRequestConfig | string) =>
+      typeof config === 'object' && config.url?.endsWith('/project-priority/')
+        ? Promise.reject(mockError)
+        : defaultRequest(config),
     );
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    const action = await getListsThunk()(vi.fn(), () => ({}), undefined);
+    const action = await setupStore().dispatch(getListsThunk());
 
     expect(action.meta.requestStatus).toBe('fulfilled');
     const payload = action.payload as Partial<IListState>;
     expect(payload.priorities).toEqual([]);
     expect(payload.types).toEqual(mockProjectTypes.data);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', mockError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error getting priorities: ', {
+      status: mockError.status,
+      data: mockError.message,
+    });
   });
 });

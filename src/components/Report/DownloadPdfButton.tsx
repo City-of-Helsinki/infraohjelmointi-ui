@@ -14,7 +14,8 @@ import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
-import { getDistricts } from '@/services/listServices';
+import { listsApi } from '@/api/listsApi';
+import { FRESH_FETCH } from '@/api/infraohjelmointiApi';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getCoordinationViewReportPdfRows } from '@/utils/reportHelpers';
@@ -138,6 +139,9 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
   const LOADING_PDF_DATA = 'loading-pdf-data';
 
   const downloadPdf = useCallback(async () => {
+    const getDistricts = () =>
+      dispatch(listsApi.endpoints.getDistricts.initiate(undefined, FRESH_FETCH)).unwrap();
+
     try {
       dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PDF_DATA }));
 

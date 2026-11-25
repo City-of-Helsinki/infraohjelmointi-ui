@@ -5,20 +5,13 @@ import { act } from 'react';
 import { Route } from 'react-router';
 import { screen, waitFor } from '@testing-library/react';
 import { useOptions } from '@/hooks/useOptions';
-import * as listServices from '@/services/listServices';
-import type { Mock } from 'vitest';
+import axios from 'axios';
+import type { MockedFunction } from 'vitest';
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('axios');
 
-vi.mock('@/services/listServices', async () => {
-  const actual =
-    await vi.importActual<typeof import('@/services/listServices')>('@/services/listServices');
-
-  return {
-    ...actual,
-    postMenuListItem: vi.fn(),
-  };
-});
+const mockedAxios = axios as MockedFunction<typeof axios>;
 
 const ResponsiblePersonOptionsConsumer = () => {
   const options = useOptions('responsiblePersons');
@@ -108,14 +101,15 @@ describe('AdminMenus', () => {
   });
 
   it('updates responsible person options immediately after adding a responsible person via admin menu', async () => {
-    const postMenuListItemMock = listServices.postMenuListItem as Mock;
-    postMenuListItemMock.mockResolvedValueOnce({
-      id: '11',
-      firstName: 'Matti',
-      lastName: 'Metsanen',
-      email: 'matti.metsanen@example.com',
-      title: 'Engineer',
-      phone: '0501234567',
+    mockedAxios.mockResolvedValueOnce({
+      data: {
+        id: '11',
+        firstName: 'Matti',
+        lastName: 'Metsanen',
+        email: 'matti.metsanen@example.com',
+        title: 'Engineer',
+        phone: '0501234567',
+      },
     });
 
     const { user } = await act(async () =>
@@ -169,15 +163,18 @@ describe('AdminMenus', () => {
     await waitFor(() => {
       expect(screen.getByTestId('responsible-person-options')).toHaveTextContent('Metsanen Matti');
     });
-    expect(postMenuListItemMock).toHaveBeenCalledWith(
-      {
-        firstName: 'Matti',
-        lastName: 'Metsanen',
-        email: 'matti.metsanen@example.com',
-        phone: '0501234567',
-        title: 'Engineer',
-      },
-      'persons',
+    expect(mockedAxios).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: expect.stringMatching(/\/persons\/$/),
+        method: 'POST',
+        data: {
+          firstName: 'Matti',
+          lastName: 'Metsanen',
+          email: 'matti.metsanen@example.com',
+          phone: '0501234567',
+          title: 'Engineer',
+        },
+      }),
     );
   });
 });

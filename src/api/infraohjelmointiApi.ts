@@ -60,6 +60,9 @@ export const axiosBaseQuery =
     }
   };
 
+// initiate() options for imperative one-off fetches that bypass the cache.
+export const FRESH_FETCH = { subscribe: false, forceRefetch: true } as const;
+
 export const infraohjelmointiApi = createApi({
   reducerPath: 'infraohjelmointiApi',
   baseQuery: axiosBaseQuery({ baseUrl: API_URL || '' }),
