@@ -136,6 +136,7 @@ describe('formatHistoryAmount', () => {
     ['12.50', '12,5'],
     [42, '42'],
     ['not-a-number', 'not-a-number'],
+    [{ unexpected: true }, '–'],
   ])('formats %p as %p', (input, expected) => {
     expect(formatHistoryAmount(input)).toBe(expected);
   });
