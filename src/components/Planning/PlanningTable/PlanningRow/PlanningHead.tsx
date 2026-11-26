@@ -13,6 +13,7 @@ import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlic
 import { createSearchParams } from 'react-router';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 import useRestrictedClassAccess from '@/hooks/useRestrictedClassAccess';
 import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
@@ -38,8 +39,24 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const { search } = useLocation();
   const user = useAppSelector(selectUser);
-  // Restricted programmers (IO-756) can't manage summing groups
-  const { isRestricted } = useRestrictedClassAccess();
+  const { isRestricted, canEditClass } = useRestrictedClassAccess();
+  const planningGroups = useAppSelector(selectPlanningGroups);
+
+  // Restricted programmers (IO-756) may edit, but not delete, the groups of their own
+  // classes. Editing is the only way to move a project into a group.
+  const isMenuDisabled = useMemo(() => {
+    if (isUserOnlyViewer(user)) {
+      return true;
+    }
+    if (!isRestricted) {
+      return false;
+    }
+    if (type !== 'group') {
+      return true;
+    }
+    const classRelation = planningGroups.find((g) => g.id === id)?.classRelation;
+    return !classRelation || !canEditClass(classRelation);
+  }, [user, isRestricted, type, planningGroups, id, canEditClass]);
 
   const [groupDialogState, setGroupDialogState] = useState({
     groupDeleteOpen: false,
@@ -75,10 +92,15 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     (e: ReactMouseEvent<HTMLButtonElement>) => {
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_GROUP_ROW,
-        groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog, onShowGroupEditDialog },
+        groupRowMenuProps: {
+          groupName: name,
+          onShowGroupDeleteDialog,
+          onShowGroupEditDialog,
+          canDelete: !isRestricted,
+        },
       });
     },
-    [name, onShowGroupDeleteDialog, onShowGroupEditDialog],
+    [name, onShowGroupDeleteDialog, onShowGroupEditDialog, isRestricted],
   );
 
   /**
@@ -140,7 +162,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               <button
                 onClick={handleGroupRowMenu}
                 data-testid={`show-more-icon-${id}`}
-                disabled={isUserOnlyViewer(user) || isRestricted}
+                disabled={isMenuDisabled}
               >
                 <IconMenuDots size={IconSize.Small} />
               </button>
