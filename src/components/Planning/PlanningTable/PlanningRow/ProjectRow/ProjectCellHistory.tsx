@@ -25,7 +25,7 @@ export const formatHistoryAmount = (value: unknown): string => {
   }
   const amount = Number(value);
   if (Number.isNaN(amount)) {
-    return String(value);
+    return typeof value === 'string' ? value : EMPTY_AMOUNT;
   }
   return amount.toLocaleString('fi-FI', { maximumFractionDigits: 2 });
 };
