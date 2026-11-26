@@ -9,7 +9,7 @@ import { renderWithProviders } from '@/utils/testUtils';
 import MyWorkloadBaseView from './MyWorkloadBaseView';
 import type { MockInstance, MockedFunction } from 'vitest';
 import { mockGroups } from '@/mocks/mockGroups';
-import { getPlanningGroupsThunk } from '@/reducers/groupSlice';
+import { setPlanningGroups } from '@/reducers/groupSlice';
 
 vi.mock('react-i18next', async () => {
   const mock = (await import('@/mocks/mockI18next')).default();
@@ -135,7 +135,7 @@ describe('MyWorkloadBaseView', () => {
     const callsBeforeGroupUpdate = mockedGetProjectsWithParams.mock.calls.length;
 
     act(() => {
-      store.dispatch(getPlanningGroupsThunk.fulfilled(mockGroups.data, 'request-id', 2026));
+      store.dispatch(setPlanningGroups(mockGroups.data));
     });
 
     expect(getByText('Test Group 1')).toBeInTheDocument();

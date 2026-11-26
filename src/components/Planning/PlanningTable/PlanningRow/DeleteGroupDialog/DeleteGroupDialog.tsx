@@ -8,8 +8,7 @@ import {
   IconTrash,
 } from 'hds-react';
 import { useTranslation } from 'react-i18next';
-import { deleteGroupThunk } from '@/reducers/groupSlice';
-import { useAppDispatch } from '@/hooks/common';
+import { useDeleteGroupMutation } from '@/api/groupApi';
 import './styles.css';
 
 interface DeleteGroupDialogProps {
@@ -22,16 +21,16 @@ interface DeleteGroupDialogProps {
 const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
   ({ isVisible, onCloseDeleteGroupDialog, groupName, id }) => {
     const { t } = useTranslation();
-    const dispatch = useAppDispatch();
+    const [deleteGroup] = useDeleteGroupMutation();
 
     const handleDeleteGroup = useCallback(async () => {
       try {
-        await dispatch(deleteGroupThunk(id));
+        await deleteGroup(id).unwrap();
         onCloseDeleteGroupDialog();
       } catch (e) {
         console.log('Error deleting group: ', e);
       }
-    }, [dispatch, id, onCloseDeleteGroupDialog]);
+    }, [deleteGroup, id, onCloseDeleteGroupDialog]);
 
     const { Header, Content, ActionButtons } = Dialog;
 

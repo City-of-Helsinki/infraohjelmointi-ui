@@ -27,6 +27,7 @@ import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
 import { mockUser } from '@/mocks/mockUsers';
 import type { Mocked } from 'vitest';
 
@@ -94,6 +95,7 @@ const mockedAxios = axios as Mocked<typeof axios>;
 describe('GroupDialog', () => {
   beforeEach(() => {
     mockGetResponseProvider();
+    routeAxiosConfigCallsToMethodMocks(mockedAxios);
   });
 
   afterEach(async () => {

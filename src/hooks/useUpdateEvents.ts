@@ -363,6 +363,7 @@ const useUpdateEvents = () => {
               type,
             }),
           ),
+          dispatch(updateGroup({ data: forcedToFrame.group, type })),
           dispatch(updateDistrict({ data: forcedToFrame.district, type })),
         ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }

@@ -124,6 +124,15 @@ const render = async (): Promise<CustomRenderResult> =>
 
 describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
+  // Group mutations trigger a project refetch that would otherwise overwrite later SSE updates
+  const settleGetRequestsSince = async (callCount: number) => {
+    await waitFor(() => expect(mockedAxios.get.mock.calls.length).toBeGreaterThan(callCount));
+    await act(async () => {
+      await Promise.allSettled(
+        mockedAxios.get.mock.results.slice(callCount).map(({ value }) => value),
+      );
+    });
+  };
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
     const { user, store, findByTestId } = renderResult;
     const { masterClasses, classes } = store.getState().class.planning;
@@ -1914,6 +1923,7 @@ describe('PlanningView', () => {
             getAllByTestId,
             getByTestId,
             queryByTestId,
+            queryByRole,
           } = await render();
           addProjectUpdateEventListener(store.dispatch);
           const { masterClasses, classes, subClasses } = store.getState().class.planning;
@@ -2071,7 +2081,10 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(patchGroupResponse);
 
+          const getCallCount = mockedAxios.get.mock.calls.length;
           await user.click(submitButton);
+          await waitFor(() => expect(queryByRole('dialog')).not.toBeInTheDocument());
+          await settleGetRequestsSince(getCallCount);
 
           await sendProjectUpdateEvent({
             ...projectsForSubClassWithoutGroup[0],
@@ -2098,7 +2111,8 @@ describe('PlanningView', () => {
         });
 
         it('can remove groups using context menu', async () => {
-          const { store, user, findByTestId, getByTestId, findByRole } = await render();
+          const { store, user, findByTestId, getByTestId, findByRole, queryByRole } =
+            await render();
           addProjectUpdateEventListener(store.dispatch);
           const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
@@ -2209,7 +2223,10 @@ describe('PlanningView', () => {
             },
           };
           mockedAxios.delete.mockResolvedValueOnce(mockDeleteResponse);
+          const getCallCount = mockedAxios.get.mock.calls.length;
           await user.click(deleteButton);
+          await waitFor(() => expect(queryByRole('dialog')).not.toBeInTheDocument());
+          await settleGetRequestsSince(getCallCount);
 
           await sendProjectUpdateEvent({
             ...projectInGroup,

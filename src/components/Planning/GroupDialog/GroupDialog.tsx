@@ -5,12 +5,11 @@ import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
 import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
-import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
+import { usePatchGroupMutation, usePostGroupMutation } from '@/api/groupApi';
 import { IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
-import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router';
@@ -70,7 +69,8 @@ const DialogContainer: FC<IDialogProps> = memo(
       }
     }, [formValues.district.value, formValues.division.value]);
 
-    const dispatch = useAppDispatch();
+    const [postGroup] = usePostGroupMutation();
+    const [patchGroup] = usePatchGroupMutation();
     const { t } = useTranslation();
 
     const navigateToGroupLocation = useCallback(
@@ -103,31 +103,28 @@ const DialogContainer: FC<IDialogProps> = memo(
       async (form: IGroupForm) => {
         if (editMode && id) {
           try {
-            const group = await patchGroup(
+            await patchGroup(
               buildRequestPayload(
                 form,
                 id,
                 hierarchyDistricts,
                 hierarchyDivisions,
               ) as IGroupPatchRequestObject,
-            );
-            dispatch(updateGroup({ data: group, type: 'planning' }));
+            ).unwrap();
             handleDialogClose();
           } catch (e) {
             console.log('Error patching group: ', e);
           }
         } else {
           try {
-            await dispatch(
-              postGroupThunk(
-                buildRequestPayload(
-                  form,
-                  null,
-                  hierarchyDistricts,
-                  hierarchyDivisions,
-                ) as IGroupRequest,
-              ),
-            );
+            await postGroup(
+              buildRequestPayload(
+                form,
+                null,
+                hierarchyDistricts,
+                hierarchyDivisions,
+              ) as IGroupRequest,
+            ).unwrap();
             handleDialogClose();
             navigateToGroupLocation(form);
           } catch (e) {
@@ -136,7 +133,8 @@ const DialogContainer: FC<IDialogProps> = memo(
         }
       },
       [
-        dispatch,
+        postGroup,
+        patchGroup,
         handleDialogClose,
         editMode,
         id,
