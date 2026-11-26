@@ -27,10 +27,11 @@ import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
 import {
-  getCoordinationGroupsThunk,
-  getForcedToFrameGroupsThunk,
-  getPlanningGroupsThunk,
+  setCoordinationGroups,
+  setForcedToFrameGroups,
+  setPlanningGroups,
 } from './reducers/groupSlice';
+import { groupApi } from './api/groupApi';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { getSapCostsThunk, getSapCurrentYearThunk } from './reducers/sapCostSlice';
@@ -70,7 +71,12 @@ export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
   dispatch(setLoading({ text: 'Loading app data', id: 'planning' }));
   try {
-    await dispatch(getPlanningGroupsThunk(year));
+    const planningGroups = await dispatch(
+      groupApi.endpoints.getPlanningGroups.initiate(year, FRESH_FETCH),
+    );
+    if (planningGroups.isSuccess) {
+      dispatch(setPlanningGroups(planningGroups.data));
+    }
     const planningClasses = await dispatch(
       classApi.endpoints.getPlanningClasses.initiate(year, FRESH_FETCH),
     );
@@ -91,7 +97,15 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
   dispatch(setIsPlanningLoading(true));
   dispatch(setLoading({ text: 'Loading app data', id: 'coordination' }));
   try {
-    await dispatch(getCoordinationGroupsThunk(year));
+    const coordinationGroups = await dispatch(
+      groupApi.endpoints.getCoordinationGroups.initiate(
+        { forcedToFrame: false, year },
+        FRESH_FETCH,
+      ),
+    );
+    if (coordinationGroups.isSuccess) {
+      dispatch(setCoordinationGroups(coordinationGroups.data));
+    }
     const coordinationClasses = await dispatch(
       classApi.endpoints.getCoordinationClasses.initiate(
         { forcedToFrame: false, year },
@@ -102,7 +116,12 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
       dispatch(setCoordinationClasses(coordinationClasses.data));
     }
     await dispatch(getCoordinationLocationsThunk(year));
-    await dispatch(getForcedToFrameGroupsThunk(year));
+    const forcedToFrameGroups = await dispatch(
+      groupApi.endpoints.getCoordinationGroups.initiate({ forcedToFrame: true, year }, FRESH_FETCH),
+    );
+    if (forcedToFrameGroups.isSuccess) {
+      dispatch(setForcedToFrameGroups(forcedToFrameGroups.data));
+    }
     const forcedToFrameClasses = await dispatch(
       classApi.endpoints.getCoordinationClasses.initiate(
         { forcedToFrame: true, year },

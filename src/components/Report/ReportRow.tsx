@@ -14,7 +14,7 @@ import { separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
 import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
 import { classApi } from '@/api/classApi';
 import { useAppDispatch } from '@/hooks/common';
-import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupServices';
+import { groupApi } from '@/api/groupApi';
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
@@ -91,7 +91,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     const forcedToFrameDistricts = separateLocationsIntoHierarchy(locationRes, true);
 
     // groups
-    const groupRes = await getCoordinatorGroups(year, forcedToFrame);
+    const groupRes = await dispatch(
+      groupApi.endpoints.getCoordinationGroups.initiate({ forcedToFrame, year }, FRESH_FETCH),
+    ).unwrap();
 
     // selections
     const initialSelections: IPlanningRowSelections = {
@@ -146,7 +148,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     const planningDistricts = separateLocationsIntoHierarchy(locationRes, false);
 
     // groups
-    const groupRes = await getPlanningGroups(year);
+    const groupRes = await dispatch(
+      groupApi.endpoints.getPlanningGroups.initiate(year, FRESH_FETCH),
+    ).unwrap();
 
     // selections
     const initialSelections: IPlanningRowSelections = {

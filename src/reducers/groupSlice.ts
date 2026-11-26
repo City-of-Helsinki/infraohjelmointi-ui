@@ -1,18 +1,12 @@
-import { IError } from '@/interfaces/common';
-import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
-import {
-  deleteGroup,
-  getCoordinatorGroups,
-  getPlanningGroups,
-  postGroup,
-} from '@/services/groupServices';
-import { toSerializableError } from '@/utils/reduxErrorUtils';
+import { groupApi } from '@/api/groupApi';
+import { IGroup } from '@/interfaces/groupInterfaces';
+import { getErrorFromRejectedAction } from '@/utils/reduxErrorUtils';
 import { RootState } from '@/store';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 
 interface IGroupUpdatePayload {
   data: IGroup | null;
-  type: 'coordination' | 'planning';
+  type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 interface IGroupsState {
   planning: { groups: Array<IGroup>; year: number };
@@ -27,63 +21,22 @@ const initialState: IGroupsState = {
   forcedToFrame: { groups: [], year: new Date().getFullYear() },
   error: null,
 };
-export const getCoordinationGroupsThunk = createAsyncThunk(
-  'group/getAllCoordinator',
-  async (year: number, thunkAPI) => {
-    try {
-      return await getCoordinatorGroups(year, false);
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
-export const getForcedToFrameGroupsThunk = createAsyncThunk(
-  'group/getAllForcedToFrame',
-  async (year: number, thunkAPI) => {
-    try {
-      return await getCoordinatorGroups(year, true);
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
-export const postGroupThunk = createAsyncThunk(
-  'group/post',
-  async (request: IGroupRequest, thunkAPI) => {
-    try {
-      const group = await postGroup(request);
-      return group;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
 
-export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: string, thunkAPI) => {
-  try {
-    const res = await deleteGroup(id);
-    return res;
-  } catch (e) {
-    return thunkAPI.rejectWithValue(toSerializableError(e));
-  }
-});
-
-export const getPlanningGroupsThunk = createAsyncThunk(
-  'group/getAllPlanning',
-  async (year: number, thunkAPI) => {
-    try {
-      const groups = await getPlanningGroups(year);
-      return groups;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(toSerializableError(e));
-    }
-  },
-);
+const toGroupsState = (groups: Array<IGroup>) => ({ year: groups[0]?.finances?.year, groups });
 
 export const groupSlice = createSlice({
   name: 'group',
   initialState,
   reducers: {
+    setPlanningGroups(state, action: PayloadAction<Array<IGroup>>) {
+      return { ...state, planning: toGroupsState(action.payload) };
+    },
+    setCoordinationGroups(state, action: PayloadAction<Array<IGroup>>) {
+      return { ...state, coordination: toGroupsState(action.payload) };
+    },
+    setForcedToFrameGroups(state, action: PayloadAction<Array<IGroup>>) {
+      return { ...state, forcedToFrame: toGroupsState(action.payload) };
+    },
     updateGroup(state, action: PayloadAction<IGroupUpdatePayload>) {
       const { data, type } = action.payload;
 
@@ -93,83 +46,38 @@ export const groupSlice = createSlice({
       }
     },
   },
+  // Query results are not synced here: ReportRow fetches other years via the same endpoints.
   extraReducers: (builder) => {
-    // GROUP POST
-    builder.addCase(postGroupThunk.fulfilled, (state, action: PayloadAction<IGroup>) => {
-      return {
-        ...state,
-        planning: { groups: [...state.planning.groups, action.payload], year: 2023 },
-      };
+    builder.addMatcher(groupApi.endpoints.postGroup.matchFulfilled, (state, action) => {
+      state.planning.groups.push(action.payload);
     });
-    builder.addCase(postGroupThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
+    builder.addMatcher(groupApi.endpoints.patchGroup.matchFulfilled, (state, action) => {
+      state.planning.groups = state.planning.groups.map((g) =>
+        g.id === action.payload.id ? action.payload : g,
+      );
     });
-    // GROUP GET ALL PLANNING GROUPS
-    builder.addCase(
-      getPlanningGroupsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IGroup>>) => {
-        return {
-          ...state,
-          planning: { year: action.payload[0]?.finances?.year, groups: action.payload },
-        };
-      },
-    );
-    builder.addCase(getPlanningGroupsThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
+    builder.addMatcher(groupApi.endpoints.deleteGroup.matchFulfilled, (state, action) => {
+      const id = action.meta.arg.originalArgs;
+      state.planning.groups = state.planning.groups.filter((g) => g.id !== id);
+      state.coordination.groups = state.coordination.groups.filter((g) => g.id !== id);
     });
-    // GROUP DELETE
-    builder.addCase(deleteGroupThunk.fulfilled, (state, action: PayloadAction<{ id: string }>) => {
-      return {
-        ...state,
-        planning: {
-          ...state.planning,
-          groups: state.planning.groups.filter((g) => g.id !== action.payload.id),
-        },
-        coordination: {
-          ...state.coordination,
-          groups: state.coordination.groups.filter((g) => g.id !== action.payload.id),
-        },
-      };
-    });
-    builder.addCase(deleteGroupThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // GET ALL COORDINATION
-    builder.addCase(
-      getCoordinationGroupsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IGroup>>) => {
-        return {
-          ...state,
-          coordination: { year: action.payload[0]?.finances?.year, groups: action.payload },
-        };
-      },
-    );
-    builder.addCase(
-      getCoordinationGroupsThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
-    // GET ALL FORCED TO FRAME
-    builder.addCase(
-      getForcedToFrameGroupsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IGroup>>) => {
-        return {
-          ...state,
-          forcedToFrame: { year: action.payload[0]?.finances?.year, groups: action.payload },
-        };
-      },
-    );
-    builder.addCase(
-      getForcedToFrameGroupsThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
+    builder.addMatcher(
+      isAnyOf(
+        groupApi.endpoints.getPlanningGroups.matchRejected,
+        groupApi.endpoints.getCoordinationGroups.matchRejected,
+        groupApi.endpoints.postGroup.matchRejected,
+        groupApi.endpoints.patchGroup.matchRejected,
+        groupApi.endpoints.deleteGroup.matchRejected,
+      ),
+      (state, action) => {
+        state.error = getErrorFromRejectedAction(action);
       },
     );
   },
 });
 
-export const { updateGroup } = groupSlice.actions;
+export const { setPlanningGroups, setCoordinationGroups, setForcedToFrameGroups, updateGroup } =
+  groupSlice.actions;
 export const selectForcedToFrameGroups = (state: RootState) => state.group.forcedToFrame.groups;
 export const selectCoordinationGroups = (state: RootState) => state.group.coordination.groups;
 export const selectPlanningGroups = (state: RootState) => state.group.planning.groups;

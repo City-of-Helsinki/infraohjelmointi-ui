@@ -51,7 +51,7 @@ import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk, sortOptions } from './reducers/listsSlice';
-import { getPlanningGroupsThunk } from './reducers/groupSlice';
+import { groupApi } from './api/groupApi';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
 import type { Mocked, MockedFunction } from 'vitest';
@@ -270,9 +270,14 @@ describe('App', () => {
   it('catches a failed groups fetch', async () => {
     const { store } = await render();
 
-    mockedAxios.get.mockRejectedValueOnce(mockError);
+    mockedAxios.mockRejectedValueOnce(mockError);
 
-    await waitFor(() => store.dispatch(getPlanningGroupsThunk(new Date().getFullYear())));
+    await store.dispatch(
+      groupApi.endpoints.getPlanningGroups.initiate(new Date().getFullYear(), {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    );
 
     const storeError = store.getState().group.error as IError;
 
