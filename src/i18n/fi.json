@@ -1314,7 +1314,8 @@
       "empty": "Ei muutoshistoriaa",
       "unknownActor": "Tuntematon käyttäjä",
       "showMore": "Näytä {{count}} muuta päivitystä",
-      "showLess": "Näytä vähemmän"
+      "showLess": "Näytä vähemmän",
+      "changedTo": "muutettu arvoon"
     },
     "priority": {
       "high": "Hanke on kiireellisesti edistettävä",

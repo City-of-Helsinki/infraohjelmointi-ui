@@ -12,6 +12,23 @@ interface IProjectCellHistoryProps {
 }
 
 const DEFAULT_VISIBLE = 2;
+const EMPTY_AMOUNT = '–';
+
+/**
+ * Budget figures are audit-logged per year as stringified decimals in keur
+ * ("1250.00"); a missing side means the cell was empty before / after. Format
+ * them the way the planning table shows them (fi-FI thousands separators).
+ */
+export const formatHistoryAmount = (value: unknown): string => {
+  if (value === null || value === undefined || value === '') {
+    return EMPTY_AMOUNT;
+  }
+  const amount = Number(value);
+  if (Number.isNaN(amount)) {
+    return String(value);
+  }
+  return amount.toLocaleString('fi-FI', { maximumFractionDigits: 2 });
+};
 const POPOVER_MAX_HEIGHT = 280;
 const VIEWPORT_GAP = 8;
 
@@ -19,7 +36,8 @@ const VIEWPORT_GAP = 8;
  * IO-881: per-cell change-history popover for the planning view. Rendered on a
  * project budget cell only while change-history mode is active. On hover it
  * lazily fetches the project's audit log narrowed to this cell's year and lists
- * who edited it and when (2 latest, with a "show more" expander).
+ * who edited it, when, and how the figure changed (old → new), 2 latest with a
+ * "show more" expander.
  *
  * The popover is fixed-positioned above the cell (design default) with a
  * scrollable body so long lists stay readable without moving with the table.
@@ -98,6 +116,7 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
   const visibleEntries = expanded ? entries : entries.slice(0, DEFAULT_VISIBLE);
   const remaining = entries.length - visibleEntries.length;
   const isLoading = isFetching || isUninitialized;
+  const yearKey = String(year);
 
   const getActorName = (entry: IProjectHistoryEntry) => {
     const name = `${entry.actor_first_name ?? ''} ${entry.actor_last_name ?? ''}`.trim();
@@ -163,6 +182,19 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
                   <div key={entry.id} className="cell-history-row">
                     <span className="cell-history-actor">{getActorName(entry)}</span>
                     <span className="cell-history-date">{stringToDateTime(entry.createdDate)}</span>
+                    <span
+                      className="cell-history-change"
+                      data-testid={`cell-history-change-${entry.id}`}
+                    >
+                      <span className="cell-history-old">
+                        {formatHistoryAmount(entry.old_values?.[yearKey])}
+                      </span>
+                      <span aria-hidden="true"> → </span>
+                      <span className="sr-only">{t('tooltips.history.changedTo')}</span>
+                      <span className="cell-history-new">
+                        {formatHistoryAmount(entry.new_values?.[yearKey])}
+                      </span>
+                    </span>
                   </div>
                 ))}
               </div>

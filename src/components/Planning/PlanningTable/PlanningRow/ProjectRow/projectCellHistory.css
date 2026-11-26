@@ -49,6 +49,22 @@
   @apply text-black-60;
 }
 
+.cell-history-change {
+  @apply text-black;
+}
+
+.cell-history-old {
+  @apply text-black-60 line-through;
+}
+
+.cell-history-new {
+  @apply font-medium;
+}
+
+.cell-history-row + .cell-history-row {
+  @apply mt-2;
+}
+
 .cell-history-message {
   @apply text-black-60;
 }
