@@ -74,6 +74,7 @@ export const infraohjelmointiApi = createApi({
     'ProjectProgrammes',
     'ProjectTasks',
     'Classes',
+    'Locations',
     'Groups',
     'TalpaProjectOpening',
   ],

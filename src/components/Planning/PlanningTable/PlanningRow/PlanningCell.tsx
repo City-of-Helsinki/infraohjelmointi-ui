@@ -19,7 +19,7 @@ import { IClass, IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
-import { patchCoordinationLocation } from '@/services/locationServices';
+import { usePatchCoordinationLocationMutation } from '@/api/locationApi';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
@@ -50,6 +50,7 @@ interface IPlanningCellProps extends IPlanningRow {
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const dispatch = useAppDispatch();
   const [patchCoordinationClass] = usePatchCoordinationClassMutation();
+  const [patchCoordinationLocation] = usePatchCoordinationLocationMutation();
   const {
     plannedBudget,
     deviation,
@@ -178,11 +179,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
 
     if (type === 'district' || type === 'districtPreview' || type === 'subLevelDistrict') {
       patchCoordinationLocation(request)
+        .unwrap()
         .then((updatedLocation) => {
           if (updatedLocation) {
             updateCellState(updatedLocation);
           }
         })
+        .catch((e) => console.log('Error patching coordination location: ', e))
         .finally(() => {
           dispatch(clearLoading(UPDATE_CELL_DATA));
         });

@@ -15,7 +15,7 @@ import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
 import { classApi } from '@/api/classApi';
 import { useAppDispatch } from '@/hooks/common';
 import { groupApi } from '@/api/groupApi';
-import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
+import { locationApi } from '@/api/locationApi';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 import { listsApi } from '@/api/listsApi';
@@ -84,10 +84,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     ) as ICoordinatorClassHierarchy;
 
     // districts
-    const locationRes = await getCoordinatorLocations({
-      forcedToFrame: forcedToFrame,
-      year: year,
-    });
+    const locationRes = await dispatch(
+      locationApi.endpoints.getCoordinationLocations.initiate({ forcedToFrame, year }, FRESH_FETCH),
+    ).unwrap();
     const forcedToFrameDistricts = separateLocationsIntoHierarchy(locationRes, true);
 
     // groups
@@ -144,7 +143,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     const classHierarchy = separateClassesIntoHierarchy(classRes, false) as IClassHierarchy;
 
     // districts
-    const locationRes = await getPlanningLocations(year);
+    const locationRes = await dispatch(
+      locationApi.endpoints.getPlanningLocations.initiate(year, FRESH_FETCH),
+    ).unwrap();
     const planningDistricts = separateLocationsIntoHierarchy(locationRes, false);
 
     // groups

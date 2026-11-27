@@ -15,10 +15,11 @@ import {
 import { classApi } from './api/classApi';
 import { FRESH_FETCH } from './api/infraohjelmointiApi';
 import {
-  getCoordinationLocationsThunk,
-  getForcedToFrameLocationsThunk,
-  getPlanningLocationsThunk,
+  setCoordinationLocations,
+  setForcedToFrameLocations,
+  setPlanningLocations,
 } from './reducers/locationSlice';
+import { locationApi } from './api/locationApi';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
@@ -83,7 +84,12 @@ export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
     if (planningClasses.isSuccess) {
       dispatch(setPlanningClasses(planningClasses.data));
     }
-    await dispatch(getPlanningLocationsThunk(year));
+    const planningLocations = await dispatch(
+      locationApi.endpoints.getPlanningLocations.initiate(year, FRESH_FETCH),
+    );
+    if (planningLocations.isSuccess) {
+      dispatch(setPlanningLocations(planningLocations.data));
+    }
   } catch (e) {
     console.log('Error loading planning data: ', e);
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
@@ -115,7 +121,15 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     if (coordinationClasses.isSuccess) {
       dispatch(setCoordinationClasses(coordinationClasses.data));
     }
-    await dispatch(getCoordinationLocationsThunk(year));
+    const coordinationLocations = await dispatch(
+      locationApi.endpoints.getCoordinationLocations.initiate(
+        { forcedToFrame: false, year },
+        FRESH_FETCH,
+      ),
+    );
+    if (coordinationLocations.isSuccess) {
+      dispatch(setCoordinationLocations(coordinationLocations.data));
+    }
     const forcedToFrameGroups = await dispatch(
       groupApi.endpoints.getCoordinationGroups.initiate({ forcedToFrame: true, year }, FRESH_FETCH),
     );
@@ -131,7 +145,15 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     if (forcedToFrameClasses.isSuccess) {
       dispatch(setForcedToFrameClasses(forcedToFrameClasses.data));
     }
-    await dispatch(getForcedToFrameLocationsThunk(year));
+    const forcedToFrameLocations = await dispatch(
+      locationApi.endpoints.getCoordinationLocations.initiate(
+        { forcedToFrame: true, year },
+        FRESH_FETCH,
+      ),
+    );
+    if (forcedToFrameLocations.isSuccess) {
+      dispatch(setForcedToFrameLocations(forcedToFrameLocations.data));
+    }
   } catch (e) {
     console.log('Error loading coordination data: ', e);
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));

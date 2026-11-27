@@ -1,7 +1,8 @@
+import { locationApi } from '@/api/locationApi';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { RootState } from '@/store';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getErrorFromRejectedAction } from '@/utils/reduxErrorUtils';
+import { createSlice, isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ILocationHierarchy {
   allLocations: Array<ILocation>;
@@ -43,44 +44,10 @@ const initialState: ILocationState = {
   error: null,
 };
 
-export const getPlanningLocationsThunk = createAsyncThunk(
-  'location/getAllPlanning',
-  async (year: number, thunkAPI) => {
-    try {
-      const locations = await getPlanningLocations(year);
-      return locations;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const getCoordinationLocationsThunk = createAsyncThunk(
-  'location/getAllCoordinator',
-  async (year: number, thunkAPI) => {
-    try {
-      const locations = await getCoordinatorLocations({ forcedToFrame: false, year });
-      return locations;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const getForcedToFrameLocationsThunk = createAsyncThunk(
-  'location/getAllForcedToFrame',
-  async (year: number, thunkAPI) => {
-    try {
-      const locations = await getCoordinatorLocations({ forcedToFrame: true, year });
-      return locations;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
 const getLocationsForParent = (allLocations: Array<ILocation>, parents: Array<ILocation>) =>
-  parent ? allLocations?.filter((al) => parents.findIndex((p) => p.id === al.parent) !== -1) : [];
+  parents.length
+    ? allLocations?.filter((al) => parents.findIndex((p) => p.id === al.parent) !== -1)
+    : [];
 
 export const separateLocationsIntoHierarchy = (
   allLocations: Array<ILocation>,
@@ -105,7 +72,7 @@ export const separateLocationsIntoHierarchy = (
     allLocations,
     divisions,
     subDivisions,
-    year: allLocations[0]?.finances?.year ?? new Date().getFullYear,
+    year: allLocations[0]?.finances?.year ?? new Date().getFullYear(),
   };
 };
 
@@ -113,6 +80,18 @@ export const locationSlice = createSlice({
   name: 'locations',
   initialState,
   reducers: {
+    setPlanningLocations(state, action: PayloadAction<Array<ILocation>>) {
+      return {
+        ...state,
+        planning: separateLocationsIntoHierarchy(action.payload, false) as ILocationHierarchy,
+      };
+    },
+    setCoordinationLocations(state, action: PayloadAction<Array<ILocation>>) {
+      return { ...state, coordination: separateLocationsIntoHierarchy(action.payload, true) };
+    },
+    setForcedToFrameLocations(state, action: PayloadAction<Array<ILocation>>) {
+      return { ...state, forcedToFrame: separateLocationsIntoHierarchy(action.payload, true) };
+    },
     updateDistrict(state, action: PayloadAction<ILocationUpdatePayload>) {
       const { data, type } = action.payload;
 
@@ -122,56 +101,26 @@ export const locationSlice = createSlice({
       }
     },
   },
+  // Fulfilled results are not synced here: ReportRow fetches other years via the same endpoints.
   extraReducers: (builder) => {
-    // GET ALL PLANNING
-    builder.addCase(
-      getPlanningLocationsThunk.fulfilled,
-      (state, action: PayloadAction<Array<ILocation>>) => {
-        return {
-          ...state,
-          planning: separateLocationsIntoHierarchy(action.payload, false) as ILocationHierarchy,
-        };
-      },
-    );
-    builder.addCase(getPlanningLocationsThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // GET ALL COORDINATION
-    builder.addCase(
-      getCoordinationLocationsThunk.fulfilled,
-      (state, action: PayloadAction<Array<ILocation>>) => {
-        return {
-          ...state,
-          coordination: separateLocationsIntoHierarchy(action.payload, true),
-        };
-      },
-    );
-    builder.addCase(
-      getCoordinationLocationsThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
-    // GET ALL FORCED TO FRAME
-    builder.addCase(
-      getForcedToFrameLocationsThunk.fulfilled,
-      (state, action: PayloadAction<Array<ILocation>>) => {
-        return {
-          ...state,
-          forcedToFrame: separateLocationsIntoHierarchy(action.payload, true),
-        };
-      },
-    );
-    builder.addCase(
-      getForcedToFrameLocationsThunk.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        return { ...state, error: action.payload };
+    builder.addMatcher(
+      isAnyOf(
+        locationApi.endpoints.getPlanningLocations.matchRejected,
+        locationApi.endpoints.getCoordinationLocations.matchRejected,
+      ),
+      (state, action) => {
+        state.error = getErrorFromRejectedAction(action);
       },
     );
   },
 });
 
-export const { updateDistrict } = locationSlice.actions;
+export const {
+  setPlanningLocations,
+  setCoordinationLocations,
+  setForcedToFrameLocations,
+  updateDistrict,
+} = locationSlice.actions;
 
 export const selectPlanningDistricts = (state: RootState) => state.location.planning.districts;
 export const selectPlanningDivisions = (state: RootState) => state.location.planning.divisions;
