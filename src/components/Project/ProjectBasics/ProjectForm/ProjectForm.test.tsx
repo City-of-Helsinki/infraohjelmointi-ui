@@ -261,7 +261,7 @@ describe('projectForm', () => {
     expect(within(await findByTestId('phase')).getByRole('textbox')).toBeDisabled();
     expect(within(await findByTestId('sapProject')).getByRole('textbox')).toBeDisabled();
     expect(within(await findByTestId('sapProject')).getByRole('textbox').tagName).toBe('INPUT');
-    expect(within(await findByTestId('hkrId')).getByRole('spinbutton')).toBeDisabled();
+    expect(within(await findByTestId('hkrId')).getByRole('textbox')).toBeDisabled();
     expect(within(await findByTestId('estPlanningStart')).getByRole('button')).toBeDisabled();
     expect(within(await findByTestId('programmed')).getByRole('textbox')).toBeDisabled();
     expect(screen.queryByTestId('programmed-0')).not.toBeInTheDocument();
@@ -532,7 +532,7 @@ describe('projectForm', () => {
     await waitFor(() => expect(dialog.queryByRole('option', { name: 'hulevesi' })).toBeNull());
   });
 
-  it('can patch a NumberField', async () => {
+  it('can patch a numeric TextField', async () => {
     const project = mockProject.data;
     const expectedValue = '1234';
     const responseProject: { data: IProject } = {
@@ -548,7 +548,7 @@ describe('projectForm', () => {
 
     const formSubmitButton = await findByTestId('submit-project-button');
 
-    const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+    const hkrIdField = await findByRole('textbox', { name: getFormField('hkrId') });
 
     await user.clear(hkrIdField);
     await user.type(hkrIdField, expectedValue);
@@ -562,6 +562,23 @@ describe('projectForm', () => {
     expect(formPatchRequest.confirmedHkrId).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
+
+  it.each(['hkrId', 'planningStartYear', 'constructionEndYear'])(
+    'shows a whole number error and does not patch when %s has non-numeric characters',
+    async (fieldName) => {
+      const { user, findByRole, findByTestId } = await render();
+
+      const field = await findByRole('textbox', { name: getFormField(fieldName) });
+      await user.clear(field);
+      await user.type(field, '20a5');
+      await user.click(await findByTestId('submit-project-button'));
+
+      expect(
+        await within(await findByTestId(fieldName)).findByText('validation.wholeNumber'),
+      ).toBeInTheDocument();
+      expect(mockedAxios.patch).not.toHaveBeenCalled();
+    },
+  );
 
   it('can patch a SelectField', async () => {
     const expectedValue = {
@@ -628,7 +645,7 @@ describe('projectForm', () => {
     const estPlanningStart = await findByRole('textbox', {
       name: getFormField('estPlanningStart'),
     });
-    const planningStartYear = await findByRole('spinbutton', {
+    const planningStartYear = await findByRole('textbox', {
       name: getFormField('planningStartYear'),
     });
 
@@ -730,10 +747,10 @@ describe('projectForm', () => {
     const programmingOptions = await screen.findAllByText('programming');
     await user.click(programmingOptions[0]);
 
-    const planningStartYearField = await findByRole('spinbutton', {
+    const planningStartYearField = await findByRole('textbox', {
       name: getFormField('planningStartYear'),
     });
-    const constructionEndYearField = await findByRole('spinbutton', {
+    const constructionEndYearField = await findByRole('textbox', {
       name: getFormField('constructionEndYear'),
     });
     const programmedField = await findByTestId('programmed-0');
@@ -831,7 +848,7 @@ describe('projectForm', () => {
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+    const hkrIdField = await findByRole('textbox', { name: getFormField('hkrId') });
     const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.clear(descriptionField);
@@ -852,7 +869,7 @@ describe('projectForm', () => {
       { user, findByTestId, findByRole }: Awaited<ReturnType<typeof render>>,
       value: string,
     ) => {
-      const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+      const hkrIdField = await findByRole('textbox', { name: getFormField('hkrId') });
       await user.clear(hkrIdField);
       await user.type(hkrIdField, value);
       await setPhaseToProposalForSubmit(user, findByTestId);
@@ -873,7 +890,7 @@ describe('projectForm', () => {
 
       await waitFor(() =>
         expect(
-          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+          (rendered.getByRole('textbox', { name: getFormField('hkrId') }) as HTMLInputElement)
             .value,
         ).toBe(String(mockProject.data.hkrId)),
       );
@@ -900,7 +917,7 @@ describe('projectForm', () => {
         } as unknown as IProject,
       });
 
-      const hkrIdField = (await rendered.findByRole('spinbutton', {
+      const hkrIdField = (await rendered.findByRole('textbox', {
         name: getFormField('hkrId'),
       })) as HTMLInputElement;
       await rendered.user.clear(hkrIdField);
@@ -996,7 +1013,7 @@ describe('projectForm', () => {
       // The field shows the saved hkrId again; the toast explains the rest
       await waitFor(() =>
         expect(
-          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+          (rendered.getByRole('textbox', { name: getFormField('hkrId') }) as HTMLInputElement)
             .value,
         ).toBe(String(mockProject.data.hkrId)),
       );
@@ -1017,7 +1034,7 @@ describe('projectForm', () => {
         } as unknown as IProject,
       });
 
-      const hkrIdField = (await rendered.findByRole('spinbutton', {
+      const hkrIdField = (await rendered.findByRole('textbox', {
         name: getFormField('hkrId'),
       })) as HTMLInputElement;
       await rendered.user.clear(hkrIdField);
@@ -1070,7 +1087,7 @@ describe('projectForm', () => {
           'Testikatu 1',
         );
         await setPhaseToProposalForSubmit(user, findByTestId);
-        const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+        const hkrIdField = await findByRole('textbox', { name: getFormField('hkrId') });
         await user.clear(hkrIdField);
         await paste(hkrIdField, hkrId);
         await user.click(await findByTestId('submit-project-button'));
@@ -1112,7 +1129,7 @@ describe('projectForm', () => {
         );
         expect(mockedAxios.post).not.toHaveBeenCalled();
         expect(
-          (rendered.getByRole('spinbutton', { name: getFormField('hkrId') }) as HTMLInputElement)
+          (rendered.getByRole('textbox', { name: getFormField('hkrId') }) as HTMLInputElement)
             .value,
         ).toBe('1234');
       }, 30000);
@@ -1197,7 +1214,7 @@ describe('projectForm', () => {
 
       const { user, findByRole, findByTestId } = await render({ project });
 
-      const planningStartYearField = await findByRole('spinbutton', {
+      const planningStartYearField = await findByRole('textbox', {
         name: getFormField('planningStartYear'),
       });
       const formSubmitButton = await findByTestId('submit-project-button');
@@ -1376,7 +1393,7 @@ describe('projectForm', () => {
 
       const { user, findByRole, findByTestId } = await render({ project });
 
-      const constructionEndYearField = await findByRole('spinbutton', {
+      const constructionEndYearField = await findByRole('textbox', {
         name: getFormField('constructionEndYear'),
       });
       const formSubmitButton = await findByTestId('submit-project-button');

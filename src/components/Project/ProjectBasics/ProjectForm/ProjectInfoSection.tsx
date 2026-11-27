@@ -1,4 +1,4 @@
-import { FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
+import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { FC, memo } from 'react';
@@ -7,7 +7,12 @@ import { Control, UseFormGetValues, UseFormWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
-import { validateMaxLength, validateRequired, validateRequiredSelect } from '@/utils/validation';
+import {
+  validateMaxLength,
+  validateNumericString,
+  validateRequired,
+  validateRequiredSelect,
+} from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 
@@ -67,10 +72,11 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           />
         </div>
         <div className="form-col-xl">
-          <NumberField
+          <TextField
             {...getFieldProps('hkrId')}
-            rules={validateMaxLength(5, t)}
+            rules={{ ...validateMaxLength(5, t), ...validateNumericString(t) }}
             disabled={isInputDisabled || isUserOnlyViewer}
+            inputMode="numeric"
           />
         </div>
       </div>
