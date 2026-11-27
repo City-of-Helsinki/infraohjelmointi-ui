@@ -20,10 +20,6 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('@/services/locationServices', () => ({
-  patchCoordinationLocation: vi.fn(),
-}));
-
 vi.mock('@/hooks/useOnClickOutsideRef', () => ({ default: vi.fn() }));
 
 vi.mock('./PlanningForecastSums', () => ({ default: () => null }));

@@ -46,7 +46,7 @@ import {
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
 import { classApi } from './api/classApi';
-import { getPlanningLocationsThunk } from './reducers/locationSlice';
+import { locationApi } from './api/locationApi';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
@@ -223,9 +223,14 @@ describe('App', () => {
   it('catches a failed locations fetch', async () => {
     const { store } = await render();
 
-    mockedAxios.get.mockRejectedValueOnce(mockError);
+    mockedAxios.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getPlanningLocationsThunk(new Date().getFullYear()));
+    await store.dispatch(
+      locationApi.endpoints.getPlanningLocations.initiate(new Date().getFullYear(), {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    );
 
     const storeError = store.getState().location.error as IError;
     expect(storeError.message).toBe(mockError.message);
