@@ -1,6 +1,17 @@
 import { FC, memo, MouseEvent, useCallback, useMemo, useRef, useState } from 'react';
-import { Button, ButtonVariant, Checkbox, Pagination, Table, type TableProps } from 'hds-react';
+import {
+  Button,
+  ButtonVariant,
+  Checkbox,
+  Pagination,
+  Select,
+  Table,
+  type TableProps,
+} from 'hds-react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/hooks/common';
+import { selectProjectPhases } from '@/reducers/listsSlice';
+import { translateOption } from '@/utils/optionTranslation';
 import {
   MyWorkloadSortState,
   MyWorkloadTableProps,
@@ -30,7 +41,9 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   viewType,
 }) => {
   const { t } = useTranslation();
+  const phases = useAppSelector(selectProjectPhases);
   const [page, setPage] = useState(0);
+  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<Array<MyWorkloadTableRow>>(listOfProjects);
   const [prevListOfProjects, setPrevListOfProjects] = useState(listOfProjects);
   const [sortState, setSortState] = useState<MyWorkloadSortState>(null);
@@ -47,19 +60,31 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
     }
   }
 
+  const phaseOptions = useMemo(
+    () => phases.map((phase) => ({ value: phase.id, label: translateOption(t, phase.value) })),
+    [phases, t],
+  );
+  const filteredRows = useMemo(
+    () =>
+      selectedPhaseIds.length === 0
+        ? tableRows
+        : tableRows.filter((row) => selectedPhaseIds.includes(row.phase.id)),
+    [tableRows, selectedPhaseIds],
+  );
   const isEmpty = !isLoading && !hasError && tableRows.length === 0;
-  const hasRows = !hasError && tableRows.length > 0;
+  const hasNoMatches = !isLoading && !hasError && tableRows.length > 0 && filteredRows.length === 0;
+  const hasRows = !hasError && filteredRows.length > 0;
   const shouldRenderTable = !isLoading && !hasError && hasRows;
 
   const rowsWithGroupNames = useMemo(
     () =>
-      tableRows.map((row) => ({
+      filteredRows.map((row) => ({
         ...row,
         groupName: row.projectGroup ? (groupNames.get(row.projectGroup) ?? '') : '',
       })),
-    [tableRows, groupNames],
+    [filteredRows, groupNames],
   );
-  const dateSortValues = useMemo(() => getMyWorkloadDateSortValues(tableRows), [tableRows]);
+  const dateSortValues = useMemo(() => getMyWorkloadDateSortValues(filteredRows), [filteredRows]);
   const compareDates = useMemo(() => createMyWorkloadDateCompare(dateSortValues), [dateSortValues]);
   const comparePhases = useMemo(() => createMyWorkloadPhaseCompare(compareDates), [compareDates]);
   const sortedRows = useMemo(
@@ -75,12 +100,13 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
   );
 
   const pageCount = useMemo(() => Math.ceil(sortedRows.length / ITEMS_PER_PAGE), [sortedRows]);
+  const currentPage = Math.min(page, Math.max(0, pageCount - 1));
   const pageHref = useCallback(() => '#', []);
 
   const availableRowsList = useMemo(() => {
-    const startIndex = page * ITEMS_PER_PAGE;
+    const startIndex = currentPage * ITEMS_PER_PAGE;
     return sortedRows.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [sortedRows, page]);
+  }, [sortedRows, currentPage]);
 
   const handlePageChange = useCallback(
     (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>, selectedPage: number) => {
@@ -128,6 +154,28 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
       <h2 ref={titleRef} tabIndex={-1} className={`${classes.sectionTitle} text-heading-m`}>
         {t('myWorkloadView.myWorkload')}
       </h2>
+      {!isLoading && !hasError && (
+        <div className={classes.phaseFilter}>
+          <Select
+            id="my-workload-phase-filter"
+            multiSelect
+            clearable
+            options={phaseOptions}
+            value={selectedPhaseIds}
+            onChange={(selectedOptions = []) => {
+              setSelectedPhaseIds(selectedOptions.map((option) => option.value));
+              setPage(0);
+            }}
+            texts={{
+              label: t('myWorkloadView.table.phaseFilter'),
+              placeholder: t('myWorkloadView.table.phaseFilterPlaceholder'),
+              clearButtonAriaLabel_one: t('myWorkloadView.table.clearPhaseFilter'),
+              clearButtonAriaLabel_multiple: t('myWorkloadView.table.clearPhaseFilter'),
+              tagRemoveSelectionAriaLabel: `${t('myWorkloadView.table.removePhaseFilter')} {{label}}`,
+            }}
+          />
+        </div>
+      )}
       <div
         className={classes.resetSort}
         style={{ display: sortState && shouldRenderTable ? 'block' : 'none' }}
@@ -161,6 +209,9 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
         </>
       )}
       {isEmpty && <p className={classes.emptyStateText}>{t('myWorkloadView.table.emptyText')}</p>}
+      {hasNoMatches && (
+        <p className={classes.emptyStateText}>{t('myWorkloadView.table.noPhaseMatches')}</p>
+      )}
       {hasError && <p className={classes.emptyStateText}>{t('appDataError')}</p>}
       {hasRows && pageCount > 1 && (
         <div className="custom-pagination" data-testid="my-workload-pagination-container">
@@ -170,7 +221,7 @@ const MyWorkloadTable: FC<MyWorkloadTableProps> = ({
             onChange={handlePageChange}
             pageCount={pageCount}
             pageHref={pageHref}
-            pageIndex={page}
+            pageIndex={currentPage}
             paginationAriaLabel="My workload pagination"
             siblingCount={2}
           />

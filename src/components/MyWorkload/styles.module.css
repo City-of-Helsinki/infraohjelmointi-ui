@@ -12,6 +12,11 @@
   margin-bottom: var(--spacing-s);
 }
 
+.phaseFilter {
+  max-width: 24rem;
+  margin-bottom: var(--spacing-s);
+}
+
 .fitTableViewport {
   width: 100%;
   overflow: hidden;
