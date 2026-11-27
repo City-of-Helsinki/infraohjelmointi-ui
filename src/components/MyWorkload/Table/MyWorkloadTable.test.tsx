@@ -10,6 +10,13 @@ import MyWorkloadTable from './MyWorkloadTable';
 import type { MockInstance } from 'vitest';
 
 vi.mock('react-i18next', async () => (await import('@/mocks/mockI18next')).default());
+vi.mock('@/hooks/common', () => ({
+  useAppSelector: () => [
+    { id: 'phase-id', value: 'design' },
+    { id: 'phase-construction', value: 'construction' },
+    { id: 'phase-completed', value: 'completed' },
+  ],
+}));
 let consoleErrorSpy: MockInstance;
 
 vi.mock('./MyWorkloadEditDialog', () => ({
@@ -29,6 +36,22 @@ vi.mock('./MyWorkloadEditDialog', () => ({
         }
       >
         trigger-save
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          project &&
+          onSave({
+            ...project,
+            phase: {
+              id: 'phase-construction',
+              value: 'construction',
+              label: 'option.construction',
+            },
+          })
+        }
+      >
+        trigger-phase-save
       </button>
     </div>
   ),
@@ -387,6 +410,128 @@ describe('MyWorkloadTable', () => {
     );
 
     expect(getByText('myWorkloadView.table.emptyText')).toBeInTheDocument();
+  });
+
+  it.each<MyWorkloadViewType>(['planning', 'construction'])(
+    'filters multiple phases immediately and clears the filter in the %s view',
+    async (viewType) => {
+      const user = userEvent.setup();
+      const rows = [
+        makeRow(1),
+        {
+          ...makeRow(2),
+          phase: { id: 'phase-construction', value: 'construction', label: 'option.construction' },
+        },
+        { ...makeRow(3), phase: { id: '', value: '', label: '' } },
+      ];
+      const { getByRole, getByText, queryByText } = render(
+        <MyWorkloadTable
+          listOfProjects={rows}
+          isLoading={false}
+          hasError={false}
+          viewType={viewType}
+        />,
+      );
+
+      await user.click(getByRole('combobox', { name: /myWorkloadView.table.phaseFilter/ }));
+      expect(getByText('option.completed')).toBeInTheDocument();
+      await user.click(getByRole('option', { name: 'option.design' }));
+      expect(getByText('Project 1')).toBeInTheDocument();
+      expect(queryByText('Project 2')).not.toBeInTheDocument();
+      expect(queryByText('Project 3')).not.toBeInTheDocument();
+      await user.click(getByRole('option', { name: 'option.construction' }));
+      expect(getByText('Project 2')).toBeInTheDocument();
+      expect(queryByText('Project 3')).not.toBeInTheDocument();
+      await user.click(getByRole('button', { name: 'myWorkloadView.table.clearPhaseFilter' }));
+      expect(getByText('Project 1')).toBeInTheDocument();
+      expect(getByText('Project 2')).toBeInTheDocument();
+      expect(getByText('Project 3')).toBeInTheDocument();
+      await user.click(getByRole('combobox', { name: /myWorkloadView.table.phaseFilter/ }));
+      await user.click(getByRole('option', { name: 'option.completed' }));
+      expect(getByText('myWorkloadView.table.noPhaseMatches')).toBeInTheDocument();
+      expect(queryByText('myWorkloadView.table.emptyText')).not.toBeInTheDocument();
+      await user.click(getByRole('button', { name: 'myWorkloadView.table.clearPhaseFilter' }));
+      expect(getByText('Project 3')).toBeInTheDocument();
+    },
+  );
+
+  it('resets pagination, keeps sorting and preserves the filter when changing views', async () => {
+    const user = userEvent.setup();
+    const rows = Array.from({ length: 11 }, (_, index) => makeRow(11 - index));
+    rows[0] = {
+      ...rows[0],
+      phase: { id: 'phase-construction', value: 'construction', label: 'option.construction' },
+    };
+    const { getAllByRole, getByRole, getByTestId, getByText, queryByText, rerender } = render(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+    await user.click(getByTestId('hds-table-sorting-header-projectName'));
+    await user.click(
+      within(getByTestId('my-workload-pagination-container')).getByRole('link', { name: 'Sivu 2' }),
+    );
+    await user.click(getByRole('combobox', { name: /myWorkloadView.table.phaseFilter/ }));
+    await user.click(getByRole('option', { name: 'option.design' }));
+    expect(getByText('Project 1')).toBeInTheDocument();
+    expect(queryByText('Project 11')).not.toBeInTheDocument();
+    expect(
+      getAllByRole('row')
+        .slice(1)
+        .map((row) => within(row).getAllByRole('cell')[1].textContent),
+    ).toEqual([
+      'Project 1',
+      'Project 10',
+      'Project 2',
+      'Project 3',
+      'Project 4',
+      'Project 5',
+      'Project 6',
+      'Project 7',
+      'Project 8',
+      'Project 9',
+    ]);
+    rerender(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={true}
+        hasError={false}
+        viewType="construction"
+      />,
+    );
+    rerender(
+      <MyWorkloadTable
+        listOfProjects={rows}
+        isLoading={false}
+        hasError={false}
+        viewType="construction"
+      />,
+    );
+    expect(getByText('Project 1')).toBeInTheDocument();
+    expect(queryByText('Project 11')).not.toBeInTheDocument();
+  });
+
+  it('shows a recoverable empty result after a saved phase changes', async () => {
+    const user = userEvent.setup();
+    const { getByRole, getByText, queryByText } = render(
+      <MyWorkloadTable
+        listOfProjects={[makeRow(1)]}
+        isLoading={false}
+        hasError={false}
+        viewType="planning"
+      />,
+    );
+    await user.click(getByRole('combobox', { name: /myWorkloadView.table.phaseFilter/ }));
+    await user.click(getByRole('option', { name: 'option.design' }));
+    await user.click(getByRole('button', { name: /myWorkloadView.table.modifyInformation/i }));
+    await user.click(getByRole('button', { name: 'trigger-phase-save' }));
+    expect(queryByText('Project 1')).not.toBeInTheDocument();
+    expect(getByText('myWorkloadView.table.noPhaseMatches')).toBeInTheDocument();
+    await user.click(getByRole('button', { name: 'myWorkloadView.table.clearPhaseFilter' }));
+    expect(getByText('Project 1')).toBeInTheDocument();
   });
 
   it('renders app data error state when request fails', () => {
