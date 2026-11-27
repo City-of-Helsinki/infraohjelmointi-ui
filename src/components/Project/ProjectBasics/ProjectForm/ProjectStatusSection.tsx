@@ -1,4 +1,4 @@
-import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
+import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import { FC, memo, useMemo, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import {
@@ -16,7 +16,12 @@ import { IListItem, IOption } from '@/interfaces/common';
 import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
-import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
+import {
+  getFieldsIfEmpty,
+  validateMaxNumber,
+  validateNumericString,
+  validateRequiredSelect,
+} from '@/utils/validation';
 import { mapIconKey } from '@/utils/common';
 import {
   getProjectPhaseDetailOptions,
@@ -290,6 +295,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const validatePlanningStartYear = useMemo(
     () => ({
       ...validateMaxNumber(3000, t),
+      ...validateNumericString(t),
       validate: {
         isPlanningStartYearValid: (date: string | null) => {
           const phase = getValues('phase').value;
@@ -348,6 +354,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const validateConstructionEndYear = useCallback(
     () => ({
       ...validateMaxNumber(3000, t),
+      ...validateNumericString(t),
       validate: {
         isConstructionEndYearValid: (date: string | null) => {
           const phase = getValues('phase').value;
@@ -480,21 +487,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <NumberField
+          <TextField
             {...getFieldProps('planningStartYear')}
             rules={validatePlanningStartYear}
             required={phasesThatNeedYearBounds.includes(currentPhase)}
             disabled={isInputDisabled || isUserOnlyViewer}
+            inputMode="numeric"
           />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <NumberField
+          <TextField
             {...getFieldProps('constructionEndYear')}
             rules={validateConstructionEndYear()}
             required={phasesThatNeedYearBounds.includes(currentPhase)}
             disabled={isUserOnlyViewer || (isUserOnlyProjectManager ? false : isInputDisabled)}
+            inputMode="numeric"
           />
         </div>
       </div>

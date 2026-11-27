@@ -18,6 +18,10 @@ export const validateInteger = (t: TFunction<'translation'>) => ({
   },
 });
 
+export const validateNumericString = (t: TFunction<'translation'>) => ({
+  pattern: { value: /^\d+$/, message: t('validation.wholeNumber') },
+});
+
 export const validateRequired = (field: string, t: TFunction<'translation'>) => ({
   required: t('validation.required', { field: t(`validation.${field}`) }) ?? '',
 });
