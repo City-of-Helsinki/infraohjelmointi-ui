@@ -37,6 +37,8 @@ export interface GroupRowMenuDetails {
   groupName: string;
   onShowGroupDeleteDialog: () => void;
   onShowGroupEditDialog: () => void;
+  /** False hides the delete action, e.g. for restricted programmers (IO-756) */
+  canDelete?: boolean;
 }
 export interface IContextMenuData {
   menuType: ContextMenuType;

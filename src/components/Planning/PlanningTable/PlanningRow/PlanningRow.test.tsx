@@ -7,6 +7,7 @@ import PlanningRow from './PlanningRow';
 import { setGroupsExpanded } from '@/reducers/planningSlice';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import mockProject from '@/mocks/mockProject';
+import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { createMockUserWithAdGroups } from '@/mocks/mockUsers';
 import { IUser, UserRole } from '@/interfaces/userInterfaces';
 import * as events from '@/utils/events';
@@ -469,4 +470,121 @@ describe('Planning project phase permissions', () => {
       }
     },
   );
+});
+
+describe('Group row menu permissions (IO-756)', () => {
+  const renderGroupHead = (
+    roles: UserRole[],
+    userOverrides: Partial<IUser>,
+    classRelation: string | null,
+  ) => {
+    const initialState = setupStore().getState();
+    const store = setupStore({
+      auth: { user: createMockUserWithAdGroups(roles, userOverrides), error: null },
+      group: {
+        ...initialState.group,
+        planning: {
+          ...initialState.group.planning,
+          groups: [
+            {
+              id: mockGroup.id,
+              name: mockGroup.name,
+              location: null,
+              classRelation,
+              locationRelation: null,
+              finances: mockClassFinances,
+            },
+          ],
+        },
+      },
+    });
+    const { key, ...groupProps } = mockGroup;
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/planning']}>
+          <table>
+            <tbody>
+              <PlanningRow key={key} {...groupProps} sapCosts={{}} />
+            </tbody>
+          </table>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    return screen.getByTestId(`show-more-icon-${mockGroup.id}`);
+  };
+
+  const restricted = (classIds: string[]) => ({
+    is_restricted_programmer: true,
+    restricted_class_ids: classIds,
+  });
+
+  it.each([
+    {
+      name: 'a planner',
+      roles: [UserRole.PLANNER],
+      overrides: {},
+      classRelation: 'c',
+      disabled: false,
+    },
+    {
+      name: 'a viewer',
+      roles: [UserRole.VIEWER],
+      overrides: {},
+      classRelation: 'c',
+      disabled: true,
+    },
+    {
+      name: 'a restricted programmer in an assigned class',
+      roles: [UserRole.VIEWER],
+      overrides: restricted(['c']),
+      classRelation: 'c',
+      disabled: false,
+    },
+    {
+      name: 'a restricted programmer outside their classes',
+      roles: [UserRole.VIEWER],
+      overrides: restricted(['other']),
+      classRelation: 'c',
+      disabled: true,
+    },
+    {
+      name: 'a restricted programmer and a group without a class',
+      roles: [UserRole.VIEWER],
+      overrides: restricted(['c']),
+      classRelation: null,
+      disabled: true,
+    },
+  ])('menu disabled=$disabled for $name', ({ roles, overrides, classRelation, disabled }) => {
+    const button = renderGroupHead(roles, overrides, classRelation);
+    if (disabled) {
+      expect(button).toBeDisabled();
+    } else {
+      expect(button).toBeEnabled();
+    }
+  });
+
+  it.each([
+    { name: 'a planner', roles: [UserRole.PLANNER], overrides: {}, canDelete: true },
+    {
+      name: 'a restricted programmer',
+      roles: [UserRole.VIEWER],
+      overrides: restricted(['c']),
+      canDelete: false,
+    },
+  ])('passes canDelete=$canDelete for $name', async ({ roles, overrides, canDelete }) => {
+    const spy = vi.spyOn(events, 'dispatchContextMenuEvent').mockImplementation(() => undefined);
+    const button = renderGroupHead(roles, overrides, 'c');
+
+    await userEvent.setup().click(button);
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        groupRowMenuProps: expect.objectContaining({ canDelete }),
+      }),
+    );
+    spy.mockRestore();
+  });
 });

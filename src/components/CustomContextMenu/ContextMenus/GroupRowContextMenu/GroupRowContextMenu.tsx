@@ -11,6 +11,7 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
   onShowGroupDeleteDialog,
   onCloseMenu,
   onShowGroupEditDialog,
+  canDelete = true,
 }) => {
   const { t } = useTranslation();
 
@@ -44,14 +45,16 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
         >
           {t(`editGroup`)}
         </Button>
-        <Button
-          variant={ButtonVariant.Supplementary}
-          onClick={handleDeleteDialogOpen}
-          iconStart={undefined}
-          data-testid="open-delete-group-dialog"
-        >
-          {t(`deleteGroup`)}
-        </Button>
+        {canDelete && (
+          <Button
+            variant={ButtonVariant.Supplementary}
+            onClick={handleDeleteDialogOpen}
+            iconStart={undefined}
+            data-testid="open-delete-group-dialog"
+          >
+            {t(`deleteGroup`)}
+          </Button>
+        )}
       </div>
     </div>
   );
